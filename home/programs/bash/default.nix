@@ -25,4 +25,5 @@
         sudo = "sudo ";
         doom = "/home/bolt/.emacs.d/bin/doom";
       };
-    }
+    };
+}

@@ -3,14 +3,16 @@
 let
   unstable = import (import ./unstable.nix) {};
 
-  pkgs-wayland = import (import ./nixpkgs-wayland.nix) {};
+  url = "https://github.com/colemickens/nixpkgs-wayland/archive/master.tar.gz";
+  pkgs-wayland = import (builtins.fetchTarball url);
+
 
   unstablePkgs = [ unstable.manix ];
 
   defaultPkgs = with pkgs; [
     alloy                 # model checker
     agda                  # dependently typed programming language
-    awk                   # text processing programming language
+    gawk                   # text processing programming language
     betterlockscreen      # fast lockscreen based on i3lock
     cachix                # nix caching
     emacs                 # text editor
@@ -41,22 +43,7 @@ let
     tree                  # display files in a tree view
     vlc                   # media player
     xclip                 # clipboard support (also for neovim)
-    whoami                # who am i
     zoom-us               # video conference
-  ];
-
-  waylandPkgs = with pkgs-wayland; [
-    pkgs.firefox-wayland
-    grim
-    slurp
-    pkgs.swaylock-fancy
-    wofi
-    wlsunset
-    xdg-desktop-portal-wlr
-    wlogout
-    pkgs.brightnessctl
-    pkgs.wl-clipboard
-    waybar
   ];
 
   gitPkgs = with pkgs.gitAndTools; [
@@ -90,6 +77,7 @@ let
 in
 {
   nixpkgs.overlays = [
+    # pkgs-wayland
   ];
 
   home = {
@@ -99,7 +87,20 @@ in
 
     packages =
       defaultPkgs
-      ++ waylandPkgs
+      ++ 
+      # Wayland Packages
+      [ pkgs.firefox-wayland
+        pkgs.grim
+        pkgs.slurp
+        pkgs.pkgs.swaylock-fancy
+        pkgs.wofi
+        # pkgs.wlsunset
+        pkgs.xdg-desktop-portal-wlr
+        # pkgs.wlogout
+        pkgs.brightnessctl
+        pkgs.wl-clipboard
+        pkgs.waybar
+      ]
       ++ gitPkgs
       ++ gnomePkgs
       ++ haskellPkgs
