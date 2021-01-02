@@ -3,171 +3,146 @@
 let
   unstable = import (import ./unstable.nix) {};
 
+  pkgs-wayland = import (import ./nixpkgs-wayland.nix) {};
+
   unstablePkgs = [ unstable.manix ];
 
   defaultPkgs = with pkgs; [
-    firefox              # browser
-    act                  # run github actions locally
-    betterlockscreen     # fast lockscreen based on i3lock
-    cachix               # nix caching
-    dmenu                # application launcher
-    emacs                # text editor
-    killall              # kill processes by name
-    konsole              # terminal emulator
-    libreoffice          # office suite
-    libnotify            # notify-send command
-    ncdu                 # disk space info (a better du)
-    neofetch             # command-line system information
-    nix-doc              # nix documentation search tool
-    patchelf             # TODO
-    pavucontrol          # pulseaudio volume control
-    paprefs              # pulseaudio preferences
-    pasystray            # pulseaudio systray
-    playerctl            # music player controller
-    pulsemixer           # pulseaudio mixer
-    rnix-lsp             # nix lsp server
-    simplescreenrecorder # self-explanatory
-    slack                # messaging client
-    spotify              # music source
-    tldr                 # summary of a man page
-    tree                 # display files in a tree view
-    vlc                  # media player
-    xclip                # clipboard support (also for neovim)
-
-    # fixes the `ar` error required by cabal
-    # binutils-unwrapped
+    act                   # run github actions locally
+    agda                  # dependently typed programming language
+    betterlockscreen      # fast lockscreen based on i3lock
+    cachix                # nix caching
+    dmenu                 # application launcher
+    emacs                 # text editor
+    evince                # pdf reader
+    killall               # kill processes by name
+    konsole               # terminal emulator
+    libreoffice           # office suite
+    libnotify             # notify-send command
+    material-design-icons # icon pack
+    ncdu                  # disk space info (a better du)
+    neofetch              # command-line system information
+    nix-doc               # nix documentation search tool
+    patchelf              # dynamic linker and RPATH of ELF executables
+    pavucontrol           # pulseaudio volume control
+    paprefs               # pulseaudio preferences
+    pasystray             # pulseaudio systray
+    pcmanfm               # file manager
+    playerctl             # music player controller
+    pulsemixer            # pulseaudio mixer
+    rnix-lsp              # nix lsp server
+    simplescreenrecorder  # self-explanatory
+    slack                 # messaging client
+    spotify               # music source
+    tldr                  # summary of a man page
+    tree                  # display files in a tree view
+    vlc                   # media player
+    xclip                 # clipboard support (also for neovim)
+    zoom-us               # video conference
   ];
 
-  waylandPckgs = with pkgs; [
-    firefox-wayland
+  waylandPkgs = with pkgs-wayland; [
+    pkgs.firefox-wayland
     grim
     slurp
-    swaylock-fancy
+    pkgs.swaylock-fancy
     wofi
+    wlsunset
     xdg-desktop-portal-wlr
   ]
 
   gitPkgs = with pkgs.gitAndTools; [
+    git
   ];
 
   gnomePkgs = with pkgs.gnome3; [
-    evince         # pdf reader
     gnome-calendar # calendar
-    nautilus       # file manager
     zenity         # display dialogs
     # themes
     adwaita-icon-theme
-    pkgs.material-design-icons
   ];
 
   haskellPkgs = with pkgs.haskellPackages; [
-    ormolu                 # code formatter
+    fourmolu                # code formatter
     cabal2nix               # convert cabal projects to nix
     cabal-install           # package manager
+    stack                   # package manager
     ghc                     # compiler
     haskell-language-server # haskell IDE (ships with ghcide)
     hoogle                  # documentation
     nix-tree                # visualize nix dependencies
   ];
 
-  polybarPkgs = with pkgs; [
-    font-awesome-ttf      # awesome fonts
-    material-design-icons # fonts with glyphs
-  ];
-
-  taffybarPkgs = with unstable; [
-    pkgs.hicolor-icon-theme              # theme needed for taffybar systray
-    taffybar                             # status bar written in Haskell
-    haskellPackages.gtk-sni-tray         # gtk-sni-tray-standalone
-    haskellPackages.status-notifier-item # status-notifier-watcher for taffybar
-  ];
-
-  xmonadPkgs = with pkgs; [
-    haskellPackages.libmpd # music player daemon
-    haskellPackages.xmobar # status bar
-    networkmanager_dmenu   # networkmanager on dmenu
-    networkmanagerapplet   # networkmanager applet
-    nitrogen               # wallpaper manager
-    xcape                  # keymaps modifier
-    xorg.xkbcomp           # keymaps modifier
-    xorg.xmodmap           # keymaps modifier
-    xorg.xrandr            # display manager (X Resize and Rotate protocol)
-  ];
+  emacsPkgs = with pkgs.emacs26Packages; [
+    doom
+    doom-themes
+  ]
 
 in
 {
-  programs.home-manager.enable = true;
-
   nixpkgs.overlays = [
-    (import ./overlays/act.nix)
   ];
-
-  imports = [
-    ./programs/git/default.nix
-    ./programs/neovim/default.nix
-    ./programs/rofi/default.nix
-    ./programs/xmonad/default.nix
-    ./services/dunst/default.nix
-    ./services/gpg-agent/default.nix
-    ./services/networkmanager/default.nix
-    ./services/picom/default.nix
-    ./services/screenlocker/default.nix
-    ./services/udiskie/default.nix
-  ];
-
-  xdg.enable = true;
 
   home = {
     username      = "bolt";
     homeDirectory = "/home/bolt";
     stateVersion  = "20.09";
 
-    packages = defaultPkgs ++ gitPkgs ++ gnomePkgs ++ haskellPkgs ++ polybarPkgs ++ xmonadPkgs ++ unstablePkgs;
+    packages =
+      defaultPkgs
+      ++ waylandPkgs
+      ++ gitPkgs
+      ++ gnomePkgs
+      ++ haskellPkgs
+      ++ emacsPkgs
+      ++ unstablePkgs;
 
     sessionVariables = {
       DISPLAY = ":0";
       EDITOR = "nvim";
-    };
+      VISUAL = "nvim";
+      SSHCOPY='DISPLAY=:0.0 xsel -i -b'
+    } // (lib.optionalAttrs isLinux {
+      XDG_CURRENT_DESKTOP = "sway";
+    });
+
+    sessionPath = [
+      "/home/bolt/.local/bin"
+      "/home/bolt/.cabal/bin"
+      "/home/bolt/.cargo/bin"
+    ];
+
+    keyboard = {
+      layout = "pt-latin1";
+      options = [
+        "caps:escape"
+      ];
+    }
   };
 
-  manual = {
-    json.enable = false;
-    html.enable = false;
-    manpages.enable = false;
-  };
-
-  # notifications about home-manager news
-  news.display = "silent";
-
-  gtk = {
-    enable = true;
-    iconTheme = {
-      name = "Adwaita-dark";
-      package = pkgs.gnome3.adwaita-icon-theme;
-    };
-    theme = {
-      name = "Adwaita-dark";
-      package = pkgs.gnome3.adwaita-icon-theme;
-    };
-  };
+  imports = [
+    ./programs/git/default.nix
+    ./programs/neovim/default.nix
+    ./programs/bash/default.nix
+    ./services/networkmanager/default.nix
+  ];
 
   programs = {
-    bat.enable = true;
-
     broot = {
       enable = true;
     };
 
     direnv = {
       enable = true;
-      enableNixDirenvIntegration = true;
+      enableBashIntegration = true;
     };
 
-    fzf = {
-      enable = true;
+    git = {
     };
 
     gpg.enable = true;
+
+    home-manager.enable = true;
 
     htop = {
       enable = true;
@@ -175,7 +150,6 @@ in
       sortKey = "PERCENT_CPU";
     };
 
-    jq.enable = true;
     ssh.enable = true;
   };
 

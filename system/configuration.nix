@@ -21,15 +21,14 @@ in
       ./hardware-configuration.nix
       # Machine-specific configuration
       ./machine/thinkpadx200.nix
-      # Window manager 
-      ./wm/xmonad.nix
+      # Window manager
+      ./wm/sway.nix
     ];
 
   networking = {
     # Enables wireless support and openvpn via network manager.
     networkmanager = {
       enable   = true;
-      # packages = [ pkgs.networkmanager_openvpn ];
     };
 
     # The global useDHCP flag is deprecated, therefore explicitly set to false here.
@@ -48,11 +47,13 @@ in
   # Set your time zone.
   time.timeZone = "Europe/Lisbon";
 
+  location.provider = "geoclue2";
+
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-    neovim
-    wget
+    i3status
+    brightnessctl
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -62,6 +63,18 @@ in
     enable           = true;
     enableSSHSupport = true;
   };
+
+  programs.sway = {
+      enable = true;
+      wrapperFeatures.gtk = true;
+      extraPackages = with pkgs; [
+        swaylock
+        swayidle
+        wl-clipboard
+        mako
+        xwayland
+      ];
+    };
 
   # List services that you want to enable:
 
@@ -83,7 +96,21 @@ in
     enable = true;
     mediaKeys.enable = true;
   };
-  hardware.pulseaudio.enable = true;
+  hardware = {
+      bluetooth = {
+        enable = true;
+        config = {
+          General.Enable = lib.concatStringsSep "," [ "Source" "Sink" "Media" "Socket" ];
+        };
+      };
+      pulseaudio = {
+        enable = true;
+        package = pkgs.pulseaudioFull;
+        extraConfig = "load-module module-switch-on-connect";
+      };
+      enableRedistributableFirmware = true;
+      cpu.intel.updateMicrocode = true;
+    };
 
   # Enable the X11 windowing system.
   services = {
@@ -101,13 +128,15 @@ in
     myfonts.icomoon-feather
   ];
 
-  # programs.fish.enable = true;
-
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.bolt = {
-    isNormalUser = true;
-    extraGroups  = [ "docker" "networkmanager" "wheel" ]; # wheel for ‘sudo’.
-  };
+  users = {
+      users.bolt = {
+        isNormalUser = true;
+        home = "/home/bolt";
+        description = "Armando Santos";
+        extraGroups = [ "audio" "wheel" "networkmanager" "vboxusers" "docker" ];
+      };
+    };
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;

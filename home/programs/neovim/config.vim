@@ -4,18 +4,15 @@ filetype off
 set viewoptions=folds,options,cursor,unix,slash
 set encoding=utf-8
 
-" Relative numbers
-set relativenumber
-
 " True color support
 set termguicolors
 
 " Theme
-colorscheme material
+colorscheme gruvbox
 
 " Other options
 syntax on
-set backspace=2
+set backspace=eol
 set laststatus=2
 set noshowmode
 
@@ -36,12 +33,6 @@ function! TabToggle()
   endif
 endfunc
 
-" Clear search highlighting
-nnoremap <C-z> :nohlsearch<CR>
-
-" Terminal mode exit shortcut
-:tnoremap <Esc> <C-\><C-n>
-
 " Fixes broken cursor on Linux
 set guicursor=
 
@@ -60,7 +51,7 @@ set hidden                  " Hide files when leaving them.
 set number                  " Show line numbers.
 set numberwidth=1           " Minimum line number column width.
 set cmdheight=2             " Number of screen lines to use for the commandline.
-set textwidth=0             " Lines length limit (0 if no limit).
+set textwidth=90            " Lines length limit (0 if no limit).
 set formatoptions=jtcrq     " Sensible default line auto cutting and formatting.
 set linebreak               " Don't cut lines in the middle of a word .
 set showmatch               " Shows matching parenthesis.
@@ -68,10 +59,18 @@ set matchtime=2             " Time during which the matching parenthesis is show
 set listchars=tab:▸\ ,eol:¬ " Invisible characters representation when :set list.
 set clipboard=unnamedplus   " Copy/Paste to/from clipboard
 set cursorline              " Highlight line cursor is currently on
-set completeopt+=noinsert   " Select the first item of popup menu automatically without inserting it
+set completeopt+=longest   " Select the first item of popup menu automatically without inserting it
+set lazyredraw
+set magic
+set mat=2
+set smarttab
+set smartindent
+set history=10000
+set mouse=a
 
 " Search
 set incsearch  " Incremental search.
+set hlsearch
 set ignorecase " Case insensitive.
 set smartcase  " Case insensitive if no uppercase letter in pattern, case sensitive otherwise.
 set nowrapscan " Don't go back to first match after the last match is found.
@@ -89,40 +88,14 @@ au BufNewFile,BufRead *.md set spell
 nnoremap Q <Nop>
 nnoremap gQ <Nop>
 
-" Disable arrow keys and page up / down
-noremap <Up> <nop>
-noremap <Down> <nop>
-noremap <Left> <nop>
-noremap <Right> <nop>
-inoremap <Up> <nop>
-inoremap <Down> <nop>
-inoremap <Left> <nop>
-inoremap <Right> <nop>
-vnoremap <Up> <nop>
-vnoremap <Down> <nop>
-vnoremap <Left> <nop>
-vnoremap <Right> <nop>
-noremap <PageUp> <nop>
-inoremap <PageUp> <nop>
-vnoremap <PageUp> <nop>
-noremap <PageDown> <nop>
-inoremap <PageDown> <nop>
-vnoremap <PageDown> <nop>
-
-" Disable mouse / touchpad (only in vim)
-set mouse=nicr
-inoremap <ScrollWheelUp> <nop>
-inoremap <S-ScrollWheelUp> <nop>
-inoremap <C-ScrollWheelUp> <nop>
-inoremap <ScrollWheelDown> <nop>
-inoremap <S-ScrollWheelDown> <nop>
-inoremap <C-ScrollWheelDown> <nop>
-inoremap <ScrollWheelLeft> <nop>
-inoremap <S-ScrollWheelLeft> <nop>
-inoremap <C-ScrollWheelLeft> <nop>
-inoremap <ScrollWheelRight> <nop>
-inoremap <S-ScrollWheelRight> <nop>
-inoremap <C-ScrollWheelRight> <nop>
+" Return to last edit position when opening files (You want this!)
+augroup last_edit
+  autocmd!
+  autocmd BufReadPost *
+       \ if line("'\"") > 0 && line("'\"") <= line("$") |
+       \   exe "normal! g`\"" |
+       \ endif
+augroup END
 
 " close quickfix window
 nnoremap <Esc> :cclose<CR>
@@ -130,11 +103,10 @@ nnoremap <Esc> :cclose<CR>
 " Clear search highlighting
 nnoremap <C-z> :nohlsearch<CR>
 
-" Terminal mode exit shortcut
-:tnoremap <Esc> <C-\><C-n>
+" No annoying sound on errors
+set noerrorbells
+set vb t_vb=
 
-" Incremental substitution
-set inccommand=split
-
-" Disable background (let picom manage it)
-hi Normal guibg=NONE ctermbg=NONE
+set wildignore+=*\\tmp\\*,*.swp,*.swo,*.zip,.git,.cabal-sandbox
+set wildmode=list:longest,full
+set wildmenu

@@ -1,84 +1,137 @@
-" shows list of yanked text (coc-yank plugin)
-nnoremap <silent> <space>y  :<C-u>CocList -A --normal yank<cr>
+set laststatus=2
+let g:airline_powerline_fonts = 1
+let g:airline_theme='base16'
 
-" ripgrep smartcase (search with case insensitive)
-let g:rg_command = 'rg --vimgrep -S'
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
 
-" search work under cursor with CtrlSF (it uses ripgrep as the engine)
-nmap <silent> <M-f> <Plug>CtrlSFCwordPath <CR>
+let g:airline#extensions#coc#enabled = 1
+let g:airline#extensions#tabline#enabled = 1
 
-" open quickfix windows when running AsyncRun
-let g:asyncrun_open = 8
+"Tabs
+nmap <A-1> <Plug>AirlineSelectTab1
+nmap <A-2> <Plug>AirlineSelectTab2
+nmap <A-3> <Plug>AirlineSelectTab3
+nmap <A-4> <Plug>AirlineSelectTab4
+nmap <A-5> <Plug>AirlineSelectTab5
+nmap <A-6> <Plug>AirlineSelectTab6
+nmap <A-7> <Plug>AirlineSelectTab7
+nmap <A-8> <Plug>AirlineSelectTab8
+nmap <A-9> <Plug>AirlineSelectTab9
+nmap <C-N> <Plug>AirlineSelectPrevTab
+nmap <C-P> <Plug>AirlineSelectNextTab
 
-" airline: status bar at the bottom
-let g:airline_powerline_fonts=1
+" Markdown
 
-let g:airline_section_error = '%{airline#util#wrap(airline#extensions#coc#get_error(),0)}'
-let g:airline_section_warning = '%{airline#util#wrap(airline#extensions#coc#get_warning(),0)}'
+" disable header folding
+let g:vim_markdown_folding_disabled = 1
+
+" do not use conceal feature, the implementation is not so good
+let g:vim_markdown_conceal = 0
+
+" disable math tex conceal feature
+let g:tex_conceal = ""
+let g:vim_markdown_math = 1
+
+" support front matter of various format
+let g:vim_markdown_frontmatter = 1  " for YAML format
+let g:vim_markdown_toml_frontmatter = 1  " for TOML format
+let g:vim_markdown_json_frontmatter = 1  " for JSON format
+
+augroup pandoc_syntax
+    au! BufNewFile,BufFilePre,BufRead *.md set filetype=markdown.pandoc
+augroup END
+
+" Intellij Vim disable beep sound
+:set visualbell
+
+"Idris2
+"<LocalLeader>r reload file
+"<LocalLeader>t show type
+"<LocalLeader>a Create an initial clause for a type declaration.
+"<LocalLeader>c case split
+"<LocalLeader>mc make case
+"<LocalLeader>w add with clause
+"<LocalLeader>e evaluate expression
+"<LocalLeader>l make lemma
+"<LocalLeader>m add missing clause
+"<LocalLeader>f refine item
+"<LocalLeader>o obvious proof search
+"<LocalLeader>s proof search
+"<LocalLeader>i open idris response window
+"<LocalLeader>d show documentation
+
+" Conceal
+let g:haskell_conceal_wide = 1
+let g:haskell_conceal_enumerations = 0
+let hscoptions="𝐒𝐓𝐄𝐌xRtB𝔻wNrlCchfDZQBI-A↱"
+
+"TABULAR
+let g:haskell_tabular = 1
+vmap a= :Tabularize /=<CR>
+vmap a; :Tabularize /::<CR>
+vmap a- :Tabularize /-><CR>
+vmap a\| :Tabularize /\|<CR>
+vmap a, :Tabularize /,<CR>
+
+" Haskell-vim
+let g:haskell_enable_quantification = 1   " to enable highlighting of `forall`
+let g:haskell_enable_recursivedo = 1      " to enable highlighting of `mdo` and `rec`
+let g:haskell_enable_arrowsyntax = 1      " to enable highlighting of `proc`
+let g:haskell_enable_pattern_synonyms = 1 " to enable highlighting of `pattern`
+let g:haskell_enable_typeroles = 1        " to enable highlighting of type roles
+let g:haskell_enable_static_pointers = 1  " to enable highlighting of `static`
+let g:haskell_backpack = 1                " to enable highlighting of backpack keywords
+let g:haskell_indent_if = 3
+let g:haskell_indent_case = 2
+let g:haskell_indent_let = 4
+let g:haskell_indent_where = 2
+let g:haskell_indent_before_where = 2
+let g:haskell_classic_highlighting = 0
+let g:haskell_indent_do = 3
+let g:haskell_indent_in = 1
+let g:haskell_indent_guard = 2
+let g:haskell_indent_case_alternative = 1
+let g:haskellmode_completion_ghc = 0
+
+" Disable hlint-refactor-vim's default keybindings
+let g:hlintRefactor#disableDefaultKeybindings = 1
+
+" hlint-refactor-vim keybindings
+map <silent> <leader>hr :call ApplyOneSuggestion()<CR>
+map <silent> <leader>hR :call ApplyAllSuggestions()<CR>
+
+" Rainbow colored parentheses
+let g:rainbow_active = 1
+let g:rainbow#max_level = 16
+let g:rainbow#pairs = [['(', ')'], ['[', ']']]
+let g:rainbow#colors = {
+\   'dark': [
+\     ['yellow',  'orange1'     ],
+\     ['green',   'yellow1'     ],
+\     ['cyan',    'greenyellow' ],
+\     ['magenta', 'green1'      ],
+\     ['red',     'springgreen1'],
+\     ['yellow',  'cyan1'       ],
+\     ['green',   'slateblue1'  ],
+\     ['cyan',    'magenta1'    ],
+\     ['magenta', 'purple1'     ]
+\   ] }
+
+nnoremap <leader>f :CtrlP<CR>
 
 " Highlighting for jsonc filetype
 autocmd FileType json syntax match Comment +\/\/.\+$+
-
-" EasyMotion search with highlighting
-map  / <Plug>(easymotion-sn)
-omap / <Plug>(easymotion-tn)
 
 " Hoogle config
 let g:hoogle_search_count = 20
 au BufNewFile,BufRead *.hs map <silent> <F1> :Hoogle<CR>
 au BufNewFile,BufRead *.hs map <silent> <C-c> :HoogleClose<CR>
 
-" Nerdtree
-map <C-F> :NERDTreeToggle<CR>
-map <C-S> :NERDTreeFind<CR>
-
-let g:NERDTreeDirArrowExpandable = '▸'
-let g:NERDTreeDirArrowCollapsible = '▾'
-
-let g:NERDTreeMinimalUI = 1
-let g:NERDTreeDirArrows = 1
-
-" Nerd commenter
-filetype plugin on
-
-" Nerdtree git plugin symbols
-let g:NERDTreeGitStatusIndicatorMapCustom = {
-    \ "Modified"  : "ᵐ",
-    \ "Staged"    : "ˢ",
-    \ "Untracked" : "ᵘ",
-    \ "Renamed"   : "ʳ",
-    \ "Unmerged"  : "ᶴ",
-    \ "Deleted"   : "ˣ",
-    \ "Dirty"     : "˜",
-    \ "Clean"     : "ᵅ",
-    \ "Unknown"   : "?"
-    \ }
-
-" Start interactive EasyAlign in visual mode (e.g. vipga)
-xmap ga <Plug>(EasyAlign)
-
-" Start interactive EasyAlign for a motion/text object (e.g. gaip)
-nmap ga <Plug>(EasyAlign)
-
-" Fuzzy finder shortcut
-nnoremap <C-p> :FZF<CR>
-
-command! -bang -nargs=* Rg
-  \ call fzf#vim#grep(
-  \   'rg --column --line-number --no-heading --color=always --smart-case '.shellescape(<q-args>), 1,
-  \   fzf#vim#with_preview(), <bang>0)
-
-command! -bang -nargs=? -complete=dir Files
-    \ call fzf#vim#files(<q-args>, fzf#vim#with_preview(), <bang>0)
-
-" vim-scala
-au BufRead,BufNewFile *.sbt set filetype=scala
-
-" Theme material-vim
-"let g:material_theme_style = 'default' | 'palenight' | 'ocean' | 'lighter' | 'darker' | 'default-community' | 'palenight-community' | 'ocean-community' | 'lighter-community' | 'darker-community'
-let g:material_theme_style = 'ocean-community'
-let g:lightline = { 'colorscheme': 'material_vim' }
-
-" FZF Hoogle
-let g:hoogle_fzf_cache_file = '~/.cache/fzf-hoogle/cache.json'
 nnoremap <leader>h :Hoogle <CR>
+
+" SUMMARY
+" a= -> Align on equal sign
+" a- -> Align on case match
+" a; -> Align on :: match
