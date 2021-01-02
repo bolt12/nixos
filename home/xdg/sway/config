@@ -9,7 +9,7 @@ set $mod Mod4
 # Floating windows
 for_window [app_id="plasmashell"] floating enable;
 for_window [app_id="Plasma"] floating enable; border none
-for_window [app_id="plasmashell" window_type="notification"] floating enable 
+for_window [app_id="plasmashell" window_type="notification"] floating enable
 no_focus [app_id="plasmashell" window_type="notification"] floating enable
 for_window [title="Wine"] floating enable
 for_window [title="Skype"] floating enable
@@ -165,7 +165,7 @@ bindsym $mod+d exec wofi
 bindsym $mod+n exec flash_window
 
 # lock screen
-bindsym $mod+shift+x exec mantablockscreen
+bindsym $mod+shift+x exec betterlockscreen
 
 # volume control
 bindsym XF86AudioRaiseVolume exec "amixer -q sset Master,0 5+ unmute"

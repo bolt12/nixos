@@ -103,6 +103,9 @@ in
 
     # Enable CUPS to print documents.
     printing.enable = true;
+
+    # Enable compton
+    compton.enable = true;
   };
 
   # Making fonts accessible to applications.
@@ -117,7 +120,7 @@ in
         isNormalUser = true;
         home = "/home/bolt";
         description = "Armando Santos";
-        extraGroups = [ "audio" "wheel" "networkmanager" "vboxusers" "docker" ];
+        extraGroups = [ "audio" "wheel" "networkmanager" "docker" ];
       };
     };
 

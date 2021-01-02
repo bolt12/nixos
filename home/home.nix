@@ -8,19 +8,22 @@ let
   unstablePkgs = [ unstable.manix ];
 
   defaultPkgs = with pkgs; [
+    alloy                 # model checker
     agda                  # dependently typed programming language
     awk                   # text processing programming language
     betterlockscreen      # fast lockscreen based on i3lock
     cachix                # nix caching
     emacs                 # text editor
     evince                # pdf reader
+    flashfocus            # focus wm
     killall               # kill processes by name
     konsole               # terminal emulator
     libreoffice           # office suite
-    material-design-icons # icon pack
     ncdu                  # disk space info (a better du)
     neofetch              # command-line system information
+    networkmanagerapplet  # nm-applet
     nix-doc               # nix documentation search tool
+    pamixer               # pulseaudio cli mixer
     patchelf              # dynamic linker and RPATH of ELF executables
     pavucontrol           # pulseaudio volume control
     paprefs               # pulseaudio preferences
@@ -50,7 +53,11 @@ let
     wofi
     wlsunset
     xdg-desktop-portal-wlr
-  ]
+    wlogout
+    pkgs.brightnessctl
+    pkgs.wl-clipboard
+    waybar
+  ];
 
   gitPkgs = with pkgs.gitAndTools; [
     git
@@ -62,8 +69,6 @@ let
     gnome-weather
     gnome-calendar # calendar
     zenity         # display dialogs
-    # themes
-    adwaita-icon-theme
   ];
 
   haskellPkgs = with pkgs.haskellPackages; [
@@ -80,7 +85,7 @@ let
   emacsPkgs = with pkgs.emacs26Packages; [
     doom
     doom-themes
-  ]
+  ];
 
 in
 {
@@ -105,7 +110,7 @@ in
       DISPLAY = ":0";
       EDITOR = "nvim";
       VISUAL = "nvim";
-      SSHCOPY='DISPLAY=:0.0 xsel -i -b'
+      SSHCOPY="DISPLAY=:0.0 xsel -i -b";
     } // (lib.optionalAttrs isLinux {
       XDG_CURRENT_DESKTOP = "sway";
     });
@@ -117,17 +122,18 @@ in
     ];
 
     keyboard = {
-      layout = "pt-latin1";
+      layout = "pt";
       options = [
         "caps:escape"
       ];
-    }
+    };
   };
 
   imports = [
     ./programs/git/default.nix
     ./programs/neovim/default.nix
     ./programs/bash/default.nix
+    ./programs/waybar/default.nix
     ./services/networkmanager/default.nix
     ./xdg/sway.nix
   ];

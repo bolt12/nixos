@@ -1,6 +1,5 @@
-{ pkgs, config, ... }:
 {
-  programs.waybar.enable = true;
-  xdg.configFile."waybar/config".source = "./config";
-
+  programs.waybar = {
+    enable = true;
+  };
 }
