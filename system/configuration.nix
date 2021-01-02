@@ -41,6 +41,10 @@ in
 
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
+  console = {
+    font = "Lat2-Terminus16";
+    keyMap = "pt-latin1";
+  };
 
   # Set your time zone.
   time.timeZone = "Europe/Lisbon";
@@ -50,6 +54,7 @@ in
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
+   vim git
   ];
 
   # Some programs need SUID wrappers, can be configured further or are

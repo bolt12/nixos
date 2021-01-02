@@ -111,9 +111,7 @@ in
       EDITOR = "nvim";
       VISUAL = "nvim";
       SSHCOPY="DISPLAY=:0.0 xsel -i -b";
-    } // (lib.optionalAttrs isLinux {
-      XDG_CURRENT_DESKTOP = "sway";
-    });
+    };
 
     sessionPath = [
       "/home/bolt/.local/bin"
@@ -135,7 +133,7 @@ in
     ./programs/bash/default.nix
     ./programs/waybar/default.nix
     ./services/networkmanager/default.nix
-    ./xdg/sway.nix
+    ./xdg/sway/default.nix
   ];
 
   programs = {

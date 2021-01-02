@@ -11,17 +11,16 @@ export PINNED_NIX_PKGS="https://github.com/NixOS/nixpkgs/archive/20.09.tar.gz"
 
 # Nix configuration
 sudo cp system/configuration.nix /etc/nixos/
-sudo cp -r system/fonts/ /etc/nixos/
 sudo cp -r system/machine/ /etc/nixos/
 sudo cp -r system/wm/ /etc/nixos/
 sudo nixos-rebuild -I nixpkgs=$PINNED_NIX_PKGS switch --upgrade
 
 # Manual steps
-mkdir -p $HOME/.config/polybar/logs
-touch $HOME/.config/polybar/logs/bottom.log
-touch $HOME/.config/polybar/logs/top.log
-mkdir -p $HOME/.cache/fzf-hoogle
-touch $HOME/.cache/fzf-hoogle/cache.json
+# mkdir -p $HOME/.config/polybar/logs
+# touch $HOME/.config/polybar/logs/bottom.log
+# touch $HOME/.config/polybar/logs/top.log
+# mkdir -p $HOME/.cache/fzf-hoogle
+# touch $HOME/.cache/fzf-hoogle/cache.json
 
 # Home manager
 mkdir -p $HOME/.config/nixpkgs/
@@ -31,7 +30,7 @@ nix-channel --update
 export NIX_PATH=$HOME/.nix-defexpr/channels${NIX_PATH:+:}$NIX_PATH
 nix-shell '<home-manager>' -A install
 cp home/nixos.png $HOME/Pictures/
-home-manager switch
+home-manager --show-trace switch
 
 # Set screenlock wallpaper
 betterlockscreen -u home/nixos.png
