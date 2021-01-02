@@ -8,17 +8,14 @@ let
   unstablePkgs = [ unstable.manix ];
 
   defaultPkgs = with pkgs; [
-    act                   # run github actions locally
     agda                  # dependently typed programming language
     betterlockscreen      # fast lockscreen based on i3lock
     cachix                # nix caching
-    dmenu                 # application launcher
     emacs                 # text editor
     evince                # pdf reader
     killall               # kill processes by name
     konsole               # terminal emulator
     libreoffice           # office suite
-    libnotify             # notify-send command
     material-design-icons # icon pack
     ncdu                  # disk space info (a better du)
     neofetch              # command-line system information
@@ -125,19 +122,14 @@ in
     ./programs/neovim/default.nix
     ./programs/bash/default.nix
     ./services/networkmanager/default.nix
+    ./xdg/sway.nix
   ];
 
   programs = {
-    broot = {
-      enable = true;
-    };
 
     direnv = {
       enable = true;
       enableBashIntegration = true;
-    };
-
-    git = {
     };
 
     gpg.enable = true;

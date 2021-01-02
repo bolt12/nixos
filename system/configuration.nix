@@ -8,11 +8,9 @@ let
   customFonts = pkgs.nerdfonts.override {
     fonts = [
       "JetBrainsMono"
-      "Iosevka"
     ];
   };
 
-  myfonts = pkgs.callPackage fonts/default.nix { inherit pkgs; };
 in
 {
   imports =
@@ -52,8 +50,6 @@ in
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-    i3status
-    brightnessctl
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -63,18 +59,6 @@ in
     enable           = true;
     enableSSHSupport = true;
   };
-
-  programs.sway = {
-      enable = true;
-      wrapperFeatures.gtk = true;
-      extraPackages = with pkgs; [
-        swaylock
-        swayidle
-        wl-clipboard
-        mako
-        xwayland
-      ];
-    };
 
   # List services that you want to enable:
 
@@ -125,7 +109,6 @@ in
   fonts.fonts = with pkgs; [
     customFonts
     font-awesome-ttf
-    myfonts.icomoon-feather
   ];
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
