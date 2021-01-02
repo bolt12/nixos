@@ -9,6 +9,7 @@ let
 
   defaultPkgs = with pkgs; [
     agda                  # dependently typed programming language
+    awk                   # text processing programming language
     betterlockscreen      # fast lockscreen based on i3lock
     cachix                # nix caching
     emacs                 # text editor
@@ -26,7 +27,9 @@ let
     pasystray             # pulseaudio systray
     pcmanfm               # file manager
     playerctl             # music player controller
+    psensor               # hardware monitoring
     pulsemixer            # pulseaudio mixer
+    python3               # python3 programming language
     rnix-lsp              # nix lsp server
     simplescreenrecorder  # self-explanatory
     slack                 # messaging client
@@ -35,6 +38,7 @@ let
     tree                  # display files in a tree view
     vlc                   # media player
     xclip                 # clipboard support (also for neovim)
+    whoami                # who am i
     zoom-us               # video conference
   ];
 
@@ -53,6 +57,9 @@ let
   ];
 
   gnomePkgs = with pkgs.gnome3; [
+    gnome-power-manager
+    gnome-control-center
+    gnome-weather
     gnome-calendar # calendar
     zenity         # display dialogs
     # themes
