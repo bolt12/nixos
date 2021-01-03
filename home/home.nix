@@ -134,6 +134,7 @@ in
     ./programs/neovim/default.nix
     ./programs/bash/default.nix
     ./programs/waybar/default.nix
+    ./programs/wofi/default.nix
     ./services/networkmanager/default.nix
     ./xdg/sway/default.nix
   ];
@@ -156,10 +157,6 @@ in
     };
 
     ssh.enable = true;
-  };
-
-  services = {
-    flameshot.enable = true;
   };
 
 }

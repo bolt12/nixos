@@ -118,13 +118,14 @@ in
     fonts = [
       customFonts
       pkgs.font-awesome-ttf
+      pkgs.ubuntu_font_family
     ];
     fontconfig = {
-      defaultFonst = {
+      defaultFonts = {
         serif = [ "Ubuntu" ];
         sansSerif = [ "Ubuntu" ];
         monospace = [ "JetBrainsMono" ];
-      }
+      };
     };
   };
 
