@@ -62,7 +62,7 @@ in
   # programs.mtr.enable = true;
   programs.gnupg.agent = {
     enable           = true;
-    enableSSHSupport = true;
+    # enableSSHSupport = true;
   };
 
   # List services that you want to enable:
@@ -115,12 +115,14 @@ in
 
   # Making fonts accessible to applications.
   fonts = {
+    enableDefaultFonts = true;
     fonts = [
       customFonts
       pkgs.font-awesome-ttf
       pkgs.ubuntu_font_family
     ];
     fontconfig = {
+      enable = true;
       defaultFonts = {
         serif = [ "Ubuntu" ];
         sansSerif = [ "Ubuntu" ];

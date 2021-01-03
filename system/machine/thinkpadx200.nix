@@ -13,10 +13,13 @@
     cleanTmpDir = true;
   };
 
+  powerManagement.enable = true;
   powerManagement.powertop.enable = true;
 
   services = {
     tlp.enable = true;
+    blueman.enable = true;
+    flameshot.enable = true;
   };
 
   networking = {

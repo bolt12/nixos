@@ -205,6 +205,7 @@ input "type:keyboard" {
 output "*" bg ~/Documents/background.png fill
 exec compton
 exec_always flashfocus
+exec_always import-gsettings
 
 # nm-applet
 exec_always nm-applet --indicator

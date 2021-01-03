@@ -11,12 +11,13 @@ let
   defaultPkgs = with pkgs; [
     alloy                   # model checker
     agda                    # dependently typed programming language
-    gawk                    # text processing programming language
     betterlockscreen        # fast lockscreen based on i3lock
+    blueman                 # bluetooth applet
     cachix                  # nix caching
     emacs                   # text editor
     evince                  # pdf reader
     flashfocus              # focus wm
+    gawk                    # text processing programming language
     killall                 # kill processes by name
     konsole                 # terminal emulator
     libreoffice             # office suite
