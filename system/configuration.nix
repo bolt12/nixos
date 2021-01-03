@@ -62,7 +62,7 @@ in
   # programs.mtr.enable = true;
   programs.gnupg.agent = {
     enable           = true;
-    enableSSHSupport = true;
+    # enableSSHSupport = true;
   };
 
   # List services that you want to enable:

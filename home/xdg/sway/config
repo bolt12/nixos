@@ -165,7 +165,7 @@ bindsym $mod+d exec wofi
 bindsym $mod+n exec flash_window
 
 # lock screen
-bindsym $mod+shift+x exec betterlockscreen
+bindsym $mod+shift+x exec "betterlockscreen -l"
 
 # volume control
 bindsym XF86AudioRaiseVolume exec "amixer -q sset Master,0 5+ unmute"
