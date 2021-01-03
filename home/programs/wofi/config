@@ -1,0 +1,11 @@
+width=400
+height=400
+mode=drun
+filter_rate=100
+term=konsole
+allow_markup=true
+allow_images=true
+prompt=Search
+hide_scroll=true
+insensitive=true
+no_actions=true
