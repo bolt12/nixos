@@ -6,7 +6,6 @@ let
   url = "https://github.com/colemickens/nixpkgs-wayland/archive/master.tar.gz";
   pkgs-wayland = import (builtins.fetchTarball url);
 
-
   unstablePkgs = [ unstable.manix ];
 
   defaultPkgs = with pkgs; [
@@ -87,7 +86,7 @@ in
 
     packages =
       defaultPkgs
-      ++ 
+      ++
       # Wayland Packages
       [ pkgs.firefox-wayland
         pkgs.grim

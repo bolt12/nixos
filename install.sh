@@ -16,11 +16,7 @@ sudo cp -r system/wm/ /etc/nixos/
 sudo nixos-rebuild -I nixpkgs=$PINNED_NIX_PKGS switch --upgrade
 
 # Manual steps
-# mkdir -p $HOME/.config/polybar/logs
-# touch $HOME/.config/polybar/logs/bottom.log
-# touch $HOME/.config/polybar/logs/top.log
-# mkdir -p $HOME/.cache/fzf-hoogle
-# touch $HOME/.cache/fzf-hoogle/cache.json
+mkdir -p $HOME/Documents
 
 # Home manager
 mkdir -p $HOME/.config/nixpkgs/
@@ -29,8 +25,8 @@ nix-channel --add https://github.com/rycee/home-manager/archive/release-20.09.ta
 nix-channel --update
 export NIX_PATH=$HOME/.nix-defexpr/channels${NIX_PATH:+:}$NIX_PATH
 nix-shell '<home-manager>' -A install
-cp home/nixos.png $HOME/Pictures/
+cp home/background.png $HOME/Documents/
 home-manager --show-trace switch
 
 # Set screenlock wallpaper
-betterlockscreen -u home/nixos.png
+betterlockscreen -u home/background.png

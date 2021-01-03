@@ -26,7 +26,7 @@ in
   networking = {
     # Enables wireless support and openvpn via network manager.
     networkmanager = {
-      enable   = true;
+      enable = true;
     };
 
     # The global useDHCP flag is deprecated, therefore explicitly set to false here.

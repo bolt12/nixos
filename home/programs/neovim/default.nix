@@ -17,6 +17,7 @@ let
     rainbow_parentheses-vim # for nested parentheses
     colorizer               # colors
     vim-surround            # quickly edit surroundings (brackets, html tags, etc)
+    gruvbox                 # color theme
     coc-nvim                # TODO
     haskell-vim             # TODO
     vim2hs                  # TODO

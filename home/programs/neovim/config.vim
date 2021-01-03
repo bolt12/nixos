@@ -12,7 +12,6 @@ colorscheme gruvbox
 
 " Other options
 syntax on
-set backspace=eol
 set laststatus=2
 set noshowmode
 
