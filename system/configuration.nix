@@ -97,6 +97,7 @@ in
         package = pkgs.pulseaudioFull;
         extraConfig = "load-module module-switch-on-connect";
       };
+      opengl.enable = true;
       enableRedistributableFirmware = true;
       cpu.intel.updateMicrocode = true;
     };
@@ -143,7 +144,6 @@ in
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
-  nixpkgs.config.pulseaudio = true;
 
   # Nix daemon config
   nix = {
