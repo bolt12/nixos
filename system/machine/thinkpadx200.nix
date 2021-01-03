@@ -19,6 +19,11 @@
   services = {
     tlp.enable = true;
     blueman.enable = true;
+    batteryNotifier = {
+      enable = true;
+      notifyCapacity = 10;
+      suspendCapacity = 5;
+    };
   };
 
   networking = {

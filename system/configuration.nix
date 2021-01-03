@@ -143,6 +143,7 @@ in
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
+  nixpkgs.config.pulseaudio = true;
 
   # Nix daemon config
   nix = {

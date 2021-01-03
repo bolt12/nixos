@@ -141,6 +141,7 @@ in
     ./programs/waybar/default.nix
     ./programs/wofi/default.nix
     ./services/networkmanager/default.nix
+    ./services/redshift/default.nix
     ./xdg/sway/default.nix
   ];
 
