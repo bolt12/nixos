@@ -121,7 +121,7 @@ in
       pkgs.ubuntu_font_family
     ];
     fontconfig = {
-      defaultFonst = {
+      defaultFonts = {
         serif = [ "Ubuntu" ];
         sansSerif = [ "Ubuntu" ];
         monospace = [ "JetBrainsMono" ];
