@@ -12,6 +12,7 @@ let
     alloy                   # model checker
     agda                    # dependently typed programming language
     bash                    # bash
+    bc                      # gnu calculator
     betterlockscreen        # fast lockscreen based on i3lock
     blueman                 # bluetooth applet
     cachix                  # nix caching
@@ -19,6 +20,7 @@ let
     evince                  # pdf reader
     flashfocus              # focus wm
     gawk                    # text processing programming language
+    jq                      # JSON processor
     killall                 # kill processes by name
     konsole                 # terminal emulator
     libreoffice             # office suite
