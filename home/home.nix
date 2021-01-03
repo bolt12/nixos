@@ -51,6 +51,7 @@ let
     tree                     # display files in a tree view
     vlc                      # media player
     xclip                    # clipboard support (also for neovim)
+    xsettingsd               # theming
     zoom-us                  # video conference
   ];
 
