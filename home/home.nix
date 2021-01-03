@@ -9,47 +9,48 @@ let
   unstablePkgs = [ unstable.manix ];
 
   defaultPkgs = with pkgs; [
-    alloy                   # model checker
-    agda                    # dependently typed programming language
-    bash                    # bash
-    bc                      # gnu calculator
-    betterlockscreen        # fast lockscreen based on i3lock
-    blueman                 # bluetooth applet
-    cachix                  # nix caching
-    emacs                   # text editor
-    evince                  # pdf reader
-    flashfocus              # focus wm
-    gawk                    # text processing programming language
-    jq                      # JSON processor
-    killall                 # kill processes by name
-    konsole                 # terminal emulator
-    libreoffice             # office suite
-    lxappearance            # edit themes
-    ncdu                    # disk space info (a better du)
-    neofetch                # command-line system information
-    networkmanagerapplet    # nm-applet
-    nix-doc                 # nix documentation search tool
-    numix-icon-theme-circle # icon theme
-    numix-cursor-theme      # icon theme
-    pamixer                 # pulseaudio cli mixer
-    patchelf                # dynamic linker and RPATH of ELF executables
-    pavucontrol             # pulseaudio volume control
-    paprefs                 # pulseaudio preferences
-    pasystray               # pulseaudio systray
-    pcmanfm                 # file manager
-    playerctl               # music player controller
-    psensor                 # hardware monitoring
-    pulsemixer              # pulseaudio mixer
-    python3                 # python3 programming language
-    rnix-lsp                # nix lsp server
-    simplescreenrecorder    # self-explanatory
-    slack                   # messaging client
-    spotify                 # music source
-    tldr                    # summary of a man page
-    tree                    # display files in a tree view
-    vlc                     # media player
-    xclip                   # clipboard support (also for neovim)
-    zoom-us                 # video conference
+    alloy                     # model checker
+    agda                      # dependently typed programming language
+    bash                      # bash
+    bc                        # gnu calculator
+    betterlockscreen          # fast lockscreen based on i3lock
+    blueman                   # bluetooth applet
+    cachix                    # nix caching
+    emacs                     # text editor
+    evince                    # pdf reader
+    flashfocus                # focus wm
+    gawk                      # text processing programming language
+    gsettings-desktop-schemas # gsettings
+    jq                        # JSON processor
+    killall                   # kill processes by name
+    konsole                   # terminal emulator
+    libreoffice               # office suite
+    lxappearance              # edit themes
+    ncdu                      # disk space info (a better du)
+    neofetch                  # command-line system information
+    networkmanagerapplet      # nm-applet
+    nix-doc                   # nix documentation search tool
+    numix-icon-theme-circle   # icon theme
+    numix-cursor-theme        # icon theme
+    pamixer                   # pulseaudio cli mixer
+    patchelf                  # dynamic linker and RPATH of ELF executables
+    pavucontrol               # pulseaudio volume control
+    paprefs                   # pulseaudio preferences
+    pasystray                 # pulseaudio systray
+    pcmanfm                   # file manager
+    playerctl                 # music player controller
+    psensor                   # hardware monitoring
+    pulsemixer                # pulseaudio mixer
+    python3                   # python3 programming language
+    rnix-lsp                  # nix lsp server
+    simplescreenrecorder      # self-explanatory
+    slack                     # messaging client
+    spotify                   # music source
+    tldr                      # summary of a man page
+    tree                      # display files in a tree view
+    vlc                       # media player
+    xclip                     # clipboard support (also for neovim)
+    zoom-us                   # video conference
   ];
 
   gitPkgs = with pkgs.gitAndTools; [
