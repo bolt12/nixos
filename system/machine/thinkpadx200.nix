@@ -19,7 +19,6 @@
   services = {
     tlp.enable = true;
     blueman.enable = true;
-    flameshot.enable = true;
   };
 
   networking = {

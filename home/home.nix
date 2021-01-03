@@ -162,4 +162,6 @@ in
     ssh.enable = true;
   };
 
+  services.flameshot.enable = true;
+
 }
