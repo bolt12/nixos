@@ -20,6 +20,7 @@ let
     killall                 # kill processes by name
     konsole                 # terminal emulator
     libreoffice             # office suite
+    lxappearance            # edit themes
     ncdu                    # disk space info (a better du)
     neofetch                # command-line system information
     networkmanagerapplet    # nm-applet
