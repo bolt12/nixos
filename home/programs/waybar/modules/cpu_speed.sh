@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 class=cpu_speed
 speed_mhz=$(lscpu | grep "CPU MHz" | sed --expression "s/CPU MHz:[[:space:]]*//g" | xargs printf "%.*f\n" 0)
