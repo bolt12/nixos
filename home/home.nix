@@ -21,6 +21,7 @@ let
     flashfocus               # focus wm
     gawk                     # text processing programming language
     glib                     # gsettings
+    gsettings-desktop-schemas
     jq                       # JSON processor
     killall                  # kill processes by name
     konsole                  # terminal emulator
