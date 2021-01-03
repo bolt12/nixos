@@ -11,6 +11,7 @@ let
   defaultPkgs = with pkgs; [
     alloy                   # model checker
     agda                    # dependently typed programming language
+    bash                    # bash
     betterlockscreen        # fast lockscreen based on i3lock
     blueman                 # bluetooth applet
     cachix                  # nix caching
