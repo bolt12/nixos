@@ -3,8 +3,8 @@
 let
   unstable = import (import ./unstable.nix) {};
 
-  url = "https://github.com/colemickens/nixpkgs-wayland/archive/master.tar.gz";
-  pkgs-wayland = import (builtins.fetchTarball url);
+  # url = "https://github.com/colemickens/nixpkgs-wayland/archive/master.tar.gz";
+  # pkgs-wayland = import (builtins.fetchTarball url);
 
   unstablePkgs = [ unstable.manix ];
 

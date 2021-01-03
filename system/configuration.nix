@@ -62,7 +62,7 @@ in
   # programs.mtr.enable = true;
   programs.gnupg.agent = {
     enable           = true;
-    # enableSSHSupport = true;
+    enableSSHSupport = true;
   };
 
   # List services that you want to enable:
@@ -104,7 +104,7 @@ in
   # Enable the X11 windowing system.
   services = {
     # Enable the OpenSSH daemon.
-    openssh.enable = true;
+    # openssh.enable = true;
 
     # Enable CUPS to print documents.
     printing.enable = true;
@@ -114,10 +114,19 @@ in
   };
 
   # Making fonts accessible to applications.
-  fonts.fonts = with pkgs; [
-    customFonts
-    font-awesome-ttf
-  ];
+  fonts = {
+    fonts = [
+      customFonts
+      pkgs.font-awesome-ttf
+    ];
+    fontconfig = {
+      defaultFonst = {
+        serif = [ "Ubuntu" ];
+        sansSerif = [ "Ubuntu" ];
+        monospace = [ "JetBrainsMono" ];
+      }
+    };
+  };
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users = {
