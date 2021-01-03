@@ -11,12 +11,13 @@ let
   defaultPkgs = with pkgs; [
     alloy                 # model checker
     agda                  # dependently typed programming language
-    gawk                   # text processing programming language
     betterlockscreen      # fast lockscreen based on i3lock
     cachix                # nix caching
     emacs                 # text editor
     evince                # pdf reader
     flashfocus            # focus wm
+    flameshot             # print screen
+    gawk                  # text processing programming language
     killall               # kill processes by name
     konsole               # terminal emulator
     libreoffice           # office suite
@@ -132,6 +133,7 @@ in
     ./programs/neovim/default.nix
     ./programs/bash/default.nix
     ./programs/waybar/default.nix
+    ./programs/wofi/default.nix
     ./services/networkmanager/default.nix
     ./xdg/sway/default.nix
   ];
@@ -154,10 +156,6 @@ in
     };
 
     ssh.enable = true;
-  };
-
-  services = {
-    flameshot.enable = true;
   };
 
 }
