@@ -114,7 +114,7 @@ in
     compton.enable = true;
 
     # Firefox NixOs wiki recommends
-    services.pipewire.enable = true;
+    pipewire.enable = true;
   };
 
   # Making fonts accessible to applications.
@@ -132,6 +132,7 @@ in
         sansSerif = [ "Ubuntu" ];
         monospace = [ "JetBrainsMono" ];
       };
+      antialias = true;
     };
   };
 
@@ -141,7 +142,7 @@ in
         isNormalUser = true;
         home = "/home/bolt";
         description = "Armando Santos";
-        extraGroups = [ "audio" "wheel" "networkmanager" "docker" ];
+        extraGroups = [ "audio" "wheel" "networkmanager" "docker" "sway" ];
       };
     };
 

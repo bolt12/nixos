@@ -219,7 +219,11 @@ exec_always {
 exec_always nm-applet --indicator
 
 # blueman-applet
-exec_always nm-applet --indicator
+exec_always blueman-applet
+#
+# Sway users might achieve this by adding the following to their Sway config file
+# This ensures all user units started after the command (not those already running) set the variables
+exec systemctl --user import-environment
 
 #********************************************************************************
 
