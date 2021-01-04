@@ -1,8 +1,9 @@
 { config, lib, pkgs, stdenv, ... }:
 
 let
+  url = "https://github.com/colemickens/nixpkgs-wayland/archive/master.tar.gz";
+  pkgs-wayland = import (builtins.fetchTarball url);
   unstable = import (import ./unstable.nix) { overlays = [ pkgs-wayland ]; };
-  pkgs-wayland = import (import ./nixpkgs-wayland.nix) {};
 
   unstablePkgs = [ unstable.manix ];
 
@@ -146,6 +147,9 @@ in
     ./services/redshift/default.nix
     ./xdg/sway/default.nix
   ];
+
+  # notifications about home-manager news
+  news.display = "silent";
 
   programs = {
 
