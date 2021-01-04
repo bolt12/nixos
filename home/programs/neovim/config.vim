@@ -58,7 +58,7 @@ set matchtime=2             " Time during which the matching parenthesis is show
 set listchars=tab:▸\ ,eol:¬ " Invisible characters representation when :set list.
 set clipboard=unnamedplus   " Copy/Paste to/from clipboard
 set cursorline              " Highlight line cursor is currently on
-set completeopt+=longest   " Select the first item of popup menu automatically without inserting it
+set completeopt+=longest    " Select the first item of popup menu automatically without inserting it
 set lazyredraw
 set magic
 set mat=2
@@ -72,7 +72,7 @@ set incsearch  " Incremental search.
 set hlsearch
 set ignorecase " Case insensitive.
 set smartcase  " Case insensitive if no uppercase letter in pattern, case sensitive otherwise.
-set nowrapscan " Don't go back to first match after the last match is found.
+" set nowrapscan " Don't go back to first match after the last match is found.
 
 " Auto-commands Vimscript
 augroup vimscript_augroup

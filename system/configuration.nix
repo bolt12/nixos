@@ -62,7 +62,7 @@ in
   # programs.mtr.enable = true;
   programs.gnupg.agent = {
     enable           = true;
-    # enableSSHSupport = true;
+    enableSSHSupport = true;
   };
 
   # List services that you want to enable:
@@ -105,13 +105,16 @@ in
   # Enable the X11 windowing system.
   services = {
     # Enable the OpenSSH daemon.
-    # openssh.enable = true;
+    openssh.enable = true;
 
     # Enable CUPS to print documents.
     printing.enable = true;
 
     # Enable compton
     compton.enable = true;
+
+    # Firefox NixOs wiki recommends
+    services.pipewire.enable = true;
   };
 
   # Making fonts accessible to applications.
@@ -144,6 +147,18 @@ in
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
+
+  # Firefox NixOS wiki recommends
+  xdg = {
+    portal = {
+      enable = true;
+      extraPortals = with pkgs; [
+        xdg-desktop-portal-wlr
+        xdg-desktop-portal-gtk
+      ];
+      gtkUsePortal = true;
+    };
+  };
 
   # Nix daemon config
   nix = {
