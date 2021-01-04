@@ -3,6 +3,7 @@
 {
   # Use the GRUB 2 boot loader.
   boot = {
+    kernelPackages = pkgs.linuxPackages_4_19;
     loader = {
       grub = {
         enable  = true;
