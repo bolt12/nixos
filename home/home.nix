@@ -1,10 +1,8 @@
 { config, lib, pkgs, stdenv, ... }:
 
 let
-  unstable = import (import ./unstable.nix) {};
-
-  # url = "https://github.com/colemickens/nixpkgs-wayland/archive/master.tar.gz";
-  # pkgs-wayland = import (builtins.fetchTarball url);
+  unstable = import (import ./unstable.nix) { overlays = [ pkgs-wayland ]; };
+  pkgs-wayland = import (import ./nixpkgs-wayland.nix) {};
 
   unstablePkgs = [ unstable.manix ];
 
@@ -55,6 +53,20 @@ let
     zoom-us                  # video conference
   ];
 
+  # Wayland Packages
+  waylandPkgs = [
+      pkgs.grim
+      pkgs.slurp
+      pkgs.pkgs.swaylock-fancy
+      pkgs.wofi
+      unstable.wlsunset
+      pkgs.xdg-desktop-portal-wlr
+      unstable.wlogout
+      pkgs.brightnessctl
+      pkgs.wl-clipboard
+      pkgs.waybar
+      ];
+
   gitPkgs = with pkgs.gitAndTools; [
     git
   ];
@@ -86,7 +98,6 @@ let
 in
 {
   nixpkgs.overlays = [
-    # pkgs-wayland
   ];
 
   home = {
@@ -96,20 +107,7 @@ in
 
     packages =
       defaultPkgs
-      ++
-      # Wayland Packages
-      [ pkgs.firefox-wayland
-        pkgs.grim
-        pkgs.slurp
-        pkgs.pkgs.swaylock-fancy
-        pkgs.wofi
-        # pkgs.wlsunset
-        pkgs.xdg-desktop-portal-wlr
-        # pkgs.wlogout
-        pkgs.brightnessctl
-        pkgs.wl-clipboard
-        pkgs.waybar
-      ]
+      ++ waylandPkgs
       ++ gitPkgs
       ++ gnomePkgs
       ++ haskellPkgs
@@ -138,9 +136,10 @@ in
   };
 
   imports = [
+    ./programs/bash/default.nix
+    ./programs/firefox/default.nix
     ./programs/git/default.nix
     ./programs/neovim/default.nix
-    ./programs/bash/default.nix
     ./programs/waybar/default.nix
     ./programs/wofi/default.nix
     ./services/networkmanager/default.nix
