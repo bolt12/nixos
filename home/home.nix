@@ -172,5 +172,6 @@ in
   };
 
   services.flameshot.enable = true;
+  services.lorri.enable = true;
 
 }
