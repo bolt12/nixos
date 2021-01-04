@@ -218,6 +218,9 @@ exec_always {
 # nm-applet
 exec_always nm-applet --indicator
 
+# blueman-applet
+exec_always nm-applet --indicator
+
 #********************************************************************************
 
 #	Appearance
