@@ -44,6 +44,7 @@ let
     python3                  # python3 programming language
     rnix-lsp                 # nix lsp server
     simplescreenrecorder     # self-explanatory
+    skypeforlinux            # skype for linux
     slack                    # messaging client
     spotify                  # music source
     tldr                     # summary of a man page
@@ -70,6 +71,7 @@ let
 
   gitPkgs = with pkgs.gitAndTools; [
     git
+    diff-so-fancy
   ];
 
   gnomePkgs = with pkgs.gnome3; [
