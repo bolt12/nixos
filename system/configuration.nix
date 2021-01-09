@@ -117,14 +117,14 @@ in
     pipewire.enable = true;
 
     # USB Automounting
-    services.gvfs.enable = true;
-    services.udisks2.enable = true;
-    services.devmon.enable = true;
+    gvfs.enable = true;
+    udisks2.enable = true;
+    devmon.enable = true;
   };
 
   # Making fonts accessible to applications.
   fonts = {
-    fontDir.enable = true;
+    enableFontDir = true;
     enableGhostscriptFonts = true;
     enableDefaultFonts = true;
     fonts = [
