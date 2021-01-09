@@ -115,21 +115,40 @@ in
 
     # Firefox NixOs wiki recommends
     pipewire.enable = true;
+
+    # USB Automounting
+    services.gvfs.enable = true;
+    services.udisks2.enable = true;
+    services.devmon.enable = true;
   };
 
   # Making fonts accessible to applications.
   fonts = {
+    fontDir.enable = true;
+    enableGhostscriptFonts = true;
     enableDefaultFonts = true;
     fonts = [
       customFonts
       pkgs.font-awesome-ttf
       pkgs.ubuntu_font_family
+      pkgs.emojione
+      pkgs.noto-fonts
+      pkgs.noto-fonts-cjk
+      pkgs.noto-fonts-extra
+      pkgs.hack-font
+      pkgs.inconsolata
+      pkgs.material-icons
+      pkgs.liberation_ttf
+      pkgs.dejavu_fonts
+      pkgs.terminus_font
+      pkgs.siji
+      pkgs.unifont
     ];
     fontconfig = {
       enable = true;
       defaultFonts = {
-        serif = [ "Ubuntu" ];
-        sansSerif = [ "Ubuntu" ];
+        serif = [ "DejaVu Serid" "Ubuntu" ];
+        sansSerif = [ "DejaVu Sans" "Ubuntu" ];
         monospace = [ "JetBrainsMono" ];
       };
       antialias = true;
@@ -142,7 +161,7 @@ in
         isNormalUser = true;
         home = "/home/bolt";
         description = "Armando Santos";
-        extraGroups = [ "audio" "wheel" "networkmanager" "docker" "sway" ];
+        extraGroups = [ "audio" "video" "wheel" "networkmanager" "docker" "sway" ];
       };
     };
 

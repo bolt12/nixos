@@ -8,51 +8,55 @@ let
   unstablePkgs = [ unstable.manix ];
 
   defaultPkgs = with pkgs; [
-    alloy                    # model checker
-    agda                     # dependently typed programming language
-    bash                     # bash
-    bc                       # gnu calculator
-    betterlockscreen         # fast lockscreen based on i3lock
-    blueman                  # bluetooth applet
-    cachix                   # nix caching
-    emacs                    # text editor
-    evince                   # pdf reader
-    flashfocus               # focus wm
-    gawk                     # text processing programming language
-    glib                     # gsettings
-    gsettings-desktop-schemas
-    jq                       # JSON processor
-    killall                  # kill processes by name
-    konsole                  # terminal emulator
-    libreoffice              # office suite
-    lxappearance             # edit themes
-    ncdu                     # disk space info (a better du)
-    neofetch                 # command-line system information
-    networkmanagerapplet     # nm-applet
-    nix-doc                  # nix documentation search tool
-    numix-icon-theme-circle  # icon theme
-    numix-cursor-theme       # icon theme
-    pamixer                  # pulseaudio cli mixer
-    patchelf                 # dynamic linker and RPATH of ELF executables
-    pavucontrol              # pulseaudio volume control
-    paprefs                  # pulseaudio preferences
-    pasystray                # pulseaudio systray
-    pcmanfm                  # file manager
-    playerctl                # music player controller
-    psensor                  # hardware monitoring
-    pulsemixer               # pulseaudio mixer
-    python3                  # python3 programming language
-    rnix-lsp                 # nix lsp server
-    simplescreenrecorder     # self-explanatory
-    skypeforlinux            # skype for linux
-    slack                    # messaging client
-    spotify                  # music source
-    tldr                     # summary of a man page
-    tree                     # display files in a tree view
-    vlc                      # media player
-    xclip                    # clipboard support (also for neovim)
-    xsettingsd               # theming
-    zoom-us                  # video conference
+    alloy                     # model checker
+    agda                      # dependently typed programming language
+    bash                      # bash
+    bc                        # gnu calculator
+    betterlockscreen          # fast lockscreen based on i3lock
+    blueman                   # bluetooth applet
+    cachix                    # nix caching
+    emacs                     # text editor
+    evince                    # pdf reader
+    flashfocus                # focus wm
+    gawk                      # text processing programming language
+    glib                      # gsettings
+    gsettings-desktop-schemas # theming related
+    gtk-engine-murrine        # theme engine
+    gtk_engines               # theme engines
+    jq                        # JSON processor
+    killall                   # kill processes by name
+    konsole                   # terminal emulator
+    libreoffice               # office suite
+    lxappearance              # edit themes
+    lxmenu-data               # desktop menus - enables "open with" options
+    ncdu                      # disk space info (a better du)
+    neofetch                  # command-line system information
+    networkmanagerapplet      # nm-applet
+    nix-doc                   # nix documentation search tool
+    numix-icon-theme-circle   # icon theme
+    numix-cursor-theme        # icon theme
+    pamixer                   # pulseaudio cli mixer
+    patchelf                  # dynamic linker and RPATH of ELF executables
+    pavucontrol               # pulseaudio volume control
+    paprefs                   # pulseaudio preferences
+    pasystray                 # pulseaudio systray
+    pcmanfm                   # file manager
+    playerctl                 # music player controller
+    psensor                   # hardware monitoring
+    pulsemixer                # pulseaudio mixer
+    python3                   # python3 programming language
+    rnix-lsp                  # nix lsp server
+    shared-mime-info          # database of common MIME types
+    simplescreenrecorder      # self-explanatory
+    skypeforlinux             # skype for linux
+    slack                     # messaging client
+    spotify                   # music source
+    tldr                      # summary of a man page
+    tree                      # display files in a tree view
+    vlc                       # media player
+    xclip                     # clipboard support (also for neovim)
+    xsettingsd                # theming
+    zoom-us                   # video conference
   ];
 
   # Wayland Packages
