@@ -1,0 +1,62 @@
+{
+    "comma": {
+        "branch": "master",
+        "description": null,
+        "homepage": null,
+        "owner": "SuperSandro2000",
+        "repo": "comma",
+        "rev": "28f94a11114893506ea2c5c5bdbc1dae1d1d8159",
+        "sha256": "05157wn3f1whq6krcijhipkjw5zjml5h4xbf06ibd77kc57lqw8z",
+        "type": "tarball",
+        "url": "https://github.com/SuperSandro2000/comma/archive/28f94a11114893506ea2c5c5bdbc1dae1d1d8159.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "niv": {
+        "branch": "master",
+        "description": "Easy dependency management for Nix projects",
+        "homepage": "https://github.com/nmattia/niv",
+        "owner": "nmattia",
+        "repo": "niv",
+        "rev": "3cd7914b2c4cff48927e11c216dadfab7d903fe5",
+        "sha256": "1agq4nvbhrylf2s77kb4xhh9k7xcwdwggq764k4jgsbs70py8cw3",
+        "type": "tarball",
+        "url": "https://github.com/nmattia/niv/archive/3cd7914b2c4cff48927e11c216dadfab7d903fe5.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "nixpkgs": {
+        "branch": "nixos-20.09",
+        "description": "Nix Packages collection",
+        "homepage": "",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "352481146d87aa2d277ea696657aa7db5378b90f",
+        "sha256": "0fyi26dcpprbh0zccwjjp6spikbbj8dsal2aa8h1qnw41a4fjjxm",
+        "type": "tarball",
+        "url": "https://github.com/NixOS/nixpkgs/archive/352481146d87aa2d277ea696657aa7db5378b90f.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "nixpkgs-unstable": {
+        "branch": "nixpkgs-unstable",
+        "description": "Nix Packages collection",
+        "homepage": "",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "495066a47fc259aa4fc5f7548e190fded2c7030e",
+        "sha256": "0q448yk73r5acbc8q3nw9hgwvi6y43cwxy8k6kgq7a5zk630rdx5",
+        "type": "tarball",
+        "url": "https://github.com/NixOS/nixpkgs/archive/495066a47fc259aa4fc5f7548e190fded2c7030e.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "nixpkgs-wayland": {
+        "branch": "master",
+        "description": "Automated, pre-built packages for Wayland (sway/wlroots) tools for NixOS.",
+        "homepage": "",
+        "owner": "colemickens",
+        "repo": "nixpkgs-wayland",
+        "rev": "5ed07dd7b108a2f112061454746f7b3062d8cb45",
+        "sha256": "1nxyh0p51msfqyv78w70ijxc52532np1146fybh429lqjll6nw4n",
+        "type": "tarball",
+        "url": "https://github.com/colemickens/nixpkgs-wayland/archive/5ed07dd7b108a2f112061454746f7b3062d8cb45.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    }
+}

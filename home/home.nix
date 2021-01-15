@@ -1,70 +1,93 @@
-{ config, lib, pkgs, stdenv, ... }:
+{ config, lib, stdenv, sources ? (import ./nix/sources.nix) , ... }:
 
 let
-  pkgs-wayland = import (builtins.fetchTarball "https://github.com/colemickens/nixpkgs-wayland/archive/master.tar.gz");
-  unstable = import (import ./unstable.nix) { overlays = [ pkgs-wayland ]; };
 
-  comma = import (builtins.fetchTarball "https://github.com/SuperSandro2000/comma/archive/master.tar.gz") { inherit pkgs; };
+  unstable = import sources.nixpkgs-unstable {
+    overlays = [
+      (import sources.nixpkgs-wayland)
+    ];
+  };
+
+  sources = import ./nix/sources.nix;
+
+  pkgs = import sources.nixpkgs {
+    overlays = [
+      (import sources.nixpkgs-wayland)
+    ];
+    config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) unfreePackages;
+  };
+
+  unfreePackages = [
+    "discord"
+    "skypeforlinux"
+    "slack"
+    "spotify"
+    "spotify-unwrapped"
+    "zoom-us"
+    "faac" # part of zoom
+  ];
 
   # Unstable branch packages
   unstablePkgs = [ unstable.manix ];
 
   # Extra packages from user repos
-  # TODO: add niv and organize sources that way
-  extraPkgs = [ comma ];
+  extraPkgs = [
+    (import sources.comma { inherit pkgs; })
+  ];
 
   defaultPkgs = with pkgs; [
-    alloy                     # model checker
-    agda                      # dependently typed programming language
-    bash                      # bash
-    bc                        # gnu calculator
-    betterlockscreen          # fast lockscreen based on i3lock
-    blueman                   # bluetooth applet
-    cachix                    # nix caching
-    deluge                    # torrent client
-    emacs                     # text editor
-    evince                    # pdf reader
-    flashfocus                # focus wm
-    gawk                      # text processing programming language
-    glib                      # gsettings
-    gsettings-desktop-schemas # theming related
-    gtk-engine-murrine        # theme engine
-    gtk_engines               # theme engines
-    jq                        # JSON processor
-    killall                   # kill processes by name
-    konsole                   # terminal emulator
-    libreoffice               # office suite
-    lxappearance              # edit themes
-    lxmenu-data               # desktop menus - enables "open with" options
-    ncdu                      # disk space info (a better du)
-    neofetch                  # command-line system information
-    networkmanagerapplet      # nm-applet
-    niv                       # dependency management for nix
-    nix-doc                   # nix documentation search tool
-    numix-icon-theme-circle   # icon theme
-    numix-cursor-theme        # icon theme
-    pamixer                   # pulseaudio cli mixer
-    patchelf                  # dynamic linker and RPATH of ELF executables
-    pavucontrol               # pulseaudio volume control
-    paprefs                   # pulseaudio preferences
-    pasystray                 # pulseaudio systray
-    pcmanfm                   # file manager
-    playerctl                 # music player controller
-    psensor                   # hardware monitoring
-    pulsemixer                # pulseaudio mixer
-    python3                   # python3 programming language
-    rnix-lsp                  # nix lsp server
-    shared-mime-info          # database of common MIME types
-    simplescreenrecorder      # self-explanatory
-    skypeforlinux             # skype for linux
-    slack                     # messaging client
-    spotify                   # music source
-    tldr                      # summary of a man page
-    tree                      # display files in a tree view
-    vlc                       # media player
-    xclip                     # clipboard support (also for neovim)
-    xsettingsd                # theming
-    zoom-us                   # video conference
+    alloy                       # model checker
+    agda                        # dependently typed programming language
+    bash                        # bash
+    bc                          # gnu calculator
+    betterlockscreen            # fast lockscreen based on i3lock
+    blueman                     # bluetooth applet
+    cachix                      # nix caching
+    deluge                      # torrent client
+    discord                     # discord client
+    emacs                       # text editor
+    evince                      # pdf reader
+    flashfocus                  # focus wm
+    gawk                        # text processing programming language
+    glib                        # gsettings
+    gsettings-desktop-schemas   # theming related
+    gtk-engine-murrine          # theme engine
+    gtk_engines                 # theme engines
+    jq                          # JSON processor
+    killall                     # kill processes by name
+    konsole                     # terminal emulator
+    libreoffice                 # office suite
+    lxappearance                # edit themes
+    lxmenu-data                 # desktop menus - enables "open with" options
+    ncdu                        # disk space info (a better du)
+    neofetch                    # command-line system information
+    networkmanagerapplet        # nm-applet
+    (import sources.niv {}).niv # dependency management for nix
+    nix-doc                     # nix documentation search tool
+    numix-icon-theme-circle     # icon theme
+    numix-cursor-theme          # icon theme
+    pamixer                     # pulseaudio cli mixer
+    patchelf                    # dynamic linker and RPATH of ELF executables
+    pavucontrol                 # pulseaudio volume control
+    paprefs                     # pulseaudio preferences
+    pasystray                   # pulseaudio systray
+    pcmanfm                     # file manager
+    playerctl                   # music player controller
+    psensor                     # hardware monitoring
+    pulsemixer                  # pulseaudio mixer
+    python3                     # python3 programming language
+    rnix-lsp                    # nix lsp server
+    shared-mime-info            # database of common MIME types
+    simplescreenrecorder        # self-explanatory
+    skypeforlinux               # skype for linux
+    slack                       # slack client
+    spotify                     # spotify client
+    tldr                        # summary of a man page
+    tree                        # display files in a tree view
+    vlc                         # media player
+    xclip                       # clipboard support (also for neovim)
+    xsettingsd                  # theming
+    zoom-us                     # zoom client
   ];
 
   # Wayland Packages
@@ -78,8 +101,8 @@ let
       unstable.wlogout
       pkgs.brightnessctl
       pkgs.wl-clipboard
-      pkgs.waybar
-      ];
+      unstable.waybar
+  ];
 
   gitPkgs = with pkgs.gitAndTools; [
     git
@@ -112,9 +135,6 @@ let
 
 in
 {
-  nixpkgs.overlays = [
-  ];
-
   home = {
     username      = "bolt";
     homeDirectory = "/home/bolt";

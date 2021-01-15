@@ -20,6 +20,7 @@ mkdir -p $HOME/Documents
 
 # Home manager
 mkdir -p $HOME/.config/nixpkgs/
+cp -r nix $HOME/.config/nixpkgs/
 cp -r home/* $HOME/.config/nixpkgs/
 nix-channel --add https://github.com/rycee/home-manager/archive/release-20.09.tar.gz home-manager
 nix-channel --update
