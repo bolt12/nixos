@@ -1,11 +1,17 @@
 { config, lib, pkgs, stdenv, ... }:
 
 let
-  url = "https://github.com/colemickens/nixpkgs-wayland/archive/master.tar.gz";
-  pkgs-wayland = import (builtins.fetchTarball url);
+  pkgs-wayland = import (builtins.fetchTarball "https://github.com/colemickens/nixpkgs-wayland/archive/master.tar.gz");
   unstable = import (import ./unstable.nix) { overlays = [ pkgs-wayland ]; };
 
+  comma = import (builtins.fetchTarball "https://github.com/SuperSandro2000/comma/archive/master.tar.gz") { inherit pkgs; };
+
+  # Unstable branch packages
   unstablePkgs = [ unstable.manix ];
+
+  # Extra packages from user repos
+  # TODO: add niv and organize sources that way
+  extraPkgs = [ comma ];
 
   defaultPkgs = with pkgs; [
     alloy                     # model checker
@@ -15,6 +21,7 @@ let
     betterlockscreen          # fast lockscreen based on i3lock
     blueman                   # bluetooth applet
     cachix                    # nix caching
+    deluge                    # torrent client
     emacs                     # text editor
     evince                    # pdf reader
     flashfocus                # focus wm
@@ -32,6 +39,7 @@ let
     ncdu                      # disk space info (a better du)
     neofetch                  # command-line system information
     networkmanagerapplet      # nm-applet
+    niv                       # dependency management for nix
     nix-doc                   # nix documentation search tool
     numix-icon-theme-circle   # icon theme
     numix-cursor-theme        # icon theme
@@ -119,7 +127,8 @@ in
       ++ gnomePkgs
       ++ haskellPkgs
       ++ emacsPkgs
-      ++ unstablePkgs;
+      ++ unstablePkgs
+      ++ extraPkgs;
 
     sessionVariables = {
       DISPLAY = ":0";
