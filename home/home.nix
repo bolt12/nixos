@@ -53,7 +53,9 @@ let
     gsettings-desktop-schemas   # theming related
     gtk-engine-murrine          # theme engine
     gtk_engines                 # theme engines
+    jdk                         # java development kit
     jq                          # JSON processor
+    jre                         # java runtime environment
     killall                     # kill processes by name
     konsole                     # terminal emulator
     libreoffice                 # office suite
@@ -87,6 +89,7 @@ let
     vlc                         # media player
     xclip                       # clipboard support (also for neovim)
     xsettingsd                  # theming
+    weechat                     # weechat irc client
     zoom-us                     # zoom client
   ];
 

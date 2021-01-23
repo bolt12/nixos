@@ -57,6 +57,9 @@ in
    vim git
   ];
 
+  # Needed for java apps fonts (?)
+  environment.variables._JAVA_OPTIONS = "-Dawt.useSystemAAFontSettings=lcd";
+
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
