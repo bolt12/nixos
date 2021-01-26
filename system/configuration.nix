@@ -8,6 +8,7 @@ let
   customFonts = pkgs.nerdfonts.override {
     fonts = [
       "JetBrainsMono"
+      "FiraCode"
     ];
   };
 
@@ -150,9 +151,9 @@ in
     fontconfig = {
       enable = true;
       defaultFonts = {
+        monospace = [ "JetBrainsMono" "FiraCode" ];
         serif = [ "DejaVu Serid" "Ubuntu" ];
         sansSerif = [ "DejaVu Sans" "Ubuntu" ];
-        monospace = [ "JetBrainsMono" ];
       };
       antialias = true;
     };

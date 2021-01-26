@@ -45,7 +45,6 @@ let
     cachix                      # nix caching
     deluge                      # torrent client
     discord                     # discord client
-    emacs                       # text editor
     evince                      # pdf reader
     flashfocus                  # focus wm
     gawk                        # text processing programming language
@@ -86,10 +85,13 @@ let
     spotify                     # spotify client
     tldr                        # summary of a man page
     tree                        # display files in a tree view
+    unzip                       # unzip
     vlc                         # media player
+    xarchiver                   # xarchiver gtk frontend
     xclip                       # clipboard support (also for neovim)
     xsettingsd                  # theming
     weechat                     # weechat irc client
+    zip                         # zip
     zoom-us                     # zoom client
   ];
 
@@ -131,11 +133,6 @@ let
     nix-tree                # visualize nix dependencies
   ];
 
-  emacsPkgs = with pkgs.emacs26Packages; [
-    doom
-    doom-themes
-  ];
-
 in
 {
   home = {
@@ -149,7 +146,6 @@ in
       ++ gitPkgs
       ++ gnomePkgs
       ++ haskellPkgs
-      ++ emacsPkgs
       ++ unstablePkgs
       ++ extraPkgs;
 
@@ -176,6 +172,7 @@ in
 
   imports = [
     ./programs/bash/default.nix
+    ./programs/emacs/default.nix
     ./programs/firefox/default.nix
     ./programs/git/default.nix
     ./programs/neovim/default.nix
@@ -185,6 +182,9 @@ in
     ./services/redshift/default.nix
     ./xdg/sway/default.nix
   ];
+
+  # fonts
+  fonts.fontconfig.enable = true;
 
   # notifications about home-manager news
   news.display = "silent";
