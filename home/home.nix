@@ -13,6 +13,7 @@ let
   pkgs = import sources.nixpkgs {
     overlays = [
       (import sources.nixpkgs-wayland)
+      (import sources.neovim-nightly-overlay)
     ];
     config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) unfreePackages;
   };
@@ -46,6 +47,7 @@ let
     deluge                      # torrent client
     discord                     # discord client
     evince                      # pdf reader
+    faac                        # part of zoom (?)
     flashfocus                  # focus wm
     gawk                        # text processing programming language
     glib                        # gsettings
@@ -92,14 +94,13 @@ let
     xsettingsd                  # theming
     weechat                     # weechat irc client
     zip                         # zip
-    zoom-us                     # zoom client
   ];
 
   # Wayland Packages
   waylandPkgs = [
       pkgs.grim
       pkgs.slurp
-      pkgs.pkgs.swaylock-fancy
+      pkgs.swaylock-fancy
       pkgs.wofi
       unstable.wlsunset
       pkgs.xdg-desktop-portal-wlr
@@ -122,15 +123,15 @@ let
     zenity         # display dialogs
   ];
 
-  haskellPkgs = with pkgs.haskellPackages; [
-    fourmolu                # code formatter
-    cabal2nix               # convert cabal projects to nix
-    cabal-install           # package manager
-    stack                   # package manager
-    ghc                     # compiler
-    haskell-language-server # haskell IDE (ships with ghcide)
-    hoogle                  # documentation
-    nix-tree                # visualize nix dependencies
+  haskellPkgs = [
+    pkgs.haskellPackages.fourmolu                    # code formatter
+    pkgs.haskellPackages.cabal2nix                   # convert cabal projects to nix
+    pkgs.haskellPackages.cabal-install               # package manager
+    pkgs.haskellPackages.stack                       # package manager
+    pkgs.haskellPackages.ghc                         # compiler
+    pkgs.haskellPackages.hoogle                      # documentation
+    pkgs.haskellPackages.nix-tree                    # visualize nix dependencies
+    unstable.haskellPackages.haskell-language-server # haskell IDE (ships with ghcide)
   ];
 
 in

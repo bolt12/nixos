@@ -1,14 +1,29 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, ... }:
 
 let
+  sources = (import ../../nix/sources.nix);
+
+  pkgs = import sources.nixpkgs {
+    overlays = [
+      (import sources.neovim-nightly-overlay)
+    ];
+  };
+
+  unstable = import sources.nixpkgs-unstable { };
 
   plugins = pkgs.vimPlugins;
+  plugins-unstable = unstable.vimPlugins;
+
+  unstablePlugins = with plugins-unstable; [
+    # nvim-lightbulb
+    # lspsaga-nvim
+  ];
 
   overriddenPlugins = with pkgs; [];
 
   myVimPlugins = with plugins; [
     vim-airline             # bottom status bar
-    vim-airline-themes      # TODO
+    vim-airline-themes      # status bar themes
     matchit-zip             # match parentheses
     base16-vim              # colors
     tabular                 # align things
@@ -17,14 +32,16 @@ let
     rainbow_parentheses-vim # for nested parentheses
     colorizer               # colors
     vim-surround            # quickly edit surroundings (brackets, html tags, etc)
+    vim-hoogle              # haskell hoogle
     gruvbox                 # color theme
-    coc-nvim                # TODO
-    haskell-vim             # TODO
-    vim2hs                  # TODO
-    hlint-refactor-vim      # TODO
+    coc-nvim                # lsp based intellisense
+    haskell-vim             # haskell vim
+    vim2hs                  # vim2hs unicode
+    hlint-refactor-vim      # hlint
     vim-nix                 # nix support (highlighting, etc)
     ctrlp-vim               # nix support (highlighting, etc)
-  ] ++ overriddenPlugins;
+  ] ++ unstablePlugins
+    ++ overriddenPlugins;
 
   baseConfig    = builtins.readFile ./config.vim;
   cocConfig     = builtins.readFile ./coc.vim;
@@ -36,6 +53,7 @@ in
 {
   programs.neovim = {
     enable       = true;
+    package      = pkgs.neovim-nightly;
     extraConfig  = vimConfig;
     plugins      = myVimPlugins;
     viAlias      = true;
