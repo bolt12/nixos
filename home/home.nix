@@ -124,14 +124,14 @@ let
   ];
 
   haskellPkgs = [
-    pkgs.haskellPackages.fourmolu                    # code formatter
-    pkgs.haskellPackages.cabal2nix                   # convert cabal projects to nix
-    pkgs.haskellPackages.cabal-install               # package manager
-    pkgs.haskellPackages.stack                       # package manager
-    pkgs.haskellPackages.ghc                         # compiler
-    pkgs.haskellPackages.hoogle                      # documentation
-    pkgs.haskellPackages.nix-tree                    # visualize nix dependencies
-    unstable.haskellPackages.haskell-language-server # haskell IDE (ships with ghcide)
+    pkgs.haskellPackages.fourmolu                # code formatter
+    pkgs.haskellPackages.cabal2nix               # convert cabal projects to nix
+    pkgs.haskellPackages.cabal-install           # package manager
+    pkgs.haskellPackages.stack                   # package manager
+    pkgs.haskellPackages.ghc                     # compiler
+    pkgs.haskellPackages.hoogle                  # documentation
+    pkgs.haskellPackages.nix-tree                # visualize nix dependencies
+    pkgs.haskellPackages.haskell-language-server # haskell IDE (ships with ghcide)
   ];
 
 in
