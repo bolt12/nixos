@@ -31,6 +31,7 @@ let
     vim-pandoc-syntax       # pandoc syntax support
     rainbow_parentheses-vim # for nested parentheses
     colorizer               # colors
+    vim-floaterm            # floating window terminal
     vim-surround            # quickly edit surroundings (brackets, html tags, etc)
     vim-hoogle              # haskell hoogle
     gruvbox                 # color theme
