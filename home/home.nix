@@ -29,7 +29,11 @@ let
   ];
 
   # Unstable branch packages
-  unstablePkgs = [ unstable.manix ];
+  unstablePkgs = [
+    unstable.manix
+    unstable.zoom-us
+    unstable.faac    # part of zoom (?)
+  ];
 
   # Extra packages from user repos
   extraPkgs = [
@@ -47,7 +51,6 @@ let
     deluge                      # torrent client
     discord                     # discord client
     evince                      # pdf reader
-    faac                        # part of zoom (?)
     feh                         # image viewer
     flashfocus                  # focus wm
     gawk                        # text processing programming language
@@ -95,7 +98,6 @@ let
     xsettingsd                  # theming
     weechat                     # weechat irc client
     zip                         # zip
-    zoom-us                     # zoom video conference
   ];
 
   # Wayland Packages

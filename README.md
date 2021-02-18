@@ -29,7 +29,7 @@ Here is an overview of the folders' structure:
 │   ├── display
 │   ├── home.nix
 │   ├── programs
-│   └── services
+│   ├── services
 │   └── xdg
 ├── imgs
 ├── install.sh
@@ -37,7 +37,7 @@ Here is an overview of the folders' structure:
 ├── notes
 └── system
     ├── configuration.nix
-    └── machine
+    ├── machine
     └── wm
 ```
 
