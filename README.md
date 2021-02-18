@@ -3,9 +3,9 @@ nix-config
 
 My current - and always evolving - NixOS configuration files, home-manager, neovim, etc.
 
-![desktop](imgs/desktop-1.jpg)
+![desktop](imgs/desktop.png)
 
-![amd](imgs/amd.jpg)
+![desktop-1](imgs/desktop-1.png)
 
 ## Programs
 
@@ -13,14 +13,12 @@ The `home.nix` file contains details about all the software I use but here's a s
 
 | Type           | Program      |
 | :------------- | :----------: |
-| Editor         | [NeoVim](https://neovim.io/) |
-| Launcher       | [Rofi](https://github.com/davatorium/rofi) |
-| Shell          | [Fish](https://fishshell.com/) |
-| Status Bar     | [Polybar](https://polybar.github.io/) |
-| Terminal       | [Alacritty](https://github.com/alacritty/alacritty) |
-| Window Manager | [XMonad](https://xmonad.org/) |
-
-I've also tried using `taffybar` for a while, configuration files still live in this repo. Here's a [screenshot](imgs/taffybar.png).
+| Editor         | [NeoVim](https://github.com/neovim/neovim) |
+| Launcher       | [Wofi](https://github.com/mikn/wofi) |
+| Shell          | [Bash](https://www.gnu.org/software/bash/) |
+| Status Bar     | [Waybar](https://github.com/Alexays/Waybar) |
+| Terminal       | [Konsole](https://konsole.kde.org/) |
+| Window Manager | [Sway](https://github.com/swaywm/sway) |
 
 ## Structure
 
@@ -30,16 +28,15 @@ Here is an overview of the folders' structure:
 ├── home
 │   ├── display
 │   ├── home.nix
-│   ├── overlays
 │   ├── programs
-│   └── secrets
 │   └── services
+│   └── xdg
 ├── imgs
 ├── install.sh
+├── nix
 ├── notes
 └── system
     ├── configuration.nix
-    └── fonts
     └── machine
     └── wm
 ```
@@ -47,6 +44,7 @@ Here is an overview of the folders' structure:
 - `home`: all the user programs, services and dotfiles.
 - `imgs`: screenshots and other images.
 - `install.sh`: the install script.
+- `nix`: the pinned packages.
 - `notes`: cheat-sheets, docs, etc.
 - `system`: the NixOS configuration, settings for different laptops and window managers.
 
@@ -57,11 +55,7 @@ On a fresh NixOS installation, run the following commands:
 ```shell
 mkdir DELETE_ME && cd DELETE_ME
 nix-shell --run \
-  "wget -c https://github.com/gvolpe/nix-config/archive/master.tar.gz && tar --strip-components=1 -xvf master.tar.gz" \
+  "wget -c https://github.com/bolt12/nixos/archive/master.tar.gz && tar --strip-components=1 -xvf master.tar.gz" \
   -p wget s-tar
 chmod +x install.sh && ./install.sh
 ```
-
-## Gnome3 (previous config)
-
-I've been using Gnome3 for a while before switching to XMonad. Have a look at [Gnome3](./GNOME.md) for more.

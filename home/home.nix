@@ -48,6 +48,7 @@ let
     discord                     # discord client
     evince                      # pdf reader
     faac                        # part of zoom (?)
+    feh                         # image viewer
     flashfocus                  # focus wm
     gawk                        # text processing programming language
     glib                        # gsettings
@@ -94,6 +95,7 @@ let
     xsettingsd                  # theming
     weechat                     # weechat irc client
     zip                         # zip
+    zoom-us                     # zoom video conference
   ];
 
   # Wayland Packages
