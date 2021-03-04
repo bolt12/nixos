@@ -24,6 +24,7 @@
         docker ="sudo docker";
         sudo = "sudo ";
         doom = "/home/bolt/.emacs.d/bin/doom";
+        welltyped = "cd /home/bolt/Desktop/Bolt/UMinho/Profissional/Well-Typed/";
       };
     };
 }
