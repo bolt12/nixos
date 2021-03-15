@@ -12,9 +12,9 @@
     loader = {
       efi = {
         canTouchEfiVariables = true;
-        systemd-boot.enable = true;
         # efiSysMountPoint = "/boot/efi";
       };
+      systemd-boot.enable = true;
       # grub = {
       #   enable = true;
       #   device = "/dev/nvme0n1p1";
@@ -44,8 +44,8 @@
 
   networking = {
     hostName = "bolt-nixos";
-    interfaces.wls1.useDHCP = true;
-    interfaces.enp0s25.useDHCP = true;
+    interfaces.wlp0s20f3.useDHCP = true;
+    interfaces.enp0s31f6.useDHCP = true;
   };
 
 
