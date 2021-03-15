@@ -12,14 +12,15 @@
     loader = {
       efi = {
         canTouchEfiVariables = true;
-        efiSysMountPoint = "/boot/efi";
+        systemd-boot.enable = true;
+        # efiSysMountPoint = "/boot/efi";
       };
-      grub = {
-        enable = true;
-        device = "nodev";
-        efiSupport = true;
-        memtest86.enable = true;
-      };
+      # grub = {
+      #   enable = true;
+      #   device = "/dev/nvme0n1p1";
+      #   efiSupport = true;
+      #   memtest86.enable = true;
+      # };
     };
     extraModulePackages = with config.boot.kernelPackages; [ acpi_call ];
     plymouth.enable = true;
