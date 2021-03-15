@@ -113,6 +113,7 @@ let
       pkgs.wl-clipboard
       pkgs.mako
       pkgs.swayidle
+      pkgs.wdisplays
       unstable.waybar
   ];
 

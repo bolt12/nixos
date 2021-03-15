@@ -155,6 +155,20 @@ mode "resize" {
 
 bindsym $mod+r mode "resize"
 
+# Screen modes. Note mirroring is not yet properly supported by sway :(
+set $mode_display AUX SCREEN: (l) LEFT (r) RIGHT (o) OFF (m) MIRROR
+mode "$mode_display" {
+    bindsym l output $scr_aux enable, output $scr_main pos 0 0, output $scr_aux pos -$native_width 0, mode "default"
+    bindsym r output $scr_aux enable, output $scr_main pos 0 0, output $scr_aux pos $native_width 0, mode "default"
+    bindsym m output $scr_aux enable, output $scr_main pos 0 0, output $scr_aux pos 0 0, mode "default"
+    bindsym o output $scr_aux disable, mode "default"
+
+    # back to normal: Enter or Escape
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+bindsym $mod+x mode "$mode_display"
+
 # wofi
 bindsym $mod+d exec wofi
 
