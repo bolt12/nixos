@@ -1,10 +1,6 @@
 { config, pkgs, ... }:
 
 {
-  # imports = [
-  #   "${builtins.fetchGit { url = "https://github.com/NixOS/nixos-hardware.git"; }}/lenovo/thinkpad/x1/7th-gen"
-  # ];
-
   # Use the GRUB 2 boot loader.
   boot = {
     # kernelPackages = pkgs.linuxPackages_4_19;
@@ -22,7 +18,9 @@
       #   memtest86.enable = true;
       # };
     };
+    kernelModules = [ "acpi_call" ];
     extraModulePackages = with config.boot.kernelPackages; [ acpi_call ];
+    blacklistedKernelModules = [ "snd_hda_intel" "snd_soc_skl" ];
     plymouth.enable = true;
     tmpOnTmpfs = true;
     cleanTmpDir = true;
@@ -30,6 +28,13 @@
 
   powerManagement.enable = true;
   powerManagement.powertop.enable = true;
+
+
+  # List packages installed in system profile. To search, run:
+  # $ nix search wget
+  environment.systemPackages = with pkgs; [
+    sof-firmware
+  ];
 
   services = {
     tlp = {
@@ -48,7 +53,6 @@
     interfaces.enp0s31f6.useDHCP = true;
   };
 
-
   # Intel UHD 620 Hardware Acceleration
   hardware.opengl = {
     extraPackages = with pkgs; [
@@ -58,4 +62,9 @@
       intel-media-driver # only available starting nixos-19.03 or the current nixos-unstable
     ];
   };
+
+  hardware.pulseaudio.extraConfig = ''
+    load-module module-alsa-sink   device=hw:0,0 channels=4
+    load-module module-alsa-source device=hw:0,6 channels=4
+  '';
 }

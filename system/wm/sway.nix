@@ -29,6 +29,7 @@
       displayManager.defaultSession = "sway";
       xkbOptions = "caps:escape";
       libinput.enable = true;
+      libinput.clickMethod = "clickfinger";
       layout = "pt";
     };
   };

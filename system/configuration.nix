@@ -57,6 +57,7 @@ in
   environment.systemPackages = with pkgs; [
     vim
     git
+    sof-firmware
   ];
 
   # Needed for java apps fonts (?)
@@ -89,6 +90,7 @@ in
   sound = {
     enable = true;
     mediaKeys.enable = true;
+    mediaKeys.volumeStep = "5%";
   };
   hardware = {
       bluetooth = {
@@ -102,12 +104,18 @@ in
         # 32 bit support for steam.
         support32Bit = true;
         package = pkgs.pulseaudioFull;
-        extraConfig = "load-module module-switch-on-connect";
+        extraConfig = ''
+          load-module module-switch-on-connect
+          '';
+
       };
       opengl.enable = true;
       enableRedistributableFirmware = true;
+      enableAllFirmware = true;
       cpu.intel.updateMicrocode = true;
     };
+
+    nixpkgs.config.pulseaudio = true; # Explicit PulseAudio support in applications
 
   # Enable the X11 windowing system.
   services = {
@@ -168,7 +176,7 @@ in
         isNormalUser = true;
         home = "/home/bolt";
         description = "Armando Santos";
-        extraGroups = [ "audio" "video" "wheel" "networkmanager" "docker" "sway" ];
+        extraGroups = [ "audio" "sound" "video" "wheel" "networkmanager" "docker" "sway" ];
       };
     };
 
