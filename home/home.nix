@@ -111,6 +111,8 @@ let
       unstable.wlogout
       pkgs.brightnessctl
       pkgs.wl-clipboard
+      pkgs.mako
+      pkgs.swayidle
       unstable.waybar
   ];
 

@@ -11,14 +11,11 @@
       enable = true;
       wrapperFeatures.gtk = true;
       extraPackages = with pkgs; [
-        swayidle
         xwayland
         dmenu
         brightnessctl
         libnotify
         i3status
-        wl-clipboard
-        mako
         compton
       ];
     };
@@ -28,17 +25,11 @@
     upower.enable = true;
 
     xserver = {
-
       enable = true;
-
       displayManager.defaultSession = "sway";
-
       xkbOptions = "caps:escape";
-
       libinput.enable = true;
-
       layout = "pt";
-
     };
   };
 }

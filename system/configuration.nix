@@ -55,7 +55,8 @@ in
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-   vim git
+    vim
+    git
   ];
 
   # Needed for java apps fonts (?)
@@ -98,6 +99,8 @@ in
       };
       pulseaudio = {
         enable = true;
+        # 32 bit support for steam.
+        support32Bit = true;
         package = pkgs.pulseaudioFull;
         extraConfig = "load-module module-switch-on-connect";
       };
@@ -152,7 +155,7 @@ in
       enable = true;
       defaultFonts = {
         monospace = [ "JetBrainsMono" "FiraCode" ];
-        serif = [ "DejaVu Serid" "Ubuntu" ];
+        serif = [ "DejaVu Serif" "Ubuntu" ];
         sansSerif = [ "DejaVu Sans" "Ubuntu" ];
       };
       antialias = true;
