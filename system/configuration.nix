@@ -60,8 +60,9 @@ in
     sof-firmware
   ];
 
-  # Needed for java apps fonts (?)
+  # Needed for java apps/fonts
   environment.variables._JAVA_OPTIONS = "-Dawt.useSystemAAFontSettings=lcd";
+  environment.variables._JAVA_AWT_WM_NONREPARENTING = "1";
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
