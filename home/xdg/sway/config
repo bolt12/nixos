@@ -179,9 +179,9 @@ bindsym $mod+n exec flash_window
 bindsym $mod+shift+x exec "betterlockscreen -l"
 
 # volume control
-bindsym XF86AudioRaiseVolume exec "amixer -q sset Master,0 10+ unmute"
-bindsym XF86AudioLowerVolume exec "amixer -q sset Master,0 10- unmute"
-bindsym XF86AudioMute exec "amixer -q sset Master,0 toggle"
+bindsym XF86AudioRaiseVolume exec "amixer -q -c 0 sset Master,0 10+ unmute"
+bindsym XF86AudioLowerVolume exec "amixer -q -c 0 sset Master,0 10- unmute"
+bindsym XF86AudioMute exec "amixer -q -c 0 sset Master,0 toggle"
 
 #brightness control
 bindsym XF86MonBrightnessDown exec brightnessctl set 15%-

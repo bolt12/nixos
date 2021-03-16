@@ -68,7 +68,7 @@
         "format": "{icon:2} {volume:4}%",
         "format-alt": "{icon:2} {volume:4}%",
         "format-alt-click": "click-right",
-        "format-muted": "",
+        "format-muted": "",
         "format-icons": {
             "phone": [" ", " ", " ", " "],
             "default": ["", "", "", ""]
