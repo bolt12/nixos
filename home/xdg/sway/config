@@ -4,7 +4,8 @@
 
 #****************************************************************************
 
-set $mod Mod4
+# exec --no-startup-id xmodmap -e 'remove Mod1 = Alt_L' && xmodmap -e 'add Mod3 = Alt_L'
+set $mod Mod1
 
 # Floating windows
 
@@ -155,20 +156,6 @@ mode "resize" {
 
 bindsym $mod+r mode "resize"
 
-# Screen modes. Note mirroring is not yet properly supported by sway :(
-set $mode_display AUX SCREEN: (l) LEFT (r) RIGHT (o) OFF (m) MIRROR
-mode "$mode_display" {
-    bindsym l output $scr_aux enable, output $scr_main pos 0 0, output $scr_aux pos -$native_width 0, mode "default"
-    bindsym r output $scr_aux enable, output $scr_main pos 0 0, output $scr_aux pos $native_width 0, mode "default"
-    bindsym m output $scr_aux enable, output $scr_main pos 0 0, output $scr_aux pos 0 0, mode "default"
-    bindsym o output $scr_aux disable, mode "default"
-
-    # back to normal: Enter or Escape
-    bindsym Return mode "default"
-    bindsym Escape mode "default"
-}
-bindsym $mod+x mode "$mode_display"
-
 # wofi
 bindsym $mod+d exec wofi
 
@@ -191,10 +178,10 @@ bindsym XF86MonBrightnessUp exec brightnessctl set +15%
 bindsym $mod+alt+p exec grim - | wl-copy
 
 # capture the specified screen area to clipboard
-bindsym $mod+p exec grim -g "$(slurp)" - | wl-copy
+bindsym $mod+shift+p exec grim -g "$(slurp)" - | wl-copy
 
 # capture the focused monitor to clipboard
-bindsym $mod+shift+p exec grim -o $(swaymsg -t get_outputs | jq -r '.[] | select(.focused) | .name') - | wl-copy
+bindsym $mod+control+shift+p exec grim -o $(swaymsg -t get_outputs | jq -r '.[] | select(.focused) | .name') - | wl-copy
 
 bar {
     swaybar_command waybar
@@ -207,11 +194,17 @@ bar {
 #********************************************************************************
 
 input "type:keyboard" {
-    xkb_layout pt
+    xkb_layout us,pt
     xkb_variant ,nodeadkeys
-    xkb_options grp:alt_shift_toggle
-    xkb_options caps:escape
+    xkb_options caps:escape,grp:shifts_toggle
 }
+
+input "type:touchpad" {
+    tap enabled
+    natural_scroll enabled
+}
+
+output HDMI-A-1 scale 1.75
 
 output "*" bg ~/Documents/background.png fill
 exec compton

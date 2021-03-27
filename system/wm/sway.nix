@@ -27,10 +27,13 @@
     xserver = {
       enable = true;
       displayManager.defaultSession = "sway";
-      xkbOptions = "caps:escape";
+      xkbOptions = ''
+        caps:escape
+        grp:shifts_toggle
+        '';
       libinput.enable = true;
       libinput.clickMethod = "clickfinger";
-      layout = "pt";
+      layout = "us,pt";
     };
   };
 }

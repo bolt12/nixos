@@ -2,7 +2,7 @@
 
   "diagnostic.virtualText" = true;
   "codeLens.enable" = true;
-  "coc.preferences.formatOnSaveFiletypes" = ["haskell"];
+  # "coc.preferences.formatOnSaveFiletypes" = ["haskell"];
   "coc.preferences.snippets.enable" = true;
 
   "languageserver" = {
@@ -34,7 +34,7 @@
             "haskell" = {
                 "hlintOn" = true;
                 "maxNumberOfProblems" = 10;
-                "formattingProvider" = "fourmolu";
+                "formattingProvider" = "stylish-haskell";
                 "completionSnippetsOn" = true;
             };
         };
@@ -42,7 +42,7 @@
             "haskell" = {
                 "hlintOn" = true;
                 "maxNumberOfProblems" = 10;
-                "formattingProvider" = "fourmolu";
+                "formattingProvider" = "stylish-haskell";
                 "completionSnippetsOn" = true;
             };
         };

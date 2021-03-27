@@ -134,9 +134,9 @@ nnoremap <leader>h :Hoogle <CR>
 " Floaterm
 hi Floaterm guibg=#282c34
 
-noremap <A-d> :FloatermToggle<CR>
-noremap! <A-d> <Esc>:FloatermToggle<CR>
-tnoremap <A-d> <C-\><C-n>:FloatermToggle<CR>
+noremap <A-S-d> :FloatermToggle<CR>
+noremap! <A-S-d> <Esc>:FloatermToggle<CR>
+tnoremap <A-S-d> <C-\><C-n>:FloatermToggle<CR>
 
 " SUMMARY
 " a= -> Align on equal sign
