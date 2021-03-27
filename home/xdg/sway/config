@@ -181,7 +181,7 @@ bindsym $mod+alt+p exec grim - | wl-copy
 bindsym $mod+shift+p exec grim -g "$(slurp)" - | wl-copy
 
 # capture the focused monitor to clipboard
-bindsym $mod+alt+shift+p exec grim -o $(swaymsg -t get_outputs | jq -r '.[] | select(.focused) | .name') - | wl-copy
+bindsym $mod+control+shift+p exec grim -o $(swaymsg -t get_outputs | jq -r '.[] | select(.focused) | .name') - | wl-copy
 
 bar {
     swaybar_command waybar
