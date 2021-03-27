@@ -8,6 +8,7 @@
         [[ $- != *i* ]] && return
 
         neofetch
+        set -o vi
         '';
       shellAliases = {
         ls = "ls --color=always";
@@ -25,6 +26,7 @@
         sudo = "sudo ";
         doom = "/home/bolt/.emacs.d/bin/doom";
         welltyped = "cd /home/bolt/Desktop/Bolt/UMinho/Profissional/Well-Typed/";
+        iohk = "cd /home/bolt/Desktop/Bolt/UMinho/Profissional/Well-Typed/Projects/IOHK";
       };
     };
 }

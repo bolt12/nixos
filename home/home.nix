@@ -95,6 +95,7 @@ let
     vlc                         # media player
     xarchiver                   # xarchiver gtk frontend
     xclip                       # clipboard support (also for neovim)
+    xorg.xmodmap                # Keyboard
     xsettingsd                  # theming
     weechat                     # weechat irc client
     zip                         # zip
@@ -131,6 +132,7 @@ let
   ];
 
   haskellPkgs = [
+    pkgs.haskellPackages.stylish-haskell         # code formatter
     pkgs.haskellPackages.fourmolu                # code formatter
     pkgs.haskellPackages.cabal2nix               # convert cabal projects to nix
     pkgs.haskellPackages.cabal-install           # package manager
@@ -171,9 +173,10 @@ in
     ];
 
     keyboard = {
-      layout = "pt";
+      layout = "us,pt";
       options = [
         "caps:escape"
+        "grp:shifts_toggle"
       ];
     };
   };

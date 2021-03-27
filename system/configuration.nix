@@ -19,7 +19,7 @@ in
       # Include the results of the hardware scan.
       ./hardware-configuration.nix
       # Machine-specific configuration
-      ./machine/thinkpadx200.nix
+      ./machine/x1-g8.nix
       # Window manager
       ./wm/sway.nix
     ];
@@ -42,10 +42,10 @@ in
 
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
-  console = {
-    font = "Lat2-Terminus16";
-    keyMap = "pt-latin1";
-  };
+  #console = {
+  #  font = "Lat2-Terminus16";
+  #  keyMap = "pt-latin1";
+  #};
 
   # Set your time zone.
   time.timeZone = "Europe/Lisbon";
@@ -177,7 +177,17 @@ in
         isNormalUser = true;
         home = "/home/bolt";
         description = "Armando Santos";
-        extraGroups = [ "audio" "sound" "video" "wheel" "networkmanager" "docker" "sway" ];
+        extraGroups = [
+          "audio"
+          "sound"
+          "video"
+          "wheel"
+          "networkmanager"
+          "docker"
+          "sway"
+          "plugdev"
+          "root"
+        ];
       };
     };
 
