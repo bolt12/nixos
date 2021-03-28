@@ -11,6 +11,18 @@
         "url": "https://github.com/SuperSandro2000/comma/archive/28f94a11114893506ea2c5c5bdbc1dae1d1d8159.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
+    "easy-hls-nix": {
+        "branch": "main",
+        "description": "Easy Haskell Language Server tooling with Nix!",
+        "homepage": null,
+        "owner": "jkachmar",
+        "repo": "easy-hls-nix",
+        "rev": "e29153112b7e4bea57c083cae5e3c12921d49456",
+        "sha256": "15wnq23181h8jr1ks97pycdxwrqymrs4i135gcb0q0mq2m4ghhhx",
+        "type": "tarball",
+        "url": "https://github.com/jkachmar/easy-hls-nix/archive/e29153112b7e4bea57c083cae5e3c12921d49456.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
     "neovim-nightly-overlay": {
         "branch": "master",
         "description": "[maintainer=@mjlbach] ",
