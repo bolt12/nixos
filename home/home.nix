@@ -18,6 +18,14 @@ let
     config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) unfreePackages;
   };
 
+  easy-hls-nix = pkgs.callPackage sources.easy-hls-nix {
+    ghcVersions = [
+      "8.6.5"
+      "8.8.4"
+      "8.10.4"
+    ];
+  };
+
   unfreePackages = [
     "discord"
     "skypeforlinux"
@@ -140,7 +148,8 @@ let
     pkgs.haskellPackages.ghc                     # compiler
     pkgs.haskellPackages.hoogle                  # documentation
     pkgs.haskellPackages.nix-tree                # visualize nix dependencies
-    pkgs.haskellPackages.haskell-language-server # haskell IDE (ships with ghcide)
+    # pkgs.haskellPackages.haskell-language-server # haskell IDE (ships with ghcide)
+    easy-hls-nix                                 # haskell IDE (ships with ghcide)
   ];
 
 in
