@@ -3,7 +3,7 @@
 {
   # Use the GRUB 2 boot loader.
   boot = {
-    # kernelPackages = pkgs.linuxPackages_4_19;
+    #kernelPackages = pkgs.linuxPackages_4_19;
     kernelPackages = pkgs.linuxPackages_latest;
     loader = {
       efi = {

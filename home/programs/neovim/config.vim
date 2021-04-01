@@ -1,5 +1,3 @@
-filetype off
-
 " Better Unix support
 set viewoptions=folds,options,cursor,unix,slash
 set encoding=utf-8

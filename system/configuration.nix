@@ -63,6 +63,11 @@ in
   # Needed for java apps/fonts
   environment.variables._JAVA_OPTIONS = "-Dawt.useSystemAAFontSettings=lcd";
   environment.variables._JAVA_AWT_WM_NONREPARENTING = "1";
+  # Other ?
+  environment.variables.SDL_VIDEODRIVER = "wayland";
+  environment.variables.QT_QPA_PLATFORM = "wayland";
+  environment.variables.QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
+  environment.variables.MOZ_ENABLE_WAYLAND = "1";
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.

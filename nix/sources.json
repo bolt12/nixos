@@ -29,10 +29,10 @@
         "homepage": "",
         "owner": "nix-community",
         "repo": "neovim-nightly-overlay",
-        "rev": "1b08112b1859f8515261ec31f1c761277443aa0e",
-        "sha256": "0npll01nl2fvx4jvnq35bs4pzwq6rnmjpp1dyqs00hyiybbw99ja",
+        "rev": "8fce5de325a371f7370a3754c4b76fdb9ca0feb7",
+        "sha256": "12v6vzp0sb5mvj5n2rxj8marnmvk0p5jabgx9fa9rldjbx4vg3nk",
         "type": "tarball",
-        "url": "https://github.com/nix-community/neovim-nightly-overlay/archive/1b08112b1859f8515261ec31f1c761277443aa0e.tar.gz",
+        "url": "https://github.com/nix-community/neovim-nightly-overlay/archive/8fce5de325a371f7370a3754c4b76fdb9ca0feb7.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "niv": {
