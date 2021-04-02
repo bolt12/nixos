@@ -10,7 +10,6 @@
       QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
       ECORE_EVAS_ENGINE = "wayland_egl";
       ELM_ENGINE = "wayland_egl";
-      QT_WAYLAND_FORCE_DPI = "physical";
   };
 
   programs.sway = {

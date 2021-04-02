@@ -12,7 +12,6 @@ let
 
   pkgs = import sources.nixpkgs {
     overlays = [
-      (import sources.nixpkgs-wayland)
       (import sources.neovim-nightly-overlay)
     ];
     config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) unfreePackages;
@@ -112,17 +111,17 @@ let
 
   # Wayland Packages
   waylandPkgs = [
-      pkgs.grim
-      pkgs.slurp
+      unstable.grim
+      unstable.slurp
       pkgs.swaylock-fancy
-      pkgs.wofi
+      unstable.wofi
       unstable.wlsunset
-      pkgs.xdg-desktop-portal-wlr
+      unstable.xdg-desktop-portal-wlr
       unstable.wlogout
       pkgs.brightnessctl
-      pkgs.wl-clipboard
-      pkgs.mako
-      pkgs.swayidle
+      unstable.wl-clipboard
+      unstable.mako
+      unstable.swayidle
       pkgs.wdisplays
       unstable.waybar
   ];
