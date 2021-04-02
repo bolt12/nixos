@@ -5,6 +5,12 @@
       MOZ_ENABLE_WAYLAND = "1";
       XDG_CURRENT_DESKTOP = "sway"; # TODO: Do we need this in non-sway setups?
       XDG_SESSION_TYPE = "wayland";
+      SDL_VIDEODRIVER = "wayland";
+      QT_QPA_PLATFORM = "wayland";
+      QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
+      ECORE_EVAS_ENGINE = "wayland_egl";
+      ELM_ENGINE = "wayland_egl";
+      QT_WAYLAND_FORCE_DPI = "physical";
   };
 
   programs.sway = {

@@ -61,13 +61,8 @@ in
   ];
 
   # Needed for java apps/fonts
-  environment.variables._JAVA_OPTIONS = "-Dawt.useSystemAAFontSettings=lcd";
+  environment.variables._JAVA_OPTIONS = "-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dsun.java2d.xrender=true";
   environment.variables._JAVA_AWT_WM_NONREPARENTING = "1";
-  # Other ?
-  environment.variables.SDL_VIDEODRIVER = "wayland";
-  environment.variables.QT_QPA_PLATFORM = "wayland";
-  environment.variables.QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
-  environment.variables.MOZ_ENABLE_WAYLAND = "1";
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -98,6 +93,7 @@ in
     mediaKeys.enable = true;
     mediaKeys.volumeStep = "5%";
   };
+
   hardware = {
       bluetooth = {
         enable = true;
@@ -113,7 +109,6 @@ in
         extraConfig = ''
           load-module module-switch-on-connect
           '';
-
       };
       opengl.enable = true;
       enableRedistributableFirmware = true;
@@ -135,7 +130,9 @@ in
     compton.enable = true;
 
     # Firefox NixOs wiki recommends
-    pipewire.enable = true;
+    pipewire = {
+      enable = true;
+    };
 
     # USB Automounting
     gvfs.enable = true;
@@ -203,11 +200,11 @@ in
   xdg = {
     portal = {
       enable = true;
+      gtkUsePortal = true;
       extraPortals = with pkgs; [
         xdg-desktop-portal-wlr
         xdg-desktop-portal-gtk
       ];
-      gtkUsePortal = true;
     };
   };
 

@@ -56,6 +56,7 @@ let
     betterlockscreen            # fast lockscreen based on i3lock
     blueman                     # bluetooth applet
     cachix                      # nix caching
+    chromium                    # google chrome
     deluge                      # torrent client
     discord                     # discord client
     evince                      # pdf reader
