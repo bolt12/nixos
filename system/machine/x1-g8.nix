@@ -23,6 +23,7 @@
     blacklistedKernelModules = [ "snd_hda_intel" "snd_soc_skl" ];
     plymouth.enable = true;
     tmpOnTmpfs = true;
+    runSize = "50%"; # Size of tmpOnTmpfs defaults to 25% of RAM
     cleanTmpDir = true;
   };
 
