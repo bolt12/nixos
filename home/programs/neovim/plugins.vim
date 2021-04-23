@@ -138,6 +138,11 @@ noremap <A-S-d> :FloatermToggle<CR>
 noremap! <A-S-d> <Esc>:FloatermToggle<CR>
 tnoremap <A-S-d> <C-\><C-n>:FloatermToggle<CR>
 
+nmap <C-b>a <Plug>BujoAddnormal
+imap <C-b>a <Plug>BujoAddinsert
+nmap <C-b>c <Plug>BujoChecknormal
+imap <C-b>c <Plug>BujoCheckinsert
+
 " SUMMARY
 " a= -> Align on equal sign
 " a- -> Align on case match

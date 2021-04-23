@@ -19,6 +19,11 @@ let
     # lspsaga-nvim
   ];
 
+  vim-bujo = pkgs.vimUtils.buildVimPlugin {
+    name = "vim-bujo";
+    src = sources.vim-bujo;
+  };
+
   overriddenPlugins = with pkgs; [];
 
   myVimPlugins = with plugins; [
@@ -41,6 +46,7 @@ let
     hlint-refactor-vim      # hlint
     vim-nix                 # nix support (highlighting, etc)
     ctrlp-vim               # nix support (highlighting, etc)
+    vim-bujo                # todos
   ] ++ unstablePlugins
     ++ overriddenPlugins;
 

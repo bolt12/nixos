@@ -17,10 +17,10 @@
         "homepage": null,
         "owner": "jkachmar",
         "repo": "easy-hls-nix",
-        "rev": "e29153112b7e4bea57c083cae5e3c12921d49456",
-        "sha256": "15wnq23181h8jr1ks97pycdxwrqymrs4i135gcb0q0mq2m4ghhhx",
+        "rev": "291cf77f512a7121bb6801cde35ee1e8b7287f91",
+        "sha256": "1bvbcp9zwmh53sm16ycp8phhc6vzc72a71sf0bvyjgfbn6zp68bc",
         "type": "tarball",
-        "url": "https://github.com/jkachmar/easy-hls-nix/archive/e29153112b7e4bea57c083cae5e3c12921d49456.tar.gz",
+        "url": "https://github.com/jkachmar/easy-hls-nix/archive/291cf77f512a7121bb6801cde35ee1e8b7287f91.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "neovim-nightly-overlay": {
@@ -29,10 +29,10 @@
         "homepage": "",
         "owner": "nix-community",
         "repo": "neovim-nightly-overlay",
-        "rev": "1964b1f4a4fc78f9fefc410431d9c94ffacb0009",
-        "sha256": "0fd5igxjspp9rrccphq5zmsbpy8653ffi1jd0kx27sswrm3jr3sp",
+        "rev": "54e09b5277d6fecbf5b0417582ef4105277011de",
+        "sha256": "0pjw94crhjapki77c23xj1da7zxz2zghfmpxilc7x2i52lqfs4sp",
         "type": "tarball",
-        "url": "https://github.com/nix-community/neovim-nightly-overlay/archive/1964b1f4a4fc78f9fefc410431d9c94ffacb0009.tar.gz",
+        "url": "https://github.com/nix-community/neovim-nightly-overlay/archive/54e09b5277d6fecbf5b0417582ef4105277011de.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "niv": {
@@ -53,10 +53,10 @@
         "homepage": "",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "c3253cdab424b87ad8490d42f6585302b20bd39b",
-        "sha256": "16dx12n4fnl5r4k1bbam5fp5bym120g20k675m4xdc9280r0liq7",
+        "rev": "5c0e6a8c319dfeff5365615266de8522386d7e5d",
+        "sha256": "0x7pnh6bnlp0lzm94wa66kghx052wk1wf52szy8x153zl07bg6m2",
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/c3253cdab424b87ad8490d42f6585302b20bd39b.tar.gz",
+        "url": "https://github.com/NixOS/nixpkgs/archive/5c0e6a8c319dfeff5365615266de8522386d7e5d.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "nixpkgs-unstable": {
@@ -65,10 +65,10 @@
         "homepage": "",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "e8893cc489de8ffbe8125fb0d37f05e8023a2d99",
-        "sha256": "1bsdxz9m50jpirhndkjaqim1vbmnjmhl0y73yqc715m9j9n0l4mi",
+        "rev": "f73da2880a93dc24e185297a6af747efdeac5f01",
+        "sha256": "16hynkzc4b5hn34hkznfkkbg9p0qphyac7sp6cs4z3syyfxpnw1d",
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/e8893cc489de8ffbe8125fb0d37f05e8023a2d99.tar.gz",
+        "url": "https://github.com/NixOS/nixpkgs/archive/f73da2880a93dc24e185297a6af747efdeac5f01.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "nixpkgs-wayland": {
@@ -77,10 +77,22 @@
         "homepage": "",
         "owner": "colemickens",
         "repo": "nixpkgs-wayland",
-        "rev": "aebe40974f9b6fc5c2583072bc856ea7bde7de53",
-        "sha256": "1wl9yby37vq23q8zkyc3f8jxkf9px81spydmdbrm2py6rx47jprn",
+        "rev": "628980c23ae8175b251624e2ddec58b89dcf18d6",
+        "sha256": "1afivbs6bx4rvph0xrn6ia4ppyhwjv0d56vla70psdiamsgqygzg",
         "type": "tarball",
-        "url": "https://github.com/colemickens/nixpkgs-wayland/archive/aebe40974f9b6fc5c2583072bc856ea7bde7de53.tar.gz",
+        "url": "https://github.com/colemickens/nixpkgs-wayland/archive/628980c23ae8175b251624e2ddec58b89dcf18d6.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "vim-bujo": {
+        "branch": "master",
+        "description": "A minimalist task manager for vim.",
+        "homepage": "",
+        "owner": "vuciv",
+        "repo": "vim-bujo",
+        "rev": "ae87612ccabd0460c6f71387b7b23515383d5468",
+        "sha256": "17ca3pgy6fipk1s1f2dlxdmgcd2h761dk9qm6dy4cmhvvac69lnh",
+        "type": "tarball",
+        "url": "https://github.com/vuciv/vim-bujo/archive/ae87612ccabd0460c6f71387b7b23515383d5468.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     }
 }
