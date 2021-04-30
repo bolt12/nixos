@@ -31,8 +31,12 @@
         }
 
         __export_ps1() {
-          export PS1="\n[\033[32m\]\W\033[00m\]]
-          (\033[33m\]\$(parse_git_branch)\[\033[31m\]\$(parse_git_dirty)\[\033[00m\]) \n[\e[36m\]\u@\h\[\e[0m\]]> "
+          if [[ -z $IN_NIX_SHELL ]]
+          then
+            export PS1="\n[\033[32m\]\W\033[00m\]] (\033[33m\]\$(parse_git_branch)\[\033[31m\]\$(parse_git_dirty)\[\033[00m\]) \n[\e[36m\]\u@\h\[\e[0m\]]> "
+          else
+            export PS1="\n[\033[32m\]\W\033[00m\]] (\033[33m\]\$(parse_git_branch)\[\033[31m\]\$(parse_git_dirty)\[\033[00m\]) \n[\e[36m\]nix-shell:\u@\h\[\e[0m\]]> "
+          fi
         }
         __export_ps1
         PROMPT_COMMAND='__export_ps1'
