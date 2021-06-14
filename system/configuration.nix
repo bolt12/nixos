@@ -29,6 +29,7 @@ in
     networkmanager = {
       enable = true;
     };
+    nameservers = [ "1.1.1.1" "8.8.8.8" ];
 
     # The global useDHCP flag is deprecated, therefore explicitly set to false here.
     # Per-interface useDHCP will be mandatory in the future, so this generated config
@@ -97,7 +98,7 @@ in
   hardware = {
       bluetooth = {
         enable = true;
-        config = {
+        settings = {
           General.Enable = lib.concatStringsSep "," [ "Source" "Sink" "Media" "Socket" ];
         };
       };
@@ -142,7 +143,7 @@ in
 
   # Making fonts accessible to applications.
   fonts = {
-    enableFontDir = true;
+    fontDir.enable = true;
     enableGhostscriptFonts = true;
     enableDefaultFonts = true;
     fonts = [
@@ -236,6 +237,6 @@ in
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "20.09"; # Did you read the comment?
+  system.stateVersion = "21.05"; # Did you read the comment?
 
 }

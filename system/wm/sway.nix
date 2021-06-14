@@ -26,7 +26,7 @@
     };
 
   services = {
-    gnome3.gnome-keyring.enable = true;
+    gnome.gnome-keyring.enable = true;
     upower.enable = true;
 
     xserver = {
@@ -35,7 +35,7 @@
       layout = "us,pt";
       xkbOptions = "caps:escape, grp:shifts_toggle";
       libinput.enable = true;
-      libinput.clickMethod = "clickfinger";
+      libinput.touchpad.clickMethod = "clickfinger";
       videoDrivers = [ "intel" ];
     };
   };

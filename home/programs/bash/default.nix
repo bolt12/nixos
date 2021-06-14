@@ -49,7 +49,7 @@
         tese = "cd /home/bolt/Desktop/Bolt/UMinho/5ºAno/Tese";
         haskell = "cd /home/bolt/Desktop/Bolt/Playground/Haskell/";
         talks = "cd /home/bolt/Desktop/Bolt/Playground/Talks/";
-        agda = "cd /home/bolt/Desktop/Bolt/Playground/Agda/";
+        agdacd = "cd /home/bolt/Desktop/Bolt/Playground/Agda/";
         playg = "cd /home/bolt/Desktop/Bolt/Playground/";
         sicstus = "rlwrap sicstus";
         idris2 = "rlwrap idris2";

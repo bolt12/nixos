@@ -32,6 +32,7 @@ let
     "spotify"
     "spotify-unwrapped"
     "zoom-us"
+    "unrar"
     "faac" # part of zoom
   ];
 
@@ -49,7 +50,8 @@ let
 
   defaultPkgs = with pkgs; [
     alloy                       # model checker
-    agda                        # dependently typed programming language
+    (agda.withPackages (p: [ p.standard-library ]))
+    # dependently typed programming language
     bash                        # bash
     bc                          # gnu calculator
     betterlockscreen            # fast lockscreen based on i3lock
@@ -158,7 +160,7 @@ in
   home = {
     username      = "bolt";
     homeDirectory = "/home/bolt";
-    stateVersion  = "20.09";
+    stateVersion  = "21.05";
 
     packages =
       defaultPkgs
@@ -192,6 +194,7 @@ in
   };
 
   imports = [
+    ./programs/agda/default.nix
     ./programs/bash/default.nix
     ./programs/emacs/default.nix
     ./programs/firefox/default.nix
