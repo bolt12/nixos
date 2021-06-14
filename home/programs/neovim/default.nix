@@ -24,6 +24,11 @@ let
     src = sources.vim-bujo;
   };
 
+  vim-silicon = pkgs.vimUtils.buildVimPlugin {
+    name = "vim-silicon";
+    src = sources.vim-silicon;
+  };
+
   overriddenPlugins = with pkgs; [];
 
   myVimPlugins = with plugins; [
@@ -36,17 +41,17 @@ let
     vim-pandoc-syntax       # pandoc syntax support
     rainbow_parentheses-vim # for nested parentheses
     colorizer               # colors
-    vim-floaterm            # floating window terminal
-    vim-surround            # quickly edit surroundings (brackets, html tags, etc)
-    vim-hoogle              # haskell hoogle
-    gruvbox                 # color theme
     coc-nvim                # lsp based intellisense
     haskell-vim             # haskell vim
-    vim2hs                  # vim2hs unicode
-    hlint-refactor-vim      # hlint
+    vim-haskellConcealPlus  # Unicode
     vim-nix                 # nix support (highlighting, etc)
     ctrlp-vim               # nix support (highlighting, etc)
+    gruvbox-community       # color theme
     vim-bujo                # todos
+    vim-floaterm            # floating window terminal
+    vim-hoogle              # haskell hoogle
+    vim-silicon             # vim Silicon integration
+    vim-surround            # quickly edit surroundings (brackets, html tags, etc)
   ] ++ unstablePlugins
     ++ overriddenPlugins;
 

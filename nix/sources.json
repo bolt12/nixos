@@ -94,5 +94,17 @@
         "type": "tarball",
         "url": "https://github.com/vuciv/vim-bujo/archive/ae87612ccabd0460c6f71387b7b23515383d5468.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "vim-silicon": {
+        "branch": "master",
+        "description": "Vim plugin for generating images of source code using https://github.com/Aloxaf/silicon",
+        "homepage": "",
+        "owner": "segeljakt",
+        "repo": "vim-silicon",
+        "rev": "4a93122ae2139a12e2a56f064d086c05160b6835",
+        "sha256": "1q323d787a3rxycx0s5qhkfy18cic7jm80b5pzd1bzs31as8g47j",
+        "type": "tarball",
+        "url": "https://github.com/segeljakt/vim-silicon/archive/4a93122ae2139a12e2a56f064d086c05160b6835.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     }
 }

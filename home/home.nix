@@ -96,6 +96,7 @@ let
     python3                     # python3 programming language
     rnix-lsp                    # nix lsp server
     shared-mime-info            # database of common MIME types
+    silicon                     # create beautiful code imgs
     simplescreenrecorder        # self-explanatory
     skypeforlinux               # skype for linux
     slack                       # slack client
