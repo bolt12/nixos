@@ -28,8 +28,9 @@ in
     # Enables wireless support and openvpn via network manager.
     networkmanager = {
       enable = true;
+      dns = "none";
     };
-    nameservers = [ "1.1.1.1" "8.8.8.8" ];
+    nameservers = [ "1.1.1.1" "8.8.8.8" "8.8.4.4" ];
 
     # The global useDHCP flag is deprecated, therefore explicitly set to false here.
     # Per-interface useDHCP will be mandatory in the future, so this generated config

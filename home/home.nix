@@ -120,8 +120,10 @@ let
       pkgs.swaylock-fancy
       unstable.wofi
       unstable.wlsunset
+      unstable.xdg-desktop-portal
       unstable.xdg-desktop-portal-wlr
       unstable.wlogout
+      unstable.pipewire
       pkgs.brightnessctl
       unstable.wl-clipboard
       unstable.mako
@@ -152,7 +154,6 @@ let
     pkgs.haskellPackages.ghc                     # compiler
     pkgs.haskellPackages.hoogle                  # documentation
     pkgs.haskellPackages.nix-tree                # visualize nix dependencies
-    # pkgs.haskellPackages.haskell-language-server # haskell IDE (ships with ghcide)
     easy-hls-nix                                 # haskell IDE (ships with ghcide)
   ];
 

@@ -219,6 +219,9 @@ exec_always {
     gsettings set $gnome-schema font-name 'JetBrainsMono Nerd Font 13'
 }
 
+# xdg-desktop-portal-wlr
+exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
+
 # nm-applet
 exec_always nm-applet --indicator
 
