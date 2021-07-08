@@ -22,6 +22,8 @@ in
       ./machine/x1-g8.nix
       # Window manager
       ./wm/sway.nix
+      # Include IOHK binary caches
+      ./iohk/caches.nix
     ];
 
   networking = {
@@ -218,7 +220,7 @@ in
     # Automate garbage collection
     gc = {
       automatic = true;
-      dates     = "weekly";
+      dates     = "monthly";
       options   = "--delete-older-than 7d";
     };
 

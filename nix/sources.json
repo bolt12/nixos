@@ -23,16 +23,28 @@
         "url": "https://github.com/jkachmar/easy-hls-nix/archive/9d64543a015563942c954b89addc1108800ed134.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
+    "neoscroll-nvim": {
+        "branch": "master",
+        "description": "Smooth scrolling neovim plugin written in lua",
+        "homepage": null,
+        "owner": "karb94",
+        "repo": "neoscroll.nvim",
+        "rev": "efc7159460953cbf2e5356b58fcf523f9ddac178",
+        "sha256": "1vcmpybkmp76blqb9snsjbnii0s85bg5mzbf9r1vr6qni80wrbi5",
+        "type": "tarball",
+        "url": "https://github.com/karb94/neoscroll.nvim/archive/efc7159460953cbf2e5356b58fcf523f9ddac178.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
     "neovim-nightly-overlay": {
         "branch": "master",
         "description": "[maintainer=@mjlbach] ",
         "homepage": "",
         "owner": "nix-community",
         "repo": "neovim-nightly-overlay",
-        "rev": "96225ac9d5895eb939d1a15db14597e3cd16d812",
-        "sha256": "0klm3dc6il94y3h16z9c13prvs12j5ahbwlk3qjmy5342z0fyjr2",
+        "rev": "28d86db158ed595d064adde1239c83cc0ef3ee08",
+        "sha256": "0fhnmlqw67k639snlxykhb29bvipgmqzmy902z3yxpzhazxf2ddw",
         "type": "tarball",
-        "url": "https://github.com/nix-community/neovim-nightly-overlay/archive/96225ac9d5895eb939d1a15db14597e3cd16d812.tar.gz",
+        "url": "https://github.com/nix-community/neovim-nightly-overlay/archive/28d86db158ed595d064adde1239c83cc0ef3ee08.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "niv": {
@@ -53,10 +65,10 @@
         "homepage": "",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "71326cd12ddfa0fac40fdb451fcba7dad763c56e",
-        "sha256": "1939fwll9xwm7mf5crz7gfvz41c8gqd8wg7fy2v6m71viiq8lrda",
+        "rev": "c06613c25df3fe1dd26243847a3c105cf6770627",
+        "sha256": "16si1436wf3fcx91p6cy3qxaib8kr78qivbi69lq4m63n96gglkv",
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/71326cd12ddfa0fac40fdb451fcba7dad763c56e.tar.gz",
+        "url": "https://github.com/NixOS/nixpkgs/archive/c06613c25df3fe1dd26243847a3c105cf6770627.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "nixpkgs-unstable": {
@@ -65,10 +77,10 @@
         "homepage": "",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "db6e089456cdddcd7e2c1d8dac37a505c797e8fa",
-        "sha256": "02yk20i9n5nhn6zgll3af7kp3q5flgrpg1h5vcqfdqcck8iikx4b",
+        "rev": "4c0834929cafb7478a5e82616d484578a80a3e41",
+        "sha256": "1ld29fsviq5ax1drh25fxqcxi44g3cisf5hfib29d0qxjqlicbdf",
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/db6e089456cdddcd7e2c1d8dac37a505c797e8fa.tar.gz",
+        "url": "https://github.com/NixOS/nixpkgs/archive/4c0834929cafb7478a5e82616d484578a80a3e41.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "nixpkgs-wayland": {
@@ -77,10 +89,22 @@
         "homepage": "",
         "owner": "colemickens",
         "repo": "nixpkgs-wayland",
-        "rev": "03f164c2a5344768c8186989c30045b7c8c7ebf7",
-        "sha256": "1925rl2fwx89v8wkvfi88m3kiddygjwjqydiqsz7c54dqi2smsi3",
+        "rev": "c53d6a085f24b1fc4c5d8984944317a5326311d2",
+        "sha256": "15rfcmhd01xcrvyn6c0lvkddrw392wwq13mxrj2sidl3vnzfglx4",
         "type": "tarball",
-        "url": "https://github.com/colemickens/nixpkgs-wayland/archive/03f164c2a5344768c8186989c30045b7c8c7ebf7.tar.gz",
+        "url": "https://github.com/colemickens/nixpkgs-wayland/archive/c53d6a085f24b1fc4c5d8984944317a5326311d2.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "venn-nvim": {
+        "branch": "main",
+        "description": "Draw ASCII diagrams in Neovim",
+        "homepage": "",
+        "owner": "jbyuki",
+        "repo": "venn.nvim",
+        "rev": "425c9df332b46d8b13bc4e641646a9fb3db9c0c8",
+        "sha256": "0hf8v4c7y55b54na6yyq32d5192fsx9kq7scpp81b6hhi4rqxa88",
+        "type": "tarball",
+        "url": "https://github.com/jbyuki/venn.nvim/archive/425c9df332b46d8b13bc4e641646a9fb3db9c0c8.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "vim-bujo": {

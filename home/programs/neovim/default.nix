@@ -29,6 +29,16 @@ let
     src = sources.vim-silicon;
   };
 
+  neoscroll = pkgs.vimUtils.buildVimPlugin {
+    name = "neoscroll-nvim";
+    src = sources.neoscroll-nvim;
+  };
+
+  venn = pkgs.vimUtils.buildVimPlugin {
+    name = "venn-nvim";
+    src = sources.venn-nvim;
+  };
+
   overriddenPlugins = with pkgs; [];
 
   myVimPlugins = with plugins; [
@@ -47,6 +57,10 @@ let
     vim-nix                 # nix support (highlighting, etc)
     ctrlp-vim               # nix support (highlighting, etc)
     gruvbox-community       # color theme
+    Shade-nvim              # dims inactive windows
+    specs-nvim              # Show where your cursor moves when jumping large distances
+    neoscroll               # smooth scrollng
+    venn-nvim               # draw diagrams
     vim-bujo                # todos
     vim-floaterm            # floating window terminal
     vim-hoogle              # haskell hoogle

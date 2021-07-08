@@ -43,6 +43,8 @@
 ; describe the character under your cursor.
 (global-set-key "\C-c\C-k" 'describe-char)
 
+(after! agda2
+  (setq agda2-highlight-level (quote interactive)))
 
 ;; Here are some additional functions/macros that could help you configure Doom:
 ;;

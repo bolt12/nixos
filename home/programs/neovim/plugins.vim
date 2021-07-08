@@ -143,7 +143,47 @@ imap <C-b>a <Plug>BujoAddinsert
 nmap <C-b>c <Plug>BujoChecknormal
 imap <C-b>c <Plug>BujoCheckinsert
 
+lua require('neoscroll').setup()
+
+lua << EOF
+require'shade'.setup({
+  overlay_opacity = 50,
+  opacity_step = 1
+  -- keys = {
+  --   brightness_up    = '<C-Up>',
+  --   brightness_down  = '<C-Down>',
+  --   toggle           = '<Leader>s',
+  -- }
+})
+EOF
+
+lua << EOF
+require('specs').setup{
+    show_jumps  = true,
+    min_jump = 30,
+    popup = {
+        delay_ms = 0, -- delay before popup displays
+        inc_ms = 10, -- time increments used for fade/resize effects
+        blend = 10, -- starting blend, between 0-100 (fully transparent), see :h winblend
+        width = 30,
+        winhl = "PMenu",
+        fader = require('specs').linear_fader,
+        resizer = require('specs').shrink_resizer
+    },
+    ignore_filetypes = {},
+    ignore_buftypes = {
+        nofile = true,
+    },
+}
+EOF
+
 " SUMMARY
 " a= -> Align on equal sign
 " a- -> Align on case match
 " a; -> Align on :: match
+"
+" set virtualedit=all or set ve=all.
+" This will allow you to freely move the cursor in the buffer. (see help virtualedit)
+" Enter in Visual Block mode using <C-v>. Select the region where the box should be.
+" Invoke :VBox. This will draw a rectangle. In case, it has a width or a height of 1, it will draw a line.
+

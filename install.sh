@@ -10,9 +10,7 @@ export PINNED_NIX_PKGS="https://github.com/NixOS/nixpkgs/archive/refs/tags/21.05
 sudo nix-channel --add https://nixos.org/channels/nixos-21.05 nixos
 
 # Nix configuration
-sudo cp system/configuration.nix /etc/nixos/
-sudo cp -r system/machine/ /etc/nixos/
-sudo cp -r system/wm/ /etc/nixos/
+sudo cp -a system/. /etc/nixos/
 sudo nixos-rebuild -I nixpkgs=$PINNED_NIX_PKGS switch --upgrade
 
 # Manual steps

@@ -27,6 +27,9 @@
     cleanTmpDir = true;
   };
 
+  # Systemd /run/user increase size
+  services.logind.extraConfig = "RuntimeDirectorySize=25%";
+
   powerManagement.enable = true;
   powerManagement.powertop.enable = true;
 
