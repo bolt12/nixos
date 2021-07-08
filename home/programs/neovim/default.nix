@@ -60,7 +60,7 @@ let
     Shade-nvim              # dims inactive windows
     specs-nvim              # Show where your cursor moves when jumping large distances
     neoscroll               # smooth scrollng
-    venn-nvim               # draw diagrams
+    venn                    # draw diagrams
     vim-bujo                # todos
     vim-floaterm            # floating window terminal
     vim-hoogle              # haskell hoogle
