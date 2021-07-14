@@ -39,6 +39,11 @@ let
     src = sources.venn-nvim;
   };
 
+  highstr = pkgs.vimUtils.buildVimPlugin {
+    name = "HighStr-nvim";
+    src = sources.HighStr-nvim;
+  };
+
   overriddenPlugins = with pkgs; [];
 
   myVimPlugins = with plugins; [
@@ -61,6 +66,9 @@ let
     specs-nvim              # Show where your cursor moves when jumping large distances
     neoscroll               # smooth scrollng
     venn                    # draw diagrams
+    nvim-web-devicons       # file icons
+    barbar-nvim             # fancy status bar
+    highstr                 # highlight stuff
     vim-bujo                # todos
     vim-floaterm            # floating window terminal
     vim-hoogle              # haskell hoogle

@@ -1,4 +1,16 @@
 {
+    "HighStr-nvim": {
+        "branch": "main",
+        "description": "🦎 A NeoVim plugin for highlighting visual selections like in a normal document editor!",
+        "homepage": "",
+        "owner": "Pocco81",
+        "repo": "HighStr.nvim",
+        "rev": "f6a76cac91c448ff2addf2371270186a226e4a69",
+        "sha256": "1w0xlc7qq54m40sk4wi6a7rj5qjf3h4xznf1pyr9xmpcv64k121s",
+        "type": "tarball",
+        "url": "https://github.com/Pocco81/HighStr.nvim/archive/f6a76cac91c448ff2addf2371270186a226e4a69.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
     "comma": {
         "branch": "master",
         "description": null,
@@ -29,10 +41,10 @@
         "homepage": null,
         "owner": "karb94",
         "repo": "neoscroll.nvim",
-        "rev": "efc7159460953cbf2e5356b58fcf523f9ddac178",
-        "sha256": "1vcmpybkmp76blqb9snsjbnii0s85bg5mzbf9r1vr6qni80wrbi5",
+        "rev": "2b0d9b2db68995bf3fd280523dc192ca602e8367",
+        "sha256": "1khjnbc06jn225dn45izypy8r3j0yqybnda76mm58bpcdnx4091a",
         "type": "tarball",
-        "url": "https://github.com/karb94/neoscroll.nvim/archive/efc7159460953cbf2e5356b58fcf523f9ddac178.tar.gz",
+        "url": "https://github.com/karb94/neoscroll.nvim/archive/2b0d9b2db68995bf3fd280523dc192ca602e8367.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "neovim-nightly-overlay": {
@@ -41,10 +53,10 @@
         "homepage": "",
         "owner": "nix-community",
         "repo": "neovim-nightly-overlay",
-        "rev": "28d86db158ed595d064adde1239c83cc0ef3ee08",
-        "sha256": "0fhnmlqw67k639snlxykhb29bvipgmqzmy902z3yxpzhazxf2ddw",
+        "rev": "6ada4e480074322be2cc8ea72709c33fb50a0a90",
+        "sha256": "05crf9d6pkgf9pyql2wakpsfk6m88dbrkkck7971ycrfa1wwymm7",
         "type": "tarball",
-        "url": "https://github.com/nix-community/neovim-nightly-overlay/archive/28d86db158ed595d064adde1239c83cc0ef3ee08.tar.gz",
+        "url": "https://github.com/nix-community/neovim-nightly-overlay/archive/6ada4e480074322be2cc8ea72709c33fb50a0a90.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "niv": {
@@ -65,10 +77,10 @@
         "homepage": "",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "c06613c25df3fe1dd26243847a3c105cf6770627",
-        "sha256": "16si1436wf3fcx91p6cy3qxaib8kr78qivbi69lq4m63n96gglkv",
+        "rev": "2a96414d7e350160a33ed0978449c9ff5b5a6eb3",
+        "sha256": "1dzrfqdjq3yq5jjskiqflzy58l2xx6059gay9p1k07zrlm1wigy5",
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/c06613c25df3fe1dd26243847a3c105cf6770627.tar.gz",
+        "url": "https://github.com/NixOS/nixpkgs/archive/2a96414d7e350160a33ed0978449c9ff5b5a6eb3.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "nixpkgs-unstable": {
@@ -77,10 +89,10 @@
         "homepage": "",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "4c0834929cafb7478a5e82616d484578a80a3e41",
-        "sha256": "1ld29fsviq5ax1drh25fxqcxi44g3cisf5hfib29d0qxjqlicbdf",
+        "rev": "dac74fead8737d6bf0823f22da26c7344f69bc0a",
+        "sha256": "0m0bqkh4bmlg5djb9bmyrpa1s4kwy2klil36487vyqkbdxnl76f7",
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/4c0834929cafb7478a5e82616d484578a80a3e41.tar.gz",
+        "url": "https://github.com/NixOS/nixpkgs/archive/dac74fead8737d6bf0823f22da26c7344f69bc0a.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "nixpkgs-wayland": {
@@ -89,10 +101,10 @@
         "homepage": "",
         "owner": "colemickens",
         "repo": "nixpkgs-wayland",
-        "rev": "c53d6a085f24b1fc4c5d8984944317a5326311d2",
-        "sha256": "15rfcmhd01xcrvyn6c0lvkddrw392wwq13mxrj2sidl3vnzfglx4",
+        "rev": "a3a8bbb8163fbe9a8f5b3c6999ce8bd589e9281e",
+        "sha256": "1rxlxjfqjspp40cvffqyl70wg45w1vhpa717s222g6fhi72mgmxl",
         "type": "tarball",
-        "url": "https://github.com/colemickens/nixpkgs-wayland/archive/c53d6a085f24b1fc4c5d8984944317a5326311d2.tar.gz",
+        "url": "https://github.com/colemickens/nixpkgs-wayland/archive/a3a8bbb8163fbe9a8f5b3c6999ce8bd589e9281e.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "venn-nvim": {
