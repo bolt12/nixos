@@ -1,4 +1,28 @@
 {
+    "AbbrevMan-nvim": {
+        "branch": "main",
+        "description": "🍍 A NeoVim plugin for managing vim abbreviations.",
+        "homepage": "",
+        "owner": "bolt12",
+        "repo": "AbbrevMan.nvim",
+        "rev": "855ffd4b210bef1583f77933d7a2dd7af2e3ea0c",
+        "sha256": "0wvhymwkqakyf3jqz4b2ly7clzhg7929qkhd5iw6xaikkfsns0rh",
+        "type": "tarball",
+        "url": "https://github.com/bolt12/AbbrevMan.nvim/archive/855ffd4b210bef1583f77933d7a2dd7af2e3ea0c.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "AutoSave-nvim": {
+        "branch": "main",
+        "description": "🦴 A NeoVim plugin for saving your work before the world collapses or you type :qa!",
+        "homepage": "",
+        "owner": "Pocco81",
+        "repo": "AutoSave.nvim",
+        "rev": "7ae42195e58c593453aa0e082e468dd10d9f1541",
+        "sha256": "15v4d7q3iiyn665lnybq57q7l5nnbavg9arcfcid4qrywxg2pqf4",
+        "type": "tarball",
+        "url": "https://github.com/Pocco81/AutoSave.nvim/archive/7ae42195e58c593453aa0e082e468dd10d9f1541.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
     "HighStr-nvim": {
         "branch": "main",
         "description": "🦎 A NeoVim plugin for highlighting visual selections like in a normal document editor!",
@@ -9,6 +33,18 @@
         "sha256": "1w0xlc7qq54m40sk4wi6a7rj5qjf3h4xznf1pyr9xmpcv64k121s",
         "type": "tarball",
         "url": "https://github.com/Pocco81/HighStr.nvim/archive/f6a76cac91c448ff2addf2371270186a226e4a69.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "cheatsheet-nvim": {
+        "branch": "master",
+        "description": "A cheatsheet plugin for neovim with bundled cheatsheets for the editor, multiple vim plugins, nerd-fonts, regex, etc. with a Telescope fuzzy finder interface !",
+        "homepage": "",
+        "owner": "sudormrfbin",
+        "repo": "cheatsheet.nvim",
+        "rev": "803d62d0de9ce2c84603f22f8b48996691bda025",
+        "sha256": "14y78v869wcm79c4ngzx6qrii5j4kmnflzfvn8q7dp8v9zksfm09",
+        "type": "tarball",
+        "url": "https://github.com/sudormrfbin/cheatsheet.nvim/archive/803d62d0de9ce2c84603f22f8b48996691bda025.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "comma": {
@@ -35,16 +71,28 @@
         "url": "https://github.com/jkachmar/easy-hls-nix/archive/9d64543a015563942c954b89addc1108800ed134.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
+    "goto-preview": {
+        "branch": "main",
+        "description": "A small Neovim plugin for previewing definitions using floating windows.",
+        "homepage": null,
+        "owner": "rmagatti",
+        "repo": "goto-preview",
+        "rev": "39aa1e0334b577c59c4f7177ef36624bdd83f100",
+        "sha256": "0rr22r1yp7s3hqfdqf48wlv2bqw9j5izwgm3np7x1ygp85xizcbg",
+        "type": "tarball",
+        "url": "https://github.com/rmagatti/goto-preview/archive/39aa1e0334b577c59c4f7177ef36624bdd83f100.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
     "neoscroll-nvim": {
         "branch": "master",
         "description": "Smooth scrolling neovim plugin written in lua",
         "homepage": null,
         "owner": "karb94",
         "repo": "neoscroll.nvim",
-        "rev": "2b0d9b2db68995bf3fd280523dc192ca602e8367",
-        "sha256": "1khjnbc06jn225dn45izypy8r3j0yqybnda76mm58bpcdnx4091a",
+        "rev": "7aeb64ffc38ed321416d72cd15c80eb78115672a",
+        "sha256": "0zhr0rc8bhwgbdiqwq3ffs6pdmghbx6vgingzdsj3w8jh4nm30xk",
         "type": "tarball",
-        "url": "https://github.com/karb94/neoscroll.nvim/archive/2b0d9b2db68995bf3fd280523dc192ca602e8367.tar.gz",
+        "url": "https://github.com/karb94/neoscroll.nvim/archive/7aeb64ffc38ed321416d72cd15c80eb78115672a.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "neovim-nightly-overlay": {
@@ -53,10 +101,10 @@
         "homepage": "",
         "owner": "nix-community",
         "repo": "neovim-nightly-overlay",
-        "rev": "6ada4e480074322be2cc8ea72709c33fb50a0a90",
-        "sha256": "05crf9d6pkgf9pyql2wakpsfk6m88dbrkkck7971ycrfa1wwymm7",
+        "rev": "f4a792e4e540887e0c34af068ba6f9347ef576ac",
+        "sha256": "1g12hm446g8nw5x66jf33anyfnis77i2qpd1flfjaqyzv2194pgh",
         "type": "tarball",
-        "url": "https://github.com/nix-community/neovim-nightly-overlay/archive/6ada4e480074322be2cc8ea72709c33fb50a0a90.tar.gz",
+        "url": "https://github.com/nix-community/neovim-nightly-overlay/archive/f4a792e4e540887e0c34af068ba6f9347ef576ac.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "niv": {
@@ -77,10 +125,10 @@
         "homepage": "",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "2a96414d7e350160a33ed0978449c9ff5b5a6eb3",
-        "sha256": "1dzrfqdjq3yq5jjskiqflzy58l2xx6059gay9p1k07zrlm1wigy5",
+        "rev": "6b940846e99cedd10eafbc301e467972ade1afec",
+        "sha256": "0nyk9x6hmdgdqgs4m5zdb7c4nhfc282yy1l4a3f9xln4mgchrw4h",
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/2a96414d7e350160a33ed0978449c9ff5b5a6eb3.tar.gz",
+        "url": "https://github.com/NixOS/nixpkgs/archive/6b940846e99cedd10eafbc301e467972ade1afec.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "nixpkgs-unstable": {
@@ -89,10 +137,10 @@
         "homepage": "",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "dac74fead8737d6bf0823f22da26c7344f69bc0a",
-        "sha256": "0m0bqkh4bmlg5djb9bmyrpa1s4kwy2klil36487vyqkbdxnl76f7",
+        "rev": "4331afb9461ed13de9c8ddbfd5dc0eaa799cb8a2",
+        "sha256": "0mymjiznljrp4ga08px73qnjp8jy4z7f2y57qaizzyqzmbkjnbpr",
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/dac74fead8737d6bf0823f22da26c7344f69bc0a.tar.gz",
+        "url": "https://github.com/NixOS/nixpkgs/archive/4331afb9461ed13de9c8ddbfd5dc0eaa799cb8a2.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "nixpkgs-wayland": {
@@ -101,10 +149,10 @@
         "homepage": "",
         "owner": "colemickens",
         "repo": "nixpkgs-wayland",
-        "rev": "a3a8bbb8163fbe9a8f5b3c6999ce8bd589e9281e",
-        "sha256": "1rxlxjfqjspp40cvffqyl70wg45w1vhpa717s222g6fhi72mgmxl",
+        "rev": "fd3be17ace1aa22ed6b1d0bd01a979deb098cbbd",
+        "sha256": "12x3r07vx3nrmi4ajkw7wz1ngbypaymkcrzf4r48441q3gz99hkm",
         "type": "tarball",
-        "url": "https://github.com/colemickens/nixpkgs-wayland/archive/a3a8bbb8163fbe9a8f5b3c6999ce8bd589e9281e.tar.gz",
+        "url": "https://github.com/colemickens/nixpkgs-wayland/archive/fd3be17ace1aa22ed6b1d0bd01a979deb098cbbd.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "venn-nvim": {
@@ -113,10 +161,10 @@
         "homepage": "",
         "owner": "jbyuki",
         "repo": "venn.nvim",
-        "rev": "425c9df332b46d8b13bc4e641646a9fb3db9c0c8",
-        "sha256": "0hf8v4c7y55b54na6yyq32d5192fsx9kq7scpp81b6hhi4rqxa88",
+        "rev": "7758a6983f150ca028c915aaebe81be993b749a5",
+        "sha256": "1x524ghrfacii5nvxsznvkrdcal343d3j0amm80h4i9cv4b0b1jy",
         "type": "tarball",
-        "url": "https://github.com/jbyuki/venn.nvim/archive/425c9df332b46d8b13bc4e641646a9fb3db9c0c8.tar.gz",
+        "url": "https://github.com/jbyuki/venn.nvim/archive/7758a6983f150ca028c915aaebe81be993b749a5.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "vim-bujo": {

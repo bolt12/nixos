@@ -44,6 +44,26 @@ let
     src = sources.HighStr-nvim;
   };
 
+  auto-save = pkgs.vimUtils.buildVimPlugin {
+    name = "auto-save";
+    src = sources.AutoSave-nvim;
+  };
+
+  abbrev = pkgs.vimUtils.buildVimPlugin {
+    name = "abbrev";
+    src = sources.AbbrevMan-nvim;
+  };
+
+  cheatsheet-nvim = pkgs.vimUtils.buildVimPlugin {
+    name = "cheatsheet-nvim";
+    src = sources.cheatsheet-nvim;
+  };
+
+  goto-preview = pkgs.vimUtils.buildVimPlugin {
+    name = "goto-preview";
+    src = sources.goto-preview;
+  };
+
   overriddenPlugins = with pkgs; [];
 
   myVimPlugins = with plugins; [
@@ -60,7 +80,6 @@ let
     haskell-vim             # haskell vim
     vim-haskellConcealPlus  # Unicode
     vim-nix                 # nix support (highlighting, etc)
-    ctrlp-vim               # nix support (highlighting, etc)
     gruvbox-community       # color theme
     Shade-nvim              # dims inactive windows
     specs-nvim              # Show where your cursor moves when jumping large distances
@@ -69,6 +88,14 @@ let
     nvim-web-devicons       # file icons
     barbar-nvim             # fancy status bar
     highstr                 # highlight stuff
+    auto-save               # auto-save files
+    abbrev                  # Abbreviations fix
+    gitsigns-nvim           # git integration
+    popup-nvim              # popups
+    plenary-nvim            # lua dependency for other plugins
+    telescope-nvim          # fuzzy finder
+    cheatsheet-nvim         # command cheatsheet
+    goto-preview            # go to line preview
     vim-bujo                # todos
     vim-floaterm            # floating window terminal
     vim-hoogle              # haskell hoogle
