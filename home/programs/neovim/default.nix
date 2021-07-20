@@ -59,11 +59,6 @@ let
     src = sources.cheatsheet-nvim;
   };
 
-  goto-preview = pkgs.vimUtils.buildVimPlugin {
-    name = "goto-preview";
-    src = sources.goto-preview;
-  };
-
   overriddenPlugins = with pkgs; [];
 
   myVimPlugins = with plugins; [
@@ -95,7 +90,6 @@ let
     plenary-nvim            # lua dependency for other plugins
     telescope-nvim          # fuzzy finder
     cheatsheet-nvim         # command cheatsheet
-    goto-preview            # go to line preview
     vim-bujo                # todos
     vim-floaterm            # floating window terminal
     vim-hoogle              # haskell hoogle
@@ -107,6 +101,7 @@ let
   baseConfig    = builtins.readFile ./config.vim;
   cocConfig     = builtins.readFile ./coc.vim;
   cocSettings   = builtins.toJSON (import ./coc-settings.nix);
+  cheatsheetTxt = builtins.readFile ./cheatsheet.txt;
   pluginsConfig = builtins.readFile ./plugins.vim;
   vimConfig     = baseConfig + pluginsConfig + cocConfig;
 
@@ -127,5 +122,6 @@ in
 
   xdg.configFile = {
     "nvim/coc-settings.json".text = cocSettings;
+    "nvim/cheatsheet.txt".text = cheatsheetTxt;
   };
 }

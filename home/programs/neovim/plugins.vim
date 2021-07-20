@@ -287,7 +287,7 @@ require('telescope').setup{
   }
 }
 EOF
-"
+
 " Find files using Telescope command-line sugar.
 nnoremap <leader>ff <cmd>Telescope find_files<cr>
 nnoremap <leader>fg <cmd>Telescope live_grep<cr>
@@ -318,21 +318,6 @@ require("cheatsheet").setup({
     include_only_installed_plugins = true,
 })
 EOF
-
-lua << EOF
-require('goto-preview').setup {
-    width = 120; -- Width of the floating window
-    height = 15; -- Height of the floating window
-    default_mappings = false; -- Bind default mappings
-    debug = false; -- Print debug information
-    opacity = nil; -- 0-100 opacity level of the floating window where 100 is fully transparent.
-    post_open_hook = nil -- A function taking two arguments, a buffer and a window to be ran as a hook.
-  }
-EOF
-
-nnoremap <leader>gpd <cmd>lua require('goto-preview').goto_preview_definition()<CR>
-nnoremap <leader>gpi <cmd>lua require('goto-preview').goto_preview_implementation()<CR>
-nnoremap <leader>gP <cmd>lua require('goto-preview').close_all_win()<CR>
 
 " SUMMARY
 " a= -> Align on equal sign

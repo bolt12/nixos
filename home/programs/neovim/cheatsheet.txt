@@ -1,0 +1,65 @@
+## gitsigns @git
+Stage hunk                               | <leader>ghs
+Undo stage hunk                          | <leader>ghu
+Stage hunk                               | <leader>ghs
+Reset hunk                               | <leader>ghr
+Preview hunk                             | <leader>ghp
+Reset buffer                             | <leader>ghR
+Blame current line                       | <leader>ghb
+Next hunk                                | ]c
+Previous hunk                            | ]c
+Hunk text object                         | ih
+
+## telescope @fuzzy @fzf
+Close                                    | <C-C>
+Toggle selection                         | <Tab>
+Open file in tab                         | <C-T>
+Open file in split                       | <C-X>
+Open file in vsplit                      | <C-V>
+Scroll up in preview window              | <C-U>
+Scroll down in preview window            | <C-D>
+Send to quickfix list                    | <C-Q>
+Send selected items to quickfix list     | <M-Q>
+Find files                               | <leader>ff
+Live grep                                | <leader>fg
+Buffers                                  | <leader>fb
+Help tags                                | <leader>fh
+
+## bujo @todo @notes
+Open TODO notes                          | :Todo
+Add item                                 | <C-b>a
+Check item                               | <C-b>c
+
+## Floaterm @terminal @floating
+Toggle Floaterm                          | <A-S-d>
+
+## Hoogle @hoogle @haskell
+Search cursos word                       | <leader>h
+
+## Tabular @align
+Align any                                | :Tabularize /<regex>
+Align =                                  | a=
+Align ::                                 | a;
+Align ->                                 | a-
+Align |                                  | a\|
+Align ,                                  | a,
+
+## Venn @diagrams
+Draw diagrams                            | set ve=all -> <C-v> -> :VBox
+
+## HighStr @highlight
+Highlight text                           | :HSHighlight <integer> (note pressing <C-U> might be needed in visual mode)
+Remove all highlights                    | :HSHighlight rm_all
+
+## Surround @parentheses @brackets @tags
+Change from " to '                       | cs"'
+Change from ' to <q>                     | cs'<q>
+Change from <q> to "                     | cst"
+Remove delimiters                        | ds<delimiter>
+Add delimiters in word                   | ysiw<delimiter>
+Wrap entire line in delimiter            | yss<delimiter>
+Visual mode wrap                         | visual selection followed by S<delimiter>
+
+## Silicon @screenshot @code
+Generate image from current buffer       | :Silicon /path/to/output.png
+Generate image and write to clipboard    | :Silicon /path/to/output.png --to-clipboard

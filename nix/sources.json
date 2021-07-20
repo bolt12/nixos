@@ -71,18 +71,6 @@
         "url": "https://github.com/jkachmar/easy-hls-nix/archive/9d64543a015563942c954b89addc1108800ed134.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
-    "goto-preview": {
-        "branch": "main",
-        "description": "A small Neovim plugin for previewing definitions using floating windows.",
-        "homepage": null,
-        "owner": "rmagatti",
-        "repo": "goto-preview",
-        "rev": "39aa1e0334b577c59c4f7177ef36624bdd83f100",
-        "sha256": "0rr22r1yp7s3hqfdqf48wlv2bqw9j5izwgm3np7x1ygp85xizcbg",
-        "type": "tarball",
-        "url": "https://github.com/rmagatti/goto-preview/archive/39aa1e0334b577c59c4f7177ef36624bdd83f100.tar.gz",
-        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
-    },
     "neoscroll-nvim": {
         "branch": "master",
         "description": "Smooth scrolling neovim plugin written in lua",
@@ -137,10 +125,10 @@
         "homepage": "",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "4331afb9461ed13de9c8ddbfd5dc0eaa799cb8a2",
-        "sha256": "0mymjiznljrp4ga08px73qnjp8jy4z7f2y57qaizzyqzmbkjnbpr",
+        "rev": "1441fa74d213d7cc120d9d7d49e540c1fc59bc58",
+        "sha256": "152qb7ch0r4bidik33zd0a9wl0929zr0dqs5l5ksm7vh3assc7sc",
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/4331afb9461ed13de9c8ddbfd5dc0eaa799cb8a2.tar.gz",
+        "url": "https://github.com/NixOS/nixpkgs/archive/1441fa74d213d7cc120d9d7d49e540c1fc59bc58.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "nixpkgs-wayland": {
