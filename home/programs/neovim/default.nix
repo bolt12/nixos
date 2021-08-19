@@ -17,6 +17,7 @@ let
   unstablePlugins = with plugins-unstable; [
     # nvim-lightbulb
     # lspsaga-nvim
+    coc-nvim                # lsp based intellisense
   ];
 
   vim-bujo = pkgs.vimUtils.buildVimPlugin {
@@ -71,7 +72,6 @@ let
     vim-pandoc-syntax       # pandoc syntax support
     rainbow_parentheses-vim # for nested parentheses
     colorizer               # colors
-    coc-nvim                # lsp based intellisense
     haskell-vim             # haskell vim
     vim-haskellConcealPlus  # Unicode
     vim-nix                 # nix support (highlighting, etc)

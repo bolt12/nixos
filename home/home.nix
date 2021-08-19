@@ -38,6 +38,7 @@ let
 
   # Unstable branch packages
   unstablePkgs = [
+    (unstable.agda.withPackages (p: [ p.standard-library ]))
     unstable.manix
     unstable.zoom-us
     unstable.faac    # part of zoom (?)
@@ -50,8 +51,6 @@ let
 
   defaultPkgs = with pkgs; [
     alloy                       # model checker
-    (agda.withPackages (p: [ p.standard-library ]))
-    # dependently typed programming language
     bash                        # bash
     bc                          # gnu calculator
     betterlockscreen            # fast lockscreen based on i3lock
@@ -125,11 +124,12 @@ let
       unstable.xdg-desktop-portal-wlr
       unstable.wlogout
       unstable.pipewire
+      unstable.wl-gammactl
       pkgs.brightnessctl
       unstable.wl-clipboard
       unstable.mako
       unstable.swayidle
-      pkgs.wdisplays
+      unstable.wdisplays
       unstable.waybar
   ];
 
