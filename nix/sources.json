@@ -41,10 +41,10 @@
         "homepage": "",
         "owner": "sudormrfbin",
         "repo": "cheatsheet.nvim",
-        "rev": "cf069d8bd1236ecd7e5e844939e71a034e7e867a",
-        "sha256": "0rw96z1xwmx5g8rb5ggmc78d58j6ipyrx1291h1f003hlgclaszf",
+        "rev": "7d83f02176287436acc06428ded782fe4bc08b94",
+        "sha256": "1ajqmg4lls4nc9bpw233rd25z5qfbnkwbdi1jnrh79nlr9sxvcyp",
         "type": "tarball",
-        "url": "https://github.com/sudormrfbin/cheatsheet.nvim/archive/cf069d8bd1236ecd7e5e844939e71a034e7e867a.tar.gz",
+        "url": "https://github.com/sudormrfbin/cheatsheet.nvim/archive/7d83f02176287436acc06428ded782fe4bc08b94.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "comma": {
@@ -89,10 +89,10 @@
         "homepage": "",
         "owner": "nix-community",
         "repo": "neovim-nightly-overlay",
-        "rev": "04d59fbf55a131092a4ab3f8a9af151149a8a371",
-        "sha256": "0ghc9i9w98s73rqmjxkm133i1gcahx0f3wfl2y0x5d3kaxlnriqb",
+        "rev": "ce1e960c55078fd4d51e4198a030a8f5bfc7454c",
+        "sha256": "1lgw4rij4z8kp7117a7fnpdialp4qvf9hqbdqyn6vb1vhxwqgm6x",
         "type": "tarball",
-        "url": "https://github.com/nix-community/neovim-nightly-overlay/archive/04d59fbf55a131092a4ab3f8a9af151149a8a371.tar.gz",
+        "url": "https://github.com/nix-community/neovim-nightly-overlay/archive/ce1e960c55078fd4d51e4198a030a8f5bfc7454c.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "niv": {
@@ -137,10 +137,10 @@
         "homepage": "",
         "owner": "colemickens",
         "repo": "nixpkgs-wayland",
-        "rev": "e48b231d6d6b9f64669443e1373047b2950ee2c8",
-        "sha256": "1yxa3lvzfqhw3gsrjd5k6bmffz0vagxnqfvca1g34yf42zdhg5kr",
+        "rev": "11dfbff3590cab8e0d7650b92748eaa5fd72f67b",
+        "sha256": "02whfnpwm8khdmyr2ajs4c51lxkkdpydc6dgmfghj3w33mxvnm79",
         "type": "tarball",
-        "url": "https://github.com/colemickens/nixpkgs-wayland/archive/e48b231d6d6b9f64669443e1373047b2950ee2c8.tar.gz",
+        "url": "https://github.com/colemickens/nixpkgs-wayland/archive/11dfbff3590cab8e0d7650b92748eaa5fd72f67b.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "venn-nvim": {

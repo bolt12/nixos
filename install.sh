@@ -11,6 +11,7 @@ sudo nix-channel --add https://nixos.org/channels/nixos-21.05 nixos
 
 # Nix configuration
 sudo cp -a system/. /etc/nixos/
+sudo cp -a nix /etc/nixos/
 sudo nixos-rebuild -I nixpkgs=$PINNED_NIX_PKGS switch --upgrade
 
 # Manual steps

@@ -175,6 +175,8 @@ in
       ++ extraPkgs;
 
     sessionVariables = {
+      MOZ_ENABLE_WAYLAND = 1;
+      XDG_CURRENT_DESKTOP = "sway";
       DISPLAY = ":0";
       EDITOR = "nvim";
       VISUAL = "nvim";
@@ -236,7 +238,6 @@ in
     ssh.enable = true;
   };
 
-  services.flameshot.enable = true;
   services.lorri.enable = true;
 
 }

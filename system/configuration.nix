@@ -101,6 +101,7 @@ in
   hardware = {
       bluetooth = {
         enable = true;
+        hsphfpd.enable = true;
         settings = {
           General.Enable = lib.concatStringsSep "," [ "Source" "Sink" "Media" "Socket" ];
         };
@@ -136,6 +137,29 @@ in
     # Firefox NixOs wiki recommends
     pipewire = {
       enable = true;
+      # High quality BT calls
+      media-session.config.bluez-monitor.rules = [
+        {
+          # Matches all cards
+          matches = [{ "device.name" = "~bluez_card.*"; }];
+          actions = {
+            "update-props" = {
+              "bluez5.auto-connect" = [ "hfp_hf" "hsp_hs" "a2dp_sink" ];
+            };
+          };
+        }
+        {
+          matches = [
+            # Matches all sources
+            { "node.name" = "~bluez_input.*"; }
+            # Matches all outputs
+            { "node.name" = "~bluez_output.*"; }
+          ];
+          actions = {
+            "node.pause-on-idle" = false;
+          };
+        }
+      ];
     };
 
     # USB Automounting
@@ -205,9 +229,9 @@ in
     portal = {
       enable = true;
       gtkUsePortal = true;
-      extraPortals = with pkgs; [
-        xdg-desktop-portal-wlr
-        xdg-desktop-portal-gtk
+      extraPortals = [
+        pkgs.xdg-desktop-portal-wlr
+        pkgs.xdg-desktop-portal-gtk
       ];
     };
   };
