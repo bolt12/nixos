@@ -81,6 +81,7 @@ let
     (import sources.niv {}).niv # dependency management for nix
     nix-doc                     # nix documentation search tool
     nodejs                      # nodejs
+    noip                        # noip
     numix-icon-theme-circle     # icon theme
     numix-cursor-theme          # icon theme
     pamixer                     # pulseaudio cli mixer

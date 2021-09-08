@@ -2,7 +2,7 @@
 
 {
   environment.sessionVariables = {
-      MOZ_DISABLE_RDD_SANDBOX=1;
+      MOZ_DISABLE_RDD_SANDBOX="1";
       MOZ_ENABLE_WAYLAND = "1";
       XDG_CURRENT_DESKTOP = "sway"; # TODO: Do we need this in non-sway setups?
       XDG_SESSION_TYPE = "wayland";
