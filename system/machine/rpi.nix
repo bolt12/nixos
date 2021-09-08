@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
 {
 
@@ -20,6 +20,9 @@
       });
     })
   ];
+
+  nixpkgs.config.allowUnfree = true;
+
 
   imports =
     [ # Include the results of the hardware scan.
@@ -57,6 +60,11 @@
   networking.hostName = "rpi-nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
   networking.wireless.interfaces = [ "wlan0" ];
+  networking.interfaces.wlan0.ipv4.addresses = [{
+    # I used static IP over WLAN because I want to use it as local DNS resolver
+    address = "192.168.1.10";
+    prefixLength = 24;
+  }];
 
   systemd.services.iwd.serviceConfig.Restart = "always";
   networking.networkmanager.enable = true;
@@ -97,6 +105,25 @@
       };
   };
 
+  # Docker container services
+
+  virtualisation.docker.enable = true;
+
+  virtualisation.oci-containers.containers = {
+    rainloop = {
+      image = "martadinata666/rainloop";
+      ports = [ "8085:80" ];
+      volumes = [ "data:/var/www/localhost/htdocs/data" ];
+    };
+    pihole = {
+      image = "pihole/pihole:latest";
+      ports = [ "53:53/tcp" "53:53/udp" "67:67/udp" "8086:80/tcp" ];
+      volumes = [ "./etc-pihole/:/etc/pihole/" "./etc-dnsmasq.d/:/etc/dnsmasq.d/" ];
+      extraOptions = [ "--cap-add=NET_ADMIN" "--dns=127.0.0.1" "--dns=1.1.1.1" "-e TZ:'Europe/Lisbon'" ];
+    };
+  };
+
+
   # Enable sound.
   sound.enable = true;
   hardware.pulseaudio.enable = true;
@@ -112,7 +139,7 @@
   # users.mutableUsers = false;     # Remove any users not defined in here
   users.users.bolt = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "networkmanager" ]; # Enable ‘sudo’ for the user.
+    extraGroups = [ "wheel" "networkmanager" "docker" ]; # Enable ‘sudo’ for the user.
     openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHKTf4Bb2BBymwZvxPtxEefspOPTACPn3HqrRiWAMJEJ armandoifsantos@gmail.com" ];
   };
 
@@ -123,6 +150,10 @@
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     wget
     git
+    noip
+    rainloop-standard
+    unzip
+    nginx
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -145,6 +176,7 @@
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
 
+  # Swap
   swapDevices = [ { device = "/swapfile"; size = 1024; } ];
 
   # This value determines the NixOS release from which the default
@@ -156,4 +188,3 @@
   system.stateVersion = "21.05"; # Did you read the comment?
 
 }
-
