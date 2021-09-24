@@ -156,8 +156,8 @@ mode "resize" {
 
 bindsym $mod+r mode "resize"
 
-# wofi
-bindsym $mod+d exec wofi
+# rofi
+bindsym $mod+d exec rofi -show drun
 
 # flash current window
 bindsym $mod+n exec flash_window
@@ -174,17 +174,8 @@ bindsym XF86AudioMute exec "amixer -q -c 0 sset Master,0 toggle"
 bindsym XF86MonBrightnessDown exec brightnessctl set 15%-
 bindsym XF86MonBrightnessUp exec brightnessctl set +15%
 
-# capture all screens to clipboard
-bindsym $mod+alt+p exec grim - | wl-copy
-
-# capture the specified screen area to clipboard
-bindsym $mod+shift+p exec grim -g "$(slurp)" - | wl-copy
-
-# capture the focused monitor to clipboard
-bindsym $mod+control+shift+p exec grim -o $(swaymsg -t get_outputs | jq -r '.[] | select(.focused) | .name') - | wl-copy
-
 bar {
-    swaybar_command waybar
+  status_command i3status
 }
 
 #*********************************************************************************
@@ -219,21 +210,12 @@ exec_always {
     gsettings set $gnome-schema font-name 'JetBrainsMono Nerd Font 13'
 }
 
-# xdg-desktop-portal-wlr
-exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
-
 # nm-applet
 exec_always nm-applet --indicator
 
 # blueman-applet
 exec_always blueman-applet
-
-exec --no-startup-id pipewire
-
 #
-# Sway users might achieve this by adding the following to their Sway config file
-# This ensures all user units started after the command (not those already running) set the variables
-exec systemctl --user import-environment
 
 #********************************************************************************
 

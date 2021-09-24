@@ -1,3 +1,4 @@
+{ pkgs, lib, ...}:
 {
-  xdg.configFile."sway/config".source = ./config;
+  xdg.configFile."sway/config".source = lib.mkForce (./config);
 }

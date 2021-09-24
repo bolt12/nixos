@@ -116,22 +116,23 @@ let
 
   # Wayland Packages
   waylandPkgs = [
-      unstable.grim
-      unstable.slurp
-      pkgs.swaylock-fancy
-      unstable.wofi
-      unstable.wlsunset
-      unstable.xdg-desktop-portal
-      unstable.xdg-desktop-portal-wlr
-      unstable.wlogout
-      unstable.pipewire
-      unstable.wl-gammactl
-      pkgs.brightnessctl
-      unstable.wl-clipboard
-      unstable.mako
-      unstable.swayidle
-      unstable.wdisplays
-      unstable.waybar
+    unstable.grim
+    unstable.slurp
+    pkgs.swaylock-fancy
+    unstable.wofi
+    unstable.wlsunset
+    unstable.xdg-desktop-portal
+    unstable.xdg-desktop-portal-wlr
+    unstable.wlogout
+    unstable.pipewire
+    unstable.wl-gammactl
+    pkgs.brightnessctl
+    unstable.wl-clipboard
+    unstable.mako
+    unstable.swayidle
+    unstable.wayland-protocols-master
+    unstable.wdisplays
+    unstable.waybar
   ];
 
   gitPkgs = with pkgs.gitAndTools; [
@@ -176,8 +177,15 @@ in
       ++ extraPkgs;
 
     sessionVariables = {
+      MOZ_DISABLE_RDD_SANDBOX="1";
       MOZ_ENABLE_WAYLAND = 1;
       XDG_CURRENT_DESKTOP = "sway";
+      XDG_SESSION_TYPE = "wayland";
+      SDL_VIDEODRIVER = "wayland";
+      QT_QPA_PLATFORM = "wayland";
+      QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
+      ECORE_EVAS_ENGINE = "wayland_egl";
+      ELM_ENGINE = "wayland_egl";
       DISPLAY = ":0";
       EDITOR = "nvim";
       VISUAL = "nvim";
@@ -208,6 +216,7 @@ in
     ./programs/neovim/default.nix
     ./programs/waybar/default.nix
     ./programs/wofi/default.nix
+    ./programs/sway/default.nix
     ./services/networkmanager/default.nix
     ./services/redshift/default.nix
     ./xdg/sway/default.nix

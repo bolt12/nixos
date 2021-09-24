@@ -17,7 +17,7 @@ let
   unstablePlugins = with plugins-unstable; [
     # nvim-lightbulb
     # lspsaga-nvim
-    coc-nvim                # lsp based intellisense
+    # coc-nvim                # lsp based intellisense
   ];
 
   vim-bujo = pkgs.vimUtils.buildVimPlugin {
@@ -63,6 +63,7 @@ let
   overriddenPlugins = with pkgs; [];
 
   myVimPlugins = with plugins; [
+    coc-nvim                # lsp based intellisense
     vim-airline             # bottom status bar
     vim-airline-themes      # status bar themes
     matchit-zip             # match parentheses
@@ -109,7 +110,7 @@ in
 {
   programs.neovim = {
     enable       = true;
-    package      = pkgs.neovim-nightly;
+    package      = unstable.neovim-unwrapped;
     extraConfig  = vimConfig;
     plugins      = myVimPlugins;
     viAlias      = true;

@@ -107,7 +107,7 @@ in
         };
       };
       pulseaudio = {
-        enable = true;
+        enable = false;
         # 32 bit support for steam.
         support32Bit = true;
         package = pkgs.pulseaudioFull;
@@ -121,8 +121,9 @@ in
       cpu.intel.updateMicrocode = true;
     };
 
-    nixpkgs.config.pulseaudio = true; # Explicit PulseAudio support in applications
+  nixpkgs.config.pulseaudio = true; # Explicit PulseAudio support in applications
 
+  security.rtkit.enable = true;
   # Enable the X11 windowing system.
   services = {
     # Enable the OpenSSH daemon.
@@ -137,6 +138,9 @@ in
     # Firefox NixOs wiki recommends
     pipewire = {
       enable = true;
+      alsa.enable = true;
+      alsa.support32Bit = true;
+      pulse.enable = true;
       # High quality BT calls
       media-session.config.bluez-monitor.rules = [
         {
@@ -232,6 +236,7 @@ in
       extraPortals = [
         pkgs.xdg-desktop-portal-wlr
         pkgs.xdg-desktop-portal-gtk
+        pkgs.xdg-desktop-portal-kde
       ];
     };
   };

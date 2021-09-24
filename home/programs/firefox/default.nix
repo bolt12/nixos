@@ -13,7 +13,6 @@ in
 {
 programs.firefox = {
   enable = true;
-  package = unstable.firefox;
   # package = unstable.wrapFirefox unstable.firefox-unwrapped {
   #   forceWayland = true;
   #   extraPolicies = {
