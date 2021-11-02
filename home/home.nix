@@ -116,6 +116,8 @@ let
 
   # Wayland Packages
   waylandPkgs = [
+    unstable.obs-studio
+    unstable.obs-studio-plugins.wlrobs
     unstable.grim
     unstable.slurp
     pkgs.swaylock-fancy
