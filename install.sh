@@ -3,11 +3,11 @@
 # Shows the output of every command
 set +x
 
-# Pin Nixpkgs to NixOS 21.05
-export PINNED_NIX_PKGS="https://github.com/NixOS/nixpkgs/archive/refs/tags/21.05.tar.gz"
+# Pin Nixpkgs to NixOS 21.11
+export PINNED_NIX_PKGS="https://github.com/NixOS/nixpkgs/archive/refs/tags/21.11.tar.gz"
 
 # Switch to the 21.05 channel
-sudo nix-channel --add https://nixos.org/channels/nixos-21.05 nixos
+sudo nix-channel --add https://nixos.org/channels/nixos-21.11 nixos
 
 # Nix configuration
 sudo cp -a system/. /etc/nixos/
@@ -21,7 +21,7 @@ mkdir -p $HOME/Documents
 mkdir -p $HOME/.config/nixpkgs/
 cp -r nix $HOME/.config/nixpkgs/
 cp -r home/* $HOME/.config/nixpkgs/
-nix-channel --add https://github.com/rycee/home-manager/archive/release-21.05.tar.gz home-manager
+nix-channel --add https://github.com/rycee/home-manager/archive/release-21.11.tar.gz home-manager
 nix-channel --update
 export NIX_PATH=$HOME/.nix-defexpr/channels${NIX_PATH:+:}$NIX_PATH
 nix-shell '<home-manager>' -A install

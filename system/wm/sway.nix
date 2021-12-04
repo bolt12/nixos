@@ -1,8 +1,6 @@
 { config, lib, pkgs, ... }:
 
 {
-
-
   programs.sway.enable = true;
   programs.sway.extraPackages = [];
 

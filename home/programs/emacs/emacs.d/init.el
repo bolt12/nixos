@@ -1,5 +1,7 @@
 ;;; init  --- The main emacs init file  -*- lexical-binding: t; -*-
 
+;;; https://github.com/TOTBWF/agda-evil-emacs/blob/main/init.el
+
 ;;; Commentary:
 ;; This Emacs configuration file is meant to get vim users
 ;; off the ground using Emacs, Evil Mode, and Agda.

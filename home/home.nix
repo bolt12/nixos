@@ -21,7 +21,9 @@ let
     ghcVersions = [
       "8.6.5"
       "8.8.4"
-      "8.10.4"
+      "8.10.5"
+      "8.10.7"
+      "9.0.1"
     ];
   };
 
@@ -38,10 +40,7 @@ let
 
   # Unstable branch packages
   unstablePkgs = [
-    (unstable.agda.withPackages (p: [ p.standard-library ]))
     unstable.manix
-    unstable.zoom-us
-    unstable.faac    # part of zoom (?)
   ];
 
   # Extra packages from user repos
@@ -51,6 +50,7 @@ let
 
   defaultPkgs = with pkgs; [
     alloy                       # model checker
+    (agda.withPackages (p: [ p.standard-library ]))
     bash                        # bash
     bc                          # gnu calculator
     betterlockscreen            # fast lockscreen based on i3lock
@@ -112,6 +112,7 @@ let
     xsettingsd                  # theming
     weechat                     # weechat irc client
     zip                         # zip
+    zoom                        # video conferencing
   ];
 
   # Wayland Packages
@@ -167,7 +168,7 @@ in
   home = {
     username      = "bolt";
     homeDirectory = "/home/bolt";
-    stateVersion  = "21.05";
+    stateVersion  = "21.11";
 
     packages =
       defaultPkgs
@@ -243,8 +244,8 @@ in
 
     htop = {
       enable = true;
-      sortDescending = true;
-      sortKey = "PERCENT_CPU";
+      # sortDescending = true;
+      # sortKey = "PERCENT_CPU";
     };
 
     ssh.enable = true;
