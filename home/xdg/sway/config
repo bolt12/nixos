@@ -229,6 +229,7 @@ exec_always nm-applet --indicator
 exec_always blueman-applet
 
 exec --no-startup-id pipewire
+exec --no-startup-id pipewire-media-session
 
 #
 # Sway users might achieve this by adding the following to their Sway config file

@@ -141,6 +141,10 @@ in
       alsa.enable = true;
       alsa.support32Bit = true;
       pulse.enable = true;
+      jack.enable = false;
+
+      media-session.enable = true;
+
       # High quality BT calls
       media-session.config.bluez-monitor.rules = [
         {
@@ -270,5 +274,6 @@ in
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "21.11"; # Did you read the comment?
+
 
 }

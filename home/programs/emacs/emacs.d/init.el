@@ -281,6 +281,27 @@ to start up a shell process, and is also more consistent."
     "C-k" 'ctrlf-backward-literal))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Auto completion
+
+;; `company' (https://github.com/company-mode/company-mode) is a text completion
+;; framework for Emacs.
+
+(use-package company-mode
+  :straight t
+  :bind (:map company-active-map
+              ("<tab>" . company-complete-selection))
+  (:map lsp-mode-map
+        ("<tab>" . company-indent-or-complete-common))
+  :bind (("C-x C-j" . dired-jump))
+  :custom
+  (company-minimum-prefix-length 1)
+  (company-idle-delay 0.0)
+  (global-company-mode 1))
+
+;(use-package company-box
+;  :hook (company-mode . company-box-mode))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Help and Documentation
 
 ;; Emacs is a self-documenting system, and you can get documentation
@@ -363,6 +384,7 @@ to start up a shell process, and is also more consistent."
 ;; Now, let's load up `agda-mode'
 (load (agda-mode-locate))
 
+(setq agda2-highlight-level (quote interactive))
 ;; Once that file is loaded, we apply our configuration, which mostly consists of keybindings.
 (with-eval-after-load (agda-mode-locate)
   (mode-leader-definer
@@ -380,7 +402,6 @@ to start up a shell process, and is also more consistent."
   (global-motion-definer
     :keymaps 'agda2-mode-map
     "d" '(agda2-goto-definition-keyboard :wk "goto definition"))
-  (setq agda2-highlight-level (quote interactive))
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
