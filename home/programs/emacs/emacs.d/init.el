@@ -61,6 +61,29 @@
 (setq mouse-wheel-scroll-amount '(1))
 (setq mouse-wheel-progressive-speed nil)
 (setq auto-window-vscroll nil)
+(setq indent-tabs-mode nil)
+;; Make backspace properly erase as many spaces as a tab
+(setq backward-delete-char-untabify-method 'hungry)
+
+;; Don't show startup screen
+(setq inhibit-startup-screen t)
+
+(use-package linum-relative
+  :straight t
+  :custom
+  ;; use relative numbers everywhere
+  (linum-relative-global-mode t)
+
+  ;; Make linum show the actual line on the current line
+  (linum-relative-current-symbol ""))
+
+(linum-relative-toggle)
+;; line numbers everywhere
+(global-linum-mode t)
+
+;; Show the column number on my powerline
+(column-number-mode 1)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; User Interface
@@ -293,10 +316,18 @@ to start up a shell process, and is also more consistent."
   (:map lsp-mode-map
         ("<tab>" . company-indent-or-complete-common))
   :bind (("C-x C-j" . dired-jump))
+  :diminish
   :custom
-  (company-minimum-prefix-length 1)
-  (company-idle-delay 0.0)
-  (global-company-mode 1))
+  (company-minimum-prefix-length 2)
+  (company-idle-delay 0.1)
+  (global-company-mode 1)
+  (company-dabbrev-other-buffers t)
+  (company-dabbrev-code-other-buffers t)
+  (company-transformers '(company-sort-by-backend-importance
+                          company-sort-prefer-same-case-prefix
+                          company-sort-by-occurrence))
+  (company-complete-number t)
+  )
 
 ;(use-package company-box
 ;  :hook (company-mode . company-box-mode))

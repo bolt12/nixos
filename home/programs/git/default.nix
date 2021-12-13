@@ -27,5 +27,7 @@ in
     ];
     userEmail = "armandoifsantos@gmail.com";
     userName = "Armando Santos";
+    signing.key = null;
+    signing.signByDefault = true;
   };
 }
