@@ -84,6 +84,8 @@ let
     noip                        # noip
     numix-icon-theme-circle     # icon theme
     numix-cursor-theme          # icon theme
+    obs-studio                  # obs-studio
+    obs-studio-plugins.wlrobs   # obs wayland protocol
     pamixer                     # pulseaudio cli mixer
     patchelf                    # dynamic linker and RPATH of ELF executables
     pavucontrol                 # pulseaudio volume control
@@ -96,7 +98,7 @@ let
     python3                     # python3 programming language
     ripgrep                     # ripgrep
     rnix-lsp                    # nix lsp server
-    shared-mime-info            # database of common MIME types
+    #shared-mime-info            # database of common MIME types
     silicon                     # create beautiful code imgs
     simplescreenrecorder        # self-explanatory
     skypeforlinux               # skype for linux
@@ -111,14 +113,13 @@ let
     xorg.xmodmap                # Keyboard
     xsettingsd                  # theming
     weechat                     # weechat irc client
+    wget                        # cli wget
     zip                         # zip
     zoom                        # video conferencing
   ];
 
   # Wayland Packages
   waylandPkgs = [
-    unstable.obs-studio
-    unstable.obs-studio-plugins.wlrobs
     unstable.grim
     unstable.slurp
     pkgs.swaylock-fancy
@@ -139,7 +140,6 @@ let
   ];
 
   gitPkgs = with pkgs.gitAndTools; [
-    git
     diff-so-fancy
   ];
 
@@ -181,7 +181,7 @@ in
 
     sessionVariables = {
       MOZ_DISABLE_RDD_SANDBOX="1";
-      MOZ_ENABLE_WAYLAND = 1;
+      MOZ_ENABLE_WAYLAND = "1";
       XDG_CURRENT_DESKTOP = "sway";
       XDG_SESSION_TYPE = "wayland";
       SDL_VIDEODRIVER = "wayland";
