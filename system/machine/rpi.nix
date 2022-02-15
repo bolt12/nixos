@@ -62,7 +62,7 @@
   networking.wireless.interfaces = [ "wlan0" ];
   networking.interfaces.wlan0.ipv4.addresses = [{
     # I used static IP over WLAN because I want to use it as local DNS resolver
-    address = "192.168.1.10";
+    address = "192.168.1.73";
     prefixLength = 24;
   }];
 
@@ -111,15 +111,17 @@
 
   virtualisation.oci-containers.containers = {
     rainloop = {
-      image = "martadinata666/rainloop";
+      image = "martadinata666/rainloop:latest";
       ports = [ "8085:80" ];
       volumes = [ "data:/var/www/localhost/htdocs/data" ];
     };
-    pihole = {
-      image = "pihole/pihole:latest";
-      ports = [ "53:53/tcp" "53:53/udp" "67:67/udp" "8086:80/tcp" ];
-      volumes = [ "./etc-pihole/:/etc/pihole/" "./etc-dnsmasq.d/:/etc/dnsmasq.d/" ];
-      extraOptions = [ "--cap-add=NET_ADMIN" "--dns=127.0.0.1" "--dns=1.1.1.1" "-e TZ:'Europe/Lisbon'" ];
+    flame = {
+      image = "pawelmalak/flame:multiarch";
+      ports = [ "5005:5005" ];
+      volumes = [ "/home/bolt/flame-dashboard:/app/data" ];
+      environment = {
+	      PASSWORD = "flame_password";
+      };
     };
   };
 
@@ -143,17 +145,23 @@
     openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHKTf4Bb2BBymwZvxPtxEefspOPTACPn3HqrRiWAMJEJ armandoifsantos@gmail.com" ];
   };
 
+
+
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages = with pkgs; [
+  environment.systemPackages = let
+    emanote = (import (pkgs.fetchFromGitHub {owner = "srid"; repo = "emanote"; rev = "master"; sha256 = "0ls1m7a6f2laszcln9vbg7l1kvv3n9mi84wn2a6xzzjywdvxdfk0"; })).defaultPackage.aarch64-linux;
+  in
+  with pkgs; [
     libraspberrypi
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     wget
     git
-    noip
-    rainloop-standard
+    git-annex
+    git-annex-utils
     unzip
-    nginx
+
+    emanote
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -177,7 +185,7 @@
   # networking.firewall.enable = false;
 
   # Swap
-  swapDevices = [ { device = "/swapfile"; size = 1024; } ];
+  swapDevices = [ { device = "/swapfile"; size = 4096; } ];
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
@@ -185,6 +193,7 @@
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "21.05"; # Did you read the comment?
+  system.stateVersion = "21.11"; # Did you read the comment?
 
 }
+

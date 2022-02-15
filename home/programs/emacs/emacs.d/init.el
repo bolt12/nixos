@@ -418,6 +418,7 @@ to start up a shell process, and is also more consistent."
 (setq agda2-highlight-level (quote interactive))
 ;; Once that file is loaded, we apply our configuration, which mostly consists of keybindings.
 (with-eval-after-load (agda-mode-locate)
+  (add-to-list 'auto-mode-alist '("\\.lagda.md\\'" . agda2-mode))
   (mode-leader-definer
     :keymaps 'agda2-mode-map
     "c" '(agda2-make-case :wk "case split")
@@ -432,7 +433,11 @@ to start up a shell process, and is also more consistent."
     "." '(agda2-goal-and-context-and-inferred :wk "display type"))
   (global-motion-definer
     :keymaps 'agda2-mode-map
-    "d" '(agda2-goto-definition-keyboard :wk "goto definition"))
+    "d" '(agda2-goto-definition-keyboard :wk "goto definition")
+    "j" '(agda2-next-goal :wk "next goal")
+    "k" '(agda2-previous-goal :wk "previous goal"))
+  (add-to-list 'auto-mode-alist '("\\.lagda.md\\'" . agda2-mode))
+  '(agda2-highlight-level (quote interactive))
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

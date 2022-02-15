@@ -27,6 +27,7 @@ in
     ];
 
   networking = {
+    hostname = "bolt-nixos";
     # Enables wireless support and openvpn via network manager.
     networkmanager = {
       enable = true;
@@ -62,6 +63,7 @@ in
     vim
     git
     sof-firmware
+    shared-mime-info
   ];
 
   # Needed for java apps/fonts

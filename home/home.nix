@@ -98,7 +98,6 @@ let
     python3                     # python3 programming language
     ripgrep                     # ripgrep
     rnix-lsp                    # nix lsp server
-    #shared-mime-info            # database of common MIME types
     silicon                     # create beautiful code imgs
     simplescreenrecorder        # self-explanatory
     skypeforlinux               # skype for linux
