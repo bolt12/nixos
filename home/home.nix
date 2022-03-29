@@ -21,7 +21,6 @@ let
     ghcVersions = [
       "8.6.5"
       "8.8.4"
-      "8.10.5"
       "8.10.7"
       "9.0.1"
     ];
@@ -58,9 +57,10 @@ let
     cachix                      # nix caching
     chromium                    # google chrome
     deluge                      # torrent client
-    discord                     # discord client
+    unstable.discord            # discord client
     evince                      # pdf reader
     feh                         # image viewer
+    ferdi                       # bundle apps together
     flashfocus                  # focus wm
     gawk                        # text processing programming language
     glib                        # gsettings
@@ -133,7 +133,7 @@ let
     unstable.wl-clipboard
     unstable.mako
     unstable.swayidle
-    unstable.wayland-protocols-master
+    pkgs.wayland-protocols
     unstable.wdisplays
     unstable.waybar
   ];

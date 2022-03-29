@@ -21,7 +21,7 @@ mkdir -p $HOME/Documents
 mkdir -p $HOME/.config/nixpkgs/
 cp -r nix $HOME/.config/nixpkgs/
 cp -r home/* $HOME/.config/nixpkgs/
-nix-channel --add https://github.com/rycee/home-manager/archive/release-21.11.tar.gz home-manager
+nix-channel --add https://github.com/nix-community/home-manager/archive/refs/heads/release-21.11.tar.gz home-manager
 nix-channel --update
 export NIX_PATH=$HOME/.nix-defexpr/channels${NIX_PATH:+:}$NIX_PATH
 nix-shell '<home-manager>' -A install

@@ -27,7 +27,7 @@ in
     ];
 
   networking = {
-    hostname = "bolt-nixos";
+    hostName = "bolt-nixos";
     # Enables wireless support and openvpn via network manager.
     networkmanager = {
       enable = true;
