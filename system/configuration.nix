@@ -22,8 +22,10 @@ in
       ./machine/x1-g8.nix
       # Window manager
       ./wm/sway.nix
-      # Include IOHK binary caches
+      # Include IOHK related configs
       ./iohk/caches.nix
+      ./iohk/ssh.nix
+      ./iohk/systemd.nix
     ];
 
   networking = {
@@ -145,6 +147,7 @@ in
       pulse.enable = true;
       jack.enable = false;
 
+      wireplumber.enable = false;
       media-session.enable = true;
 
       # High quality BT calls
@@ -185,7 +188,7 @@ in
     enableDefaultFonts = true;
     fonts = [
       customFonts
-      pkgs.font-awesome-ttf
+      pkgs.font-awesome
       pkgs.ubuntu_font_family
       pkgs.emojione
       pkgs.noto-fonts
@@ -199,6 +202,7 @@ in
       pkgs.terminus_font
       pkgs.siji
       pkgs.unifont
+      pkgs.open-sans
     ];
     fontconfig = {
       enable = true;
@@ -275,7 +279,7 @@ in
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "21.11"; # Did you read the comment?
+  system.stateVersion = "22.05"; # Did you read the comment?
 
 
 }

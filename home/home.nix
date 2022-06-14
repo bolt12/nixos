@@ -22,7 +22,7 @@ let
       "8.6.5"
       "8.8.4"
       "8.10.7"
-      "9.0.1"
+      "9.0.2"
     ];
   };
 
@@ -44,12 +44,13 @@ let
 
   # Extra packages from user repos
   extraPkgs = [
-    (import sources.comma { inherit pkgs; })
+    # (import sources.comma { inherit pkgs; })
   ];
 
   defaultPkgs = with pkgs; [
     alloy                       # model checker
     (agda.withPackages (p: [ p.standard-library ]))
+    awscli2                     # aws cli v2
     bash                        # bash
     bc                          # gnu calculator
     betterlockscreen            # fast lockscreen based on i3lock
@@ -220,7 +221,6 @@ in
     ./programs/wofi/default.nix
     ./programs/sway/default.nix
     ./services/networkmanager/default.nix
-    ./services/redshift/default.nix
     ./xdg/sway/default.nix
   ];
 
