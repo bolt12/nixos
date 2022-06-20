@@ -25,19 +25,20 @@
 
 
   imports =
-    [ # Include the results of the hardware scan.
+    [
+      # Include the results of the hardware scan.
       ./hardware-configuration.nix
     ];
 
   # Use the extlinux boot loader. (NixOS wants to enable GRUB by default)
   boot.loader.grub.enable = false;
   # Enables the generation of /boot/extlinux/extlinux.conf
-  boot.loader.generic-extlinux-compatible.enable = true;
+  # boot.loader.generic-extlinux-compatible.enable = true;
   # if you have a Raspberry Pi 2 or 3, pick this:
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
   # A bunch of boot parameters needed for optimal runtime on RPi 3b+
-  boot.kernelParams = ["cma=256M"];
+  boot.kernelParams = [ "cma=256M" ];
   boot.loader.raspberryPi.enable = true;
   boot.loader.raspberryPi.version = 3;
   boot.loader.raspberryPi.uboot.enable = true;
@@ -97,30 +98,31 @@
 
   # Enable Avahi for service discovery
   services.avahi = {
+    enable = true;
+    publish = {
       enable = true;
-      publish = {
-          enable = true;
-          addresses = true;
-          workstation = true;
-      };
+      addresses = true;
+      workstation = true;
+    };
   };
 
   # Docker container services
 
-  virtualisation.docker.enable = true;
+  # virtualisation.docker.enable = true;
+  virtualisation.oci-containers.backend = "podman";
 
   virtualisation.oci-containers.containers = {
     rainloop = {
-      image = "martadinata666/rainloop:latest";
-      ports = [ "8085:80" ];
-      volumes = [ "data:/var/www/localhost/htdocs/data" ];
+      image = "newargus/rainloop-webmail";
+      ports = [ "80:80" ];
+      volumes = [ "data:/var/www/html/data" ];
     };
     flame = {
       image = "pawelmalak/flame:multiarch";
       ports = [ "5005:5005" ];
       volumes = [ "/home/bolt/flame-dashboard:/app/data" ];
       environment = {
-	      PASSWORD = "flame_password";
+        PASSWORD = "flame_password";
       };
     };
   };
@@ -145,14 +147,17 @@
     openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHKTf4Bb2BBymwZvxPtxEefspOPTACPn3HqrRiWAMJEJ armandoifsantos@gmail.com" ];
   };
 
+  users.users.root = {
+    openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHKTf4Bb2BBymwZvxPtxEefspOPTACPn3HqrRiWAMJEJ armandoifsantos@gmail.com" ];
+  };
+
 
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages = let
-    emanote = (import (pkgs.fetchFromGitHub {owner = "srid"; repo = "emanote"; rev = "master"; sha256 = "0ls1m7a6f2laszcln9vbg7l1kvv3n9mi84wn2a6xzzjywdvxdfk0"; })).defaultPackage.aarch64-linux;
-  in
-  with pkgs; [
+  environment.systemPackages =
+  let emanote = (import (fetchTarball { url = https://github.com/bolt12/emanote/archive/14cf9ea9747fac5a06c1aeeaeedfc87d329abe99.tar.gz; sha256 = "sha256:1ndlq93yk0yal4x4vml60fvdzw8ijir0ir43pwc76qqh2jid171l"; })).packages.aarch64-linux.default;
+  in with pkgs; [
     libraspberrypi
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     wget
@@ -177,15 +182,23 @@
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
   services.openssh.permitRootLogin = "yes";
+  services.openssh.forwardX11 = true;
+
+  # Optional: You can configure the email address used with Let's Encrypt.
+  # This way you get renewal reminders (automated by NixOS) as well as expiration emails.
+  # security.acme.certs = {
+  #   "blog.example.com".email = "youremail@address.com";
+  # };
+
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
+  networking.firewall.enable = false;
 
   # Swap
-  swapDevices = [ { device = "/swapfile"; size = 4096; } ];
+  swapDevices = [{ device = "/swapfile"; size = 1024; }];
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
@@ -193,7 +206,6 @@
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "21.11"; # Did you read the comment?
+  system.stateVersion = "22.05"; # Did you read the comment?
 
 }
-

@@ -18,6 +18,10 @@
       #   memtest86.enable = true;
       # };
     };
+
+    # Emulate ARM on my system. Useful to deploy NixOS on ARM via nixops
+    binfmt.emulatedSystems = [ "aarch64-linux" ];
+
     kernelModules = [ "acpi_call" ];
     extraModulePackages = with config.boot.kernelPackages; [ acpi_call ];
     blacklistedKernelModules = [ "snd_hda_intel" "snd_soc_skl" ];
