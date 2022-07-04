@@ -1,4 +1,4 @@
-{ config, lib, stdenv, sources ? (import ./nix/sources.nix) , ... }:
+{ config, lib, stdenv, sources ? (import ./nix/sources.nix), ... }:
 
 let
 
@@ -180,7 +180,7 @@ in
       ++ extraPkgs;
 
     sessionVariables = {
-      MOZ_DISABLE_RDD_SANDBOX="1";
+      MOZ_DISABLE_RDD_SANDBOX = "1";
       MOZ_ENABLE_WAYLAND = "1";
       XDG_CURRENT_DESKTOP = "sway";
       XDG_SESSION_TYPE = "wayland";
@@ -192,7 +192,7 @@ in
       DISPLAY = ":0";
       EDITOR = "nvim";
       VISUAL = "nvim";
-      SSHCOPY="DISPLAY=:0.0 xsel -i -b";
+      SSHCOPY = "DISPLAY=:0.0 xsel -i -b";
     };
 
     sessionPath = [

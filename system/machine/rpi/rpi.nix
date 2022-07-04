@@ -4,8 +4,10 @@
 
 { config, lib, pkgs, ... }:
 
+let emanote = import (fetchTarball { url = https://github.com/srid/emanote/archive/master.tar.gz; });
+    emanotePkg = emanote.packages.${builtins.currentSystem}.default;
+in
 {
-
   nixpkgs.overlays = [
     (self: super: {
       firmwareLinuxNonfree = super.firmwareLinuxNonfree.overrideAttrs (old: {
@@ -23,11 +25,11 @@
 
   nixpkgs.config.allowUnfree = true;
 
-
   imports =
     [
       # Include the results of the hardware scan.
       ./hardware-configuration.nix
+      emanote.homeManagerModule
     ];
 
   # Use the extlinux boot loader. (NixOS wants to enable GRUB by default)
@@ -114,12 +116,12 @@
   virtualisation.oci-containers.containers = {
     rainloop = {
       image = "newargus/rainloop-webmail";
-      ports = [ "80:80" ];
+      ports = [ "80:81" ];
       volumes = [ "data:/var/www/html/data" ];
     };
     flame = {
       image = "pawelmalak/flame:multiarch";
-      ports = [ "5005:5005" ];
+      ports = [ "5005:80" ];
       volumes = [ "/home/bolt/flame-dashboard:/app/data" ];
       environment = {
         PASSWORD = "flame_password";
@@ -156,18 +158,17 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages =
-  let emanote = (import (fetchTarball { url = https://github.com/bolt12/emanote/archive/14cf9ea9747fac5a06c1aeeaeedfc87d329abe99.tar.gz; sha256 = "sha256:1ndlq93yk0yal4x4vml60fvdzw8ijir0ir43pwc76qqh2jid171l"; })).packages.aarch64-linux.default;
-  in with pkgs; [
-    libraspberrypi
-    vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-    wget
-    git
-    git-annex
-    git-annex-utils
-    unzip
+    with pkgs; [
+      libraspberrypi
+      vim
+      wget
+      git
+      git-annex
+      git-annex-utils
+      unzip
 
-    emanote
-  ];
+      emanotePkg
+    ];
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -178,6 +179,16 @@
   # };
 
   # List services that you want to enable:
+
+  services.emanote = {
+    enable = false;
+    # host = "127.0.0.1"; # default listen address is 127.0.0.1
+    # port = 7000;        # default http port is 7000
+    # notes = [
+    #   "/home/user/notes"  # add as many layers as you like
+    # ];
+    package = emanotePkg;
+  };
 
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;

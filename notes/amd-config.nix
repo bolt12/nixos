@@ -16,7 +16,9 @@
   };
 
   environment.systemPackages = with pkgs; [
-    chromium wget gparted
+    chromium
+    wget
+    gparted
   ];
 
   sound.enable = true;
@@ -42,8 +44,8 @@
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.gvolpe = {
     isNormalUser = true;
-    extraGroups  = [ "docker" "networkmanager" "wheel" ]; # wheel for ‘sudo’.
-    shell        = pkgs.fish;
+    extraGroups = [ "docker" "networkmanager" "wheel" ]; # wheel for ‘sudo’.
+    shell = pkgs.fish;
   };
 
   # Allow unfree packages

@@ -77,10 +77,10 @@
         "homepage": "",
         "owner": "nix-community",
         "repo": "neovim-nightly-overlay",
-        "rev": "179846815ffdfedc017fc6a1205019200054f9c6",
-        "sha256": "09bspxn4lw41cx6p8lvqg389p3982w6xy5l3i6cdm9hqm9m2q6cf",
+        "rev": "61ce522387dc8219b1efe4315fb65ddbadae2b60",
+        "sha256": "18zrsgkc68rkxkap261klvkwx7lazzmkkgmm0w00z0cdgsw93i4v",
         "type": "tarball",
-        "url": "https://github.com/nix-community/neovim-nightly-overlay/archive/179846815ffdfedc017fc6a1205019200054f9c6.tar.gz",
+        "url": "https://github.com/nix-community/neovim-nightly-overlay/archive/61ce522387dc8219b1efe4315fb65ddbadae2b60.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "niv": {
@@ -113,10 +113,10 @@
         "homepage": "",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "e0a42267f73ea52adc061a64650fddc59906fc99",
-        "sha256": "0r1dsj51x2rm016xwvdnkm94v517jb1rpn4rk63k6krc4d0n3kh9",
+        "rev": "660ac43ff9ab1f12e28bfb31d4719795777fe152",
+        "sha256": "090r91bhbp7i5bi1ihwwknbc5ahk2i5gkf4f5g2piy3bxiyf2r2c",
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/e0a42267f73ea52adc061a64650fddc59906fc99.tar.gz",
+        "url": "https://github.com/NixOS/nixpkgs/archive/660ac43ff9ab1f12e28bfb31d4719795777fe152.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "nixpkgs-wayland": {
@@ -125,10 +125,10 @@
         "homepage": "",
         "owner": "nix-community",
         "repo": "nixpkgs-wayland",
-        "rev": "dffdd4d8c397557807610d64ed867897079ae886",
-        "sha256": "0rjz35hmvi8q9d8h9wdb050bbwb8g095vwhrx0rbzxri78hhz5d5",
+        "rev": "1446abe5e85b4fb2b19491b3f1617c2e53be5d3b",
+        "sha256": "0959gq6mik5a7fi1ipjy92s7zs39s1ancalqg6c1c8vzzxi9qx1w",
         "type": "tarball",
-        "url": "https://github.com/nix-community/nixpkgs-wayland/archive/dffdd4d8c397557807610d64ed867897079ae886.tar.gz",
+        "url": "https://github.com/nix-community/nixpkgs-wayland/archive/1446abe5e85b4fb2b19491b3f1617c2e53be5d3b.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "venn-nvim": {

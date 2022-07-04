@@ -103,27 +103,27 @@ in
   };
 
   hardware = {
-      bluetooth = {
-        enable = true;
-        hsphfpd.enable = true;
-        settings = {
-          General.Enable = lib.concatStringsSep "," [ "Source" "Sink" "Media" "Socket" ];
-        };
+    bluetooth = {
+      enable = true;
+      hsphfpd.enable = true;
+      settings = {
+        General.Enable = lib.concatStringsSep "," [ "Source" "Sink" "Media" "Socket" ];
       };
-      pulseaudio = {
-        enable = false;
-        # 32 bit support for steam.
-        support32Bit = true;
-        package = pkgs.pulseaudioFull;
-        extraConfig = ''
-          load-module module-switch-on-connect
-          '';
-      };
-      opengl.enable = true;
-      enableRedistributableFirmware = true;
-      enableAllFirmware = true;
-      cpu.intel.updateMicrocode = true;
     };
+    pulseaudio = {
+      enable = false;
+      # 32 bit support for steam.
+      support32Bit = true;
+      package = pkgs.pulseaudioFull;
+      extraConfig = ''
+        load-module module-switch-on-connect
+      '';
+    };
+    opengl.enable = true;
+    enableRedistributableFirmware = true;
+    enableAllFirmware = true;
+    cpu.intel.updateMicrocode = true;
+  };
 
   nixpkgs.config.pulseaudio = true; # Explicit PulseAudio support in applications
 
@@ -217,23 +217,23 @@ in
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users = {
-      users.bolt = {
-        isNormalUser = true;
-        home = "/home/bolt";
-        description = "Armando Santos";
-        extraGroups = [
-          "audio"
-          "sound"
-          "video"
-          "wheel"
-          "networkmanager"
-          "docker"
-          "sway"
-          "plugdev"
-          "root"
-        ];
-      };
+    users.bolt = {
+      isNormalUser = true;
+      home = "/home/bolt";
+      description = "Armando Santos";
+      extraGroups = [
+        "audio"
+        "sound"
+        "video"
+        "wheel"
+        "networkmanager"
+        "docker"
+        "sway"
+        "plugdev"
+        "root"
+      ];
     };
+  };
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
@@ -259,8 +259,8 @@ in
     # Automate garbage collection
     gc = {
       automatic = true;
-      dates     = "monthly";
-      options   = "--delete-older-than 7d";
+      dates = "monthly";
+      options = "--delete-older-than 7d";
     };
 
     # Avoid unwanted garbage collection when using nix-direnv

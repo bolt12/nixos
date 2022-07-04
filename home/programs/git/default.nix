@@ -17,8 +17,7 @@ in
 {
   programs.git = {
     enable = true;
-    aliases = {
-    };
+    aliases = { };
     extraConfig = gitConfig;
     ignores = [
       "*.direnv"

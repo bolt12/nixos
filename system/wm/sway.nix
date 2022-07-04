@@ -2,7 +2,7 @@
 
 {
   programs.sway.enable = true;
-  programs.sway.extraPackages = [];
+  programs.sway.extraPackages = [ ];
 
   services = {
     upower.enable = true;
