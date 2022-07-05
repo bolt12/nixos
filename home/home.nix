@@ -49,7 +49,17 @@ let
 
   defaultPkgs = with pkgs; [
     alloy                       # model checker
-    (agda.withPackages (p: [ p.standard-library ]))
+    (agda.withPackages (p: [
+      (p.standard-library.overrideAttrs (oldAttrs: {
+        version = "master";
+        src =  fetchFromGitHub {
+          repo = "agda-stdlib";
+          owner = "agda";
+          rev = "master";
+          sha256 = "sha256-CT8EqYgNzEnAGI0mLwM1ZyKCHPcq4i9xnjCp+dJgdWI=";
+        };
+      }))
+    ]))
     awscli2                     # aws cli v2
     bash                        # bash
     bc                          # gnu calculator
