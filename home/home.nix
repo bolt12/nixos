@@ -137,6 +137,7 @@ let
     unstable.wlsunset
     unstable.xdg-desktop-portal
     unstable.xdg-desktop-portal-wlr
+    pkgs.xdg-desktop-portal-gtk
     unstable.wlogout
     unstable.pipewire
     unstable.wl-gammactl
@@ -144,6 +145,7 @@ let
     unstable.wl-clipboard
     unstable.mako
     unstable.swayidle
+    unstable.wlroots
     pkgs.wayland-protocols
     unstable.wdisplays
     unstable.waybar
@@ -190,19 +192,18 @@ in
       ++ extraPkgs;
 
     sessionVariables = {
-      MOZ_DISABLE_RDD_SANDBOX = "1";
-      MOZ_ENABLE_WAYLAND = "1";
-      XDG_CURRENT_DESKTOP = "sway";
-      XDG_SESSION_TYPE = "wayland";
-      SDL_VIDEODRIVER = "wayland";
-      QT_QPA_PLATFORM = "wayland";
-      QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
-      ECORE_EVAS_ENGINE = "wayland_egl";
-      ELM_ENGINE = "wayland_egl";
-      DISPLAY = ":0";
-      EDITOR = "nvim";
-      VISUAL = "nvim";
-      SSHCOPY = "DISPLAY=:0.0 xsel -i -b";
+      MOZ_DISABLE_RDD_SANDBOX="1";
+      MOZ_ENABLE_WAYLAND="1";
+      XDG_CURRENT_DESKTOP="sway";
+      XDG_SESSION_TYPE="wayland";
+      SDL_VIDEODRIVER="wayland";
+      QT_QPA_PLATFORM="wayland";
+      QT_WAYLAND_DISABLE_WINDOWDECORATION="1";
+      ECORE_EVAS_ENGINE="wayland_egl";
+      ELM_ENGINE="wayland_egl";
+      EDITOR="nvim";
+      VISUAL="nvim";
+      NIXOS_OZONE_WL="1";
     };
 
     sessionPath = [

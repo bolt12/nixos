@@ -13,12 +13,12 @@ in
 {
   programs.firefox = {
     enable = true;
-    # package = unstable.wrapFirefox unstable.firefox-unwrapped {
-    #   forceWayland = true;
-    #   extraPolicies = {
-    #     ExtensionSettings = {};
-    #   };
-    # };
+    package = unstable.wrapFirefox unstable.firefox-unwrapped {
+      forceWayland = true;
+      extraPolicies = {
+        ExtensionSettings = {};
+      };
+    };
   };
 
 }

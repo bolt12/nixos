@@ -16,7 +16,7 @@ services.gnome-keyring.enable = true;
 
 wayland.windowManager.sway = {
   enable = true;
-  package = unstable.sway-unwrapped;
+  package = unstable.sway;
   wrapperFeatures.base = true ;
   wrapperFeatures.gtk = true ;
   xwayland = true;
@@ -30,6 +30,15 @@ wayland.windowManager.sway = {
       export SSH_ASKPASS="${pkgs.ksshaskpass}/bin/ksshaskpass"
       export XDG_SESSION_TYPE=wayland
       export XDG_CURRENT_DESKTOP=sway
+      export NIXOS_OZONE_WL=1=sway
+
+      export _JAVA_OPTIONS="-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dsun.java2d.xrender=true";
+      export MOZ_DISABLE_RDD_SANDBOX="1";
+      export MOZ_ENABLE_WAYLAND="1";
+      export ECORE_EVAS_ENGINE="wayland_egl";
+      export ELM_ENGINE="wayland_egl";
+      export EDITOR="nvim";
+      export VISUAL="nvim";
     '';
 };
 

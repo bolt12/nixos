@@ -69,8 +69,20 @@ in
   ];
 
   # Needed for java apps/fonts
-  environment.variables._JAVA_OPTIONS = "-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dsun.java2d.xrender=true";
-  environment.variables._JAVA_AWT_WM_NONREPARENTING = "1";
+  environment.variables._JAVA_OPTIONS="-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dsun.java2d.xrender=true";
+  environment.variables._JAVA_AWT_WM_NONREPARENTING="1";
+  environment.variables.MOZ_DISABLE_RDD_SANDBOX="1";
+  environment.variables.MOZ_ENABLE_WAYLAND="1";
+  environment.variables.XDG_CURRENT_DESKTOP="sway";
+  environment.variables.XDG_SESSION_TYPE="wayland";
+  environment.variables.SDL_VIDEODRIVER="wayland";
+  environment.variables.QT_QPA_PLATFORM="wayland";
+  environment.variables.QT_WAYLAND_DISABLE_WINDOWDECORATION="1";
+  environment.variables.ECORE_EVAS_ENGINE="wayland_egl";
+  environment.variables.ELM_ENGINE="wayland_egl";
+  environment.variables.EDITOR="nvim";
+  environment.variables.VISUAL="nvim";
+  environment.variables.NIXOS_OZONE_WL="1";
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
