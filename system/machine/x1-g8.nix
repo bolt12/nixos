@@ -27,12 +27,12 @@
     blacklistedKernelModules = [ "snd_hda_intel" "snd_soc_skl" ];
     plymouth.enable = true;
     tmpOnTmpfs = true;
-    runSize = "50%"; # Size of tmpOnTmpfs defaults to 25% of RAM
+    runSize = "50%"; # Size of tmpOnTmpfs defaults to 50% of RAM
     cleanTmpDir = true;
   };
 
   # Systemd /run/user increase size
-  services.logind.extraConfig = "RuntimeDirectorySize=25%";
+  services.logind.extraConfig = "RuntimeDirectorySize=50%";
 
   powerManagement.enable = true;
   powerManagement.powertop.enable = true;

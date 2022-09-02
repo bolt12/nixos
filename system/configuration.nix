@@ -25,7 +25,7 @@ in
       # Include IOHK related configs
       ./iohk/caches.nix
       ./iohk/ssh.nix
-      ./iohk/systemd.nix
+      # ./iohk/systemd.nix
     ];
 
   networking = {
@@ -215,6 +215,7 @@ in
       pkgs.siji
       pkgs.unifont
       pkgs.open-sans
+      pkgs.open-dyslexic
     ];
     fontconfig = {
       enable = true;

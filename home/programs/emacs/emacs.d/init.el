@@ -45,6 +45,9 @@
 (straight-use-package 'use-package)
 (require 'use-package)
 
+;; Disable warnings buffer
+(setq warning-minimum-level :emergency)
+
 ;; By default, the GC threshold for Emacs is 800Kib, which means we will trigger
 ;; GC when we initialize, which can really slow down load times!
 ;; To avoid this, let's bump it up to 10Mib.
@@ -79,7 +82,7 @@
 
 (linum-relative-toggle)
 ;; line numbers everywhere
-(global-linum-mode t)
+(add-hook 'prog-mode-hook 'linum-mode)
 
 ;; Show the column number on my powerline
 (column-number-mode 1)
@@ -144,12 +147,27 @@ to start up a shell process, and is also more consistent."
   ;; variable's documentation inside emacs!
   (setq evil-want-keybinding nil)
   (setq evil-want-C-u-scroll t)
+
+  ;; On older versions of emacs, we fall back to using
+  ;; `undo-tree' for our undo system.
+  (if (>= emacs-major-version 28)
+      (setq evil-undo-system 'undo-tree)
+    (setq evil-undo-system 'undo-redo))
+
   ;; Code in the `:config' section gets run /after/
   ;; the package loads.
   :config
   ;; Here, we just want to enable `evil-mode' once we've finished loading
   ;; it.
   (evil-mode 1))
+
+(use-package undo-tree
+  :straight t
+  ;; See the above note for setting the undo system.
+  :if (< emacs-major-version 28))
+
+(global-undo-tree-mode)
+(add-hook 'evil-local-mode-hook 'turn-on-undo-tree-mode)
 
 ;; We install the `which-key' (https://github.com/justbur/emacs-which-key) so that we
 ;; can see what keybindings we have available. This is super useful for discovery!
@@ -416,9 +434,10 @@ to start up a shell process, and is also more consistent."
 (load (agda-mode-locate))
 
 (setq agda2-highlight-level (quote interactive))
+(require 'agda-input)
+
 ;; Once that file is loaded, we apply our configuration, which mostly consists of keybindings.
 (with-eval-after-load (agda-mode-locate)
-  (add-to-list 'auto-mode-alist '("\\.lagda.md\\'" . agda2-mode))
   (mode-leader-definer
     :keymaps 'agda2-mode-map
     "c" '(agda2-make-case :wk "case split")
@@ -437,8 +456,9 @@ to start up a shell process, and is also more consistent."
     "j" '(agda2-next-goal :wk "next goal")
     "k" '(agda2-previous-goal :wk "previous goal"))
   (add-to-list 'auto-mode-alist '("\\.lagda.md\\'" . agda2-mode))
-  '(agda2-highlight-level (quote interactive))
+  (set-input-method "Agda")
 )
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Themes

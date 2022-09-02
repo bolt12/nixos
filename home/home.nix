@@ -39,7 +39,6 @@ let
 
   # Unstable branch packages
   unstablePkgs = [
-    unstable.manix
   ];
 
   # Extra packages from user repos
@@ -68,7 +67,7 @@ let
     cachix                      # nix caching
     chromium                    # google chrome
     deluge                      # torrent client
-    unstable.discord            # discord client
+    discord                     # discord client
     evince                      # pdf reader
     feh                         # image viewer
     ferdi                       # bundle apps together
@@ -81,11 +80,14 @@ let
     jdk                         # java development kit
     jq                          # JSON processor
     jre                         # java runtime environment
+    imv                         # image viewer
     killall                     # kill processes by name
     konsole                     # terminal emulator
     libreoffice                 # office suite
     lxappearance                # edit themes
     lxmenu-data                 # desktop menus - enables "open with" options
+    manix                       # nix manual
+    mpv                         # video player
     ncdu                        # disk space info (a better du)
     neofetch                    # command-line system information
     networkmanagerapplet        # nm-applet
@@ -114,6 +116,7 @@ let
     skypeforlinux               # skype for linux
     slack                       # slack client
     spotify                     # spotify client
+    thunderbird-wayland         # mail client
     tldr                        # summary of a man page
     tree                        # display files in a tree view
     unzip                       # unzip
@@ -132,21 +135,21 @@ let
   waylandPkgs = [
     unstable.grim
     unstable.slurp
-    pkgs.swaylock-fancy
+    unstable.swaylock-fancy
     unstable.wofi
     unstable.wlsunset
     unstable.xdg-desktop-portal
     unstable.xdg-desktop-portal-wlr
-    pkgs.xdg-desktop-portal-gtk
+    unstable.xdg-desktop-portal-gtk
     unstable.wlogout
     unstable.pipewire
     unstable.wl-gammactl
-    pkgs.brightnessctl
+    unstable.brightnessctl
     unstable.wl-clipboard
     unstable.mako
     unstable.swayidle
     unstable.wlroots
-    pkgs.wayland-protocols
+    unstable.wayland-protocols
     unstable.wdisplays
     unstable.waybar
   ];
@@ -180,7 +183,7 @@ in
   home = {
     username      = "bolt";
     homeDirectory = "/home/bolt";
-    stateVersion  = "21.11";
+    stateVersion  = "22.05";
 
     packages =
       defaultPkgs

@@ -163,27 +163,6 @@ require('specs').setup{
 EOF
 
 lua << EOF
-local autosave = require("autosave")
-
-autosave.setup(
-    {
-        enabled = true,
-        execution_message = "AutoSave: saved at " .. vim.fn.strftime("%H:%M:%S"),
-        events = {"InsertLeave"},
-        conditions = {
-            exists = true,
-            filetype_is_not = {},
-            modifiable = true
-        },
-        write_all_buffers = false,
-        on_off_commands = true,
-        clean_command_line_interval = 2500,
-        debounce_delay = 140
-    }
-)
-EOF
-
-lua << EOF
 local abbrev_man = require("abbrev-man")
 
 abbrev_man.setup({
@@ -205,8 +184,38 @@ require('gitsigns').setup {
     topdelete    = {hl = 'GitSignsDelete', text = '‾', numhl='GitSignsDeleteNr', linehl='GitSignsDeleteLn'},
     changedelete = {hl = 'GitSignsChange', text = '~', numhl='GitSignsChangeNr', linehl='GitSignsChangeLn'},
   },
+  signcolumn = true,  -- Toggle with `:Gitsigns toggle_signs`
   numhl = false,
   linehl = false,
+  word_diff  = false, -- Toggle with `:Gitsigns toggle_word_diff`
+  watch_gitdir = {
+    interval = 1000,
+    follow_files = true
+  },
+  attach_to_untracked = true,
+  current_line_blame = true, -- Toggle with `:Gitsigns toggle_current_line_blame`
+  current_line_blame_opts = {
+    virt_text = true,
+    virt_text_pos = 'eol', -- 'eol' | 'overlay' | 'right_align'
+    delay = 1000,
+    ignore_whitespace = false,
+  },
+  current_line_blame_formatter = '<author>, <author_time:%Y-%m-%d> - <summary>',
+  sign_priority = 6,
+  update_debounce = 100,
+  status_formatter = nil, -- Use default
+  max_file_length = 40000,
+  preview_config = {
+    -- Options passed to nvim_open_win
+    border = 'single',
+    style = 'minimal',
+    relative = 'cursor',
+    row = 0,
+    col = 1
+  },
+  yadm = {
+    enable = false
+  },
   keymaps = {
     -- Default keymap options
     noremap = true,
@@ -228,16 +237,6 @@ require('gitsigns').setup {
     ['o ih'] = ':<C-U>lua require"gitsigns".select_hunk()<CR>',
     ['x ih'] = ':<C-U>lua require"gitsigns".select_hunk()<CR>'
   },
-  watch_index = {
-    interval = 1000,
-    follow_files = true
-  },
-  current_line_blame = true,
-  sign_priority = 6,
-  update_debounce = 100,
-  status_formatter = nil, -- Use default
-  use_decoration_api = true,
-  use_internal_diff = true  -- If luajit is present
 }
 EOF
 

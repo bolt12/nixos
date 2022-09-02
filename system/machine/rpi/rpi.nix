@@ -29,7 +29,8 @@ in
     [
       # Include the results of the hardware scan.
       ./hardware-configuration.nix
-      emanote.homeManagerModule
+
+      # emanote.homeManagerModule
     ];
 
   # Use the extlinux boot loader. (NixOS wants to enable GRUB by default)
@@ -116,12 +117,12 @@ in
   virtualisation.oci-containers.containers = {
     rainloop = {
       image = "newargus/rainloop-webmail";
-      ports = [ "80:81" ];
+      ports = [ "8080:80" ];
       volumes = [ "data:/var/www/html/data" ];
     };
     flame = {
       image = "pawelmalak/flame:multiarch";
-      ports = [ "5005:80" ];
+      ports = [ "80:5005" ];
       volumes = [ "/home/bolt/flame-dashboard:/app/data" ];
       environment = {
         PASSWORD = "flame_password";
@@ -167,7 +168,7 @@ in
       git-annex-utils
       unzip
 
-      emanotePkg
+      # emanotePkg
     ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -180,15 +181,15 @@ in
 
   # List services that you want to enable:
 
-  services.emanote = {
-    enable = false;
-    # host = "127.0.0.1"; # default listen address is 127.0.0.1
-    # port = 7000;        # default http port is 7000
-    # notes = [
-    #   "/home/user/notes"  # add as many layers as you like
-    # ];
-    package = emanotePkg;
-  };
+  # services.emanote = {
+  #   enable = false;
+  #   # host = "127.0.0.1"; # default listen address is 127.0.0.1
+  #   # port = 7000;        # default http port is 7000
+  #   # notes = [
+  #   #   "/home/user/notes"  # add as many layers as you like
+  #   # ];
+  #   package = emanotePkg;
+  # };
 
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
@@ -209,7 +210,7 @@ in
   networking.firewall.enable = false;
 
   # Swap
-  swapDevices = [{ device = "/swapfile"; size = 1024; }];
+  swapDevices = [{ device = "/swapfile"; size = 8192; }];
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

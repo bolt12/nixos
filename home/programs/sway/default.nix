@@ -16,9 +16,9 @@ services.gnome-keyring.enable = true;
 
 wayland.windowManager.sway = {
   enable = true;
-  package = unstable.sway;
-  wrapperFeatures.base = true ;
-  wrapperFeatures.gtk = true ;
+  package = unstable.sway-unwrapped;
+  wrapperFeatures.base = true;
+  wrapperFeatures.gtk = true;
   xwayland = true;
   extraSessionCommands =
     ''

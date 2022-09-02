@@ -3,22 +3,16 @@
 let
   sources = (import ../../nix/sources.nix);
 
-  pkgs = import sources.nixpkgs {
+  unstable = import sources.nixpkgs-unstable {
     overlays = [
-      (import sources.neovim-nightly-overlay)
+      # (import sources.neovim-nightly-overlay)
     ];
   };
 
-  unstable = import sources.nixpkgs-unstable { };
+  pkgs = import sources.nixpkgs { };
 
   plugins = pkgs.vimPlugins;
   plugins-unstable = unstable.vimPlugins;
-
-  unstablePlugins = with plugins-unstable; [
-    # nvim-lightbulb
-    # lspsaga-nvim
-    # coc-nvim                # lsp based intellisense
-  ];
 
   vim-bujo = pkgs.vimUtils.buildVimPlugin {
     name = "vim-bujo";
@@ -45,11 +39,6 @@ let
     src = sources.HighStr-nvim;
   };
 
-  auto-save = pkgs.vimUtils.buildVimPlugin {
-    name = "auto-save";
-    src = sources.AutoSave-nvim;
-  };
-
   abbrev = pkgs.vimUtils.buildVimPlugin {
     name = "abbrev";
     src = sources.AbbrevMan-nvim;
@@ -60,65 +49,67 @@ let
     src = sources.cheatsheet-nvim;
   };
 
-  overriddenPlugins = with pkgs; [];
+  overriddenPlugins = with pkgs; [ ];
+
+  unstablePlugins = with plugins-unstable; [
+    coc-nvim # lsp based intellisense
+  ];
 
   myVimPlugins = with plugins; [
-    coc-nvim                # lsp based intellisense
-    vim-airline             # bottom status bar
-    vim-airline-themes      # status bar themes
-    matchit-zip             # match parentheses
-    base16-vim              # colors
-    tabular                 # align things
-    vim-markdown            # markdown support
-    vim-pandoc-syntax       # pandoc syntax support
+    vim-airline # bottom status bar
+    vim-airline-themes # status bar themes
+    matchit-zip # match parentheses
+    base16-vim # colors
+    tabular # align things
+    vim-markdown # markdown support
+    vim-pandoc-syntax # pandoc syntax support
     rainbow_parentheses-vim # for nested parentheses
-    colorizer               # colors
-    haskell-vim             # haskell vim
-    vim-haskellConcealPlus  # Unicode
-    vim-nix                 # nix support (highlighting, etc)
-    gruvbox-community       # color theme
-    Shade-nvim              # dims inactive windows
-    specs-nvim              # Show where your cursor moves when jumping large distances
-    neoscroll               # smooth scrollng
-    venn                    # draw diagrams
-    nvim-web-devicons       # file icons
-    barbar-nvim             # fancy status bar
-    highstr                 # highlight stuff
-    auto-save               # auto-save files
-    abbrev                  # Abbreviations fix
-    gitsigns-nvim           # git integration
-    popup-nvim              # popups
-    plenary-nvim            # lua dependency for other plugins
-    telescope-nvim          # fuzzy finder
-    cheatsheet-nvim         # command cheatsheet
-    vim-bujo                # todos
-    vim-floaterm            # floating window terminal
-    vim-hoogle              # haskell hoogle
-    vim-silicon             # vim Silicon integration
-    vim-surround            # quickly edit surroundings (brackets, html tags, etc)
+    colorizer # colors
+    haskell-vim # haskell vim
+    vim-haskellConcealPlus # Unicode
+    vim-nix # nix support (highlighting, etc)
+    gruvbox-community # color theme
+    Shade-nvim # dims inactive windows
+    specs-nvim # Show where your cursor moves when jumping large distances
+    neoscroll # smooth scrollng
+    venn # draw diagrams
+    nvim-web-devicons # file icons
+    barbar-nvim # fancy status bar
+    highstr # highlight stuff
+    abbrev # Abbreviations fix
+    gitsigns-nvim # git integration
+    popup-nvim # popups
+    plenary-nvim # lua dependency for other plugins
+    telescope-nvim # fuzzy finder
+    cheatsheet-nvim # command cheatsheet
+    vim-bujo # todos
+    vim-floaterm # floating window terminal
+    vim-hoogle # haskell hoogle
+    vim-silicon # vim Silicon integration
+    vim-surround # quickly edit surroundings (brackets, html tags, etc)
   ] ++ unstablePlugins
-    ++ overriddenPlugins;
+  ++ overriddenPlugins;
 
-  baseConfig    = builtins.readFile ./config.vim;
-  cocConfig     = builtins.readFile ./coc.vim;
-  cocSettings   = builtins.toJSON (import ./coc-settings.nix);
+  baseConfig = builtins.readFile ./config.vim;
+  cocConfig = builtins.readFile ./coc.vim;
+  cocSettings = builtins.toJSON (import ./coc-settings.nix);
   cheatsheetTxt = builtins.readFile ./cheatsheet.txt;
   pluginsConfig = builtins.readFile ./plugins.vim;
-  vimConfig     = baseConfig + pluginsConfig + cocConfig;
+  vimConfig = baseConfig + pluginsConfig + cocConfig;
 
 in
 {
   programs.neovim = {
-    enable       = true;
-    package      = unstable.neovim-unwrapped;
-    extraConfig  = vimConfig;
-    plugins      = myVimPlugins;
-    viAlias      = true;
-    vimAlias     = true;
+    enable = true;
+    package = pkgs.neovim-unwrapped;
+    extraConfig = vimConfig;
+    plugins = myVimPlugins;
+    viAlias = true;
+    vimAlias = true;
     vimdiffAlias = true;
-    withNodeJs   = true; # for coc.nvim
-    withPython3  = true; # for plugins
-    withRuby     = true;
+    withNodeJs = true; # for coc.nvim
+    withPython3 = true; # for plugins
+    withRuby = true;
   };
 
   xdg.configFile = {

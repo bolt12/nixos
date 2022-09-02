@@ -2,7 +2,10 @@
 
 {
   programs.sway.enable = true;
+  programs.sway.wrapperFeatures.base = true;
+  programs.sway.wrapperFeatures.gtk = true;
   programs.sway.extraPackages = [ ];
+  programs.xwayland.enable = true;
 
   services = {
     upower.enable = true;
