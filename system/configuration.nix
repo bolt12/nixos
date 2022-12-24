@@ -66,6 +66,7 @@ in
     git
     sof-firmware
     shared-mime-info
+    zlib
   ];
 
   # Needed for java apps/fonts
@@ -255,7 +256,8 @@ in
   xdg = {
     portal = {
       enable = true;
-      gtkUsePortal = true;
+      # deprecated
+      # gtkUsePortal = true;
       extraPortals = [
         pkgs.xdg-desktop-portal-wlr
         pkgs.xdg-desktop-portal-gtk
@@ -266,9 +268,6 @@ in
 
   # Nix daemon config
   nix = {
-    # Automate `nix-store --optimise`
-    autoOptimiseStore = true;
-
     # Automate garbage collection
     gc = {
       automatic = true;
@@ -282,8 +281,13 @@ in
       keep-derivations = true
     '';
 
-    # Required by Cachix to be used as non-root user
-    trustedUsers = [ "root" "bolt" ];
+    settings = {
+      # Automate `nix-store --optimise`
+      auto-optimise-store = true;
+
+      # Required by Cachix to be used as non-root user
+      trusted-users = [ "root" "bolt" ];
+    };
   };
 
   # This value determines the NixOS release from which the default
@@ -292,7 +296,7 @@ in
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "22.05"; # Did you read the comment?
+  system.stateVersion = "22.11"; # Did you read the comment?
 
 
 }

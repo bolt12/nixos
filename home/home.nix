@@ -27,6 +27,7 @@ let
   };
 
   unfreePackages = [
+    "vscode"
     "discord"
     "skypeforlinux"
     "slack"
@@ -55,7 +56,7 @@ let
           repo = "agda-stdlib";
           owner = "agda";
           rev = "master";
-          sha256 = "sha256-CT8EqYgNzEnAGI0mLwM1ZyKCHPcq4i9xnjCp+dJgdWI=";
+          sha256 = "sha256-K2uSD8UVGeV2doPkOV3YDs7ldqOchrmxgo33/8YDrQE=";
         };
       }))
     ]))
@@ -70,7 +71,7 @@ let
     discord                     # discord client
     evince                      # pdf reader
     feh                         # image viewer
-    ferdi                       # bundle apps together
+    firefox                     # internet browser
     flashfocus                  # focus wm
     gawk                        # text processing programming language
     glib                        # gsettings
@@ -93,6 +94,7 @@ let
     networkmanagerapplet        # nm-applet
     (import sources.niv {}).niv # dependency management for nix
     nix-doc                     # nix documentation search tool
+    nix-index                   # nix locate files
     nodejs                      # nodejs
     noip                        # noip
     numix-icon-theme-circle     # icon theme
@@ -121,6 +123,7 @@ let
     tree                        # display files in a tree view
     unzip                       # unzip
     vlc                         # media player
+    vscode                      # visual studio code
     xarchiver                   # xarchiver gtk frontend
     xclip                       # clipboard support (also for neovim)
     xorg.xmodmap                # Keyboard
@@ -128,6 +131,7 @@ let
     weechat                     # weechat irc client
     wget                        # cli wget
     zip                         # zip
+    zlib                        # zlib
     zoom                        # video conferencing
   ];
 
@@ -183,7 +187,7 @@ in
   home = {
     username      = "bolt";
     homeDirectory = "/home/bolt";
-    stateVersion  = "22.05";
+    stateVersion  = "22.11";
 
     packages =
       defaultPkgs
@@ -228,7 +232,6 @@ in
     ./programs/agda/default.nix
     ./programs/bash/default.nix
     ./programs/emacs/default.nix
-    ./programs/firefox/default.nix
     ./programs/git/default.nix
     ./programs/neovim/default.nix
     ./programs/waybar/default.nix

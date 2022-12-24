@@ -5,6 +5,7 @@ let g:airline_theme='base16'
 set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=%*
+set statusline+=%{get(b:,'gitsigns_head','')}
 set statusline+=%{get(b:,'gitsigns_status','')}
 
 let g:airline#extensions#coc#enabled = 1

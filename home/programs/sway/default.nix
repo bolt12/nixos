@@ -16,7 +16,7 @@ services.gnome-keyring.enable = true;
 
 wayland.windowManager.sway = {
   enable = true;
-  package = unstable.sway-unwrapped;
+  # package = unstable.sway-unwrapped;
   wrapperFeatures.base = true;
   wrapperFeatures.gtk = true;
   xwayland = true;

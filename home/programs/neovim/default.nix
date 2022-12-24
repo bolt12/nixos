@@ -87,6 +87,7 @@ let
     vim-hoogle # haskell hoogle
     vim-silicon # vim Silicon integration
     vim-surround # quickly edit surroundings (brackets, html tags, etc)
+    vim-fugitive # git plugin
   ] ++ unstablePlugins
   ++ overriddenPlugins;
 

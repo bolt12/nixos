@@ -17,10 +17,10 @@
         "homepage": "",
         "owner": "Pocco81",
         "repo": "HighStr.nvim",
-        "rev": "25ab3f02f6174394d93ae21914de0e552c255bb8",
-        "sha256": "1djc679ri4b070x8jsi70rpmlkprvdfx8hjgrww1r3jcidsg144z",
+        "rev": "1cb5e030bb16df52c8428b53dc235466a4eb1d01",
+        "sha256": "12947ndcq16w8rsk5qvycv5ipfxcrfl7k3p2yk2nv42w05i84853",
         "type": "tarball",
-        "url": "https://github.com/Pocco81/HighStr.nvim/archive/25ab3f02f6174394d93ae21914de0e552c255bb8.tar.gz",
+        "url": "https://github.com/Pocco81/HighStr.nvim/archive/1cb5e030bb16df52c8428b53dc235466a4eb1d01.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "cheatsheet-nvim": {
@@ -53,10 +53,10 @@
         "homepage": "",
         "owner": "nix-community",
         "repo": "emacs-overlay",
-        "rev": "9f50a8d3be2291db155cb751448eb2e34d12b5e4",
-        "sha256": "0jl0lrs8jqkznh1nyjlvrxfscvbmqlr7zmd9i3d8pip6yaxh88pq",
+        "rev": "1cb4409944f776fbf9ca79bbd25cd8f4c3b70069",
+        "sha256": "0v2bfjy00zcbn7897wxfhgpwmpgdsy1clgryrw7rzrj4mb42q7bg",
         "type": "tarball",
-        "url": "https://github.com/nix-community/emacs-overlay/archive/9f50a8d3be2291db155cb751448eb2e34d12b5e4.tar.gz",
+        "url": "https://github.com/nix-community/emacs-overlay/archive/1cb4409944f776fbf9ca79bbd25cd8f4c3b70069.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "neoscroll-nvim": {
@@ -77,10 +77,10 @@
         "homepage": "",
         "owner": "nix-community",
         "repo": "neovim-nightly-overlay",
-        "rev": "a5ab01e6ecd69449937a9f2807b95959947cf7b3",
-        "sha256": "1mda7dpyjbd5ds5lkarhkrqbxiy6wawm2gas0p0s0980scgs4b3y",
+        "rev": "5ad674018528be87531b91a1491b398f0b923e52",
+        "sha256": "0dh4bxrlhqkwpl37f2i9pgyw75fmdi813kq1wh9hvwd2b2qgsqr0",
         "type": "tarball",
-        "url": "https://github.com/nix-community/neovim-nightly-overlay/archive/a5ab01e6ecd69449937a9f2807b95959947cf7b3.tar.gz",
+        "url": "https://github.com/nix-community/neovim-nightly-overlay/archive/5ad674018528be87531b91a1491b398f0b923e52.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "niv": {
@@ -89,22 +89,22 @@
         "homepage": "https://github.com/nmattia/niv",
         "owner": "nmattia",
         "repo": "niv",
-        "rev": "82e5cd1ad3c387863f0545d7591512e76ab0fc41",
-        "sha256": "090l219mzc0gi33i3psgph6s2pwsc8qy4lyrqjdj4qzkvmaj65a7",
+        "rev": "689d0e5539eddd0b0f566aee7bb18629eee7df74",
+        "sha256": "1rld3lk42l6b01f2gcrhq8qm9vry1awmfl29zmpiqda9dy89vbx0",
         "type": "tarball",
-        "url": "https://github.com/nmattia/niv/archive/82e5cd1ad3c387863f0545d7591512e76ab0fc41.tar.gz",
+        "url": "https://github.com/nmattia/niv/archive/689d0e5539eddd0b0f566aee7bb18629eee7df74.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "nixpkgs": {
-        "branch": "22.05",
+        "branch": "22.11",
         "description": "Nix Packages collection",
         "homepage": "",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "ce6aa13369b667ac2542593170993504932eb836",
-        "sha256": "0d643wp3l77hv2pmg2fi7vyxn4rwy0iyr8djcw1h5x72315ck9ik",
+        "rev": "4d2b37a84fad1091b9de401eb450aae66f1a741e",
+        "sha256": "11w3wn2yjhaa5pv20gbfbirvjq6i3m7pqrq2msf0g7cv44vijwgw",
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/ce6aa13369b667ac2542593170993504932eb836.tar.gz",
+        "url": "https://github.com/NixOS/nixpkgs/archive/4d2b37a84fad1091b9de401eb450aae66f1a741e.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "nixpkgs-unstable": {
@@ -113,10 +113,10 @@
         "homepage": "",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "03428dbaaa23d6bf458770907b0927b377c873a8",
-        "sha256": "0rcqpb4laiq6ai24i9fa41h2hhg2s2bb4iihjnzdj9bmqysgs9z5",
+        "rev": "bb0359be0a1a08c8d74412fe8c69aa2ffb3f477e",
+        "sha256": "14f19wi7b7wiscw3jlqrpcgls83fkkvd3lpgklx25g34vlyhi4kh",
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/03428dbaaa23d6bf458770907b0927b377c873a8.tar.gz",
+        "url": "https://github.com/NixOS/nixpkgs/archive/bb0359be0a1a08c8d74412fe8c69aa2ffb3f477e.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "nixpkgs-wayland": {
@@ -125,10 +125,10 @@
         "homepage": "",
         "owner": "nix-community",
         "repo": "nixpkgs-wayland",
-        "rev": "096ede2cecf9eecb5625c45f9de2c917c75f80e8",
-        "sha256": "0qyj3n1jgrykix4z5sxbxl53lrj8cp5aicpbk7jyv86ns5fa3zgr",
+        "rev": "2b322f2ae98af4daf4ad5a761480fc87e8de5f74",
+        "sha256": "05avk7xv1qz3m1alarza64jvdx9vfm6vximywbf9zlwjvnnk7d0a",
         "type": "tarball",
-        "url": "https://github.com/nix-community/nixpkgs-wayland/archive/096ede2cecf9eecb5625c45f9de2c917c75f80e8.tar.gz",
+        "url": "https://github.com/nix-community/nixpkgs-wayland/archive/2b322f2ae98af4daf4ad5a761480fc87e8de5f74.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "venn-nvim": {
@@ -137,10 +137,10 @@
         "homepage": "",
         "owner": "jbyuki",
         "repo": "venn.nvim",
-        "rev": "288329d9b5b8c2ffcb58cfe38fa3dd4ddf2139a0",
-        "sha256": "1b7nlg0xrm0bxwl3zda9m08pj3zmnmryjnpc9zx6b1g8qa4a4vjw",
+        "rev": "c114563960b8fb1197695d42798d1f3e7190b798",
+        "sha256": "02fcn8h0k750vw8a4pibc3cvy02pbv25c8b01davhcill98nmkia",
         "type": "tarball",
-        "url": "https://github.com/jbyuki/venn.nvim/archive/288329d9b5b8c2ffcb58cfe38fa3dd4ddf2139a0.tar.gz",
+        "url": "https://github.com/jbyuki/venn.nvim/archive/c114563960b8fb1197695d42798d1f3e7190b798.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "vim-bujo": {

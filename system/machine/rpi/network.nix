@@ -23,7 +23,7 @@
     # Says we are going to deploy to an already existing NixOS machine
     deployment.targetHost = "192.168.1.73";
 
-    nix.trustedUsers = [ "bolt" ];
+    nix.settings.trusted-users = [ "bolt" ];
 
     imports = [
       ./rpi.nix
