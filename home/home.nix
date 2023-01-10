@@ -17,15 +17,6 @@ let
     config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) unfreePackages;
   };
 
-  easy-hls-nix = pkgs.callPackage sources.easy-hls-nix {
-    ghcVersions = [
-      "8.6.5"
-      "8.8.4"
-      "8.10.7"
-      "9.0.2"
-    ];
-  };
-
   unfreePackages = [
     "vscode"
     "discord"
@@ -40,6 +31,12 @@ let
 
   # Unstable branch packages
   unstablePkgs = [
+    (unstable.agda.withPackages (p: [
+      (p.standard-library.overrideAttrs (oldAttrs: {
+        version = "local version";
+        src = /home/bolt/Desktop/Bolt/Playground/Agda/agda-stdlib;
+      }))
+    ]))
   ];
 
   # Extra packages from user repos
@@ -49,17 +46,6 @@ let
 
   defaultPkgs = with pkgs; [
     alloy                       # model checker
-    (agda.withPackages (p: [
-      (p.standard-library.overrideAttrs (oldAttrs: {
-        version = "master";
-        src =  fetchFromGitHub {
-          repo = "agda-stdlib";
-          owner = "agda";
-          rev = "master";
-          sha256 = "sha256-K2uSD8UVGeV2doPkOV3YDs7ldqOchrmxgo33/8YDrQE=";
-        };
-      }))
-    ]))
     awscli2                     # aws cli v2
     bash                        # bash
     bc                          # gnu calculator
@@ -179,7 +165,11 @@ let
     pkgs.haskellPackages.ghc                     # compiler
     pkgs.haskellPackages.hoogle                  # documentation
     pkgs.haskellPackages.nix-tree                # visualize nix dependencies
-    easy-hls-nix                                 # haskell IDE (ships with ghcide)
+    (pkgs.haskell-language-server.override
+      { supportedGhcVersions =
+        [ "8107"
+        ];
+      })
   ];
 
 in

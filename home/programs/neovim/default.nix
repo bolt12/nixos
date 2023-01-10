@@ -52,10 +52,10 @@ let
   overriddenPlugins = with pkgs; [ ];
 
   unstablePlugins = with plugins-unstable; [
-    coc-nvim # lsp based intellisense
   ];
 
   myVimPlugins = with plugins; [
+    coc-nvim # lsp based intellisense
     vim-airline # bottom status bar
     vim-airline-themes # status bar themes
     matchit-zip # match parentheses
