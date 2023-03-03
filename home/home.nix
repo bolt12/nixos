@@ -45,80 +45,82 @@ let
   ];
 
   defaultPkgs = with pkgs; [
-    alloy                       # model checker
-    awscli2                     # aws cli v2
-    bash                        # bash
-    bc                          # gnu calculator
-    betterlockscreen            # fast lockscreen based on i3lock
-    blueman                     # bluetooth applet
-    cachix                      # nix caching
-    chromium                    # google chrome
-    deluge                      # torrent client
-    discord                     # discord client
-    evince                      # pdf reader
-    feh                         # image viewer
-    firefox                     # internet browser
-    flashfocus                  # focus wm
-    gawk                        # text processing programming language
-    glib                        # gsettings
-    gsettings-desktop-schemas   # theming related
-    gtk-engine-murrine          # theme engine
-    gtk_engines                 # theme engines
-    jdk                         # java development kit
-    jq                          # JSON processor
-    jre                         # java runtime environment
-    imv                         # image viewer
-    killall                     # kill processes by name
-    konsole                     # terminal emulator
-    libreoffice                 # office suite
-    lxappearance                # edit themes
-    lxmenu-data                 # desktop menus - enables "open with" options
-    manix                       # nix manual
-    mpv                         # video player
-    ncdu                        # disk space info (a better du)
-    neofetch                    # command-line system information
-    networkmanagerapplet        # nm-applet
-    (import sources.niv {}).niv # dependency management for nix
-    nix-doc                     # nix documentation search tool
-    nix-index                   # nix locate files
-    nodejs                      # nodejs
-    noip                        # noip
-    numix-icon-theme-circle     # icon theme
-    numix-cursor-theme          # icon theme
-    obs-studio                  # obs-studio
-    obs-studio-plugins.wlrobs   # obs wayland protocol
-    pamixer                     # pulseaudio cli mixer
-    patchelf                    # dynamic linker and RPATH of ELF executables
-    pavucontrol                 # pulseaudio volume control
-    paprefs                     # pulseaudio preferences
-    pasystray                   # pulseaudio systray
-    pcmanfm                     # file manager
-    playerctl                   # music player controller
-    psensor                     # hardware monitoring
-    pulsemixer                  # pulseaudio mixer
-    python3                     # python3 programming language
-    ripgrep                     # ripgrep
-    rnix-lsp                    # nix lsp server
-    silicon                     # create beautiful code imgs
-    simplescreenrecorder        # self-explanatory
-    skypeforlinux               # skype for linux
-    slack                       # slack client
-    spotify                     # spotify client
-    thunderbird-wayland         # mail client
-    tldr                        # summary of a man page
-    tree                        # display files in a tree view
-    unzip                       # unzip
-    vlc                         # media player
-    vscode                      # visual studio code
-    xarchiver                   # xarchiver gtk frontend
-    xclip                       # clipboard support (also for neovim)
-    xorg.xmodmap                # Keyboard
-    xsettingsd                  # theming
-    weechat                     # weechat irc client
-    wget                        # cli wget
-    zip                         # zip
-    zlib                        # zlib
-    zoom                        # video conferencing
+    alloy                        # model checker
+    awscli2                      # aws cli v2
+    bash                         # bash
+    bc                           # gnu calculator
+    betterlockscreen             # fast lockscreen based on i3lock
+    blueman                      # bluetooth applet
+    cachix                       # nix caching
+    chromium                     # google chrome
+    deluge                       # torrent client
+    discord                      # discord client
+    evince                       # pdf reader
+    feh                          # image viewer
+    firefox                      # internet browser
+    flashfocus                   # focus wm
+    gawk                         # text processing programming language
+    git-extras                   # git extra commands like 'git sed'
+    glib                         # gsettings
+    gsettings-desktop-schemas    # theming related
+    gtk-engine-murrine           # theme engine
+    gtk_engines                  # theme engines
+    jdk                          # java development kit
+    jq                           # JSON processor
+    jre                          # java runtime environment
+    imv                          # image viewer
+    killall                      # kill processes by name
+    konsole                      # terminal emulator
+    libreoffice                  # office suite
+    lxappearance                 # edit themes
+    lxmenu-data                  # desktop menus - enables "open with" options
+    manix                        # nix manual
+    mpv                          # video player
+    ncdu                         # disk space info (a better du)
+    neofetch                     # command-line system information
+    networkmanagerapplet         # nm-applet
+    (import sources.niv {}).niv  # dependency management for nix
+    nix-doc                      # nix documentation search tool
+    nix-index                    # nix locate files
+    nodejs                       # nodejs
+    noip                         # noip
+    numix-icon-theme-circle      # icon theme
+    numix-cursor-theme           # icon theme
+    obs-studio                   # obs-studio
+    obs-studio-plugins.wlrobs    # obs wayland protocol
+    pamixer                      # pulseaudio cli mixer
+    patchelf                     # dynamic linker and RPATH of ELF executables
+    pavucontrol                  # pulseaudio volume control
+    paprefs                      # pulseaudio preferences
+    pasystray                    # pulseaudio systray
+    pcmanfm                      # file manager
+    playerctl                    # music player controller
+    psensor                      # hardware monitoring
+    pulsemixer                   # pulseaudio mixer
+    python3                      # python3 programming language
+    ripgrep                      # ripgrep
+    rnix-lsp                     # nix lsp server
+    silicon                      # create beautiful code imgs
+    simplescreenrecorder         # self-explanatory
+    skypeforlinux                # skype for linux
+    slack                        # slack client
+    spotify                      # spotify client
+    thunderbird-wayland          # mail client
+    tldr                         # summary of a man page
+    tree                         # display files in a tree view
+    texlive.combined.scheme-full # latex
+    unzip                        # unzip
+    vlc                          # media player
+    vscode                       # visual studio code
+    xarchiver                    # xarchiver gtk frontend
+    xclip                        # clipboard support (also for neovim)
+    xorg.xmodmap                 # Keyboard
+    xsettingsd                   # theming
+    weechat                      # weechat irc client
+    wget                         # cli wget
+    zip                          # zip
+    zlib                         # zlib
+    zoom                         # video conferencing
   ];
 
   # Wayland Packages

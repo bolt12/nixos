@@ -12,7 +12,7 @@
     };
 
     "haskell" = {
-        "command" = "haskell-language-server-wrapper";
+        "command" = "haskell-language-server";
         "args" = ["--lsp"];
         "rootPatterns" = [
             "*.cabal"

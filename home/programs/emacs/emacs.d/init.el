@@ -436,6 +436,8 @@ to start up a shell process, and is also more consistent."
 (require 'agda-input)
 (setq agda2-highlight-level (quote interactive))
 (add-to-list 'auto-mode-alist '("\\.lagda.md\\'" . agda2-mode))
+(add-to-list 'auto-mode-alist '("\\.lagda.tex\\'" . agda2-mode))
+  (set-input-method "Agda")
 
 ;; Once that file is loaded, we apply our configuration, which mostly consists of keybindings.
 (with-eval-after-load (agda-mode-locate)
@@ -456,7 +458,6 @@ to start up a shell process, and is also more consistent."
     "d" '(agda2-goto-definition-keyboard :wk "goto definition")
     "j" '(agda2-next-goal :wk "next goal")
     "k" '(agda2-previous-goal :wk "previous goal"))
-  (set-input-method "Agda")
 )
 
 

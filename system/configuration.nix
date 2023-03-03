@@ -132,7 +132,10 @@ in
         load-module module-switch-on-connect
       '';
     };
-    opengl.enable = true;
+    opengl = {
+      enable = true;
+      driSupport32Bit = true;
+    };
     enableRedistributableFirmware = true;
     enableAllFirmware = true;
     cpu.intel.updateMicrocode = true;
@@ -217,6 +220,7 @@ in
       pkgs.unifont
       pkgs.open-sans
       pkgs.open-dyslexic
+      pkgs.xits-math
     ];
     fontconfig = {
       enable = true;

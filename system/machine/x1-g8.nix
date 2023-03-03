@@ -57,12 +57,14 @@
     hostName = "bolt-nixos";
     interfaces.wlp0s20f3.useDHCP = true;
     interfaces.enp0s31f6.useDHCP = true;
+    interfaces.enp45s0u2.useDHCP = true;
   };
 
   # Intel UHD 620 Hardware Acceleration
   hardware.opengl = {
     enable = true;
     driSupport = true;
+    driSupport32Bit = true;
     extraPackages = with pkgs; [
       vaapiIntel
       vaapiVdpau
