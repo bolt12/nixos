@@ -22,6 +22,7 @@
 ;; We use `straight.el' (https://github.com/raxod502/straight.el) for package management.
 ;; To get that set up, we need to do a bit of bootstrapping.
 ;; Don't worry if you don't understand this!
+(defvar native-comp-deferred-compilation-deny-list ())
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -417,6 +418,7 @@ to start up a shell process, and is also more consistent."
 (add-to-path "/usr/local/bin")
 (add-to-path "~/.local/bin/")
 (add-to-path "~/.cabal/bin")
+(add-to-path "~/.nix-profile/bin")
 
 ;; Now for the tricky part. `agda-mode' is a bit odd, as Agda ships with a bundle of elisp
 ;; files that need to match up with the version of Agda you've installed. This makes

@@ -67,6 +67,7 @@ in
     sof-firmware
     shared-mime-info
     zlib
+    gtk3
   ];
 
   # Needed for java apps/fonts
@@ -99,7 +100,7 @@ in
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
-  networking.firewall.enable = false;
+  # networking.firewall.enable = false;
 
   # Enable Docker support.
   virtualisation = {

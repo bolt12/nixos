@@ -17,7 +17,7 @@ let
 in {
   programs.emacs = {
     enable = true;
-    package = pkgs.emacsPgtk;
+    package = pkgs.emacs;
     extraPackages = epkgs: with epkgs; [
       use-package
       nix-mode

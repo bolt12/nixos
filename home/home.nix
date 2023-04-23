@@ -63,6 +63,7 @@ let
     git-extras                   # git extra commands like 'git sed'
     glib                         # gsettings
     gsettings-desktop-schemas    # theming related
+    gtk3                         # gtk3 lib
     gtk-engine-murrine           # theme engine
     gtk_engines                  # theme engines
     jdk                          # java development kit
@@ -117,6 +118,7 @@ let
     xorg.xmodmap                 # Keyboard
     xsettingsd                   # theming
     weechat                      # weechat irc client
+    wireguard-tools              # wireguard
     wget                         # cli wget
     zip                          # zip
     zlib                         # zlib

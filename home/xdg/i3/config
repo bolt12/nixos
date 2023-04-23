@@ -171,8 +171,8 @@ bindsym XF86AudioLowerVolume exec "amixer -q -c 0 sset Master,0 10- unmute"
 bindsym XF86AudioMute exec "amixer -q -c 0 sset Master,0 toggle"
 
 #brightness control
-bindsym XF86MonBrightnessDown exec brightnessctl set 15%-
-bindsym XF86MonBrightnessUp exec brightnessctl set +15%
+bindsym XF86MonBrightnessDown exec brightnessctl set 1%-
+bindsym XF86MonBrightnessUp exec brightnessctl set +1%
 
 bar {
   status_command i3status

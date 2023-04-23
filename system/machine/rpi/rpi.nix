@@ -2,10 +2,10 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, lib, pkgs, ... }:
+{ config, pkgs, ... }:
 
-let emanote = import (fetchTarball { url = https://github.com/srid/emanote/archive/master.tar.gz; });
-    emanotePkg = emanote.packages.${builtins.currentSystem}.default;
+let emanote = import (builtins.fetchTarball "https://github.com/srid/emanote/archive/master.tar.gz");
+    emanotePkg = emanote.packages.aarch64-linux.default;
 in
 {
   nixpkgs.overlays = [
@@ -13,8 +13,7 @@ in
       firmwareLinuxNonfree = super.firmwareLinuxNonfree.overrideAttrs (old: {
         version = "2020-12-18";
         src = pkgs.fetchgit {
-          url =
-            "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git";
+          url = "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git";
           rev = "b79d2396bc630bfd9b4058459d3e82d7c3428599";
           sha256 = "1rb5b3fzxk5bi6kfqp76q1qszivi0v1kdz1cwj2llp5sd9ns03b5";
         };
@@ -26,8 +25,7 @@ in
   nixpkgs.config.allowUnfree = true;
 
   imports =
-    [
-      # Include the results of the hardware scan.
+    [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
 
       # emanote.homeManagerModule
@@ -36,15 +34,29 @@ in
   # Use the extlinux boot loader. (NixOS wants to enable GRUB by default)
   boot.loader.grub.enable = false;
   # Enables the generation of /boot/extlinux/extlinux.conf
-  # boot.loader.generic-extlinux-compatible.enable = true;
-  # if you have a Raspberry Pi 2 or 3, pick this:
-  boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.loader.generic-extlinux-compatible.enable = true;
 
-  # A bunch of boot parameters needed for optimal runtime on RPi 3b+
-  boot.kernelParams = [ "cma=256M" ];
-  boot.loader.raspberryPi.enable = true;
-  boot.loader.raspberryPi.version = 3;
-  boot.loader.raspberryPi.uboot.enable = true;
+  networking.hostName = "rpi-nixos"; # Define your hostname.
+  networking.wireless.interfaces = [ "wlan0" ];
+  systemd.services.iwd.serviceConfig.Restart = "always";
+  networking.networkmanager.enable = true;
+  networking.networkmanager.wifi.backend = "iwd";
+  networking.wireless.iwd.enable = true;
+
+  # Emanote systemd service
+  systemd.services.emanote = {
+    enable = true;
+    description = "Emanote web server";
+    after = [ "network.target" ];
+    wantedBy = [ "default.target" ];
+
+    serviceConfig = {
+      ExecStart = ''
+        /nix/store/djj5lxjmyghwvnvvggxwdw8z2l9gy7rv-system-path/bin/emanote --layers \
+        "/home/bolt/notes" run --host=0.0.0.0 --port=7000
+      '';
+    };
+  };
 
   # Preserve space by sacrificing documentation and history
   documentation.nixos.enable = false;
@@ -61,20 +73,6 @@ in
   networking.useDHCP = false;
   networking.interfaces.eth0.useDHCP = true;
 
-  networking.hostName = "rpi-nixos"; # Define your hostname.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-  networking.wireless.interfaces = [ "wlan0" ];
-  networking.interfaces.wlan0.ipv4.addresses = [{
-    # I used static IP over WLAN because I want to use it as local DNS resolver
-    address = "192.168.1.73";
-    prefixLength = 24;
-  }];
-
-  systemd.services.iwd.serviceConfig.Restart = "always";
-  networking.networkmanager.enable = true;
-  networking.networkmanager.wifi.backend = "iwd";
-  networking.wireless.iwd.enable = true;
-
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
@@ -90,24 +88,15 @@ in
   # services.xserver.enable = true;
 
   # Enable support for Pi firmware blobs
-  hardware.enableRedistributableFirmware = true;
+  hardware.enableRedistributableFirmware = false;
+  hardware.firmware = [ pkgs.raspberrypiWirelessFirmware ];
 
   # Configure keymap in X11
-  services.xserver.layout = "us";
-  services.xserver.xkbOptions = "eurosign:e";
+  # services.xserver.layout = "us";
+  # services.xserver.xkbOptions = "eurosign:e";
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
-
-  # Enable Avahi for service discovery
-  services.avahi = {
-    enable = true;
-    publish = {
-      enable = true;
-      addresses = true;
-      workstation = true;
-    };
-  };
 
   # Docker container services
 
@@ -115,38 +104,19 @@ in
   virtualisation.oci-containers.backend = "podman";
 
   virtualisation.oci-containers.containers = {
-    rainloop = {
-      image = "newargus/rainloop-webmail";
-      ports = [ "8080:80" ];
-      volumes = [ "data:/var/www/html/data" ];
-    };
-    flame = {
-      image = "pawelmalak/flame:multiarch";
-      ports = [ "80:5005" ];
-      volumes = [ "/home/bolt/flame-dashboard:/app/data" ];
-      environment = {
-        PASSWORD = "flame_password";
-      };
-    };
   };
-
 
   # Enable sound.
   sound.enable = true;
   hardware.pulseaudio.enable = true;
 
-  boot.loader.raspberryPi.firmwareConfig = ''
-    dtparam=audio=on
-  '';
-
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  # users.mutableUsers = false;     # Remove any users not defined in here
   users.users.bolt = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "networkmanager" "docker" ]; # Enable ‘sudo’ for the user.
+    extraGroups = [ "wheel" "networkmanager" "podman" ]; # Enable ‘sudo’ for the user.
     openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHKTf4Bb2BBymwZvxPtxEefspOPTACPn3HqrRiWAMJEJ armandoifsantos@gmail.com" ];
   };
 
@@ -154,22 +124,73 @@ in
     openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHKTf4Bb2BBymwZvxPtxEefspOPTACPn3HqrRiWAMJEJ armandoifsantos@gmail.com" ];
   };
 
-
-
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages =
     with pkgs; [
       libraspberrypi
-      vim
+      neovim
       wget
       git
       git-annex
       git-annex-utils
       unzip
+      wireguard-tools
+      iptables
 
-      # emanotePkg
+      emanotePkg
     ];
+
+  # enable NAT
+  networking.nat.enable = true;
+  networking.nat.externalInterface = "wlan0";
+  networking.nat.internalInterfaces = [ "wg0" ];
+
+  # Open ports in the firewall.
+  networking.firewall = {
+    enable = true;
+    allowedTCPPorts = [ 22 25 465 587 7000 ];
+    allowedUDPPorts = [ 51820 ];
+  };
+
+  networking.wireguard.interfaces = {
+    # "wg0" is the network interface name. You can name the interface arbitrarily.
+    wg0 = {
+      # Determines the IP address and subnet of the server's end of the tunnel interface.
+      ips = [ "10.100.0.1/24" ];
+
+      # The port that WireGuard listens to. Must be accessible by the client.
+      listenPort = 51820;
+
+      # This allows the wireguard server to route your traffic to the internet and hence be like a VPN
+      # For this to work you have to set the dnsserver IP of your router (or dnsserver of choice) in your clients
+      postSetup = ''
+        ${pkgs.iptables}/bin/iptables -t nat -A POSTROUTING -s 10.100.0.0/24 -o wlan0 -j MASQUERADE
+      '';
+
+      # This undoes the above command
+      postShutdown = ''
+        ${pkgs.iptables}/bin/iptables -t nat -D POSTROUTING -s 10.100.0.0/24 -o wlan0 -j MASQUERADE
+      '';
+
+      # Path to the private key file.
+      #
+      # Note: The private key can also be included inline via the privateKey option,
+      # but this makes the private key world-readable; thus, using privateKeyFile is
+      # recommended.
+      privateKeyFile = "/home/bolt/wireguard-keys/private";
+
+      peers = [
+        # List of allowed peers.
+        { # Feel free to give a meaning full name
+          # Public key of the peer (not a file path).
+          publicKey = "hUUAT7Dny5aFJHvwUE9poaaAcEheyEDMhff5AwQPiRk=";
+          # List of IPs assigned to this peer within the tunnel subnet. Used to configure routing.
+          allowedIPs = [ "10.100.0.2/32" ];
+        }
+      ];
+    };
+  };
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -181,33 +202,10 @@ in
 
   # List services that you want to enable:
 
-  # services.emanote = {
-  #   enable = false;
-  #   # host = "127.0.0.1"; # default listen address is 127.0.0.1
-  #   # port = 7000;        # default http port is 7000
-  #   # notes = [
-  #   #   "/home/user/notes"  # add as many layers as you like
-  #   # ];
-  #   package = emanotePkg;
-  # };
-
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
   services.openssh.permitRootLogin = "yes";
   services.openssh.forwardX11 = true;
-
-  # Optional: You can configure the email address used with Let's Encrypt.
-  # This way you get renewal reminders (automated by NixOS) as well as expiration emails.
-  # security.acme.certs = {
-  #   "blog.example.com".email = "youremail@address.com";
-  # };
-
-
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  networking.firewall.enable = false;
 
   # Swap
   swapDevices = [{ device = "/swapfile"; size = 8192; }];
@@ -218,6 +216,5 @@ in
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "22.11"; # Did you read the comment?
-
+  system.stateVersion = "21.05"; # Did you read the comment?
 }
