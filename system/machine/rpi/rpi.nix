@@ -182,11 +182,17 @@ in
 
       peers = [
         # List of allowed peers.
-        { # Feel free to give a meaning full name
+        { # X1 G8 Carbon
           # Public key of the peer (not a file path).
           publicKey = "hUUAT7Dny5aFJHvwUE9poaaAcEheyEDMhff5AwQPiRk=";
           # List of IPs assigned to this peer within the tunnel subnet. Used to configure routing.
           allowedIPs = [ "10.100.0.2/32" ];
+        }
+        { # Android phone
+          # Public key of the peer (not a file path).
+          publicKey = "GhHsMo+0PqWAbflsSuphRzN4YyOzOjVKV31O6gjOIFQ=";
+          # List of IPs assigned to this peer within the tunnel subnet. Used to configure routing.
+          allowedIPs = [ "10.100.0.3/32" ];
         }
       ];
     };

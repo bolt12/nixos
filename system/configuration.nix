@@ -251,7 +251,9 @@ in
         "plugdev"
         "root"
       ];
+    openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOK8UTLb9TxZdIEX5wU4d4qkJhE+i94TnucxtZmdl+ZM bolt@rpi-nixos" ];
     };
+
   };
 
   # Allow unfree packages
