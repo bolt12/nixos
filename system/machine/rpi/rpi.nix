@@ -70,8 +70,8 @@ in
   # The global useDHCP flag is deprecated, therefore explicitly set to false here.
   # Per-interface useDHCP will be mandatory in the future, so this generated config
   # replicates the default behaviour.
-  networking.useDHCP = false;
-  networking.interfaces.eth0.useDHCP = true;
+  #networking.useDHCP = false;
+  # networking.interfaces.eth0.useDHCP = true;
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
@@ -137,6 +137,7 @@ in
       unzip
       wireguard-tools
       iptables
+      unbound-full
 
       emanotePkg
     ];
@@ -149,8 +150,8 @@ in
   # Open ports in the firewall.
   networking.firewall = {
     enable = true;
-    allowedTCPPorts = [ 22 25 465 587 7000 ];
-    allowedUDPPorts = [ 51820 ];
+    allowedTCPPorts = [ 22 25 53 465 587 7000 ];
+    allowedUDPPorts = [ 53 51820 ];
   };
 
   networking.wireguard.interfaces = {
@@ -196,6 +197,60 @@ in
         }
       ];
     };
+  };
+
+  # Setting up Unbound as a recursive DNS Server
+  # Check https://docs.pi-hole.net/guides/dns/unbound/#configure-unbound
+  services.unbound = {
+    enable = true;
+    user = "root";
+    settings = {
+      include = "/run/keys/unbound-ads";
+      server = {
+        verbosity = 2;
+        log-queries= "yes";
+
+        serve-expired = "yes";
+        serve-expired-ttl = 86400;
+
+        interface = [ "0.0.0.0" ];
+        do-ip4 = "yes";
+        do-udp = "yes";
+        do-tcp = "yes";
+
+
+        harden-glue = "yes";
+        harden-dnssec-stripped = "yes";
+        use-caps-for-id = "no";
+        edns-buffer-size = "1232";
+        prefetch = "yes";
+
+        num-threads = 1;
+        so-rcvbuf = "1m";
+
+        private-address = [ "192.168.0.0/16"
+                            "169.254.0.0/16"
+                            "172.16.0.0/12"
+                            "10.0.0.0/8"
+                          ];
+
+        access-control = [ "192.168.0.0/16 allow" ];
+        qname-minimisation = "yes";
+      };
+      remote-control = {
+        control-enable = true;
+      };
+    };
+  };
+
+  networking = {
+    useDHCP = false;
+    interfaces.wlan0.ipv4.addresses = [ {
+      address = "192.168.1.73";
+      prefixLength = 24;
+    } ];
+    defaultGateway = "192.168.1.254";
+    nameservers = [ "127.0.0.1" "1.1.1.1" "192.168.1.254" ];
   };
 
   # Some programs need SUID wrappers, can be configured further or are

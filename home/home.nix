@@ -4,7 +4,7 @@ let
 
   unstable = import sources.nixpkgs-unstable {
     overlays = [
-      (import sources.nixpkgs-wayland)
+      (import sources.nixpkgs-wayland).overlay
     ];
   };
 
@@ -15,11 +15,13 @@ let
       (import sources.neovim-nightly-overlay)
     ];
     config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) unfreePackages;
+    config.permittedInsecurePackages = [ "python2.7-pyjwt-1.7.1" ];
   };
 
   unfreePackages = [
     "vscode"
     "discord"
+    "nixops"
     "skypeforlinux"
     "slack"
     "spotify"
@@ -61,6 +63,7 @@ let
     flashfocus                   # focus wm
     gawk                         # text processing programming language
     git-extras                   # git extra commands like 'git sed'
+    git-annex                    # git annex
     glib                         # gsettings
     gsettings-desktop-schemas    # theming related
     gtk3                         # gtk3 lib
@@ -83,6 +86,7 @@ let
     (import sources.niv {}).niv  # dependency management for nix
     nix-doc                      # nix documentation search tool
     nix-index                    # nix locate files
+    nixops                       # nixops
     nodejs                       # nodejs
     noip                         # noip
     numix-icon-theme-circle      # icon theme
@@ -172,6 +176,7 @@ let
     (pkgs.haskell-language-server.override
       { supportedGhcVersions =
         [ "8107"
+          "902"
         ];
       })
   ];

@@ -29,6 +29,10 @@
       ./rpi.nix
     ];
 
+    deployment.keys.unbound-ads = {
+      keyFile = ./unbound-ads/unbound_ad_servers;
+    };
+
     nixpkgs.localSystem = {
       system = "aarch64-linux";
       config = "aarch64-unknown-linux-gnu";

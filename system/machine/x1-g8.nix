@@ -58,6 +58,9 @@
     interfaces.wlp0s20f3.useDHCP = true;
     interfaces.enp0s31f6.useDHCP = true;
     interfaces.enp45s0u2.useDHCP = true;
+
+    defaultGateway = "192.168.1.254";
+    nameservers = [ "192.168.1.73" "1.1.1.1" "192.168.1.254" ];
   };
 
   # Enable WireGuard
