@@ -23,6 +23,10 @@
 ;; To get that set up, we need to do a bit of bootstrapping.
 ;; Don't worry if you don't understand this!
 (defvar native-comp-deferred-compilation-deny-list ())
+
+;; Use develop branch for straight
+(setq straight-repository-branch "develop")
+
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -45,6 +49,8 @@
 
 (straight-use-package 'use-package)
 (require 'use-package)
+;; Remove noisy warnings
+(setq native-comp-async-report-warnings-errors nil)
 
 ;; Disable warnings buffer
 (setq warning-minimum-level :emergency)
