@@ -26,9 +26,11 @@
     extraModulePackages = with config.boot.kernelPackages; [ acpi_call ];
     blacklistedKernelModules = [ "snd_hda_intel" "snd_soc_skl" ];
     plymouth.enable = true;
-    tmpOnTmpfs = true;
-    runSize = "50%"; # Size of tmpOnTmpfs defaults to 50% of RAM
-    cleanTmpDir = true;
+    tmp = {
+      useTmpfs    = true;
+      cleanOnBoot = true;
+    };
+    runSize = "50%"; # Size of useTmpfs defaults to 50% of RAM
   };
 
   # Systemd /run/user increase size
@@ -66,6 +68,7 @@
   # Enable WireGuard
   networking.firewall.enable = true;
   networking.firewall.trustedInterfaces = [ "wg0" ];
+  networking.firewall.allowedTCPPorts = [ 20 21 8000 ];
   networking.firewall.allowedUDPPorts = [ 51820 ];
 
   networking.wireguard.interfaces = {

@@ -5,6 +5,9 @@
   # "coc.preferences.formatOnSaveFiletypes" = ["haskell"];
   "coc.preferences.snippets.enable" = true;
 
+  # Important, otherwise link completion containing spaces and other special characters won't work.
+  "suggest.invalidInsertCharacters" = [];
+
   "languageserver" = {
     "dhall" = {
       "command" = "dhall-lsp-server";
@@ -53,6 +56,12 @@
       "filetypes" = [ "nix" ];
     };
 
+    "zk" = {
+      "command" = "zk";
+      "args" = ["lsp"];
+      "trace.server" = "messages";
+      "filetypes" = ["markdown"];
+    };
   };
 
   "yank.highlight.duration" = 700;

@@ -1,14 +1,14 @@
 ## gitsigns @git
 Stage hunk                               | <leader>ghs
 Undo stage hunk                          | <leader>ghu
-Stage hunk                               | <leader>ghs
 Reset hunk                               | <leader>ghr
 Preview hunk                             | <leader>ghp
 Reset buffer                             | <leader>ghR
 Blame current line                       | <leader>ghb
 Next hunk                                | ]c
-Previous hunk                            | ]c
+Previous hunk                            | [c
 Hunk text object                         | ih
+View git diff                            | <leader>gd
 
 ## telescope @fuzzy @fzf
 Close                                    | <C-C>
@@ -24,32 +24,44 @@ Find files                               | <leader>ff
 Live grep                                | <leader>fg
 Buffers                                  | <leader>fb
 Help tags                                | <leader>fh
+Find in files                            | <leader>fs
+Find word                                | <leader>fw
 
 ## bujo @todo @notes
 Open TODO notes                          | :Todo
 Add item                                 | <C-b>a
 Check item                               | <C-b>c
+Delete item                              | <C-b>d
 
 ## Floaterm @terminal @floating
 Toggle Floaterm                          | <A-S-d>
+New Floaterm                             | <leader>fn
+Next Floaterm                            | <leader>fj
+Previous Floaterm                        | <leader>fk
+Kill Floaterm                            | <leader>fx
 
 ## Hoogle @hoogle @haskell
 Search cursos word                       | <leader>h
+Hoogle Lookup                            | :Hoogle
 
 ## Tabular @align
 Align any                                | :Tabularize /<regex>
-Align =                                  | a=
-Align ::                                 | a;
-Align ->                                 | a-
-Align |                                  | a\|
-Align ,                                  | a,
+Align =                                  | :Tabularize /=
+Align ::                                 | :Tabularize /::
+Align ->                                 | :Tabularize /->
+Align |                                  | :Tabularize /|
+Align ,                                  | :Tabularize /,
 
 ## Venn @diagrams
 Draw diagrams                            | set ve=all -> <C-v> -> :VBox
+Draw Circle                              | :Circle
+Draw Ellipse                             | :Ellipse
+Draw Rectangle                           | :Rectangle
 
 ## HighStr @highlight
 Highlight text                           | :HSHighlight <integer> (note pressing <C-U> might be needed in visual mode)
 Remove all highlights                    | :HSHighlight rm_all
+Toggle highlight                         | :HSHighlight toggle <integer>
 
 ## Surround @parentheses @brackets @tags
 Change from " to '                       | cs"'
@@ -59,7 +71,79 @@ Remove delimiters                        | ds<delimiter>
 Add delimiters in word                   | ysiw<delimiter>
 Wrap entire line in delimiter            | yss<delimiter>
 Visual mode wrap                         | visual selection followed by S<delimiter>
+Change tag                               | cst<tag>
 
 ## Silicon @screenshot @code
 Generate image from current buffer       | :Silicon /path/to/output.png
 Generate image and write to clipboard    | :Silicon /path/to/output.png --to-clipboard
+Generate image from selection            | :'<,'>Silicon --from-stdin /path/to/output.png
+
+## vim-airline @status @bar
+Display airline status bar                 | :AirlineToggle
+Display tab line                          | :AirlineTablineToggle
+Toggle airline extensions                 | :AirlineExtensionsToggle
+
+## vim-markdown @markdown
+Toggle folding of markdown sections       | zf
+Open link under cursor                    | gx
+Preview markdown in browser               | :MarkdownPreview
+
+## vim-pandoc-syntax @pandoc
+Toggle pandoc syntax features             | :PandocToggle
+
+## rainbow_parentheses-vim @parentheses
+Toggle rainbow parentheses                | :RainbowParenthesesToggle
+Toggle rainbow parentheses load for all files | :RainbowParenthesesLoadRound
+
+## colorizer @color
+Toggle color highlighting for hex codes and names | :ColorizerToggle
+
+## vim-nix @nix
+Format nix file                           | :NixFormat
+
+## gruvbox-community @theme
+Set gruvbox theme                         | :colorscheme gruvbox
+
+## Shade-nvim @shade
+Toggle shade for inactive windows         | :ShadeToggle
+
+## specs-nvim @specs
+Toggle specs                              | :SpecsToggle
+Enable specs                              | :SpecsEnable
+
+## vim-fugitive @git
+Check git status                          | :Gstatus
+Commit changes                            | :Gcommit
+Push changes                              | :Gpush
+
+## vim-haskellConcealPlus @haskell
+Toggle Haskell Conceal Plus               | :HaskellConcealToggle
+
+## barbar-nvim @buffers @tabs
+Navigate to next buffer                   | :BufferNext
+Navigate to previous buffer               | :BufferPrevious
+Close buffer                              | :BufferClose
+
+## zk-nvim @zk
+Create new zk note                        | :ZkNew
+Link to zk note                           | :ZkLink
+
+## coc-nvim @lsp
+Show coc information                      | :CocInfo
+Show coc commands                         | :CocCommand
+Show coc diagnostics                      | :CocDiagnostics
+
+## matchit-zip @matching
+Switch between matching items             | %
+
+## base16-vim @theme
+Set base16 theme                          | :colorscheme base16-[theme name]
+
+## popup-nvim @popup
+Create new popup                          | :lua require('popup').create({options})
+
+## plenary-nvim @lua
+Run lua tests                             | :PlenaryTest
+
+## nvim-web-devicons @icons
+Enable devicons                           | :lua require'nvim-web-devicons'.setup()

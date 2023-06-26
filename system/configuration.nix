@@ -165,31 +165,7 @@ in
       jack.enable = false;
 
       wireplumber.enable = false;
-      media-session.enable = true;
 
-      # High quality BT calls
-      media-session.config.bluez-monitor.rules = [
-        {
-          # Matches all cards
-          matches = [{ "device.name" = "~bluez_card.*"; }];
-          actions = {
-            "update-props" = {
-              "bluez5.auto-connect" = [ "hfp_hf" "hsp_hs" "a2dp_sink" ];
-            };
-          };
-        }
-        {
-          matches = [
-            # Matches all sources
-            { "node.name" = "~bluez_input.*"; }
-            # Matches all outputs
-            { "node.name" = "~bluez_output.*"; }
-          ];
-          actions = {
-            "node.pause-on-idle" = false;
-          };
-        }
-      ];
     };
 
     # USB Automounting
@@ -303,7 +279,7 @@ in
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "22.11"; # Did you read the comment?
+  system.stateVersion = "23.05"; # Did you read the comment?
 
 
 }

@@ -105,7 +105,7 @@ let g:rainbow#colors = {
 \     ['magenta', 'purple1'     ]
 \   ] }
 
-" nnoremap <leader>f :CtrlP<CR>
+nnoremap <leader>F :CtrlP<CR>
 
 " Highlighting for jsonc filetype
 autocmd FileType json syntax match Comment +\/\/.\+$+
@@ -287,6 +287,35 @@ require('telescope').setup{
   }
 }
 EOF
+
+" zk bindings
+"
+" User command to index the current notebook.
+"
+" zk.index expects a notebook path as first argument, so we provide the current
+" buffer path with expand("%:p").
+command! -nargs=0 ZkIndex :call CocAction("runCommand", "zk.index", expand("%:p"))
+nnoremap <leader>zi :ZkIndex<CR>
+
+" User command to create and open a new note, to be called like this:
+" :ZkNew {"title": "An interesting subject", "dir": "inbox", ...}
+"
+" Note the concatenation with the "edit" command to open the note right away.
+command! -nargs=? ZkNew :exec "edit ".CocAction("runCommand", "zk.new", expand("%:p"), <args>).path
+
+" Create a new note after prompting for its title.
+nnoremap <leader>zn :ZkNew {"title": input("Title: ")}<CR>
+
+" Create a new note in the directory journal/daily.
+nnoremap <leader>zw :ZkNew {"dir": "journal/weekly"}<CR>
+
+" User command to search your notebook.
+command! -nargs=? ZkList :call CocAction("runCommand", "zk.list", expand("%:p"), {"select": ["path", "title"], "match": [<f-args>]})
+nnoremap <leader>zl :ZkList<Space>
+
+" User command to list all tags in your notebook.
+command! ZkTagList :call CocAction("runCommand", "zk.tag.list", expand("%:p"))
+nnoremap <leader>zt :ZkTagList<CR>
 
 " Find files using Telescope command-line sugar.
 nnoremap <leader>ff <cmd>Telescope find_files<cr>

@@ -52,8 +52,7 @@ in
 
     serviceConfig = {
       ExecStart = ''
-        /nix/store/djj5lxjmyghwvnvvggxwdw8z2l9gy7rv-system-path/bin/emanote --layers \
-        "/home/bolt/notes" run --host=0.0.0.0 --port=7000
+        ${emanotePkg}/bin/emanote --layers "/home/bolt/journal" run --host=0.0.0.0 --port=7000
       '';
     };
   };

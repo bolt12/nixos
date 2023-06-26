@@ -171,8 +171,8 @@ bindsym XF86AudioLowerVolume exec "amixer -q -c 0 sset Master,0 10- unmute"
 bindsym XF86AudioMute exec "amixer -q -c 0 sset Master,0 toggle"
 
 #brightness control
-bindsym XF86MonBrightnessDown exec brightnessctl set 15%-
-bindsym XF86MonBrightnessUp exec brightnessctl set +15%
+bindsym XF86MonBrightnessDown exec brightnessctl set 5%-
+bindsym XF86MonBrightnessUp exec brightnessctl set +5%
 
 # capture all screens to clipboard
 bindsym $mod+alt+p exec grim - | wl-copy
@@ -228,7 +228,6 @@ exec_always nm-applet --indicator
 exec_always blueman-applet
 
 exec --no-startup-id pipewire
-exec --no-startup-id pipewire-media-session
 
 #
 # Sway users might achieve this by adding the following to their Sway config file

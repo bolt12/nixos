@@ -12,16 +12,19 @@ let
 
   pkgs = import sources.nixpkgs {
     overlays = [
-      (import sources.neovim-nightly-overlay)
+      # (import sources.neovim-nightly-overlay)
     ];
     config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) unfreePackages;
-    config.permittedInsecurePackages = [ "python2.7-pyjwt-1.7.1" ];
+    config.permittedInsecurePackages = [ "python2.7-pyjwt-1.7.1"
+                                         "python2.7-certifi-2021.10.8"
+                                         "python-2.7.18.6"
+                                         "openssl-1.1.1u"
+                                       ];
   };
 
   unfreePackages = [
     "vscode"
     "discord"
-    "nixops"
     "skypeforlinux"
     "slack"
     "spotify"
@@ -51,16 +54,17 @@ let
     awscli2                      # aws cli v2
     bash                         # bash
     bc                           # gnu calculator
-    betterlockscreen             # fast lockscreen based on i3lock
     blueman                      # bluetooth applet
     cachix                       # nix caching
     chromium                     # google chrome
     deluge                       # torrent client
     discord                      # discord client
     evince                       # pdf reader
+    fd                           # file finder
     feh                          # image viewer
     firefox                      # internet browser
     flashfocus                   # focus wm
+    fzf                          # fuzzy finder
     gawk                         # text processing programming language
     git-extras                   # git extra commands like 'git sed'
     git-annex                    # git annex
@@ -126,6 +130,7 @@ let
     wget                         # cli wget
     zip                          # zip
     zlib                         # zlib
+    zk                           # zettelkasten note taking
     zoom                         # video conferencing
   ];
 
@@ -177,6 +182,7 @@ let
       { supportedGhcVersions =
         [ "8107"
           "902"
+          "928"
         ];
       })
   ];
@@ -186,7 +192,7 @@ in
   home = {
     username      = "bolt";
     homeDirectory = "/home/bolt";
-    stateVersion  = "22.11";
+    stateVersion  = "23.05";
 
     packages =
       defaultPkgs
@@ -236,6 +242,7 @@ in
     ./programs/waybar/default.nix
     ./programs/wofi/default.nix
     ./programs/sway/default.nix
+    ./programs/atuin/default.nix
     ./services/networkmanager/default.nix
     ./xdg/sway/default.nix
   ];
@@ -267,5 +274,7 @@ in
   };
 
   services.lorri.enable = true;
+
+  services.betterlockscreen.enable = true;
 
 }

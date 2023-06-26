@@ -88,6 +88,7 @@ let
     vim-silicon # vim Silicon integration
     vim-surround # quickly edit surroundings (brackets, html tags, etc)
     vim-fugitive # git plugin
+    zk-nvim # zk plugin
   ] ++ unstablePlugins
   ++ overriddenPlugins;
 
