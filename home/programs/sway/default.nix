@@ -5,7 +5,6 @@ let
 
   unstable = import sources.nixpkgs-unstable {
     overlays = [
-      (import sources.nixpkgs-wayland)
     ];
   };
 

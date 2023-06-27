@@ -3,7 +3,6 @@
 {
   # Use the GRUB 2 boot loader.
   boot = {
-    #kernelPackages = pkgs.linuxPackages_5_4;
     kernelPackages = pkgs.linuxPackages_latest;
     loader = {
       efi = {
@@ -30,7 +29,7 @@
       useTmpfs    = true;
       cleanOnBoot = true;
     };
-    runSize = "50%"; # Size of useTmpfs defaults to 50% of RAM
+    runSize = "75%"; # Size of useTmpfs defaults to 50% of RAM
   };
 
   # Systemd /run/user increase size
@@ -121,8 +120,14 @@
     ];
   };
 
-  hardware.pulseaudio.extraConfig = ''
-    load-module module-alsa-sink   device=hw:0,0 channels=4
-    load-module module-alsa-source device=hw:0,6 channels=4
+  boot.extraModprobeConfig = ''
+    options sof-hda-dsp enable=0,1
   '';
+  hardware.pulseaudio = {
+    extraConfig = ''
+      load-module module-combine-sink
+      load-module module-alsa-sink   device=hw:0,0 channels=4
+      load-module module-alsa-source device=hw:0,6 channels=4
+    '';
+  };
 }

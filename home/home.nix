@@ -4,7 +4,6 @@ let
 
   unstable = import sources.nixpkgs-unstable {
     overlays = [
-      (import sources.nixpkgs-wayland).overlay
     ];
   };
 
@@ -12,7 +11,7 @@ let
 
   pkgs = import sources.nixpkgs {
     overlays = [
-      # (import sources.neovim-nightly-overlay)
+      (import sources.neovim-nightly-overlay)
     ];
     config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) unfreePackages;
     config.permittedInsecurePackages = [ "python2.7-pyjwt-1.7.1"
@@ -46,11 +45,11 @@ let
 
   # Extra packages from user repos
   extraPkgs = [
-    # (import sources.comma { inherit pkgs; })
   ];
 
   defaultPkgs = with pkgs; [
     alloy                        # model checker
+    alsa-utils                   # sound utils
     awscli2                      # aws cli v2
     bash                         # bash
     bc                           # gnu calculator
@@ -80,6 +79,7 @@ let
     killall                      # kill processes by name
     konsole                      # terminal emulator
     libreoffice                  # office suite
+    lsof
     lxappearance                 # edit themes
     lxmenu-data                  # desktop menus - enables "open with" options
     manix                        # nix manual
@@ -146,6 +146,7 @@ let
     unstable.xdg-desktop-portal-gtk
     unstable.wlogout
     unstable.pipewire
+    unstable.wireplumber
     unstable.wl-gammactl
     unstable.brightnessctl
     unstable.wl-clipboard
@@ -182,7 +183,6 @@ let
       { supportedGhcVersions =
         [ "8107"
           "902"
-          "928"
         ];
       })
   ];

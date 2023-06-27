@@ -111,7 +111,7 @@ in
 
   # Enable sound.
   sound = {
-    enable = true;
+    enable = false;
     mediaKeys.enable = true;
     mediaKeys.volumeStep = "5%";
   };
@@ -141,8 +141,6 @@ in
     enableAllFirmware = true;
     cpu.intel.updateMicrocode = true;
   };
-
-  nixpkgs.config.pulseaudio = true; # Explicit PulseAudio support in applications
 
   security.rtkit.enable = true;
   # Enable the X11 windowing system.
@@ -280,6 +278,4 @@ in
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "23.05"; # Did you read the comment?
-
-
 }

@@ -41,10 +41,10 @@
         "homepage": "",
         "owner": "nix-community",
         "repo": "emacs-overlay",
-        "rev": "ceb35ffa6615a7f96d36d7651570f722452b743b",
-        "sha256": "1pvk4zq9g6lk6h04wdjwk6lgv7vdscwq0n2ybc6ib068ajzmwfra",
+        "rev": "edf4b5c9b016c4223ad2fddf523ef33c15c2fecb",
+        "sha256": "1f0qifc54qbkh0kff7g48nd3kn3y7h1fclja9fnpfb8x9hzndrsp",
         "type": "tarball",
-        "url": "https://github.com/nix-community/emacs-overlay/archive/ceb35ffa6615a7f96d36d7651570f722452b743b.tar.gz",
+        "url": "https://github.com/nix-community/emacs-overlay/archive/edf4b5c9b016c4223ad2fddf523ef33c15c2fecb.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "neoscroll-nvim": {
@@ -65,10 +65,10 @@
         "homepage": "",
         "owner": "nix-community",
         "repo": "neovim-nightly-overlay",
-        "rev": "c5cf4a6dbf6940fe46db0a2c75d38e5c8b599f29",
-        "sha256": "052mcixcc62ld4rqqipql2ssp4620cpsrbc09p7zjyb6fn3q9b9p",
+        "rev": "3ca106854788f12a9520ae0d04592ea09b51a75d",
+        "sha256": "1h7cbxjjcsgz4af91f16wmrqmcsxg2wixs4wwp9j4slpcxdds79f",
         "type": "tarball",
-        "url": "https://github.com/nix-community/neovim-nightly-overlay/archive/c5cf4a6dbf6940fe46db0a2c75d38e5c8b599f29.tar.gz",
+        "url": "https://github.com/nix-community/neovim-nightly-overlay/archive/3ca106854788f12a9520ae0d04592ea09b51a75d.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "niv": {
@@ -101,22 +101,10 @@
         "homepage": "",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "1c9db9710cb23d60570ad4d7ab829c2d34403de3",
-        "sha256": "1pvxfig2mjkr6ks7mqhlk8zfacj7mks6vmrg4yd9jzjw0kx1yqik",
+        "rev": "6b3d1b1cf13f407fef5e634b224d575eb7211975",
+        "sha256": "1aldvpliqbp04k1gz1i7jnjaml74lhnghkid49lndqi6kp906dgd",
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/1c9db9710cb23d60570ad4d7ab829c2d34403de3.tar.gz",
-        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
-    },
-    "nixpkgs-wayland": {
-        "branch": "master",
-        "description": "Automated, pre-built packages for Wayland (sway/wlroots) tools for NixOS. [maintainer=@colemickens]",
-        "homepage": "",
-        "owner": "nix-community",
-        "repo": "nixpkgs-wayland",
-        "rev": "1f2c7a5a77daa7e1165250e0333284536309f5aa",
-        "sha256": "097nbgb241yf9pmm4h2gsnslrqzzlp3fwbm3jvx8gaczkbdqgwv8",
-        "type": "tarball",
-        "url": "https://github.com/nix-community/nixpkgs-wayland/archive/1f2c7a5a77daa7e1165250e0333284536309f5aa.tar.gz",
+        "url": "https://github.com/NixOS/nixpkgs/archive/6b3d1b1cf13f407fef5e634b224d575eb7211975.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "venn-nvim": {

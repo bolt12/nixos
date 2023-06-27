@@ -15,7 +15,7 @@ nix-channel --update
 # Nix configuration
 sudo cp -a system/. /etc/nixos/
 sudo cp -a nix /etc/nixos/
-sudo nixos-rebuild -I nixpkgs=$PINNED_NIX_PKGS switch --upgrade
+sudo nixos-rebuild -I nixpkgs=$PINNED_NIX_PKGS switch --upgrade-all
 
 # Manual steps
 mkdir -p $HOME/Documents
