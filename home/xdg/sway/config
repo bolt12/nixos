@@ -163,7 +163,7 @@ bindsym $mod+d exec wofi
 bindsym $mod+n exec flash_window
 
 # lock screen
-bindsym $mod+shift+x exec "betterlockscreen -l"
+bindsym $mod+shift+x exec "swaylock"
 
 # volume control
 bindsym XF86AudioRaiseVolume exec "amixer -q -c 0 sset Master,0 10+ unmute"
@@ -171,8 +171,8 @@ bindsym XF86AudioLowerVolume exec "amixer -q -c 0 sset Master,0 10- unmute"
 bindsym XF86AudioMute exec "amixer -q -c 0 sset Master,0 toggle"
 
 #brightness control
-bindsym XF86MonBrightnessDown exec brightnessctl set 5%-
-bindsym XF86MonBrightnessUp exec brightnessctl set +5%
+bindsym XF86MonBrightnessDown exec light -U 10
+bindsym XF86MonBrightnessUp exec light -A 10
 
 # capture all screens to clipboard
 bindsym $mod+alt+p exec grim - | wl-copy
@@ -206,7 +206,6 @@ input "type:touchpad" {
 output HDMI-A-1 scale 1.75
 
 output "*" bg ~/Documents/background.png fill
-exec compton
 exec_always flashfocus
 
 set $gnome-schema org.gnome.desktop.interface
@@ -219,7 +218,7 @@ exec_always {
 }
 
 # xdg-desktop-portal-wlr
-exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
+exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway DISPLAY SWAYSOCK
 
 # nm-applet
 exec_always nm-applet --indicator

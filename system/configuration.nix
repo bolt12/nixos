@@ -4,15 +4,6 @@
 
 { config, lib, pkgs, ... }:
 
-let
-  customFonts = pkgs.nerdfonts.override {
-    fonts = [
-      "JetBrainsMono"
-      "FiraCode"
-    ];
-  };
-
-in
 {
   imports =
     [
@@ -20,8 +11,6 @@ in
       ./hardware-configuration.nix
       # Machine-specific configuration
       ./machine/x1-g8.nix
-      # Window manager
-      ./wm/sway.nix
       # Include IOHK related configs
       ./iohk/caches.nix
       ./iohk/ssh.nix
@@ -62,12 +51,8 @@ in
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-    vim
-    git
-    sof-firmware
-    shared-mime-info
-    zlib
-    gtk3
+    cage
+    greetd.gtkgreet
   ];
 
   # Needed for java apps/fonts
@@ -86,6 +71,13 @@ in
   environment.variables.VISUAL="nvim";
   environment.variables.NIXOS_OZONE_WL="1";
 
+  environment.etc = {
+    "greetd/environments".text = ''
+      sway
+      bash
+    '';
+  };
+
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
@@ -93,6 +85,8 @@ in
     enable           = true;
     enableSSHSupport = true;
   };
+
+  programs.light.enable = true;
 
   # List services that you want to enable:
 
@@ -109,13 +103,6 @@ in
     };
   };
 
-  # Enable sound.
-  sound = {
-    enable = false;
-    mediaKeys.enable = true;
-    mediaKeys.volumeStep = "5%";
-  };
-
   hardware = {
     bluetooth = {
       enable = true;
@@ -123,15 +110,6 @@ in
       settings = {
         General.Enable = lib.concatStringsSep "," [ "Source" "Sink" "Media" "Socket" ];
       };
-    };
-    pulseaudio = {
-      enable = false;
-      # 32 bit support for steam.
-      support32Bit = true;
-      package = pkgs.pulseaudioFull;
-      extraConfig = ''
-        load-module module-switch-on-connect
-      '';
     };
     opengl = {
       enable = true;
@@ -142,6 +120,12 @@ in
     cpu.intel.updateMicrocode = true;
   };
 
+  security.pam.services.swaylock.text = ''
+    # PAM configuration file for the swaylock screen locker. By default, it includes
+    # the 'login' configuration file (see /etc/pam.d/login)
+    auth include login
+  '';
+  security.polkit.enable = true;
   security.rtkit.enable = true;
   # Enable the X11 windowing system.
   services = {
@@ -151,9 +135,6 @@ in
     # Enable CUPS to print documents.
     printing.enable = true;
 
-    # Enable compton
-    compton.enable = true;
-
     # Firefox NixOs wiki recommends
     pipewire = {
       enable = true;
@@ -161,15 +142,34 @@ in
       alsa.support32Bit = true;
       pulse.enable = true;
       jack.enable = false;
-
       wireplumber.enable = false;
-
     };
 
     # USB Automounting
     gvfs.enable = true;
     udisks2.enable = true;
     devmon.enable = true;
+
+    upower.enable = true;
+
+    greetd = {
+      enable = true;
+      settings = {
+        default_session = {
+          command = "cage -s -- gtkgreet";
+          user = "bolt";
+        };
+      };
+    };
+
+    xserver = {
+      enable = true;
+      layout = "us,pt";
+      xkbOptions = "caps:escape, grp:shifts_toggle";
+      libinput.enable = true;
+      libinput.touchpad.clickMethod = "clickfinger";
+      videoDrivers = [ "intel" ];
+    };
   };
 
   # Making fonts accessible to applications.
@@ -177,35 +177,6 @@ in
     fontDir.enable = true;
     enableGhostscriptFonts = true;
     enableDefaultFonts = true;
-    fonts = [
-      customFonts
-      pkgs.font-awesome
-      pkgs.ubuntu_font_family
-      pkgs.emojione
-      pkgs.noto-fonts
-      pkgs.noto-fonts-cjk
-      pkgs.noto-fonts-extra
-      pkgs.hack-font
-      pkgs.inconsolata
-      pkgs.material-icons
-      pkgs.liberation_ttf
-      pkgs.dejavu_fonts
-      pkgs.terminus_font
-      pkgs.siji
-      pkgs.unifont
-      pkgs.open-sans
-      pkgs.open-dyslexic
-      pkgs.xits-math
-    ];
-    fontconfig = {
-      enable = true;
-      defaultFonts = {
-        monospace = [ "JetBrainsMono" "FiraCode" ];
-        serif = [ "DejaVu Serif" "Ubuntu" ];
-        sansSerif = [ "DejaVu Sans" "Ubuntu" ];
-      };
-      antialias = true;
-    };
   };
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
@@ -237,8 +208,6 @@ in
   xdg = {
     portal = {
       enable = true;
-      # deprecated
-      # gtkUsePortal = true;
       extraPortals = [
         pkgs.xdg-desktop-portal-wlr
         pkgs.xdg-desktop-portal-gtk

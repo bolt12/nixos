@@ -4,7 +4,7 @@ let
   gitConfig = {
     core = {
       editor = "nvim";
-      pager  = "diff-so-fancy | less --tabs=4 -RFX";
+      # pager  = "diff-so-fancy | less --tabs=4 -RFX";
     };
     merge.tool = "vimdiff";
     mergetool = {
@@ -28,5 +28,15 @@ in
     userName = "Armando Santos";
     signing.key = null;
     signing.signByDefault = true;
+
+    delta = {
+      enable = true;
+      options = {
+        side-by-side = true;
+        line-numbers = true;
+        hyperlinks = true;
+        true-color = "always";
+      };
+    };
   };
 }

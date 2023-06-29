@@ -33,7 +33,7 @@
   };
 
   # Systemd /run/user increase size
-  services.logind.extraConfig = "RuntimeDirectorySize=50%";
+  services.logind.extraConfig = "RuntimeDirectorySize=75%";
 
   powerManagement.enable = true;
   powerManagement.powertop.enable = true;
@@ -118,16 +118,5 @@
       libvdpau-va-gl
       intel-media-driver # only available starting nixos-19.03 or the current nixos-unstable
     ];
-  };
-
-  boot.extraModprobeConfig = ''
-    options sof-hda-dsp enable=0,1
-  '';
-  hardware.pulseaudio = {
-    extraConfig = ''
-      load-module module-combine-sink
-      load-module module-alsa-sink   device=hw:0,0 channels=4
-      load-module module-alsa-source device=hw:0,6 channels=4
-    '';
   };
 }

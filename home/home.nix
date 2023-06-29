@@ -55,6 +55,7 @@ let
     bc                           # gnu calculator
     blueman                      # bluetooth applet
     cachix                       # nix caching
+    cage                         # Wayland kiosk compositor
     chromium                     # google chrome
     deluge                       # torrent client
     discord                      # discord client
@@ -72,6 +73,7 @@ let
     gtk3                         # gtk3 lib
     gtk-engine-murrine           # theme engine
     gtk_engines                  # theme engines
+    greetd.gtkgreet              # a gtk based greeter for greetd
     jdk                          # java development kit
     jq                           # JSON processor
     jre                          # java runtime environment
@@ -79,7 +81,7 @@ let
     killall                      # kill processes by name
     konsole                      # terminal emulator
     libreoffice                  # office suite
-    lsof
+    lsof                         # A tool to list open files
     lxappearance                 # edit themes
     lxmenu-data                  # desktop menus - enables "open with" options
     manix                        # nix manual
@@ -111,6 +113,7 @@ let
     rnix-lsp                     # nix lsp server
     silicon                      # create beautiful code imgs
     simplescreenrecorder         # self-explanatory
+    shared-mime-info             # A database of common MIME types
     skypeforlinux                # skype for linux
     slack                        # slack client
     spotify                      # spotify client
@@ -187,12 +190,48 @@ let
       })
   ];
 
+  fontsPkgs = [
+    (pkgs.nerdfonts.override {
+      fonts = [
+        "JetBrainsMono"
+        "FiraCode"
+      ];
+    })
+    pkgs.font-awesome
+    pkgs.ubuntu_font_family
+    pkgs.emojione
+    pkgs.noto-fonts
+    pkgs.noto-fonts-cjk
+    pkgs.noto-fonts-extra
+    pkgs.hack-font
+    pkgs.inconsolata
+    pkgs.material-icons
+    pkgs.liberation_ttf
+    pkgs.dejavu_fonts
+    pkgs.terminus_font
+    pkgs.siji
+    pkgs.unifont
+    pkgs.open-sans
+    pkgs.open-dyslexic
+    pkgs.xits-math
+  ];
+
 in
 {
   home = {
+    enableNixpkgsReleaseCheck = true;
+
     username      = "bolt";
     homeDirectory = "/home/bolt";
     stateVersion  = "23.05";
+
+    keyboard = {
+      layout = "us,pt";
+      options = [
+        "caps:escape"
+        "grp:shifts_toggle"
+      ];
+    };
 
     packages =
       defaultPkgs
@@ -200,6 +239,7 @@ in
       ++ gitPkgs
       ++ gnomePkgs
       ++ haskellPkgs
+      ++ fontsPkgs
       ++ unstablePkgs
       ++ extraPkgs;
 
@@ -224,13 +264,6 @@ in
       "/home/bolt/.cargo/bin"
     ];
 
-    keyboard = {
-      layout = "us,pt";
-      options = [
-        "caps:escape"
-        "grp:shifts_toggle"
-      ];
-    };
   };
 
   imports = [
@@ -242,7 +275,6 @@ in
     ./programs/waybar/default.nix
     ./programs/wofi/default.nix
     ./programs/sway/default.nix
-    ./programs/atuin/default.nix
     ./services/networkmanager/default.nix
     ./xdg/sway/default.nix
   ];
@@ -253,7 +285,18 @@ in
   # notifications about home-manager news
   news.display = "silent";
 
+  # If a program requires to many options or something custom it might be better to
+  # extract it into a different file
   programs = {
+
+    ssh = {
+      matchBlocks = {
+        "rpi" = {
+          hostname = "192.168.1.73";
+          user = "bolt";
+        };
+      };
+    };
 
     direnv = {
       enable = true;
@@ -271,10 +314,27 @@ in
     };
 
     ssh.enable = true;
+
+    atuin = {
+      enable = true;
+      enableBashIntegration = true;
+    };
+
+    autorandr.enable = true;
   };
 
-  services.lorri.enable = true;
-
-  services.betterlockscreen.enable = true;
+  services = {
+    lorri.enable = true;
+    blueman-applet.enable = true;
+    udiskie.enable = true;
+    wlsunset = {
+      enable = true;
+      latitude = "39" ;
+      longitude = "-8" ;
+    };
+    swayidle.enable = true;
+    poweralertd.enable = true;
+    autorandr.enable = true;
+  };
 
 }
