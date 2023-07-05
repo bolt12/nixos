@@ -15,7 +15,8 @@
     };
 
     "haskell" = {
-        "command" = "haskell-language-server";
+        "trace.server" = "verbose";
+        "command" = "haskell-language-server-wrapper";
         "args" = ["--lsp"];
         "rootPatterns" = [
             "*.cabal"
@@ -39,6 +40,9 @@
                 "maxNumberOfProblems" = 10;
                 "formattingProvider" = "stylish-haskell";
                 "completionSnippetsOn" = true;
+                "plugin" = {
+                  "stan" = { "globalOn" = false; };
+                };
             };
         };
         "initializationOptions" = {

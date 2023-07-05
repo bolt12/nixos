@@ -62,7 +62,7 @@ let
     evince                       # pdf reader
     fd                           # file finder
     feh                          # image viewer
-    firefox                      # internet browser
+    firefox-wayland              # internet browser
     flashfocus                   # focus wm
     fzf                          # fuzzy finder
     gawk                         # text processing programming language
@@ -92,6 +92,7 @@ let
     (import sources.niv {}).niv  # dependency management for nix
     nix-doc                      # nix documentation search tool
     nix-index                    # nix locate files
+    nix-tree                     # interactively browse a Nix store paths dependencies
     nixops                       # nixops
     nodejs                       # nodejs
     noip                         # noip
@@ -174,20 +175,15 @@ let
   ];
 
   haskellPkgs = [
-    pkgs.haskellPackages.stylish-haskell         # code formatter
-    pkgs.haskellPackages.fourmolu                # code formatter
-    pkgs.haskellPackages.cabal2nix               # convert cabal projects to nix
-    pkgs.haskellPackages.cabal-install           # package manager
-    pkgs.haskellPackages.stack                   # package manager
-    pkgs.haskellPackages.ghc                     # compiler
-    pkgs.haskellPackages.hoogle                  # documentation
-    pkgs.haskellPackages.nix-tree                # visualize nix dependencies
-    (pkgs.haskell-language-server.override
-      { supportedGhcVersions =
-        [ "8107"
-          "902"
-        ];
-      })
+    pkgs.stylish-haskell          # code formatter
+    pkgs.haskellPackages.fourmolu # code formatter
+    pkgs.cabal2nix                # convert cabal projects to nix
+    pkgs.cabal-install            # package manager
+    pkgs.stack                    # package manager
+    pkgs.haskellPackages.ghc      # compiler
+    pkgs.haskellPackages.ghcide   # compiler
+    pkgs.haskellPackages.hoogle   # documentation
+    pkgs.haskellPackages.haskell-language-server
   ];
 
   fontsPkgs = [

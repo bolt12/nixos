@@ -5,7 +5,7 @@ let
 
   unstable = import sources.nixpkgs-unstable {
     overlays = [
-      # (import sources.neovim-nightly-overlay)
+      (import sources.neovim-nightly-overlay)
     ];
   };
 
@@ -13,6 +13,11 @@ let
 
   plugins = pkgs.vimPlugins;
   plugins-unstable = unstable.vimPlugins;
+
+  coc-nvim-22-11 = pkgs.vimUtils.buildVimPlugin {
+    name = "coc.nvim";
+    src = sources.coc-nvim;
+  };
 
   vim-bujo = pkgs.vimUtils.buildVimPlugin {
     name = "vim-bujo";
@@ -55,7 +60,7 @@ let
   ];
 
   myVimPlugins = with plugins; [
-    coc-nvim # lsp based intellisense
+    coc-nvim-22-11 # lsp based intellisense
     vim-airline # bottom status bar
     vim-airline-themes # status bar themes
     matchit-zip # match parentheses
@@ -103,7 +108,7 @@ in
 {
   programs.neovim = {
     enable = true;
-    package = pkgs.neovim-unwrapped;
+    package = unstable.neovim-unwrapped;
     extraConfig = vimConfig;
     plugins = myVimPlugins;
     viAlias = true;
