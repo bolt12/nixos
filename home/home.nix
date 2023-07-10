@@ -41,6 +41,7 @@ let
         src = /home/bolt/Desktop/Bolt/Playground/Agda/agda-stdlib;
       }))
     ]))
+    unstable.nixd
   ];
 
   # Extra packages from user repos
@@ -114,7 +115,6 @@ let
     rnix-lsp                     # nix lsp server
     silicon                      # create beautiful code imgs
     simplescreenrecorder         # self-explanatory
-    shared-mime-info             # A database of common MIME types
     skypeforlinux                # skype for linux
     slack                        # slack client
     spotify                      # spotify client

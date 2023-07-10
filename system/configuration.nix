@@ -53,6 +53,7 @@
   environment.systemPackages = with pkgs; [
     cage
     greetd.gtkgreet
+    shared-mime-info
   ];
 
   # Needed for java apps/fonts

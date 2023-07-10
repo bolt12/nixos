@@ -56,7 +56,7 @@
     };
 
     "nix" = {
-      "command" = "rnix-lsp";
+      "command" = "nixd";
       "filetypes" = [ "nix" ];
     };
 
