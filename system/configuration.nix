@@ -107,7 +107,7 @@
   hardware = {
     bluetooth = {
       enable = true;
-      hsphfpd.enable = true;
+      hsphfpd.enable = false;
       settings = {
         General.Enable = lib.concatStringsSep "," [ "Source" "Sink" "Media" "Socket" ];
       };
@@ -130,6 +130,7 @@
   security.rtkit.enable = true;
   # Enable the X11 windowing system.
   services = {
+    dbus.enable = true;
     # Enable the OpenSSH daemon.
     openssh.enable = true;
 
@@ -143,7 +144,7 @@
       alsa.support32Bit = true;
       pulse.enable = true;
       jack.enable = false;
-      wireplumber.enable = false;
+      # wireplumber.enable = true;
     };
 
     # USB Automounting
@@ -210,10 +211,9 @@
     portal = {
       enable = true;
       extraPortals = [
-        pkgs.xdg-desktop-portal-wlr
         pkgs.xdg-desktop-portal-gtk
-        pkgs.xdg-desktop-portal-kde
       ];
+      wlr.enable = true;
     };
   };
 

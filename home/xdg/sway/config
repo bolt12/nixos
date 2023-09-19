@@ -218,15 +218,15 @@ exec_always {
 }
 
 # xdg-desktop-portal-wlr
-exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway DISPLAY SWAYSOCK
-
+exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
+exec systemctl --user stop pipewire xdg-desktop-portal xdg-desktop-portal-wlr
+exec systemctl --user start pipewire xdg-desktop-portal xdg-desktop-portal-wlr
 # nm-applet
 exec_always nm-applet --indicator
 
 # blueman-applet
 exec_always blueman-applet
 
-exec --no-startup-id pipewire
 exec --no-startup-id wireplumber
 
 #

@@ -23,6 +23,9 @@
 
     kernelModules = [ "acpi_call" ];
     extraModulePackages = with config.boot.kernelPackages; [ acpi_call ];
+    extraModprobeConfig = ''
+      options snd-intel-dspcfg dsp_driver=1
+    '';
     blacklistedKernelModules = [ "snd_hda_intel" "snd_soc_skl" ];
     plymouth.enable = true;
     tmp = {

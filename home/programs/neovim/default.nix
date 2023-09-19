@@ -60,7 +60,7 @@ let
   ];
 
   myVimPlugins = with plugins; [
-    coc-nvim-22-11 # lsp based intellisense
+    coc-nvim # lsp based intellisense
     vim-airline # bottom status bar
     vim-airline-themes # status bar themes
     matchit-zip # match parentheses
@@ -108,7 +108,7 @@ in
 {
   programs.neovim = {
     enable = true;
-    package = unstable.neovim-unwrapped;
+    package = unstable.neovim-nightly;
     extraConfig = vimConfig;
     plugins = myVimPlugins;
     viAlias = true;

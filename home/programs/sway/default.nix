@@ -30,13 +30,13 @@ in
         export XDG_CURRENT_DESKTOP=sway
         export NIXOS_OZONE_WL=1=sway
 
-          export _JAVA_OPTIONS="-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dsun.java2d.xrender=true";
-          export MOZ_DISABLE_RDD_SANDBOX="1";
-          export MOZ_ENABLE_WAYLAND="1";
-          export ECORE_EVAS_ENGINE="wayland_egl";
-          export ELM_ENGINE="wayland_egl";
-          export EDITOR="nvim";
-          export VISUAL="nvim";
+        export _JAVA_OPTIONS="-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dsun.java2d.xrender=true";
+        export MOZ_DISABLE_RDD_SANDBOX="1";
+        export MOZ_ENABLE_WAYLAND="1";
+        export ECORE_EVAS_ENGINE="wayland_egl";
+        export ELM_ENGINE="wayland_egl";
+        export EDITOR="nvim";
+        export VISUAL="nvim";
         '';
       };
 

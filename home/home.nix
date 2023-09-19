@@ -18,12 +18,14 @@ let
                                          "python2.7-certifi-2021.10.8"
                                          "python-2.7.18.6"
                                          "openssl-1.1.1u"
+                                         "openssl-1.1.1v"
                                        ];
   };
 
   unfreePackages = [
     "vscode"
     "discord"
+    "google-chrome"
     "skypeforlinux"
     "slack"
     "spotify"
@@ -63,13 +65,14 @@ let
     evince                       # pdf reader
     fd                           # file finder
     feh                          # image viewer
-    firefox-wayland              # internet browser
+    firefox                      # internet browser
     flashfocus                   # focus wm
     fzf                          # fuzzy finder
     gawk                         # text processing programming language
     git-extras                   # git extra commands like 'git sed'
     git-annex                    # git annex
     glib                         # gsettings
+    google-chrome                # A freeware web browser developed by Google
     gsettings-desktop-schemas    # theming related
     gtk3                         # gtk3 lib
     gtk-engine-murrine           # theme engine
@@ -117,6 +120,7 @@ let
     simplescreenrecorder         # self-explanatory
     skypeforlinux                # skype for linux
     slack                        # slack client
+    sof-firmware                 # Sound Open Firmware
     spotify                      # spotify client
     thunderbird-wayland          # mail client
     tldr                         # summary of a man page
