@@ -24,9 +24,10 @@
     kernelModules = [ "acpi_call" ];
     extraModulePackages = with config.boot.kernelPackages; [ acpi_call ];
     extraModprobeConfig = ''
-      options snd-intel-dspcfg dsp_driver=1
+      options snd-intel-dspcfg dsp_driver=3
+      options snd_sof sof_debug=128
     '';
-    blacklistedKernelModules = [ "snd_hda_intel" "snd_soc_skl" ];
+    blacklistedKernelModules = [ "snd_soc_skl" ];
     plymouth.enable = true;
     tmp = {
       useTmpfs    = true;
@@ -56,6 +57,8 @@
     };
     blueman.enable = true;
   };
+
+  sound.enable = true;
 
   networking = {
     hostName = "bolt-nixos";

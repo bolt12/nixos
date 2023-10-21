@@ -111,11 +111,11 @@ nnoremap <leader>F :CtrlP<CR>
 autocmd FileType json syntax match Comment +\/\/.\+$+
 
 " Hoogle config
-let g:hoogle_search_count = 20
-au BufNewFile,BufRead *.hs map <silent> <F1> :Hoogle<CR>
-au BufNewFile,BufRead *.hs map <silent> <C-c> :HoogleClose<CR>
+" let g:hoogle_search_count = 20
+" au BufNewFile,BufRead *.hs map <silent> <F1> :Hoogle<CR>
+" au BufNewFile,BufRead *.hs map <silent> <C-c> :HoogleClose<CR>
 
-nnoremap <leader>h :Hoogle <CR>
+" nnoremap <leader>h :Hoogle <CR>
 
 " Floaterm
 hi Floaterm guibg=#282c34
@@ -346,6 +346,166 @@ require("cheatsheet").setup({
     -- same directory name)
     include_only_installed_plugins = true,
 })
+EOF
+
+lua << EOF
+
+-- Global mappings.
+-- See `:help vim.diagnostic.*` for documentation on any of the below functions
+vim.keymap.set('n', '<space>e', vim.diagnostic.open_float)
+vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
+vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
+vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist)
+
+local has_words_before = function()
+  unpack = unpack or table.unpack
+  local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+  return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+end
+
+local luasnip = require'luasnip'
+local cmp = require'cmp'
+
+local haskell_snippets = require('haskell-snippets').all
+luasnip.add_snippets('haskell', haskell_snippets, { key = 'haskell' })
+
+cmp.setup {
+  snippet = {
+    expand = function(args)
+      luasnip.lsp_expand(args.body) -- For `luasnip` users.
+    end,
+  },
+  sources = {
+    { name = 'nvim_lsp' },
+    { name = 'luasnip' }
+  },
+  mapping = cmp.mapping.preset.insert({
+
+    -- ... Your other mappings ...
+
+    ["<Tab>"] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.select_next_item()
+      -- You could replace the expand_or_jumpable() calls with expand_or_locally_jumpable()
+      -- that way you will only jump inside the snippet region
+      elseif luasnip.expand_or_locally_jumpable() then
+        luasnip.expand_or_jump()
+      elseif has_words_before() then
+        cmp.complete()
+      else
+        fallback()
+      end
+    end, { "i", "s" }),
+
+    ["<S-Tab>"] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.select_prev_item()
+      elseif luasnip.jumpable(-1) then
+        luasnip.jump(-1)
+      else
+        fallback()
+      end
+    end, { "i", "s" }),
+  })
+}
+
+-- The nvim-cmp almost supports LSP's capabilities so You should advertise it to LSP servers..
+local capabilities = require('cmp_nvim_lsp').default_capabilities()
+
+vim.g.haskell_tools = {
+        hls = {
+          on_attach = function(client, bufnr, ht)
+            local bufnr = vim.api.nvim_get_current_buf()
+            local opts = { noremap = true, silent = true, buffer = bufnr, }
+
+            vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
+            vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
+            vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
+            vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
+            vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
+            vim.keymap.set('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, opts)
+            vim.keymap.set('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, opts)
+            vim.keymap.set('n', '<leader>wl', function()
+              print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+            end, opts)
+            vim.keymap.set('n', '<leader>D', vim.lsp.buf.type_definition, opts)
+            vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
+            vim.keymap.set({ 'n', 'v' }, '<leader>ca', vim.lsp.buf.code_action, opts)
+            vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
+            vim.keymap.set('n', '<leader>f', function()
+              vim.lsp.buf.format { async = true }
+            end, opts)
+
+            -- haskell-language-server relies heavily on codeLenses,
+            -- so auto-refresh (see advanced configuration) is enabled by default
+            vim.keymap.set('n', '<leader>cl', vim.lsp.codelens.run, opts)
+            -- Hoogle search for the type signature of the definition under the cursor
+            vim.keymap.set('n', '<leader>hs', ht.hoogle.hoogle_signature, opts)
+            -- Evaluate all code snippets
+            vim.keymap.set('n', '<leader>ea', ht.lsp.buf_eval_all, opts)
+            -- Toggle a GHCi repl for the current package
+            vim.keymap.set('n', '<leader>rr', ht.repl.toggle, opts)
+            -- Toggle a GHCi repl for the current buffer
+            vim.keymap.set('n', '<leader>rf', function()
+              ht.repl.toggle(vim.api.nvim_buf_get_name(0))
+            end, opts)
+            vim.keymap.set('n', '<leader>rq', ht.repl.quit, opts)
+          end,
+          default_settings = {
+            haskell = {
+              hlintOn = true,
+              maxNumberOfProblems = 10,
+              formattingProvider = "stylish-haskell",
+              completionSnippetsOn = true,
+              plugin = {
+                stan = { globalOn = false }
+              }
+            },
+          },
+          capabilities = capabilities
+        },
+      }
+
+EOF
+
+lua << EOF
+local lspconfig = require('lspconfig')
+local configs = require('lspconfig/configs')
+
+configs.zk = {
+  default_config = {
+    cmd = {'zk', 'lsp'},
+    filetypes = {'markdown'},
+    root_dir = function()
+      return vim.loop.cwd()
+    end,
+    settings = {}
+  };
+}
+
+lspconfig.zk.setup({ on_attach = function(client, buffer)
+  -- Add keybindings here, see https://github.com/neovim/nvim-lspconfig#keybindings-and-completion
+  local bufnr = vim.api.nvim_get_current_buf()
+  local opts = { noremap = true, silent = true, buffer = bufnr, }
+
+  vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
+  vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
+  vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
+  vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
+  vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
+  vim.keymap.set('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, opts)
+  vim.keymap.set('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, opts)
+  vim.keymap.set('n', '<leader>wl', function()
+    print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+  end, opts)
+  vim.keymap.set('n', '<leader>D', vim.lsp.buf.type_definition, opts)
+  vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
+  vim.keymap.set({ 'n', 'v' }, '<leader>ca', vim.lsp.buf.code_action, opts)
+  vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
+  vim.keymap.set('n', '<leader>f', function()
+    vim.lsp.buf.format { async = true }
+  end, opts)
+end })
 EOF
 
 " SUMMARY

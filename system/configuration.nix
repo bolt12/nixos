@@ -140,11 +140,12 @@
     # Firefox NixOs wiki recommends
     pipewire = {
       enable = true;
+      audio.enable = true;
       alsa.enable = true;
       alsa.support32Bit = true;
       pulse.enable = true;
-      jack.enable = false;
-      # wireplumber.enable = true;
+      # jack.enable = true;
+      wireplumber.enable = true;
     };
 
     # USB Automounting
@@ -212,6 +213,7 @@
       enable = true;
       extraPortals = [
         pkgs.xdg-desktop-portal-gtk
+        pkgs.xdg-desktop-portal-wlr
       ];
       wlr.enable = true;
     };

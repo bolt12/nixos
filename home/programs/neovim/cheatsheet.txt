@@ -128,11 +128,6 @@ Close buffer                              | :BufferClose
 Create new zk note                        | :ZkNew
 Link to zk note                           | :ZkLink
 
-## coc-nvim @lsp
-Show coc information                      | :CocInfo
-Show coc commands                         | :CocCommand
-Show coc diagnostics                      | :CocDiagnostics
-
 ## matchit-zip @matching
 Switch between matching items             | %
 

@@ -41,10 +41,10 @@
         "homepage": "",
         "owner": "neoclide",
         "repo": "coc.nvim",
-        "rev": "fe66892cb7bd9e9f1efeb2e6a57c9720ef5005bd",
-        "sha256": "153aqk95majyjly2br01z949yki24k61bg6n35ilc1s6sm6h6wg9",
+        "rev": "e3f91b5ed551ae95d1f5c3b75f557f188ad17b52",
+        "sha256": "00llckim5b3bx2d90mwnsmzw6sy7vh8b96103rvral2lxw6b1yxl",
         "type": "tarball",
-        "url": "https://github.com/neoclide/coc.nvim/archive/fe66892cb7bd9e9f1efeb2e6a57c9720ef5005bd.tar.gz",
+        "url": "https://github.com/neoclide/coc.nvim/archive/e3f91b5ed551ae95d1f5c3b75f557f188ad17b52.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "emacs-overlay": {
@@ -53,10 +53,34 @@
         "homepage": "",
         "owner": "nix-community",
         "repo": "emacs-overlay",
-        "rev": "c8b16cbc2dca35a619d513487be8c939d83b9869",
-        "sha256": "1ymzx03ki35xbnv6d6iccsj1zmjaq3hyy975pjs18vxhqqvsb573",
+        "rev": "4ef658a5331019c33673cac27361304df28025fa",
+        "sha256": "0vnv1rr3r5d3ywwrqwjikmrvx51ywn1aghnq769qv6sm6h0cx8fm",
         "type": "tarball",
-        "url": "https://github.com/nix-community/emacs-overlay/archive/c8b16cbc2dca35a619d513487be8c939d83b9869.tar.gz",
+        "url": "https://github.com/nix-community/emacs-overlay/archive/4ef658a5331019c33673cac27361304df28025fa.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "haskell-snippets": {
+        "branch": "master",
+        "description": "My collection of Haskell snippets for LuaSnip. Powered by tree-sitter and LSP. ",
+        "homepage": "",
+        "owner": "mrcjkb",
+        "repo": "haskell-snippets.nvim",
+        "rev": "b61a10a89461ebbd8e789365b1b0745e3262a5d1",
+        "sha256": "1i2adv6jxnkycgwsgp63a7d59sv7p16j0jw0314wjplwlc6jd0wl",
+        "type": "tarball",
+        "url": "https://github.com/mrcjkb/haskell-snippets.nvim/archive/b61a10a89461ebbd8e789365b1b0745e3262a5d1.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "haskell-tools": {
+        "branch": "master",
+        "description": "Supercharge your Haskell experience in neovim!",
+        "homepage": "",
+        "owner": "mrcjkb",
+        "repo": "haskell-tools.nvim",
+        "rev": "5cb31c5553862e15ce8a4a73ed2698ad42323020",
+        "sha256": "13hhlqg5fn9iwhrrfq2k77n5hzk2r9d32izhpx5015rbxn8cc3fv",
+        "type": "tarball",
+        "url": "https://github.com/mrcjkb/haskell-tools.nvim/archive/5cb31c5553862e15ce8a4a73ed2698ad42323020.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "neoscroll-nvim": {
@@ -77,10 +101,10 @@
         "homepage": "",
         "owner": "nix-community",
         "repo": "neovim-nightly-overlay",
-        "rev": "40cac209b21ba559d1d0c8bdb33a7c9413f16d87",
-        "sha256": "1yb8hrba8p4nmhgk2cyyc2i5c49w2f4xd872l0z42lk3c1y0jsd4",
+        "rev": "7df3a41d1792b59df111c829e9f6b8407bfdf1a4",
+        "sha256": "0caqiimnxqchkxzmfv26k5j6i4n0qh796b7dng135ksa6yxpnp05",
         "type": "tarball",
-        "url": "https://github.com/nix-community/neovim-nightly-overlay/archive/40cac209b21ba559d1d0c8bdb33a7c9413f16d87.tar.gz",
+        "url": "https://github.com/nix-community/neovim-nightly-overlay/archive/7df3a41d1792b59df111c829e9f6b8407bfdf1a4.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "niv": {
@@ -89,10 +113,10 @@
         "homepage": "https://github.com/nmattia/niv",
         "owner": "nmattia",
         "repo": "niv",
-        "rev": "9341b1027da2c2f95f8e808a3cb4b403e0a62c77",
-        "sha256": "1l996s518iv7bcfzzhxlsn35ahbslpbvhl3ds1zpnama7la23y9b",
+        "rev": "723f0eeb969a730db3c30f977c2b66b9dce9fe4a",
+        "sha256": "0016l7230gd2kdh0g2w573r9a2krqb7x4ifcjhhsn4h1bwap7qr0",
         "type": "tarball",
-        "url": "https://github.com/nmattia/niv/archive/9341b1027da2c2f95f8e808a3cb4b403e0a62c77.tar.gz",
+        "url": "https://github.com/nmattia/niv/archive/723f0eeb969a730db3c30f977c2b66b9dce9fe4a.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "nixpkgs": {
@@ -101,10 +125,10 @@
         "homepage": "",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "5d017a8822e0907fb96f7700a319f9fe2434de02",
-        "sha256": "0q2ayp60pyzd6kcj3dcn28nzbpsh44mxl08y8mcmm0gxnqd54xl8",
+        "rev": "679cadfdfed2b90311a247b2d6ef6dfd3d6cab73",
+        "sha256": "05iybhlry8sg6qdgf7qx1d8rvq43ph32qgpar53g8yja300x0swz",
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/5d017a8822e0907fb96f7700a319f9fe2434de02.tar.gz",
+        "url": "https://github.com/NixOS/nixpkgs/archive/679cadfdfed2b90311a247b2d6ef6dfd3d6cab73.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "nixpkgs-unstable": {
@@ -113,10 +137,10 @@
         "homepage": "",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "ace5093e36ab1e95cb9463863491bee90d5a4183",
-        "sha256": "0scwlhcz9kzl86yqrdk1hc3fjbli6yxyd0na9qn4q5cm53nzdqg6",
+        "rev": "7c9cc5a6e5d38010801741ac830a3f8fd667a7a0",
+        "sha256": "1f7nsfz327habs623k5sviafxvvvsjnarsvz3m99qsrw88zdd929",
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/ace5093e36ab1e95cb9463863491bee90d5a4183.tar.gz",
+        "url": "https://github.com/NixOS/nixpkgs/archive/7c9cc5a6e5d38010801741ac830a3f8fd667a7a0.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "venn-nvim": {

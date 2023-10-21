@@ -19,6 +19,7 @@ let
                                          "python-2.7.18.6"
                                          "openssl-1.1.1u"
                                          "openssl-1.1.1v"
+                                         "openssl-1.1.1w"
                                        ];
   };
 
@@ -61,6 +62,7 @@ let
     cage                         # Wayland kiosk compositor
     chromium                     # google chrome
     deluge                       # torrent client
+    dig                          # dns tool
     discord                      # discord client
     evince                       # pdf reader
     fd                           # file finder
@@ -84,6 +86,7 @@ let
     imv                          # image viewer
     killall                      # kill processes by name
     konsole                      # terminal emulator
+    libcamera                    # open source camera stack for linux
     libreoffice                  # office suite
     lsof                         # A tool to list open files
     lxappearance                 # edit themes
@@ -188,6 +191,7 @@ let
     pkgs.haskellPackages.ghcide   # compiler
     pkgs.haskellPackages.hoogle   # documentation
     pkgs.haskellPackages.haskell-language-server
+    pkgs.haskellPackages.fast-tags
   ];
 
   fontsPkgs = [

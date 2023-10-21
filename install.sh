@@ -4,7 +4,7 @@
 set +x
 
 # Pin Nixpkgs to nixos-23.05
-export PINNED_NIX_PKGS="https://github.com/NixOS/nixpkgs/archive/5d017a8822e0907fb96f7700a319f9fe2434de02.tar.gz"
+export PINNED_NIX_PKGS="https://github.com/NixOS/nixpkgs/archive/679cadfdfed2b90311a247b2d6ef6dfd3d6cab73.tar.gz"
 
 # Switch to the 23.05 channel
 sudo nix-channel --add https://nixos.org/channels/nixos-23.05 nixos
