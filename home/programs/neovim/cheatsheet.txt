@@ -142,3 +142,39 @@ Run lua tests                             | :PlenaryTest
 
 ## nvim-web-devicons @icons
 Enable devicons                           | :lua require'nvim-web-devicons'.setup()
+
+## Haskell-Tools @haskell
+Declaration of symbol                     | gD
+Definition of symbol                      | gd
+Hover                                     | K
+Implementation                            | gi
+Signature help                            | <C-k>
+Add workspace folder                      | <leader>wa
+Remove workspace folder                   | <leader>wr
+List workspace folders                    | <leader>wl
+Type definition                           | <leader>D
+Rename                                    | <leader>rn
+Code action (normal and visual mode)      | <leader>ca
+References                                | gr
+Format                                    | <leader>f
+Run code lens                             | <leader>cl
+Hoogle signature search                   | <leader>hs
+Evaluate all code snippets                | <leader>ea
+Toggle GHCi repl for current package      | <leader>rr
+Toggle GHCi repl for current buffer       | <leader>rf
+Quit GHCi repl                            | <leader>rq
+
+## git messenger
+Open popup                                                    | :Gitmessenger or <leader>gm
+When inside the popup: Close window                           | q
+When inside the popup: Go to older commit                     | o
+When inside the popup: Go to newer commit                     | O
+When inside the popup: toggle diff hunks inside the file      | d
+When inside the popup: toggle all diff hunks of the commit    | D
+When inside the popup: toggle word diff hunks in current file | r
+When inside the popup: toggle all word diff hunks of commit   | R
+When inside the popup: show help                              | ?
+
+## Undotree
+Help press ? in undnotree window | ?
+Invoke undotree via telescope    | :Telescope undo

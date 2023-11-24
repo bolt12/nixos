@@ -24,16 +24,18 @@ let
   };
 
   unfreePackages = [
-    "vscode"
     "discord"
+    "faac" # part of zoom
     "google-chrome"
     "skypeforlinux"
     "slack"
     "spotify"
     "spotify-unwrapped"
-    "zoom-us"
+    "steam"
+    "steam-original"
     "unrar"
-    "faac" # part of zoom
+    "vscode"
+    "zoom-us"
   ];
 
   # Unstable branch packages
@@ -71,19 +73,21 @@ let
     flashfocus                   # focus wm
     fzf                          # fuzzy finder
     gawk                         # text processing programming language
-    git-extras                   # git extra commands like 'git sed'
+    gh                           # Github CLI
     git-annex                    # git annex
+    git-extras                   # git extra commands like 'git sed'
     glib                         # gsettings
     google-chrome                # A freeware web browser developed by Google
+    greetd.gtkgreet              # a gtk based greeter for greetd
     gsettings-desktop-schemas    # theming related
     gtk3                         # gtk3 lib
     gtk-engine-murrine           # theme engine
     gtk_engines                  # theme engines
-    greetd.gtkgreet              # a gtk based greeter for greetd
+    (import sources.niv {}).niv  # dependency management for nix
+    imv                          # image viewer
     jdk                          # java development kit
     jq                           # JSON processor
     jre                          # java runtime environment
-    imv                          # image viewer
     killall                      # kill processes by name
     konsole                      # terminal emulator
     libcamera                    # open source camera stack for linux
@@ -96,22 +100,21 @@ let
     ncdu                         # disk space info (a better du)
     neofetch                     # command-line system information
     networkmanagerapplet         # nm-applet
-    (import sources.niv {}).niv  # dependency management for nix
     nix-doc                      # nix documentation search tool
     nix-index                    # nix locate files
-    nix-tree                     # interactively browse a Nix store paths dependencies
     nixops                       # nixops
+    nix-tree                     # interactively browse a Nix store paths dependencies
     nodejs                       # nodejs
     noip                         # noip
-    numix-icon-theme-circle      # icon theme
     numix-cursor-theme           # icon theme
+    numix-icon-theme-circle      # icon theme
     obs-studio                   # obs-studio
     obs-studio-plugins.wlrobs    # obs wayland protocol
     pamixer                      # pulseaudio cli mixer
-    patchelf                     # dynamic linker and RPATH of ELF executables
-    pavucontrol                  # pulseaudio volume control
     paprefs                      # pulseaudio preferences
     pasystray                    # pulseaudio systray
+    patchelf                     # dynamic linker and RPATH of ELF executables
+    pavucontrol                  # pulseaudio volume control
     pcmanfm                      # file manager
     playerctl                    # music player controller
     psensor                      # hardware monitoring
@@ -125,48 +128,49 @@ let
     slack                        # slack client
     sof-firmware                 # Sound Open Firmware
     spotify                      # spotify client
+    steam                        # game library
+    texlive.combined.scheme-full # latex
     thunderbird-wayland          # mail client
     tldr                         # summary of a man page
     tree                         # display files in a tree view
-    texlive.combined.scheme-full # latex
     unzip                        # unzip
     vlc                          # media player
     vscode                       # visual studio code
+    weechat                      # weechat irc client
+    wget                         # cli wget
+    wireguard-tools              # wireguard
     xarchiver                    # xarchiver gtk frontend
     xclip                        # clipboard support (also for neovim)
     xorg.xmodmap                 # Keyboard
     xsettingsd                   # theming
-    weechat                      # weechat irc client
-    wireguard-tools              # wireguard
-    wget                         # cli wget
     zip                          # zip
-    zlib                         # zlib
     zk                           # zettelkasten note taking
+    zlib                         # zlib
     zoom                         # video conferencing
   ];
 
   # Wayland Packages
   waylandPkgs = [
-    unstable.grim
-    unstable.slurp
-    unstable.swaylock-fancy
-    unstable.wofi
-    unstable.wlsunset
-    unstable.xdg-desktop-portal
-    unstable.xdg-desktop-portal-wlr
-    unstable.xdg-desktop-portal-gtk
-    unstable.wlogout
-    unstable.pipewire
-    unstable.wireplumber
-    unstable.wl-gammactl
     unstable.brightnessctl
-    unstable.wl-clipboard
+    unstable.grim
     unstable.mako
+    unstable.pipewire
+    unstable.slurp
     unstable.swayidle
-    unstable.wlroots
+    unstable.swaylock-fancy
+    unstable.waybar
     unstable.wayland-protocols
     unstable.wdisplays
-    unstable.waybar
+    unstable.wireplumber
+    unstable.wl-clipboard
+    unstable.wl-gammactl
+    unstable.wlogout
+    unstable.wlroots
+    unstable.wlsunset
+    unstable.wofi
+    unstable.xdg-desktop-portal
+    unstable.xdg-desktop-portal-gtk
+    unstable.xdg-desktop-portal-wlr
   ];
 
   gitPkgs = with pkgs.gitAndTools; [
@@ -174,24 +178,24 @@ let
   ];
 
   gnomePkgs = with pkgs.gnome3; [
-    gnome-power-manager
-    gnome-control-center
-    gnome-weather
     gnome-calendar # calendar
+    gnome-control-center
+    gnome-power-manager
+    gnome-weather
     zenity         # display dialogs
   ];
 
   haskellPkgs = [
-    pkgs.stylish-haskell          # code formatter
-    pkgs.haskellPackages.fourmolu # code formatter
     pkgs.cabal2nix                # convert cabal projects to nix
     pkgs.cabal-install            # package manager
-    pkgs.stack                    # package manager
+    pkgs.haskellPackages.fast-tags
+    pkgs.haskellPackages.fourmolu # code formatter
     pkgs.haskellPackages.ghc      # compiler
     pkgs.haskellPackages.ghcide   # compiler
-    pkgs.haskellPackages.hoogle   # documentation
     pkgs.haskellPackages.haskell-language-server
-    pkgs.haskellPackages.fast-tags
+    pkgs.haskellPackages.hoogle   # documentation
+    pkgs.stack                    # package manager
+    pkgs.stylish-haskell          # code formatter
   ];
 
   fontsPkgs = [
@@ -201,22 +205,22 @@ let
         "FiraCode"
       ];
     })
-    pkgs.font-awesome
-    pkgs.ubuntu_font_family
+    pkgs.dejavu_fonts
     pkgs.emojione
+    pkgs.font-awesome
+    pkgs.hack-font
+    pkgs.inconsolata
+    pkgs.liberation_ttf
+    pkgs.material-icons
     pkgs.noto-fonts
     pkgs.noto-fonts-cjk
     pkgs.noto-fonts-extra
-    pkgs.hack-font
-    pkgs.inconsolata
-    pkgs.material-icons
-    pkgs.liberation_ttf
-    pkgs.dejavu_fonts
-    pkgs.terminus_font
-    pkgs.siji
-    pkgs.unifont
-    pkgs.open-sans
     pkgs.open-dyslexic
+    pkgs.open-sans
+    pkgs.siji
+    pkgs.terminus_font
+    pkgs.ubuntu_font_family
+    pkgs.unifont
     pkgs.xits-math
   ];
 
@@ -239,27 +243,27 @@ in
 
     packages =
       defaultPkgs
-      ++ waylandPkgs
+      ++ extraPkgs
+      ++ fontsPkgs
       ++ gitPkgs
       ++ gnomePkgs
       ++ haskellPkgs
-      ++ fontsPkgs
       ++ unstablePkgs
-      ++ extraPkgs;
+      ++ waylandPkgs;
 
     sessionVariables = {
+      ECORE_EVAS_ENGINE="wayland_egl";
+      EDITOR="nvim";
+      ELM_ENGINE="wayland_egl";
       MOZ_DISABLE_RDD_SANDBOX="1";
       MOZ_ENABLE_WAYLAND="1";
-      XDG_CURRENT_DESKTOP="sway";
-      XDG_SESSION_TYPE="wayland";
-      SDL_VIDEODRIVER="wayland";
+      NIXOS_OZONE_WL="1";
       QT_QPA_PLATFORM="wayland";
       QT_WAYLAND_DISABLE_WINDOWDECORATION="1";
-      ECORE_EVAS_ENGINE="wayland_egl";
-      ELM_ENGINE="wayland_egl";
-      EDITOR="nvim";
+      SDL_VIDEODRIVER="wayland";
       VISUAL="nvim";
-      NIXOS_OZONE_WL="1";
+      XDG_CURRENT_DESKTOP="sway";
+      XDG_SESSION_TYPE="wayland";
     };
 
     sessionPath = [

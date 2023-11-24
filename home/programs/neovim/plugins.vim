@@ -8,7 +8,6 @@ set statusline+=%*
 set statusline+=%{get(b:,'gitsigns_head','')}
 set statusline+=%{get(b:,'gitsigns_status','')}
 
-let g:airline#extensions#coc#enabled = 1
 let g:airline#extensions#tabline#enabled = 1
 
 "Tabs
@@ -132,18 +131,6 @@ imap <C-b>c <Plug>BujoCheckinsert
 lua require('neoscroll').setup()
 
 lua << EOF
-require'shade'.setup({
-  overlay_opacity = 50,
-  opacity_step = 1
-  -- keys = {
-  --   brightness_up    = '<C-Up>',
-  --   brightness_down  = '<C-Down>',
-  --   toggle           = '<Leader>s',
-  -- }
-})
-EOF
-
-lua << EOF
 require('specs').setup{
     show_jumps  = true,
     min_jump = 30,
@@ -243,6 +230,40 @@ EOF
 
 lua << EOF
 require('telescope').setup{
+  extensions = {
+    undo = {
+      use_delta = true,
+      use_custom_command = nil, -- setting this implies `use_delta = false`. Accepted format is: { "bash", "-c", "echo '$DIFF' | delta" }
+      side_by_side = true,
+      diff_context_lines = vim.o.scrolloff,
+      entry_format = "state #$ID, $STAT, $TIME",
+      time_format = "",
+      saved_only = false,
+      layout_strategy = "vertical",
+      layout_config = {
+        preview_height = 0.8,
+      },
+    },
+    ["ui-select"] = {
+      require("telescope.themes").get_dropdown {
+        -- even more opts
+      }
+
+      -- pseudo code / specification for writing custom displays, like the one
+      -- for "codeactions"
+      -- specific_opts = {
+      --   [kind] = {
+      --     make_indexed = function(items) -> indexed_items, width,
+      --     make_displayer = function(widths) -> displayer
+      --     make_display = function(displayer) -> function(e)
+      --     make_ordinal = function(e) -> string
+      --   },
+      --   -- for example to disable the custom builtin "codeactions" display
+      --      do the following
+      --   codeactions = false,
+      -- }
+    }
+  },
   defaults = {
     vimgrep_arguments = {
       'rg',
@@ -286,36 +307,13 @@ require('telescope').setup{
     buffer_previewer_maker = require'telescope.previewers'.buffer_previewer_maker
   }
 }
+
+-- To get ui-select loaded and working with telescope, you need to call
+-- load_extension, somewhere after setup function:
+require("telescope").load_extension("ui-select")
+
+require("telescope").load_extension("undo")
 EOF
-
-" zk bindings
-"
-" User command to index the current notebook.
-"
-" zk.index expects a notebook path as first argument, so we provide the current
-" buffer path with expand("%:p").
-command! -nargs=0 ZkIndex :call CocAction("runCommand", "zk.index", expand("%:p"))
-nnoremap <leader>zi :ZkIndex<CR>
-
-" User command to create and open a new note, to be called like this:
-" :ZkNew {"title": "An interesting subject", "dir": "inbox", ...}
-"
-" Note the concatenation with the "edit" command to open the note right away.
-command! -nargs=? ZkNew :exec "edit ".CocAction("runCommand", "zk.new", expand("%:p"), <args>).path
-
-" Create a new note after prompting for its title.
-nnoremap <leader>zn :ZkNew {"title": input("Title: ")}<CR>
-
-" Create a new note in the directory journal/daily.
-nnoremap <leader>zw :ZkNew {"dir": "journal/weekly"}<CR>
-
-" User command to search your notebook.
-command! -nargs=? ZkList :call CocAction("runCommand", "zk.list", expand("%:p"), {"select": ["path", "title"], "match": [<f-args>]})
-nnoremap <leader>zl :ZkList<Space>
-
-" User command to list all tags in your notebook.
-command! ZkTagList :call CocAction("runCommand", "zk.tag.list", expand("%:p"))
-nnoremap <leader>zt :ZkTagList<CR>
 
 " Find files using Telescope command-line sugar.
 nnoremap <leader>ff <cmd>Telescope find_files<cr>
@@ -377,7 +375,8 @@ cmp.setup {
   },
   sources = {
     { name = 'nvim_lsp' },
-    { name = 'luasnip' }
+    { name = 'luasnip' },
+    { name = 'git' }
   },
   mapping = cmp.mapping.preset.insert({
 
@@ -506,6 +505,87 @@ lspconfig.zk.setup({ on_attach = function(client, buffer)
     vim.lsp.buf.format { async = true }
   end, opts)
 end })
+EOF
+
+lua << EOF
+require('litee.lib').setup()
+require('litee.gh').setup({
+  -- deprecated, around for compatability for now.
+  jump_mode   = "invoking",
+  -- remap the arrow keys to resize any litee.nvim windows.
+  map_resize_keys = false,
+  -- do not map any keys inside any gh.nvim buffers.
+  disable_keymaps = false,
+  -- the icon set to use.
+  icon_set = "default",
+  -- any custom icons to use.
+  icon_set_custom = nil,
+  -- whether to register the @username and #issue_number omnifunc completion
+  -- in buffers which start with .git/
+  git_buffer_completion = true,
+  -- defines keymaps in gh.nvim buffers.
+  keymaps = {
+      -- when inside a gh.nvim panel, this key will open a node if it has
+      -- any futher functionality. for example, hitting <CR> on a commit node
+      -- will open the commit's changed files in a new gh.nvim panel.
+      open = "<CR>",
+      -- when inside a gh.nvim panel, expand a collapsed node
+      expand = "zo",
+      -- when inside a gh.nvim panel, collpased and expanded node
+      collapse = "zc",
+      -- when cursor is over a "#1234" formatted issue or PR, open its details
+      -- and comments in a new tab.
+      goto_issue = "gd",
+      -- show any details about a node, typically, this reveals commit messages
+      -- and submitted review bodys.
+      details = "d",
+      -- inside a convo buffer, submit a comment
+      submit_comment = "<C-s>",
+      -- inside a convo buffer, when your cursor is ontop of a comment, open
+      -- up a set of actions that can be performed.
+      actions = "<C-a>",
+      -- inside a thread convo buffer, resolve the thread.
+      resolve_thread = "<C-r>",
+      -- inside a gh.nvim panel, if possible, open the node's web URL in your
+      -- browser. useful particularily for digging into external failed CI
+      -- checks.
+      goto_web = "gx"
+  }
+})
+EOF
+
+lua << EOF
+require('spectre').setup({
+  live_update = false, -- auto execute search again when you write to any file in vim
+  find_engine = {
+    ['rg'] = {
+          cmd = "rg",
+          -- default args
+          args = {
+            '--color=never',
+            '--no-heading',
+            '--with-filename',
+            '--line-number',
+            '--column',
+            '--multiline',
+          } ,
+          options = {
+            ['ignore-case'] = {
+              value= "--ignore-case",
+              icon="[I]",
+              desc="ignore case"
+            },
+            ['hidden'] = {
+              value="--hidden",
+              desc="hidden file",
+              icon="[H]"
+            },
+            -- you can put any rg search option you want here it can toggle with
+            -- show_option function
+          }
+        },
+      }
+})
 EOF
 
 " SUMMARY
