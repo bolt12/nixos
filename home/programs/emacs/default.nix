@@ -29,9 +29,4 @@ in {
     source = ./emacs.d;
     recursive = true;
   };
-  # home.file.".doom.d" = {
-  #   source = ./doom.d;
-  #   recursive = true;
-  #   onChange = builtins.readFile ./reload.sh;
-  # };
 }

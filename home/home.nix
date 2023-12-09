@@ -95,6 +95,7 @@ let
     lsof                         # A tool to list open files
     lxappearance                 # edit themes
     lxmenu-data                  # desktop menus - enables "open with" options
+    lm_sensors                   # CPU sensors
     manix                        # nix manual
     mpv                          # video player
     ncdu                         # disk space info (a better du)
@@ -283,7 +284,6 @@ in
     ./programs/waybar/default.nix
     ./programs/wofi/default.nix
     ./programs/sway/default.nix
-    ./services/networkmanager/default.nix
     ./xdg/sway/default.nix
   ];
 

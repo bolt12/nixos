@@ -2,10 +2,9 @@
     "layer": "bottom",
     "position": "top",
     "height": 35,
-    "modules-left": ["sway/workspaces", "sway/mode", "sway/window"],
-    // "modules-center": ["custom/media"],
-    "modules-center": ["clock", "memory", "custom/storage"],
-    "modules-right": ["idle_inhibitor", "custom/media", "custom/weather", "tray", "pulseaudio", "battery", "custom/powermenu"],
+    "modules-left": ["sway/workspaces", "sway/mode", "sway/window", ],
+    "modules-center": ["clock", "memory", "custom/storage", "custom/system_load", "temperature"],
+    "modules-right": ["custom/weather", "wireplumber", "battery", "tray", "custom/powermenu"],
     "sway/mode": {
         "format": " {}"
     },
@@ -18,18 +17,15 @@
         "tooltip": false
     },
     "clock": {
-        "format": "{:%a %d %b - %H:%M}",
+        "format": "{:%a %d %b %Y - %H:%M}",
         "tooltip": false,
         "on-click": "gnome-calendar"
     },
-    "custom/cpu_speed": {
+
+    "custom/system_load": {
+        "format": " {}",
         "interval": 5,
-        "return-type": "json",
-        "exec": "~/.config/waybar/modules/cpu_speed.sh",
-        "format": "{icon}  {}",
-        "format-icons": [""],
-        "escape": true,
-        "on-click": "konsole -e htop"
+        "exec": "cat /proc/loadavg | cut -d ' ' -f1-3"
     },
     "custom/powermenu": {
         "return-type": "json",
@@ -53,49 +49,10 @@
         "tooltip": false,
         "on-click": "gnome-power-statistics"
     },
-    "network": {
-        "format": "",
-        "format-alt": "{ipaddr}/{cidr} {icon}",
-        "format-alt-click": "click-right",
-        "format-wifi": "  {essid} ({signalStrength}%)",
-        "format-ethernet": " {ifname}: {ipaddr}/{cidr}",
-        "format-linked": "{ifname} (No IP) ",
-        "format-disconnected": "Disconnected ⚠",
-        "on-click": "gnome-control-center wifi",
-        "tooltip": false
-    },
-    "pulseaudio": {
-        "format": "{icon:2} {volume:4}%",
-        "format-alt": "{icon:2} {volume:4}%",
-        "format-alt-click": "click-right",
+    "wireplumber": {
+        "format": "{volume}% {icon}",
         "format-muted": "",
-        "format-icons": {
-            "phone": [" ", " ", " ", " "],
-            "default": ["", "", "", ""]
-        },
-        "scroll-step": 2,
-        "on-click": "gnome-control-center sound",
-        "tooltip": false
-    },
-    "custom/spotify": {
-        "interval": 5,
-        "return-type": "json",
-        "exec": "~/.config/waybar/modules/spotify.sh",
-        "exec-if": "pgrep spotify",
-        "on-click": "playerctl play-pause",
-        "escape": true
-    },
-    "custom/media": {
-        "format": "{icon} {}",
-        "return-type": "json",
-        "max-length": 40,
-        "format-icons": {
-            "spotify": "",
-            "default": "🎜"
-        },
-        "escape": true,
-        "exec": "$HOME/.config/waybar/modules/mediaplayer.py 2> /dev/null" // Script in resources folder
-        // "exec": "$HOME/.config/waybar/mediaplayer.py --player spotify 2> /dev/null" // Filter player based on name
+        "format-icons": ["", "", ""]
     },
     "custom/storage": {
         "format": "{} ",
@@ -114,11 +71,11 @@
         "on-scroll-up": "light -U 1"
     },
     "temperature": {
-        "format": " {temperatureC:3}°C",
-        //"hwmon-path": "/sys/devices/platform/coretemp.0/hwmon/hwmon3/temp1_input",
-        "hwmon-path": "/sys/class/thermal/thermal_zone1/temp",
-        //"on-click": "konsole -e 'watch -n1 sensors'"
-        "on-click": "psensor"
+       // "thermal-zone": 2,
+       // "hwmon-path": "/sys/class/hwmon/hwmon2/temp1_input",
+       // "critical-threshold": 80,
+       // "format-critical": "{temperatureC}°C ",
+       "format": "{temperatureC}°C "
     },
     "custom/weather": {
         "format": "{}",
@@ -130,37 +87,12 @@
         "exec-if": "ping wttr.in -c1",
         "on-click": "gnome-weather"
     },
-    "idle_inhibitor": {
-        "format": "{icon}",
-        "format-alt": "{icon} idle {status}",
-        "format-alt-click": "click-right",
-        "format-icons": {
-            "activated": "",
-            "deactivated": ""
-        },
-        "tooltip": false
-    },
-    "custom/mail": {
-        "format": "",
-        "format-alt": "{alt} ",
-        "format-alt-click": "click-right",
-        "interval": 60,
-        "return-type": "json",
-        "exec": "~/.config/waybar/modules/mail.py",
-        "tooltip": false
-    },
-    "custom/test": {
-        "format": "{}",
-        "exec": "/tmp/test blub",
-        "param": "blah",
-        "interval": 5
-    },
     "tray": {
         "icon-size": 20,
         "spacing": 18
     },
     "memory": {
-	"interval": 5,
-	"format": "Mem {}%"
+	    "interval": 5,
+	    "format": "Mem {}%"
     }
 }

@@ -64,6 +64,11 @@ let
     src = sources.gh-nvim;
   };
 
+  telescope-ui-select = pkgs.vimUtils.buildVimPlugin {
+    name = "telescope-ui-select-nvim";
+    src = sources.telescope-ui-select-nvim;
+  };
+
   overriddenPlugins = with pkgs; [ ];
 
   unstablePlugins = with plugins-unstable; [
@@ -101,7 +106,7 @@ let
     specs-nvim              # Show where your cursor moves when jumping large distances
     tabular                 # align things
     telescope-nvim          # fuzzy finder
-    telescope-ui-select-nvim # telescope picker
+    telescope-ui-select     # telescope picker
     telescope-undo-nvim     # undo tree with telescope
     undotree                # undo tree for neovim
     venn                    # draw diagrams
@@ -121,24 +126,24 @@ let
   ] ++ unstablePlugins
   ++ overriddenPlugins;
 
-  baseConfig = builtins.readFile ./config.vim;
+  baseConfig    = builtins.readFile ./config.vim;
   cheatsheetTxt = builtins.readFile ./cheatsheet.txt;
   pluginsConfig = builtins.readFile ./plugins.vim;
-  vimConfig = baseConfig + pluginsConfig;
+  vimConfig     = baseConfig + pluginsConfig;
 
 in
 {
   programs.neovim = {
-    enable = true;
-    package = unstable.neovim-nightly;
-    extraConfig = vimConfig;
-    plugins = myVimPlugins;
-    viAlias = true;
-    vimAlias = true;
+    enable       = true;
+    package      = unstable.neovim-nightly;
+    extraConfig  = vimConfig;
+    plugins      = myVimPlugins;
+    viAlias      = true;
+    vimAlias     = true;
     vimdiffAlias = true;
-    withNodeJs = true;
-    withPython3 = true;
-    withRuby = true;
+    withNodeJs   = true;
+    withPython3  = true;
+    withRuby     = true;
   };
 
   xdg.configFile = {

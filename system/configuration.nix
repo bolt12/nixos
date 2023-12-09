@@ -15,6 +15,9 @@
       ./iohk/caches.nix
       ./iohk/ssh.nix
       # ./iohk/systemd.nix
+
+      # Import nixos home manager module
+      <home-manager/nixos>
     ];
 
   networking = {
@@ -22,26 +25,32 @@
     # Enables wireless support and openvpn via network manager.
     networkmanager = {
       enable = true;
-      dns = "none";
+      dns    = "none";
     };
-    nameservers = [ "1.1.1.1" "8.8.8.8" "8.8.4.4" ];
+    nameservers =
+    [ "192.168.1.73"
+      "1.1.1.1"
+      "8.8.8.8"
+      "8.8.4.4"
+    ];
 
     # The global useDHCP flag is deprecated, therefore explicitly set to false here.
     # Per-interface useDHCP will be mandatory in the future, so this generated config
     # replicates the default behaviour.
     useDHCP = false;
-  };
 
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
+    # Enable WireGuard
+    firewall = {
+      enable            = true;
+      trustedInterfaces = [ "wg0" ];
+      allowedTCPPorts   = [ 20 21 8000 ];
+      allowedUDPPorts   = [ 51820 ];
+    };
+
+  };
 
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
-  #console = {
-  #  font = "Lat2-Terminus16";
-  #  keyMap = "pt-latin1";
-  #};
 
   # Set your time zone.
   time.timeZone = "Europe/Lisbon";
@@ -56,29 +65,6 @@
     shared-mime-info
   ];
 
-  # Needed for java apps/fonts
-  environment.variables._JAVA_OPTIONS="-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dsun.java2d.xrender=true";
-  environment.variables._JAVA_AWT_WM_NONREPARENTING="1";
-  environment.variables.MOZ_DISABLE_RDD_SANDBOX="1";
-  environment.variables.MOZ_ENABLE_WAYLAND="1";
-  environment.variables.XDG_CURRENT_DESKTOP="sway";
-  environment.variables.XDG_SESSION_TYPE="wayland";
-  environment.variables.SDL_VIDEODRIVER="wayland";
-  environment.variables.QT_QPA_PLATFORM="wayland";
-  environment.variables.QT_WAYLAND_DISABLE_WINDOWDECORATION="1";
-  environment.variables.ECORE_EVAS_ENGINE="wayland_egl";
-  environment.variables.ELM_ENGINE="wayland_egl";
-  environment.variables.EDITOR="nvim";
-  environment.variables.VISUAL="nvim";
-  environment.variables.NIXOS_OZONE_WL="1";
-
-  environment.etc = {
-    "greetd/environments".text = ''
-      sway
-      bash
-    '';
-  };
-
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
@@ -86,16 +72,6 @@
     enable           = true;
     enableSSHSupport = true;
   };
-
-  programs.light.enable = true;
-
-  # List services that you want to enable:
-
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
 
   # Enable Docker support.
   virtualisation = {
@@ -106,89 +82,36 @@
 
   hardware = {
     bluetooth = {
-      enable = true;
+      enable         = true;
       hsphfpd.enable = false;
-      settings = {
-        General.Enable = lib.concatStringsSep "," [ "Source" "Sink" "Media" "Socket" ];
+      settings       = {
+        General.Enable =
+          lib.concatStringsSep "," [ "Source" "Sink" "Media" "Socket" ];
       };
     };
     opengl = {
-      enable = true;
+      enable          = true;
       driSupport32Bit = true;
     };
     enableRedistributableFirmware = true;
-    enableAllFirmware = true;
-    cpu.intel.updateMicrocode = true;
-  };
-
-  security.pam.services.swaylock.text = ''
-    # PAM configuration file for the swaylock screen locker. By default, it includes
-    # the 'login' configuration file (see /etc/pam.d/login)
-    auth include login
-  '';
-  security.polkit.enable = true;
-  security.rtkit.enable = true;
-  # Enable the X11 windowing system.
-  services = {
-    dbus.enable = true;
-    # Enable the OpenSSH daemon.
-    openssh.enable = true;
-
-    # Enable CUPS to print documents.
-    printing.enable = true;
-
-    # Firefox NixOs wiki recommends
-    pipewire = {
-      enable = true;
-      audio.enable = true;
-      alsa.enable = true;
-      alsa.support32Bit = true;
-      pulse.enable = true;
-      # jack.enable = true;
-      wireplumber.enable = true;
-    };
-
-    # USB Automounting
-    gvfs.enable = true;
-    udisks2.enable = true;
-    devmon.enable = true;
-
-    upower.enable = true;
-
-    greetd = {
-      enable = true;
-      settings = {
-        default_session = {
-          command = "cage -s -- gtkgreet";
-          user = "bolt";
-        };
-      };
-    };
-
-    xserver = {
-      enable = true;
-      layout = "us,pt";
-      xkbOptions = "caps:escape, grp:shifts_toggle";
-      libinput.enable = true;
-      libinput.touchpad.clickMethod = "clickfinger";
-      videoDrivers = [ "intel" ];
-    };
+    enableAllFirmware             = true;
+    cpu.intel.updateMicrocode     = true;
   };
 
   # Making fonts accessible to applications.
   fonts = {
-    fontDir.enable = true;
+    fontDir.enable         = true;
     enableGhostscriptFonts = true;
-    enableDefaultFonts = true;
+    enableDefaultFonts     = true;
   };
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users = {
     users.bolt = {
       isNormalUser = true;
-      home = "/home/bolt";
-      description = "Armando Santos";
-      extraGroups = [
+      home         = "/home/bolt";
+      description  = "Armando Santos";
+      extraGroups  = [
         "audio"
         "sound"
         "video"
@@ -199,33 +122,27 @@
         "plugdev"
         "root"
       ];
-    openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOK8UTLb9TxZdIEX5wU4d4qkJhE+i94TnucxtZmdl+ZM bolt@rpi-nixos" ];
+      openssh.authorizedKeys.keys =
+        [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOK8UTLb9TxZdIEX5wU4d4qkJhE+i94TnucxtZmdl+ZM bolt@rpi-nixos" ];
     };
 
+  };
+
+  # Home Manager Configuration:
+  home-manager.users.bolt = { pkgs, ... }: {
+    imports = [ ./home-manager/home.nix ];
   };
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
-
-  # Firefox NixOS wiki recommends
-  xdg = {
-    portal = {
-      enable = true;
-      extraPortals = [
-        pkgs.xdg-desktop-portal-gtk
-        pkgs.xdg-desktop-portal-wlr
-      ];
-      wlr.enable = true;
-    };
-  };
 
   # Nix daemon config
   nix = {
     # Automate garbage collection
     gc = {
       automatic = true;
-      dates = "monthly";
-      options = "--delete-older-than 7d";
+      dates     = "monthly";
+      options   = "--delete-older-than 7d";
     };
 
     # Avoid unwanted garbage collection when using nix-direnv

@@ -4,7 +4,6 @@ let
   gitConfig = {
     core = {
       editor = "nvim";
-      # pager  = "diff-so-fancy | less --tabs=4 -RFX";
     };
     merge.tool = "vimdiff";
     mergetool = {
@@ -26,6 +25,7 @@ in
     ];
     userEmail = "armandoifsantos@gmail.com";
     userName = "Armando Santos";
+
     signing.key = null;
     signing.signByDefault = true;
 

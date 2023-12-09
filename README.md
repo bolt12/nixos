@@ -34,7 +34,6 @@ Here is an overview of the folders' structure:
 ├── imgs
 ├── install.sh
 ├── nix
-├── notes
 └── system
     ├── configuration.nix
     ├── machine
