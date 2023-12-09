@@ -3,8 +3,8 @@
 # Shows the output of every command
 set +x
 
-# Pin Nixpkgs to nixos-23.05
-export PINNED_NIX_PKGS="https://github.com/NixOS/nixpkgs/archive/0561103cedb11e7554cf34cea81e5f5d578a4753.tar.gz"
+# Pin Nixpkgs to nixos-23.11
+export PINNED_NIX_PKGS="https://github.com/NixOS/nixpkgs/archive/b4372c4924d9182034066c823df76d6eaf1f4ec4.tar.gz"
 
 # Nix configuration
 # Manual steps
@@ -20,11 +20,11 @@ cp -r home/* /etc/nixos/home-manager/
 mkdir -p $HOME/Documents
 cp home/background.png $HOME/Documents/
 
-# Switch to the 23.05 channel
-sudo nix-channel --add https://nixos.org/channels/nixos-23.05 nixos
-nix-channel --add https://nixos.org/channels/nixos-23.05 nixpkgs
-sudo nix-channel --add https://github.com/nix-community/home-manager/archive/refs/heads/release-23.05.tar.gz home-manager
-nix-channel --add https://github.com/nix-community/home-manager/archive/refs/heads/release-23.05.tar.gz home-manager-user
+# Switch to the 23.11 channel
+sudo nix-channel --add https://nixos.org/channels/nixos-23.11 nixos
+nix-channel --add https://nixos.org/channels/nixos-23.11 nixpkgs
+sudo nix-channel --add https://github.com/nix-community/home-manager/archive/refs/heads/release-23.11.tar.gz home-manager
+nix-channel --add https://github.com/nix-community/home-manager/archive/refs/heads/release-23.11.tar.gz home-manager-user
 sudo nix-channel --update
 nix-channel --update
 

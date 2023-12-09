@@ -92,18 +92,19 @@ let
     konsole                      # terminal emulator
     libcamera                    # open source camera stack for linux
     libreoffice                  # office suite
+    lm_sensors                   # CPU sensors
     lsof                         # A tool to list open files
     lxappearance                 # edit themes
     lxmenu-data                  # desktop menus - enables "open with" options
-    lm_sensors                   # CPU sensors
     manix                        # nix manual
     mpv                          # video player
     ncdu                         # disk space info (a better du)
     neofetch                     # command-line system information
     networkmanagerapplet         # nm-applet
+    nix-bash-completions         # nix bash completions
     nix-doc                      # nix documentation search tool
     nix-index                    # nix locate files
-    nixops                       # nixops
+    nixops_unstable              # nixops
     nix-tree                     # interactively browse a Nix store paths dependencies
     nodejs                       # nodejs
     noip                         # noip
@@ -131,7 +132,7 @@ let
     spotify                      # spotify client
     steam                        # game library
     texlive.combined.scheme-full # latex
-    thunderbird-wayland          # mail client
+    thunderbird                  # mail client
     tldr                         # summary of a man page
     tree                         # display files in a tree view
     unzip                        # unzip
@@ -189,6 +190,7 @@ let
   haskellPkgs = [
     pkgs.cabal2nix                # convert cabal projects to nix
     pkgs.cabal-install            # package manager
+    pkgs.haskellPackages.eventlog2html
     pkgs.haskellPackages.fast-tags
     pkgs.haskellPackages.fourmolu # code formatter
     pkgs.haskellPackages.ghc      # compiler
@@ -232,7 +234,7 @@ in
 
     username      = "bolt";
     homeDirectory = "/home/bolt";
-    stateVersion  = "23.05";
+    stateVersion  = "23.11";
 
     keyboard = {
       layout = "us,pt";

@@ -4,7 +4,7 @@
     "height": 35,
     "modules-left": ["sway/workspaces", "sway/mode", "sway/window", ],
     "modules-center": ["clock", "memory", "custom/storage", "custom/system_load", "temperature"],
-    "modules-right": ["custom/weather", "wireplumber", "battery", "tray", "custom/powermenu"],
+    "modules-right": ["custom/weather", "pulseaudio", "battery", "tray", "custom/powermenu"],
     "sway/mode": {
         "format": " {}"
     },
@@ -23,7 +23,7 @@
     },
 
     "custom/system_load": {
-        "format": " {}",
+        "format": "{} ",
         "interval": 5,
         "exec": "cat /proc/loadavg | cut -d ' ' -f1-3"
     },
@@ -49,10 +49,18 @@
         "tooltip": false,
         "on-click": "gnome-power-statistics"
     },
-    "wireplumber": {
-        "format": "{volume}% {icon}",
+    "pulseaudio": {
+        "format": "{icon:2} {volume:4}%",
+        "format-alt": "{icon:2} {volume:4}%",
+        "format-alt-click": "click-right",
         "format-muted": "",
-        "format-icons": ["", "", ""]
+        "format-icons": {
+            "phone": [" ", " ", " ", " "],
+            "default": ["", "", "", ""]
+        },
+        "scroll-step": 2,
+        "on-click": "gnome-control-center sound",
+        "tooltip": false
     },
     "custom/storage": {
         "format": "{} ",

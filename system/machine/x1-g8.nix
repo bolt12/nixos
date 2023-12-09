@@ -156,7 +156,7 @@
   xdg = {
     portal = {
       enable = true;
-      extraPortals = [
+      configPackages = [
         pkgs.xdg-desktop-portal-gtk
         pkgs.xdg-desktop-portal-wlr
       ];
