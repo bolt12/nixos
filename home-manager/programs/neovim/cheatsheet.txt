@@ -175,6 +175,21 @@ When inside the popup: toggle word diff hunks in current file | r
 When inside the popup: toggle all word diff hunks of commit   | R
 When inside the popup: show help                              | ?
 
+## Gitsigns
+Next hunk                 | ]c
+Previous hunk             | [c
+Stage hunk                | <leader>ghs
+Reset hunk                | <leader>ghr
+Stage buffer              | <leader>ghS
+Undo stage hunk           | <leader>ghu
+Reset buffer              | <leader>ghR
+Preview hunk              | <leader>ghp
+Blame line                | <leader>ghb
+Toggle current blame line | <leader>gtb
+Diff this                 | <leader>ghd
+Diff this ?               | <leader>ghD
+Toggle deleted            | <leader>gtd
+
 ## Undotree
 Help press ? in undnotree window | ?
 Invoke undotree via telescope    | :Telescope undo

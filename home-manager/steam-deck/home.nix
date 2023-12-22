@@ -1,26 +1,11 @@
-{ config, lib, stdenv, sources ? (import ./nix/sources.nix), ... }:
+{ pkgs, lib, system, inputs, ... }:
 
 let
 
-  unstable = import sources.nixpkgs-unstable {
+  unstable = import inputs.nixpkgs-unstable {
+    inherit (pkgs) system;
     overlays = [
     ];
-  };
-
-  sources = import ./nix/sources.nix;
-
-  pkgs = import sources.nixpkgs {
-    overlays = [
-      (import sources.neovim-nightly-overlay)
-    ];
-    config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) unfreePackages;
-    config.permittedInsecurePackages = [ "python2.7-pyjwt-1.7.1"
-                                         "python2.7-certifi-2021.10.8"
-                                         "python-2.7.18.6"
-                                         "openssl-1.1.1u"
-                                         "openssl-1.1.1v"
-                                         "openssl-1.1.1w"
-                                       ];
   };
 
   unfreePackages = [
@@ -36,16 +21,25 @@ let
     "unrar"
     "vscode"
     "zoom-us"
+    "obinskit"
   ];
+
+  agdaStdlibSrc = pkgs.fetchFromGitHub {
+      owner = "agda";
+      repo = "agda-stdlib";
+      rev = "v2.0";
+      sha256 = "sha256-TjGvY3eqpF+DDwatT7A78flyPcTkcLHQ1xcg+MKgCoE="; # Replace with the correct hash
+    };
 
   # Unstable branch packages
   unstablePkgs = [
     (unstable.agda.withPackages (p: [
       (p.standard-library.overrideAttrs (oldAttrs: {
-        version = "local version";
-        src = /home/bolt/Desktop/Bolt/Playground/Agda/agda-stdlib;
+        version = "v2.0";
+        src = agdaStdlibSrc;
       }))
     ]))
+
     unstable.nixd
   ];
 
@@ -59,9 +53,7 @@ let
     awscli2                      # aws cli v2
     bash                         # bash
     bc                           # gnu calculator
-    blueman                      # bluetooth applet
     cachix                       # nix caching
-    cage                         # Wayland kiosk compositor
     chromium                     # google chrome
     deluge                       # torrent client
     dig                          # dns tool
@@ -69,8 +61,8 @@ let
     evince                       # pdf reader
     fd                           # file finder
     feh                          # image viewer
-    firefox                      # internet browser
-    flashfocus                   # focus wm
+    ffmpeg_5-full                # A complete, cross-platform solution to record, convert and stream audio and video
+    findutils                    # find files utilities
     fzf                          # fuzzy finder
     gawk                         # text processing programming language
     gh                           # Github CLI
@@ -78,12 +70,9 @@ let
     git-extras                   # git extra commands like 'git sed'
     glib                         # gsettings
     google-chrome                # A freeware web browser developed by Google
-    greetd.gtkgreet              # a gtk based greeter for greetd
     gsettings-desktop-schemas    # theming related
     gtk3                         # gtk3 lib
-    gtk-engine-murrine           # theme engine
-    gtk_engines                  # theme engines
-    (import sources.niv {}).niv  # dependency management for nix
+    helvum                       # sound
     imv                          # image viewer
     jdk                          # java development kit
     jq                           # JSON processor
@@ -94,13 +83,10 @@ let
     libreoffice                  # office suite
     lm_sensors                   # CPU sensors
     lsof                         # A tool to list open files
-    lxappearance                 # edit themes
-    lxmenu-data                  # desktop menus - enables "open with" options
     manix                        # nix manual
     mpv                          # video player
     ncdu                         # disk space info (a better du)
     neofetch                     # command-line system information
-    networkmanagerapplet         # nm-applet
     nix-bash-completions         # nix bash completions
     nix-doc                      # nix documentation search tool
     nix-index                    # nix locate files
@@ -108,10 +94,8 @@ let
     nix-tree                     # interactively browse a Nix store paths dependencies
     nodejs                       # nodejs
     noip                         # noip
-    numix-cursor-theme           # icon theme
-    numix-icon-theme-circle      # icon theme
+    obinskit                     # anne pro 2 keyboard settings manager
     obs-studio                   # obs-studio
-    obs-studio-plugins.wlrobs    # obs wayland protocol
     pamixer                      # pulseaudio cli mixer
     paprefs                      # pulseaudio preferences
     pasystray                    # pulseaudio systray
@@ -130,7 +114,6 @@ let
     slack                        # slack client
     sof-firmware                 # Sound Open Firmware
     spotify                      # spotify client
-    steam                        # game library
     texlive.combined.scheme-full # latex
     thunderbird                  # mail client
     tldr                         # summary of a man page
@@ -138,7 +121,6 @@ let
     unzip                        # unzip
     vlc                          # media player
     vscode                       # visual studio code
-    weechat                      # weechat irc client
     wget                         # cli wget
     wireguard-tools              # wireguard
     xarchiver                    # xarchiver gtk frontend
@@ -151,40 +133,8 @@ let
     zoom                         # video conferencing
   ];
 
-  # Wayland Packages
-  waylandPkgs = [
-    unstable.brightnessctl
-    unstable.grim
-    unstable.mako
-    unstable.pipewire
-    unstable.slurp
-    unstable.swayidle
-    unstable.swaylock-fancy
-    unstable.waybar
-    unstable.wayland-protocols
-    unstable.wdisplays
-    unstable.wireplumber
-    unstable.wl-clipboard
-    unstable.wl-gammactl
-    unstable.wlogout
-    unstable.wlroots
-    unstable.wlsunset
-    unstable.wofi
-    unstable.xdg-desktop-portal
-    unstable.xdg-desktop-portal-gtk
-    unstable.xdg-desktop-portal-wlr
-  ];
-
   gitPkgs = with pkgs.gitAndTools; [
     diff-so-fancy
-  ];
-
-  gnomePkgs = with pkgs.gnome3; [
-    gnome-calendar # calendar
-    gnome-control-center
-    gnome-power-manager
-    gnome-weather
-    zenity         # display dialogs
   ];
 
   haskellPkgs = [
@@ -229,11 +179,29 @@ let
 
 in
 {
+  nix = {
+    package = pkgs.nix;
+    settings.experimental-features = [ "nix-command" "flakes" ];
+  };
+
+  nixpkgs = {
+    config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) unfreePackages;
+    config.permittedInsecurePackages = [ "python2.7-pyjwt-1.7.1"
+                                         "python2.7-certifi-2021.10.8"
+                                         "python-2.7.18.6"
+                                         "openssl-1.1.1u"
+                                         "openssl-1.1.1v"
+                                         "openssl-1.1.1w"
+                                         "obinskit-1.2.1"
+                                         "electron-13.6.9"
+                                       ];
+  };
+
   home = {
     enableNixpkgsReleaseCheck = true;
 
-    username      = "bolt";
-    homeDirectory = "/home/bolt";
+    username      = "deck";
+    homeDirectory = "/home/deck";
     stateVersion  = "23.11";
 
     keyboard = {
@@ -249,44 +217,28 @@ in
       ++ extraPkgs
       ++ fontsPkgs
       ++ gitPkgs
-      ++ gnomePkgs
       ++ haskellPkgs
-      ++ unstablePkgs
-      ++ waylandPkgs;
+      ++ unstablePkgs;
 
     sessionVariables = {
-      ECORE_EVAS_ENGINE="wayland_egl";
       EDITOR="nvim";
-      ELM_ENGINE="wayland_egl";
-      MOZ_DISABLE_RDD_SANDBOX="1";
-      MOZ_ENABLE_WAYLAND="1";
-      NIXOS_OZONE_WL="1";
-      QT_QPA_PLATFORM="wayland";
-      QT_WAYLAND_DISABLE_WINDOWDECORATION="1";
-      SDL_VIDEODRIVER="wayland";
       VISUAL="nvim";
-      XDG_CURRENT_DESKTOP="sway";
-      XDG_SESSION_TYPE="wayland";
     };
 
     sessionPath = [
-      "/home/bolt/.local/bin"
-      "/home/bolt/.cabal/bin"
-      "/home/bolt/.cargo/bin"
+      "/home/deck/.local/bin"
+      "/home/deck/.cabal/bin"
+      "/home/deck/.cargo/bin"
     ];
 
   };
 
   imports = [
-    ./programs/agda/default.nix
-    ./programs/bash/default.nix
-    ./programs/emacs/default.nix
-    ./programs/git/default.nix
-    ./programs/neovim/default.nix
-    ./programs/waybar/default.nix
-    ./programs/wofi/default.nix
-    ./programs/sway/default.nix
-    ./xdg/sway/default.nix
+    ../programs/agda/default.nix
+    ../programs/bash/default.nix
+    ../programs/emacs/default.nix
+    ../programs/git/default.nix
+    ../programs/neovim/default.nix
   ];
 
   # fonts
@@ -317,11 +269,7 @@ in
 
     home-manager.enable = true;
 
-    htop = {
-      enable = true;
-      # sortDescending = true;
-      # sortKey = "PERCENT_CPU";
-    };
+    htop.enable = true;
 
     ssh.enable = true;
 
@@ -331,20 +279,12 @@ in
     };
 
     autorandr.enable = true;
+
+    firefox.enable = true;
   };
 
   services = {
-    lorri.enable = true;
-    blueman-applet.enable = true;
-    udiskie.enable = true;
-    wlsunset = {
-      enable = true;
-      latitude = "39" ;
-      longitude = "-8" ;
-    };
-    swayidle.enable = true;
-    poweralertd.enable = true;
-    autorandr.enable = true;
   };
 
 }
+
