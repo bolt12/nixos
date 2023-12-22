@@ -1,5 +1,14 @@
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 
+let
+
+  unstable = import nixpkgs-unstable {
+    overlays = [
+    ];
+    system = config.nixpkgs.system;
+  };
+
+in
 {
   # Use the GRUB 2 boot loader.
   boot = {

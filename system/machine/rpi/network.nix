@@ -1,3 +1,14 @@
+{ config, pkgs, inputs, ... }:
+
+let
+
+  unstable = import nixpkgs-unstable {
+    overlays = [
+    ];
+    system = config.nixpkgs.system;
+  };
+
+in
 {
   network.description = "My remote machines";
 
@@ -6,7 +17,7 @@
   network.enableRollback = true;
 
   # Common configuration shared between all servers
-  defaults = { config, pkgs, ... }: {
+  defaults = { config, ... }: {
     imports = [
     ];
 

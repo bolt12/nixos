@@ -1,5 +1,14 @@
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 
+let
+
+  unstable = import inputs.nixpkgs-unstable {
+    overlays = [
+    ];
+    system = config.nixpkgs.system;
+  };
+
+in
 {
   # Use the GRUB 2 boot loader.
   boot = {
@@ -149,6 +158,21 @@
 
     blueman.enable = true;
 
+    # Fix obinskit permissions
+    udev.extraRules = ''
+      SUBSYSTEM=="input", GROUP="input", MODE="0666"
+
+      # For ANNE PRO 2
+      SUBSYSTEM=="usb", ATTRS{idVendor}=="04d9", ATTRS{idProduct}=="8008", MODE="0666", GROUP="plugdev"
+      KERNEL=="hidraw*", ATTRS{idVendor}=="04d9", ATTRS{idProduct}=="8008", MODE="0666", GROUP="plugdev"
+      SUBSYSTEM=="usb", ATTRS{idVendor}=="04d9", ATTRS{idProduct}=="8009", MODE="0666", GROUP="plugdev"
+      KERNEL=="hidraw*", ATTRS{idVendor}=="04d9", ATTRS{idProduct}=="8009", MODE="0666", GROUP="plugdev"
+
+      ## For ANNE PRO
+      SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="5710", MODE="0666", GROUP="plugdev"
+      KERNEL=="hidraw*", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="5710", MODE="0666", GROUP="plugdev"
+    '';
+
     flatpak.enable = true;
   };
 
@@ -157,8 +181,10 @@
     portal = {
       enable = true;
       configPackages = [
+        pkgs.xdg-desktop-portal
         pkgs.xdg-desktop-portal-gtk
         pkgs.xdg-desktop-portal-wlr
+        pkgs.xdg-desktop-portal-gnome
       ];
       wlr.enable = true;
     };

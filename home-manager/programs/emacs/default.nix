@@ -1,23 +1,17 @@
-{ config, lib, ... }:
+{ pkgs, inputs, ... }:
 
 let
-  sources = (import ../../nix/sources.nix);
-
-  pkgs = import sources.nixpkgs {
+  unstable = import inputs.nixpkgs-unstable {
+    inherit (pkgs) system;
     overlays = [
-      (import sources.emacs-overlay)
+      inputs.emacs-overlay.overlay
     ];
   };
 
-  unstable = import sources.nixpkgs-unstable {
-    overlays = [
-      (import sources.emacs-overlay)
-    ];
-  };
 in {
   programs.emacs = {
     enable = true;
-    package = pkgs.emacs;
+    package = unstable.emacs;
     extraPackages = epkgs: with epkgs; [
       use-package
       nix-mode

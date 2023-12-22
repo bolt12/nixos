@@ -1,9 +1,8 @@
-{ config, pkgs, ... }:
+{ pkgs, inputs, ... }:
 let
 
-  sources = import ../../nix/sources.nix;
-
-  unstable = import sources.nixpkgs-unstable {
+  unstable = import inputs.nixpkgs-unstable {
+    inherit (pkgs) system;
     overlays = [
     ];
   };

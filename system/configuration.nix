@@ -2,22 +2,30 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, inputs, ... }@attrs:
 
+let
+
+  unstable = import inputs.nixpkgs-unstable {
+    overlays = [
+    ];
+    system = config.nixpkgs.system;
+  };
+
+in
 {
   imports =
     [
       # Include the results of the hardware scan.
-      ./hardware-configuration.nix
+      ./machine/x1-g8/hardware-configuration.nix
       # Machine-specific configuration
-      ./machine/x1-g8.nix
+      ./machine/x1-g8/default.nix
       # Include IOHK related configs
       ./iohk/caches.nix
       ./iohk/ssh.nix
-      # ./iohk/systemd.nix
 
       # Import nixos home manager module
-      <home-manager/nixos>
+      inputs.home-manager.nixosModules.home-manager
     ];
 
   networking = {
@@ -129,8 +137,18 @@
   };
 
   # Home Manager Configuration:
-  home-manager.users.bolt = { pkgs, ... }: {
-    imports = [ ./home-manager/home.nix ];
+  home-manager = {
+    useGlobalPkgs   = false;
+    useUserPackages = true;
+
+    extraSpecialArgs = {
+      inherit inputs;
+    };
+
+    users.bolt = { nixpkgs, ... }: {
+
+      imports = [ ../home-manager/home.nix ];
+    };
   };
 
   # Allow unfree packages

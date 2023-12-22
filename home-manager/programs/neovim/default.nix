@@ -1,72 +1,66 @@
-{ config, lib, ... }:
+{ inputs
+, pkgs
+, ... }:
 
 let
-  sources = (import ../../nix/sources.nix);
-
-  unstable = import sources.nixpkgs-unstable {
+  unstable = import inputs.nixpkgs-unstable {
+    inherit (pkgs) system;
     overlays = [
-      (import sources.neovim-nightly-overlay)
+      inputs.neovim-nightly-overlay.overlay
     ];
   };
-
-  pkgs = import sources.nixpkgs { };
 
   plugins = pkgs.vimPlugins;
   plugins-unstable = unstable.vimPlugins;
 
   haskell-tools = pkgs.vimUtils.buildVimPlugin {
     name = "haskell-tools";
-    src = sources.haskell-tools;
+    src = inputs.haskell-tools;
   };
 
   vim-bujo = pkgs.vimUtils.buildVimPlugin {
     name = "vim-bujo";
-    src = sources.vim-bujo;
+    src = inputs.vim-bujo;
   };
 
   vim-silicon = pkgs.vimUtils.buildVimPlugin {
     name = "vim-silicon";
-    src = sources.vim-silicon;
+    src = inputs.vim-silicon;
   };
 
   neoscroll = pkgs.vimUtils.buildVimPlugin {
     name = "neoscroll-nvim";
-    src = sources.neoscroll-nvim;
+    src = inputs.neoscroll-nvim;
   };
 
   venn = pkgs.vimUtils.buildVimPlugin {
     name = "venn-nvim";
-    src = sources.venn-nvim;
+    src = inputs.venn-nvim;
   };
 
   highstr = pkgs.vimUtils.buildVimPlugin {
     name = "HighStr-nvim";
-    src = sources.HighStr-nvim;
-  };
-
-  abbrev = pkgs.vimUtils.buildVimPlugin {
-    name = "abbrev";
-    src = sources.AbbrevMan-nvim;
+    src = inputs.HighStr-nvim;
   };
 
   cheatsheet-nvim = pkgs.vimUtils.buildVimPlugin {
     name = "cheatsheet-nvim";
-    src = sources.cheatsheet-nvim;
+    src = inputs.cheatsheet-nvim;
   };
 
   haskell-snippets = pkgs.vimUtils.buildVimPlugin {
     name = "haskell-snippets";
-    src = sources.haskell-snippets;
+    src = inputs.haskell-snippets-nvim;
   };
 
   gh-nvim = pkgs.vimUtils.buildVimPlugin {
     name = "gh-nvim";
-    src = sources.gh-nvim;
+    src = inputs.gh-nvim;
   };
 
   telescope-ui-select = pkgs.vimUtils.buildVimPlugin {
     name = "telescope-ui-select-nvim";
-    src = sources.telescope-ui-select-nvim;
+    src = inputs.telescope-ui-select-nvim;
   };
 
   overriddenPlugins = with pkgs; [ ];
@@ -75,7 +69,6 @@ let
   ];
 
   myVimPlugins = with plugins; [
-    abbrev                  # Abbreviations fix
     barbar-nvim             # fancy status bar
     base16-vim              # colors
     cheatsheet-nvim         # command cheatsheet

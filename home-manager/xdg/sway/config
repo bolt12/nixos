@@ -120,6 +120,18 @@ bindsym $mod+Shift+8 move container to workspace $ws8
 bindsym $mod+Shift+9 move container to workspace $ws9
 bindsym $mod+Shift+0 move container to workspace $ws10
 
+# Assign workspaces to monitors
+workspace $ws1 output HDMI-A-1
+workspace $ws2 output HDMI-A-1
+workspace $ws3 output eDP-1
+
+# Move currently focused window to scratchpad
+bindsym $mod+Shift+minus move scratchpad
+
+# Show the next scratchpad window or hide the focused scratchpad window.
+# If there are multiple scratchpad windows, this command cycles through them.
+bindsym $mod+Shift+equal scratchpad show
+
 # reload the configuration file
 bindsym $mod+Shift+c reload
 
@@ -217,10 +229,15 @@ exec_always {
     gsettings set $gnome-schema font-name 'JetBrainsMono Nerd Font 13'
 }
 
+#
+# Sway users might achieve this by adding the following to their Sway config file
+# This ensures all user units started after the command (not those already running) set the variables
+exec systemctl --user import-environment
+
 # xdg-desktop-portal-wlr
 exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
-exec systemctl --user stop pipewire xdg-desktop-portal xdg-desktop-portal-wlr
-exec systemctl --user start pipewire xdg-desktop-portal xdg-desktop-portal-wlr
+exec systemctl --user restart pipewire pipewire-pulse.service pipewire-pulse.socket pipewire.socket wireplumber.service
+
 # nm-applet
 exec_always nm-applet --indicator
 
@@ -228,11 +245,6 @@ exec_always nm-applet --indicator
 exec_always blueman-applet
 
 exec --no-startup-id wireplumber
-
-#
-# Sway users might achieve this by adding the following to their Sway config file
-# This ensures all user units started after the command (not those already running) set the variables
-exec systemctl --user import-environment
 
 #********************************************************************************
 

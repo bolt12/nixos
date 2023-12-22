@@ -2,15 +2,24 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 
+let
+
+  unstable = import nixpkgs-unstable {
+    overlays = [
+    ];
+    system = config.nixpkgs.system;
+  };
+
+in
 {
   nixpkgs = {
     overlays = [
       (self: super: {
         firmwareLinuxNonfree = super.firmwareLinuxNonfree.overrideAttrs (old: {
           version = "2020-12-18";
-          src = pkgs.fetchgit {
+          src = nixpkgs.fetchgit {
             url = "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git";
             rev = "b79d2396bc630bfd9b4058459d3e82d7c3428599";
             sha256 = "1rb5b3fzxk5bi6kfqp76q1qszivi0v1kdz1cwj2llp5sd9ns03b5";
