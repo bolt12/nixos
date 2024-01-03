@@ -31,6 +31,8 @@ let
       sha256 = "sha256-TjGvY3eqpF+DDwatT7A78flyPcTkcLHQ1xcg+MKgCoE="; # Replace with the correct hash
     };
 
+  nixops = inputs.nixops.defaultPackage.${pkgs.system};
+
   # Unstable branch packages
   unstablePkgs = [
     (unstable.agda.withPackages (p: [
@@ -90,7 +92,7 @@ let
     nix-bash-completions         # nix bash completions
     nix-doc                      # nix documentation search tool
     nix-index                    # nix locate files
-    nixops_unstable              # nixops
+    nixops                       # nixops
     nix-tree                     # interactively browse a Nix store paths dependencies
     nodejs                       # nodejs
     noip                         # noip

@@ -1,23 +1,16 @@
-{ config, pkgs, inputs, ... }:
+{
+  network = {
+    description = "My remote machines";
 
-let
+    storage.legacy = {};
 
-  unstable = import nixpkgs-unstable {
-    overlays = [
-    ];
-    system = config.nixpkgs.system;
+    # Each deployment creates a new profile generation to able to run nixops
+    # rollback
+    enableRollback = true;
   };
 
-in
-{
-  network.description = "My remote machines";
-
-  # Each deployment creates a new profile generation to able to run nixops
-  # rollback
-  network.enableRollback = true;
-
   # Common configuration shared between all servers
-  defaults = { config, ... }: {
+  defaults = { config, pkgs, ... }: {
     imports = [
     ];
 
@@ -30,11 +23,11 @@ in
 
   # Server definitions
 
-  rpi = { config, ... }: {
+  rpi = { config, pkgs, ... }: {
     # Says we are going to deploy to an already existing NixOS machine
     deployment.targetHost = "192.168.1.73";
 
-    nix.trustedUsers = [ "bolt" ];
+    nix.settings.trusted-users = [ "bolt" ];
 
     imports = [
       ./rpi.nix
@@ -47,6 +40,7 @@ in
     nixpkgs.localSystem = {
       system = "aarch64-linux";
       config = "aarch64-unknown-linux-gnu";
+      hostPlatform = "aarch64-linux";
     };
 
   };
