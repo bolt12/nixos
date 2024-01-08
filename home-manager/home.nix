@@ -231,6 +231,7 @@ in
 {
   nix = {
     settings.experimental-features = [ "nix-command" "flakes" ];
+    settings.access-tokens = "github.com=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";
   };
 
   nixpkgs = {
