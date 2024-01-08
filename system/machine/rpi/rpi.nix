@@ -6,10 +6,10 @@
 
 let
 
-  unstable = import nixpkgs-unstable {
+  unstable = import inputs.nixpkgs-unstable {
+    inherit (pkgs) system;
     overlays = [
     ];
-    system = config.nixpkgs.system;
   };
 
 in
@@ -19,7 +19,7 @@ in
       (self: super: {
         firmwareLinuxNonfree = super.firmwareLinuxNonfree.overrideAttrs (old: {
           version = "2020-12-18";
-          src = nixpkgs.fetchgit {
+          src = inputs.nixpkgs.fetchgit {
             url = "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git";
             rev = "b79d2396bc630bfd9b4058459d3e82d7c3428599";
             sha256 = "1rb5b3fzxk5bi6kfqp76q1qszivi0v1kdz1cwj2llp5sd9ns03b5";
@@ -44,11 +44,11 @@ in
     # Enables the generation of /boot/extlinux/extlinux.conf
     loader.generic-extlinux-compatible.enable = true;
 
-    cleanTmpDir = true;
-  }
+    tmp.cleanOnBoot = true;
+  };
 
   networking = {
-    hostName                    = "rpi-nixos";
+    hostName = "rpi-nixos";
     wireless = {
       interfaces = [ "wlan0" ];
       iwd.enable = true;
@@ -70,9 +70,9 @@ in
 
     # enable NAT
     nat = {
-      nat.enable             = true;
-      nat.externalInterface  = "wlan0";
-      nat.internalInterfaces = [ "wg0" ];
+      enable             = true;
+      externalInterface  = "wlan0";
+      internalInterfaces = [ "wg0" ];
     };
 
     # Open ports in the firewall.
@@ -141,7 +141,7 @@ in
 
         serviceConfig = {
           ExecStart = ''
-            ${emanotePkg}/bin/emanote --layers "/home/bolt/journal" run --host=0.0.0.0 --port=7000
+            ${pkgs.haskellPackages.emanote}/bin/emanote --layers "/home/bolt/journal" run --host=0.0.0.0 --port=7000
           '';
         };
       };
@@ -273,8 +273,10 @@ in
     # Enable the OpenSSH daemon.
     openssh = {
       enable          = true;
-      permitRootLogin = "yes";
-      forwardX11      = true;
+      settings = {
+        X11Forwarding = true;
+        PermitRootLogin = "yes";
+      };
     };
 
   };

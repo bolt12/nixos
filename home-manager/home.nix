@@ -24,6 +24,8 @@ let
     "obinskit"
   ];
 
+  nixops = inputs.nixops.defaultPackage.${pkgs.system};
+
   agdaStdlibSrc = pkgs.fetchFromGitHub {
       owner = "agda";
       repo = "agda-stdlib";
@@ -100,7 +102,7 @@ let
     nix-bash-completions         # nix bash completions
     nix-doc                      # nix documentation search tool
     nix-index                    # nix locate files
-    nixops_unstable              # nixops
+    nixops                       # nixops
     nix-tree                     # interactively browse a Nix store paths dependencies
     nodejs                       # nodejs
     noip                         # noip

@@ -2,6 +2,7 @@
   description = "A flake to build my NixOS configuration";
 
   inputs = {
+    nixpkgs-23-05.url = "github:NixOS/nixpkgs/nixos-23.05";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     home-manager = {
@@ -11,6 +12,10 @@
       # the `inputs.nixpkgs` of the current flake,
       # to avoid problems caused by different versions of nixpkgs.
       inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    nixops = {
+      url = "github:NixOS/nixops";
     };
 
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
@@ -109,5 +114,8 @@
         };
       };
 
+      nixopsConfigurations = {
+        default = import ./system/machine/rpi/nixops.nix // { nixpkgs = inputs.nixpkgs-23-05; };
+      };
    };
 }
