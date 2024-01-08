@@ -16,6 +16,9 @@
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
     emacs-overlay.url = "github:nix-community/emacs-overlay";
 
+    # Needed for steam-deck
+    nixgl.url = "github:guibou/nixGL";
+
     # Neovim plugins
     haskell-tools.url = "github:MrcJkb/haskell-tools.nvim";
     vim-bujo = {

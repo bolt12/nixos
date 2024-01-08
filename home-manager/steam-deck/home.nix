@@ -1,4 +1,4 @@
-{ pkgs, lib, system, inputs, ... }:
+{ pkgs, lib, inputs, ... }:
 
 let
 
@@ -72,7 +72,6 @@ let
     google-chrome                # A freeware web browser developed by Google
     gsettings-desktop-schemas    # theming related
     gtk3                         # gtk3 lib
-    helvum                       # sound
     imv                          # image viewer
     jdk                          # java development kit
     jq                           # JSON processor
@@ -87,11 +86,13 @@ let
     mpv                          # video player
     ncdu                         # disk space info (a better du)
     neofetch                     # command-line system information
+    nettools                     # ifconfig and friends
     nix-bash-completions         # nix bash completions
     nix-doc                      # nix documentation search tool
     nix-index                    # nix locate files
     nixops_unstable              # nixops
     nix-tree                     # interactively browse a Nix store paths dependencies
+    nixgl.nixGLIntel             # fix driver issues in non-nixos nix setups
     nodejs                       # nodejs
     noip                         # noip
     obinskit                     # anne pro 2 keyboard settings manager
@@ -108,13 +109,13 @@ let
     python3                      # python3 programming language
     ripgrep                      # ripgrep
     rnix-lsp                     # nix lsp server
+    shared-mime-info             # mime info
     silicon                      # create beautiful code imgs
     simplescreenrecorder         # self-explanatory
     skypeforlinux                # skype for linux
     slack                        # slack client
     sof-firmware                 # Sound Open Firmware
-    spotify                      # spotify client
-    texlive.combined.scheme-full # latex
+    # texlive.combined.scheme-full # latex
     thunderbird                  # mail client
     tldr                         # summary of a man page
     tree                         # display files in a tree view
@@ -195,6 +196,7 @@ in
                                          "obinskit-1.2.1"
                                          "electron-13.6.9"
                                        ];
+    overlays = [ inputs.nixgl.overlay ];
   };
 
   home = {
@@ -223,6 +225,7 @@ in
     sessionVariables = {
       EDITOR="nvim";
       VISUAL="nvim";
+      BASH_ENV="/home/deck/.bashrc";
     };
 
     sessionPath = [
@@ -252,6 +255,7 @@ in
   programs = {
 
     ssh = {
+      enable = true;
       matchBlocks = {
         "rpi" = {
           hostname = "192.168.1.73";
@@ -271,8 +275,6 @@ in
 
     htop.enable = true;
 
-    ssh.enable = true;
-
     atuin = {
       enable = true;
       enableBashIntegration = true;
@@ -284,6 +286,18 @@ in
   };
 
   services = {
+  };
+
+  xdg = {
+    mime.enable = true;
+    systemDirs.data = [
+      "/home/deck/.nix-profile/share"
+      "/nix/var/nix/profiles/default/share"
+      "/home/deck/.local/share/flatpak/exports/share"
+      "/var/lib/flatpak/exports/share"
+      "/usr/local/share"
+      "/usr/share"
+      ];
   };
 
 }
