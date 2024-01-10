@@ -27,7 +27,8 @@
     # Says we are going to deploy to an already existing NixOS machine
     deployment.targetHost = "192.168.1.73";
 
-    nix.settings.trusted-users = [ "bolt" ];
+    nix.settings.trusted-users = [ "bolt" "deck" ];
+    deployment.targetUser = "bolt";
 
     imports = [
       ./rpi.nix
