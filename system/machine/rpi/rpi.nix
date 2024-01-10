@@ -123,6 +123,12 @@ in
             # List of IPs assigned to this peer within the tunnel subnet. Used to configure routing.
             allowedIPs = [ "10.100.0.3/32" ];
           }
+          { # Steam DEck
+            # Public key of the peer (not a file path).
+            publicKey = "N1VIBzM8r1g0ItVXPrAopAGN8R+Dpqcmm8BbPKHOBx8=";
+            # List of IPs assigned to this peer within the tunnel subnet. Used to configure routing.
+            allowedIPs = [ "10.100.0.4/32" ];
+          }
         ];
       };
     };
