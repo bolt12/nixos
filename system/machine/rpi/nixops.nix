@@ -25,10 +25,9 @@
 
   rpi = { config, pkgs, ... }: {
     # Says we are going to deploy to an already existing NixOS machine
-    deployment.targetHost = "192.168.1.73";
+    deployment.targetHost = "192.168.1.78";
 
-    nix.settings.trusted-users = [ "bolt" "deck" ];
-    deployment.targetUser = "bolt";
+    nix.settings.trusted-users = [ "bolt" "deck" "root" "@wheel" ];
 
     imports = [
       ./rpi.nix
