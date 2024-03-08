@@ -119,7 +119,7 @@ in
           }
           { # Android phone
             # Public key of the peer (not a file path).
-            publicKey = "GhHsMo+0PqWAbflsSuphRzN4YyOzOjVKV31O6gjOIFQ=";
+            publicKey = "KP3wpBB2zEsJnSHzVISjJ1gmUAAWS/rOa1rgBJ5uBkM=";
             # List of IPs assigned to this peer within the tunnel subnet. Used to configure routing.
             allowedIPs = [ "10.100.0.3/32" ];
           }

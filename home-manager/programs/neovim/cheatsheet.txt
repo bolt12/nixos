@@ -107,10 +107,6 @@ Set gruvbox theme                         | :colorscheme gruvbox
 ## Shade-nvim @shade
 Toggle shade for inactive windows         | :ShadeToggle
 
-## specs-nvim @specs
-Toggle specs                              | :SpecsToggle
-Enable specs                              | :SpecsEnable
-
 ## vim-fugitive @git
 Check git status                          | :Gstatus
 Commit changes                            | :Gcommit

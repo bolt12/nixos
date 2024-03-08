@@ -96,7 +96,6 @@ let
     plenary-nvim            # lua dependency for other plugins
     popup-nvim              # popups
     rainbow_parentheses-vim # for nested parentheses
-    specs-nvim              # Show where your cursor moves when jumping large distances
     tabular                 # align things
     telescope-nvim          # fuzzy finder
     telescope-ui-select     # telescope picker
