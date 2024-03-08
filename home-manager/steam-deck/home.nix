@@ -234,6 +234,7 @@ in
       "/home/deck/.local/bin"
       "/home/deck/.cabal/bin"
       "/home/deck/.cargo/bin"
+      "/home/deck/.nix-profile/bin"
     ];
 
   };
