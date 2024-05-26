@@ -104,6 +104,7 @@ let
     nix-index                    # nix locate files
     nixops                       # nixops
     nix-tree                     # interactively browse a Nix store paths dependencies
+    nmap                         # network map
     nodejs                       # nodejs
     noip                         # noip
     numix-cursor-theme           # icon theme
@@ -122,7 +123,7 @@ let
     pulsemixer                   # pulseaudio mixer
     python3                      # python3 programming language
     ripgrep                      # ripgrep
-    rnix-lsp                     # nix lsp server
+    # rnix-lsp                     # nix lsp server
     silicon                      # create beautiful code imgs
     simplescreenrecorder         # self-explanatory
     skypeforlinux                # skype for linux
@@ -130,7 +131,6 @@ let
     sof-firmware                 # Sound Open Firmware
     spotify                      # spotify client
     steam                        # game library
-    texlive.combined.scheme-full # latex
     thunderbird                  # mail client
     tldr                         # summary of a man page
     tree                         # display files in a tree view

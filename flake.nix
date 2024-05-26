@@ -1,6 +1,13 @@
 {
   description = "A flake to build my NixOS configuration";
 
+  nixConfig = {
+    extra-substituters = [ "https://raspberry-pi-nix.cachix.org" ];
+    extra-trusted-public-keys = [
+      "raspberry-pi-nix.cachix.org-1:WmV2rdSangxW0rZjY/tBvBDSaNFQ3DyEQsVw8EvHn9o="
+    ];
+  };
+
   inputs = {
     nixpkgs-23-05.url = "github:NixOS/nixpkgs/nixos-23.05";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
@@ -17,6 +24,8 @@
     nixops = {
       url = "github:NixOS/nixops";
     };
+
+    raspberry-pi-nix.url = "github:tstat/raspberry-pi-nix";
 
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
     emacs-overlay.url = "github:nix-community/emacs-overlay";
@@ -91,11 +100,21 @@
       system = "x86_64-linux";
     in {
       # NixOS x86 configurations
-      nixosConfigurations.bolt-nixos = nixpkgs.lib.nixosSystem {
-        inherit system;
+      nixosConfigurations = {
+        bolt-nixos = nixpkgs.lib.nixosSystem {
+          inherit system;
 
-        specialArgs = {inherit inputs;};
-        modules     = [ ./system/configuration.nix ];
+          specialArgs = {inherit inputs;};
+          modules     = [ ./system/configuration.nix ];
+        };
+        bolt-rpi5-nixos = nixpkgs.lib.nixosSystem {
+          system = "aarch64-linux";
+
+          specialArgs = {inherit inputs;};
+          modules = [ inputs.raspberry-pi-nix.nixosModules.raspberry-pi
+                      ./system/machine/rpi/rpi5.nix
+                    ];
+        };
       };
 
       # Home Manager activation script

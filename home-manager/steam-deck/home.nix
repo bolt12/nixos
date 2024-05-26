@@ -95,6 +95,7 @@ let
     nixops                       # nixops
     nix-tree                     # interactively browse a Nix store paths dependencies
     nixgl.nixGLIntel             # fix driver issues in non-nixos nix setups
+    nmap                         # network map
     nodejs                       # nodejs
     noip                         # noip
     obinskit                     # anne pro 2 keyboard settings manager
@@ -110,14 +111,13 @@ let
     pulsemixer                   # pulseaudio mixer
     python3                      # python3 programming language
     ripgrep                      # ripgrep
-    rnix-lsp                     # nix lsp server
+    # rnix-lsp                     # nix lsp server
     shared-mime-info             # mime info
     silicon                      # create beautiful code imgs
     simplescreenrecorder         # self-explanatory
     skypeforlinux                # skype for linux
     slack                        # slack client
     sof-firmware                 # Sound Open Firmware
-    # texlive.combined.scheme-full # latex
     thunderbird                  # mail client
     tldr                         # summary of a man page
     tree                         # display files in a tree view
