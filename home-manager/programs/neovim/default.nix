@@ -6,7 +6,7 @@ let
   unstable = import inputs.nixpkgs-unstable {
     inherit (pkgs) system;
     overlays = [
-      inputs.neovim-nightly-overlay.overlay
+      inputs.neovim-nightly-overlay.overlays.default
     ];
   };
 
@@ -127,7 +127,7 @@ in
 {
   programs.neovim = {
     enable       = true;
-    package      = unstable.neovim-nightly;
+    package      = unstable.neovim;
     extraConfig  = vimConfig;
     plugins      = myVimPlugins;
     viAlias      = true;
