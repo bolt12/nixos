@@ -137,15 +137,17 @@ in
 
     xserver = {
       enable     = true;
-      layout     = "us,pt";
-      xkbOptions = "caps:escape, grp:shifts_toggle";
-
-      libinput = {
-        enable = true;
-        touchpad.clickMethod = "clickfinger";
+      xkb = {
+        layout  = "us,pt";
+        options = "caps:escape, grp:shifts_toggle";
       };
 
       videoDrivers = [ "intel" ];
+    };
+
+    libinput = {
+      enable = true;
+      touchpad.clickMethod = "clickfinger";
     };
 
     tlp = {
@@ -157,21 +159,6 @@ in
     };
 
     blueman.enable = true;
-
-    # Fix obinskit permissions
-    udev.extraRules = ''
-      SUBSYSTEM=="input", GROUP="input", MODE="0666"
-
-      # For ANNE PRO 2
-      SUBSYSTEM=="usb", ATTRS{idVendor}=="04d9", ATTRS{idProduct}=="8008", MODE="0666", GROUP="plugdev"
-      KERNEL=="hidraw*", ATTRS{idVendor}=="04d9", ATTRS{idProduct}=="8008", MODE="0666", GROUP="plugdev"
-      SUBSYSTEM=="usb", ATTRS{idVendor}=="04d9", ATTRS{idProduct}=="8009", MODE="0666", GROUP="plugdev"
-      KERNEL=="hidraw*", ATTRS{idVendor}=="04d9", ATTRS{idProduct}=="8009", MODE="0666", GROUP="plugdev"
-
-      ## For ANNE PRO
-      SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="5710", MODE="0666", GROUP="plugdev"
-      KERNEL=="hidraw*", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="5710", MODE="0666", GROUP="plugdev"
-    '';
 
     flatpak.enable = true;
   };

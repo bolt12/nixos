@@ -74,15 +74,17 @@ in
 
     xserver = {
       enable     = true;
-      layout     = "us,pt";
-      xkbOptions = "caps:escape, grp:shifts_toggle";
-
-      libinput = {
-        enable = true;
-        touchpad.clickMethod = "clickfinger";
+      xkb = {
+        layout  = "us,pt";
+        options = "caps:escape, grp:shifts_toggle";
       };
 
       videoDrivers = [ "intel" ];
+    };
+
+    libinput = {
+      enable = true;
+      touchpad.clickMethod = "clickfinger";
     };
 
     tlp = {

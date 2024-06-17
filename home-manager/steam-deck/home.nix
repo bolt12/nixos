@@ -21,7 +21,6 @@ let
     "unrar"
     "vscode"
     "zoom-us"
-    "obinskit"
   ];
 
   agdaStdlibSrc = pkgs.fetchFromGitHub {
@@ -98,7 +97,6 @@ let
     nmap                         # network map
     nodejs                       # nodejs
     noip                         # noip
-    obinskit                     # anne pro 2 keyboard settings manager
     obs-studio                   # obs-studio
     pamixer                      # pulseaudio cli mixer
     paprefs                      # pulseaudio preferences
@@ -195,7 +193,6 @@ in
                                          "openssl-1.1.1u"
                                          "openssl-1.1.1v"
                                          "openssl-1.1.1w"
-                                         "obinskit-1.2.1"
                                          "electron-13.6.9"
                                        ];
     overlays = [ inputs.nixgl.overlay ];

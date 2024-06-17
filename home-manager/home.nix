@@ -21,7 +21,6 @@ let
     "unrar"
     "vscode"
     "zoom-us"
-    "obinskit"
   ];
 
   nixops = inputs.nixops.defaultPackage.${pkgs.system};
@@ -109,7 +108,6 @@ let
     noip                         # noip
     numix-cursor-theme           # icon theme
     numix-icon-theme-circle      # icon theme
-    obinskit                     # anne pro 2 keyboard settings manager
     obs-studio                   # obs-studio
     obs-studio-plugins.wlrobs    # obs wayland protocol
     pamixer                      # pulseaudio cli mixer
@@ -241,7 +239,6 @@ in
                                          "openssl-1.1.1u"
                                          "openssl-1.1.1v"
                                          "openssl-1.1.1w"
-                                         "obinskit-1.2.1"
                                          "electron-13.6.9"
                                        ];
   };
@@ -251,7 +248,7 @@ in
 
     username      = "bolt";
     homeDirectory = "/home/bolt";
-    stateVersion  = "23.11";
+    stateVersion  = "24.05";
 
     keyboard = {
       layout = "us,pt";
