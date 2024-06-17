@@ -9,116 +9,6 @@ let pkgs-23-05 = import inputs.nixpkgs-23-05 {
                  };
 in {
 
-  nixpkgs = {
-    config.allowUnfree = true;
-  };
-
-  # Disable libcamera (not compiling)
-  raspberry-pi-nix.libcamera-overlay.enable = false;
-
-
-  # imports =
-  #   [ # Include the results of the hardware scan.
-  #     ./hardware-configuration.nix
-  #   ];
-
-  boot = {
-    # Use the extlinux boot loader. (NixOS wants to enable GRUB by default)
-    loader.grub.enable = false;
-
-    # Enables the generation of /boot/extlinux/extlinux.conf
-    loader.generic-extlinux-compatible.enable = true;
-
-    tmp.cleanOnBoot = true;
-  };
-
-  networking = {
-    hostName = "rpi-nixos";
-    wireless = {
-      interfaces = [ "wlan0" ];
-      iwd.enable = true;
-    };
-    useDHCP = false;
-    interfaces.wlan0.ipv4.addresses = [ {
-      address = "192.168.1.73";
-      prefixLength = 24;
-    } ];
-
-    defaultGateway = "192.168.1.254";
-    nameservers = [ "127.0.0.1" "1.1.1.1" "192.168.1.254" ];
-
-    networkmanager = {
-      enable = true;
-
-      wifi.backend = "iwd";
-    };
-
-    # enable NAT
-    nat = {
-      enable             = true;
-      externalInterface  = "wlan0";
-      internalInterfaces = [ "wg0" ];
-    };
-
-    # Open ports in the firewall.
-    firewall = {
-      enable          = true;
-      allowedTCPPorts = [ 22 25 53 465 587 7000 ];
-      allowedUDPPorts = [ 53 51820 ];
-    };
-
-    wireguard.interfaces = {
-      # "wg0" is the network interface name. You can name the interface arbitrarily.
-      wg0 = {
-        # Determines the IP address and subnet of the server's end of the tunnel interface.
-        ips = [ "10.100.0.1/24" ];
-
-        # The port that WireGuard listens to. Must be accessible by the client.
-        listenPort = 51820;
-
-        # This allows the wireguard server to route your traffic to the internet and hence be like a VPN
-        # For this to work you have to set the dnsserver IP of your router (or dnsserver of choice) in your clients
-        postSetup = ''
-          ${pkgs.iptables}/bin/iptables -t nat -A POSTROUTING -s 10.100.0.0/24 -o wlan0 -j MASQUERADE
-        '';
-
-        # This undoes the above command
-        postShutdown = ''
-          ${pkgs.iptables}/bin/iptables -t nat -D POSTROUTING -s 10.100.0.0/24 -o wlan0 -j MASQUERADE
-        '';
-
-        # Path to the private key file.
-        #
-        # Note: The private key can also be included inline via the privateKey option,
-        # but this makes the private key world-readable; thus, using privateKeyFile is
-        # recommended.
-        privateKeyFile = "/home/bolt/wireguard-keys/private";
-
-        peers = [
-          # List of allowed peers.
-          { # X1 G8 Carbon
-            # Public key of the peer (not a file path).
-            publicKey = "hUUAT7Dny5aFJHvwUE9poaaAcEheyEDMhff5AwQPiRk=";
-            # List of IPs assigned to this peer within the tunnel subnet. Used to configure routing.
-            allowedIPs = [ "10.100.0.2/32" ];
-          }
-          { # Android phone
-            # Public key of the peer (not a file path).
-            publicKey = "KP3wpBB2zEsJnSHzVISjJ1gmUAAWS/rOa1rgBJ5uBkM=";
-            # List of IPs assigned to this peer within the tunnel subnet. Used to configure routing.
-            allowedIPs = [ "10.100.0.3/32" ];
-          }
-          { # Steam DEck
-            # Public key of the peer (not a file path).
-            publicKey = "N1VIBzM8r1g0ItVXPrAopAGN8R+Dpqcmm8BbPKHOBx8=";
-            # List of IPs assigned to this peer within the tunnel subnet. Used to configure routing.
-            allowedIPs = [ "10.100.0.4/32" ];
-          }
-        ];
-      };
-    };
-  };
-
   systemd = {
     services = {
       iwd.serviceConfig.Restart = "always";
@@ -139,106 +29,35 @@ in {
     };
   };
 
-
-  # Preserve space by sacrificing documentation and history
-  documentation.nixos.enable = false;
-
-  nix = {
-    gc = {
-      automatic = true;
-      options = "--delete-older-than 30d";
-    };
-  };
-
-  # Set your time zone.
-  time.timeZone = "Europe/Lisbon";
-
-  # Enable support for Pi firmware blobs
-  hardware = {
-    bluetooth.enable = true;
-    firmware                      =
-      [ pkgs.raspberrypiWirelessFirmware ];
-
-    pulseaudio.enable = false;
-    raspberry-pi = {
-      config = {
-        all = {
-          base-dt-params = {
-            # enable autoprobing of bluetooth driver
-            # https://github.com/raspberrypi/linux/blob/c8c99191e1419062ac8b668956d19e788865912a/arch/arm/boot/dts/overlays/README#L222-L224
-            krnbt = {
-              enable = true;
-              value = "on";
-            };
-          };
-        };
-      };
-    };
-  };
-
-  # Enable CUPS to print documents.
-  services.printing.enable = true;
-
-  # Docker container services
-
-  # virtualisation.docker.enable = true;
-  virtualisation = {
-    oci-containers.backend = "podman";
-    oci-containers.containers = {
-    };
-  };
-
-  # Enable sound.
-  sound.enable = true;
-
-  # Define a user account. Don't forget to set a password with ‘passwd’.
-  users = {
-    users = {
-      bolt = {
-        initialPassword = "tlob";
-        isNormalUser = true;
-        extraGroups =
-          [ "wheel"
-            "networkmanager"
-            "podman"
-          ];
-        openssh.authorizedKeys.keys =
-            [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHKTf4Bb2BBymwZvxPtxEefspOPTACPn3HqrRiWAMJEJ armandoifsantos@gmail.com" ];
-    };
-      root = {
-        openssh.authorizedKeys.keys =
-          [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHKTf4Bb2BBymwZvxPtxEefspOPTACPn3HqrRiWAMJEJ armandoifsantos@gmail.com" ];
-      };
-    };
-  };
-
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages =
-    with pkgs; [
-      bluez
-      bluez-tools
-      git
-      git-annex
-      git-annex-utils
-      iptables
-      libraspberrypi
-      neovim
-      unbound-full
-      unzip
-      wget
-      wireguard-tools
-    ];
+  environment = {
+    systemPackages =
+      with pkgs; [
+        bluez
+        bluez-tools
+        pkgs-23-05.emanote
+        git
+        git-annex
+        git-annex-utils
+        iptables
+        libraspberrypi
+        neovim
+        unbound-full
+        unzip
+        wget
+        wireguard-tools
+      ];
+  };
 
   services = {
-
     # Setting up Unbound as a recursive DNS Server
     # Check https://docs.pi-hole.net/guides/dns/unbound/#configure-unbound
     unbound = {
       enable = true;
-      user = "root";
+      user = "bolt";
       settings = {
-        include = "/run/keys/unbound-ads";
+        include = "/etc/unbound/unbound-ads";
         server = {
           verbosity = 2;
           log-queries= "yes";
@@ -275,19 +94,61 @@ in {
         };
       };
     };
+  };
 
-    # Enable the OpenSSH daemon.
-    openssh = {
-      enable          = true;
-      settings = {
-        X11Forwarding = true;
-        PermitRootLogin = "yes";
+  networking = {
+    wireguard.interfaces = {
+      # "wg0" is the network interface name. You can name the interface arbitrarily.
+      wg0 = {
+        generatePrivateKeyFile = true;
+        # Determines the IP address and subnet of the server's end of the tunnel interface.
+        ips = [ "10.100.0.1/24" ];
+
+        # The port that WireGuard listens to. Must be accessible by the client.
+        listenPort = 51820;
+
+        # This allows the wireguard server to route your traffic to the internet and hence be like a VPN
+        # For this to work you have to set the dnsserver IP of your router (or dnsserver of choice) in your clients
+        postSetup = ''
+          ${pkgs.iptables}/bin/iptables -t nat -A POSTROUTING -s 10.100.0.0/24 -o wlan0 -j MASQUERADE
+        '';
+
+        # This undoes the above command
+        postShutdown = ''
+          ${pkgs.iptables}/bin/iptables -t nat -D POSTROUTING -s 10.100.0.0/24 -o wlan0 -j MASQUERADE
+        '';
+
+        # Path to the private key file.
+        #
+        # Note: The private key can also be included inline via the privateKey option,
+        # but this makes the private key world-readable; thus, using privateKeyFile is
+        # recommended.
+        privateKeyFile = "/home/bolt/wireguard-keys/privatekey";
+
+        peers = [
+          # List of allowed peers.
+          { # X1 G8 Carbon
+            # Public key of the peer (not a file path).
+            publicKey = "hUUAT7Dny5aFJHvwUE9poaaAcEheyEDMhff5AwQPiRk=";
+            # List of IPs assigned to this peer within the tunnel subnet. Used to configure routing.
+            allowedIPs = [ "10.100.0.2/32" ];
+          }
+          { # Android phone
+            # Public key of the peer (not a file path).
+            publicKey = "KP3wpBB2zEsJnSHzVISjJ1gmUAAWS/rOa1rgBJ5uBkM=";
+            # List of IPs assigned to this peer within the tunnel subnet. Used to configure routing.
+            allowedIPs = [ "10.100.0.3/32" ];
+          }
+          { # Steam DEck
+            # Public key of the peer (not a file path).
+            publicKey = "N1VIBzM8r1g0ItVXPrAopAGN8R+Dpqcmm8BbPKHOBx8=";
+            # List of IPs assigned to this peer within the tunnel subnet. Used to configure routing.
+            allowedIPs = [ "10.100.0.4/32" ];
+          }
+        ];
       };
     };
-
   };
-  # Swap
-  swapDevices = [{ device = "/swapfile"; size = 8192; }];
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

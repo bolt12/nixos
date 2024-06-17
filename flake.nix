@@ -107,14 +107,15 @@
           specialArgs = {inherit inputs;};
           modules     = [ ./system/configuration.nix ];
         };
-        bolt-rpi5-nixos = nixpkgs.lib.nixosSystem {
+
+        bolt-rpi5-sd-image = (nixpkgs.lib.nixosSystem {
           system = "aarch64-linux";
 
           specialArgs = {inherit inputs;};
           modules = [ inputs.raspberry-pi-nix.nixosModules.raspberry-pi
-                      ./system/machine/rpi/rpi5.nix
+                      ./system/machine/rpi/rpi-basic.nix
                     ];
-        };
+        }).config.system.build.sdImage;
       };
 
       # Home Manager activation script
@@ -134,7 +135,49 @@
       };
 
       nixopsConfigurations = {
-        default = import ./system/machine/rpi/nixops.nix // { nixpkgs = inputs.nixpkgs-23-05; };
+        default = {
+          inherit (inputs) nixpkgs;
+          network = {
+            description = "My remote machines";
+
+            storage.legacy = {};
+
+            # Each deployment creates a new profile generation to able to run nixops
+            # rollback
+            enableRollback = true;
+          };
+
+          # Common configuration shared between all servers
+          defaults = { ... }: {
+            imports = [
+              inputs.raspberry-pi-nix.nixosModules.raspberry-pi
+              ./system/machine/rpi/rpi-basic.nix
+            ];
+          };
+
+          # Server definitions
+
+          rpi-5 = { ... }: {
+
+            # Augment standard NixOS module arguments.
+            _module.args = {
+              inherit inputs;
+            };
+
+            # Says we are going to deploy to an already existing NixOS machine
+            deployment.targetHost = "192.168.1.110";
+
+            imports = [
+              ./system/machine/rpi/rpi5.nix
+            ];
+
+            nixpkgs.localSystem = {
+              system = "aarch64-linux";
+              config = "aarch64-unknown-linux-gnu";
+              hostPlatform = "aarch64-linux";
+            };
+          };
+        };
       };
-   };
-}
+    };
+  }

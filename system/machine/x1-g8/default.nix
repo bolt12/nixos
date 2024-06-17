@@ -216,7 +216,7 @@ in
 
           {
             # Public key of the server (not a file path).
-            publicKey = "zhuXCQYECo/myiKKVHMBPGfbb49JnwifRfsQdHJK9y4=";
+            publicKey = "MOdy/dZZKa4Ra4zGoQZ30FtXkZxHdpLgBH+DTG2YQRc=";
 
             # Forward all the traffic via VPN.
             allowedIPs = [ "0.0.0.0/0" "::0/0" ];
