@@ -2,14 +2,14 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, lib, pkgs, inputs, ... }@attrs:
+{ config, lib, pkgs, inputs, system, ... }@attrs:
 
 let
 
   unstable = import inputs.nixpkgs-unstable {
     overlays = [
     ];
-    system = config.nixpkgs.system;
+    system = system;
   };
 
 in
@@ -142,11 +142,10 @@ in
     useUserPackages = true;
 
     extraSpecialArgs = {
-      inherit inputs;
+      inherit inputs system;
     };
 
     users.bolt = { nixpkgs, ... }: {
-
       imports = [ ../home-manager/home.nix ];
     };
   };

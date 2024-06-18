@@ -1,9 +1,9 @@
-{ lib, inputs, pkgs, ... }:
+{ lib, inputs, pkgs, system, ... }:
 
 let
 
   unstable = import inputs.nixpkgs-unstable {
-    inherit (pkgs) system;
+    inherit system;
     overlays = [
     ];
   };
@@ -23,7 +23,7 @@ let
     "zoom-us"
   ];
 
-  nixops = inputs.nixops.defaultPackage.${pkgs.system};
+  nixops = inputs.nixops.defaultPackage.${system};
 
   agdaStdlibSrc = pkgs.fetchFromGitHub {
       owner = "agda";

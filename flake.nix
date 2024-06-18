@@ -90,6 +90,11 @@
       repo = "telescope-ui-select.nvim";
       flake = false;
     };
+
+    cornelis = {
+      url = "github:isovector/cornelis";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { self
@@ -104,7 +109,7 @@
         bolt-nixos = nixpkgs.lib.nixosSystem {
           inherit system;
 
-          specialArgs = {inherit inputs;};
+          specialArgs = {inherit inputs system;};
           modules     = [ ./system/configuration.nix ];
         };
 

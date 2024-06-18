@@ -1,5 +1,6 @@
 { inputs
 , pkgs
+, system
 , ... }:
 
 let
@@ -63,6 +64,22 @@ let
     src = inputs.telescope-ui-select-nvim;
   };
 
+  cornelis = {
+    # plugin packages in required Vim plugin dependencies
+    plugin = inputs.cornelis.packages.${system}.cornelis-vim;
+    config = ''
+      let g:cornelis_use_global_binary = 1
+      let g:cornelis_split_location = 'bottom'
+      " Highlight holes with a yellow undercurl/underline:
+      highlight CornelisHole ctermfg=yellow ctermbg=NONE cterm=undercurl
+
+      " Highlight "generalizables" (declarations in `variable` blocks) like constants:
+      highlight link CornelisGeneralizable Constant
+
+      au BufWritePost *.agda execute "normal! :CornelisLoad\<CR>"
+    '';
+  };
+
   overriddenPlugins = with pkgs; [ ];
 
   unstablePlugins = with plugins-unstable; [
@@ -76,6 +93,7 @@ let
     cmp_luasnip             # snippets
     cmp-nvim-lsp            # auto complete sources
     colorizer               # colors
+    cornelis                # agda-mode for neovim
     friendly-snippets       # snippets
     gh-nvim                 # gh code review plugin
     git-messenger-vim       # Check git commits on cursor hover
@@ -136,6 +154,7 @@ in
     withNodeJs   = true;
     withPython3  = true;
     withRuby     = true;
+    extraPackages = [ inputs.cornelis.packages.${system}.cornelis ];
   };
 
   xdg.configFile = {

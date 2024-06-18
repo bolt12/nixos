@@ -189,3 +189,37 @@ Toggle deleted            | <leader>gtd
 ## Undotree
 Help press ? in undnotree window | ?
 Invoke undotree via telescope    | :Telescope undo
+
+## Cornelis global commands
+
+Load and type-check buffer                | :CornelisLoad
+Show all goals                            | :CornelisGoals
+Kill and restart the `agda` process       | :CornelisRestart
+Abort running command                     | :CornelisAbort
+Solve constraints                         | :CornelisSolve <RW>
+Jump to definition of name at cursor      | :CornelisGoToDefinition
+Jump to previous goal                     | :CornelisPrevGoal
+Jump to next goal                         | :CornelisNextGoal
+Expand `?`-holes to `{! !}`               | :CornelisQuestionToMeta
+Increment including sub-/superscripts     | :CornelisInc
+Decrement including sub-/superscripts     | :CornelisDec
+Close all info windows                    | :CornelisCloseInfoWindows
+
+#### Cornelis context commands
+
+Fill goal with hole contents                    | :CornelisGive
+Refine goal                                     | :CornelisRefine
+Fill goal with normalized hole contents         | :CornelisElaborate <RW>
+Automatic proof search                          | :CornelisAuto
+Case split                                      | :CornelisMakeCase
+Show goal type and context                      | :CornelisTypeContext <RW>
+Show inferred type of hole contents             | :CornelisTypeInfer <RW>
+Show goal type, context, and inferred type      | :CornelisTypeContextInfer <RW>
+Compute normal form of hole contents            | :CornelisNormalize <CM>
+Show why a given name is in scope               | :CornelisWhyInScope
+Copy inferred type to register `"`              | :CornelisHelperFunc <RW>
+
+### Cornelis CM and RW arguments
+
+<RW> | AsIs, Instantiated, HeadNormal, Simplified, Normalised
+<CM> | DefaultCompute, IgnoreAbstract, UseShowInstance, HeadCompute

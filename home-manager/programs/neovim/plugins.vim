@@ -592,6 +592,25 @@ require('spectre').setup({
 })
 EOF
 
+au BufRead,BufNewFile *.agda call AgdaFiletype()
+au QuitPre *.agda :CornelisCloseInfoWindows
+function! AgdaFiletype()
+    nnoremap <C-c> <Nop>
+    nnoremap <buffer> <leader><C-c><C-l> :CornelisLoad<CR>
+    nnoremap <buffer> <leader><C-c><C-r> :CornelisRefine<CR>
+    nnoremap <buffer> <leader><C-c><C-c> :CornelisMakeCase<CR>
+    nnoremap <buffer> <leader><C-c><C-,> :CornelisTypeContext<CR>
+    nnoremap <buffer> <leader><C-c><C-.> :CornelisTypeContextInfer<CR>
+    nnoremap <buffer> <leader><C-c><C-s> :CornelisSolve<CR>
+    nnoremap <buffer> <leader><C-C><C-a> :CornelisAuto<CR>
+    nnoremap <buffer> <leader><C-C><C-h> :CornelisHelperFunc<CR>
+    nnoremap <buffer> gd        :CornelisGoToDefinition<CR>
+    nnoremap <buffer> [/        :CornelisPrevGoal<CR>
+    nnoremap <buffer> ]/        :CornelisNextGoal<CR>
+    nnoremap <buffer> <C-A>     :CornelisInc<CR>
+    nnoremap <buffer> <C-X>     :CornelisDec<CR>
+endfunction
+
 " SUMMARY
 " a= -> Align on equal sign
 " a- -> Align on case match
