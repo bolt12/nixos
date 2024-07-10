@@ -84,6 +84,7 @@ let
     imv                          # image viewer
     jdk                          # java development kit
     jq                           # JSON processor
+    jujutsu                      # A Git-compatible DVCS that is both simple and powerful
     jre                          # java runtime environment
     killall                      # kill processes by name
     konsole                      # terminal emulator
@@ -347,6 +348,10 @@ in
     autorandr.enable = true;
 
     firefox.enable = true;
+
+    jujutsu = {
+      enable = true;
+    };
   };
 
   services = {

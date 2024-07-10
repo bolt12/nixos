@@ -593,17 +593,19 @@ require('spectre').setup({
 EOF
 
 au BufRead,BufNewFile *.agda call AgdaFiletype()
+au BufRead,BufNewFile *.lagda.md call AgdaFiletype()
 au QuitPre *.agda :CornelisCloseInfoWindows
 function! AgdaFiletype()
     nnoremap <C-c> <Nop>
     nnoremap <buffer> <leader><C-c><C-l> :CornelisLoad<CR>
     nnoremap <buffer> <leader><C-c><C-r> :CornelisRefine<CR>
     nnoremap <buffer> <leader><C-c><C-c> :CornelisMakeCase<CR>
-    nnoremap <buffer> <leader><C-c><C-,> :CornelisTypeContext<CR>
-    nnoremap <buffer> <leader><C-c><C-.> :CornelisTypeContextInfer<CR>
+    nnoremap <buffer> <leader><C-c>tc    :CornelisTypeContext<CR>
+    nnoremap <buffer> <leader><C-c>ti    :CornelisTypeContextInfer<CR>
     nnoremap <buffer> <leader><C-c><C-s> :CornelisSolve<CR>
     nnoremap <buffer> <leader><C-C><C-a> :CornelisAuto<CR>
     nnoremap <buffer> <leader><C-C><C-h> :CornelisHelperFunc<CR>
+    nnoremap <buffer> <leader><C-C><C-n> :CornelisNormalize<CR>
     nnoremap <buffer> gd        :CornelisGoToDefinition<CR>
     nnoremap <buffer> [/        :CornelisPrevGoal<CR>
     nnoremap <buffer> ]/        :CornelisNextGoal<CR>
