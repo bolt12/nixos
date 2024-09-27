@@ -33,8 +33,8 @@ set nofoldenable        " Start with no folds closed (adjust as desired)
 
 " Improve Command Line Experience
 set wildignore+=*\\tmp\\*,*.swp,*.swo,*.zip,.git,.cabal-sandbox
-set wildmode=list:longest,full
 set wildmenu
+set wildmode=list:full,full
 
 " Clipboard integration
 set clipboard=unnamedplus

@@ -331,17 +331,9 @@ require("cheatsheet").setup({
 
     -- For generic cheatsheets like default, unicode, nerd-fonts, etc
     bundled_cheatsheets = true,
-    -- bundled_cheatsheets = {
-    --     enabled = {},
-    --     disabled = {},
-    -- },
 
     -- For plugin specific cheatsheets
     bundled_plugin_cheatsheets = true,
-    -- bundled_plugin_cheatsheets = {
-    --     enabled = {},
-    --     disabled = {},
-    -- }
 
     -- For bundled plugin cheatsheets, do not show a sheet if you
     -- don't have the plugin installed (searches runtimepath for
@@ -365,52 +357,103 @@ local has_words_before = function()
   return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
 end
 
-local luasnip = require'luasnip'
 local cmp = require'cmp'
+local luasnip = require'luasnip'
 
 local haskell_snippets = require('haskell-snippets').all
 luasnip.add_snippets('haskell', haskell_snippets, { key = 'haskell' })
 
-cmp.setup {
+cmp.setup ({
   snippet = {
     expand = function(args)
       luasnip.lsp_expand(args.body) -- For `luasnip` users.
     end,
   },
-  sources = {
+  sources = cmp.config.sources({
     { name = 'nvim_lsp' },
-    { name = 'luasnip' },
-    { name = 'git' }
-  },
+    { name = 'luasnip' }, -- For luasnip users.
+    { name = 'path' },
+    { name = 'cmp_git' },
+  }, {
+    { name = 'buffer' },
+  }),
   mapping = cmp.mapping.preset.insert({
 
-    -- ... Your other mappings ...
+   -- ... Your other mappings ...
 
-    ["<Tab>"] = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.select_next_item()
-      -- You could replace the expand_or_jumpable() calls with expand_or_locally_jumpable()
-      -- that way you will only jump inside the snippet region
-      elseif luasnip.expand_or_locally_jumpable() then
-        luasnip.expand_or_jump()
-      elseif has_words_before() then
-        cmp.complete()
-      else
-        fallback()
-      end
-    end, { "i", "s" }),
+   ["<CR>"] = cmp.mapping({
+     i = function(fallback)
+       if cmp.visible() and cmp.get_active_entry() then
+         cmp.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = false })
+       else
+         fallback()
+       end
+     end,
+     s = cmp.mapping.confirm({ select = true }),
+     c = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = true }),
+   }),
 
-    ["<S-Tab>"] = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.select_prev_item()
-      elseif luasnip.jumpable(-1) then
-        luasnip.jump(-1)
-      else
-        fallback()
-      end
-    end, { "i", "s" }),
+   ["<Tab>"] = cmp.mapping(function(fallback)
+     if cmp.visible() then
+       cmp.select_next_item()
+     elseif luasnip.locally_jumpable(1) then
+       luasnip.jump(1)
+     else
+       fallback()
+     end
+   end, { "i", "s" }),
+
+   ["<S-Tab>"] = cmp.mapping(function(fallback)
+     if cmp.visible() then
+       cmp.select_prev_item()
+     elseif luasnip.locally_jumpable(-1) then
+       luasnip.jump(-1)
+     else
+       fallback()
+     end
+   end, { "i", "s" }),
   })
-}
+})
+cmp.setup.filetype('gitcommit', {
+  sources = cmp.config.sources({
+    { name = 'git' },
+  }, {
+    { name = 'buffer' },
+  })
+})
+require("cmp_git").setup()
+cmp.setup.cmdline(':', {
+  mapping = cmp.mapping.preset.cmdline(),
+  sources = cmp.config.sources({
+    { name = 'path' }
+  }, {
+    {
+      name = 'cmdline',
+      option = {
+        ignore_cmds = { 'Man', '!' }
+      }
+    }
+  })
+})
+
+-- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
+cmp.setup.cmdline({ '/', '?' }, {
+  mapping = cmp.mapping.preset.cmdline(),
+  sources = {
+    { name = 'buffer' }
+  }
+})
+
+-- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+cmp.setup.cmdline(':', {
+  mapping = cmp.mapping.preset.cmdline(),
+  sources = cmp.config.sources({
+    { name = 'path' }
+  }, {
+    { name = 'cmdline' }
+  }),
+  matching = { disallow_symbol_nonprefix_matching = false }
+})
 
 -- The nvim-cmp almost supports LSP's capabilities so You should advertise it to LSP servers..
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
@@ -592,6 +635,63 @@ require('spectre').setup({
 })
 EOF
 
+lua << EOF
+require("ibl").setup()
+EOF
+
+lua << EOF
+local path = "/home/bolt/.config/nvim/custom-plugins/?.lua"
+package.path = package.path .. ";" .. path
+require('chatgpt-ui')
+EOF
+
+lua << EOF
+require('advanced-git-search').setup({
+    -- Browse command to open commits in browser. Default fugitive GBrowse.
+    -- {commit_hash} is the placeholder for the commit hash.
+    browse_command = "GBrowse {commit_hash}",
+    -- when {commit_hash} is not provided, the commit will be appended to the specified command seperated by a space
+    -- browse_command = "GBrowse",
+    -- => both will result in calling `:GBrowse commit`
+
+    -- fugitive or diffview
+    diff_plugin = "delta",
+    -- customize git in previewer
+    -- e.g. flags such as { "--no-pager" }, or { "-c", "delta.side-by-side=false" }
+    git_flags = {
+      "delta.side-by-side=true",
+      "delta.line-numbers=true",
+      "delta.hyperlinks=true",
+      "delta.true-color='always'"
+    },
+    -- customize git diff in previewer
+    -- e.g. flags such as { "--raw" }
+    git_diff_flags = {},
+    -- Show builtin git pickers when executing "show_custom_functions" or :AdvancedGitSearch
+    show_builtin_git_pickers = false,
+    entry_default_author_or_date = "author", -- one of "author" or "date"
+    keymaps = {
+        -- following keymaps can be overridden
+        toggle_date_author = "<C-w>",
+        open_commit_in_browser = "<C-o>",
+        copy_commit_hash = "<C-y>",
+        show_entire_commit = "<C-e>",
+    }
+
+    -- Telescope layout setup
+    telescope_theme = {
+        function_name_1 = {
+            -- Theme options
+        },
+        function_name_2 = "dropdown"
+        -- e.g. realistic example
+        show_custom_functions = {
+            layout_config = { width = 0.4, height = 0.4 },
+        },
+    }
+})
+EOF
+
 au BufRead,BufNewFile *.agda call AgdaFiletype()
 au BufRead,BufNewFile *.lagda.md call AgdaFiletype()
 au QuitPre *.agda :CornelisCloseInfoWindows
@@ -612,6 +712,7 @@ function! AgdaFiletype()
     nnoremap <buffer> <C-A>     :CornelisInc<CR>
     nnoremap <buffer> <C-X>     :CornelisDec<CR>
 endfunction
+
 
 " SUMMARY
 " a= -> Align on equal sign

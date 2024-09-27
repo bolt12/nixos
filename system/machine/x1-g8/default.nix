@@ -26,11 +26,13 @@ in
     kernelModules       = [ "acpi_call" ];
     extraModulePackages =
       with config.boot.kernelPackages; [ acpi_call ];
-    extraModprobeConfig = ''
-      options snd-intel-dspcfg dsp_driver=3
-      options snd_sof sof_debug=128
-    '';
-    blacklistedKernelModules = [ "snd_soc_skl" ];
+    # extraModprobeConfig = ''
+    #   options snd-hda-intel model=generic
+    #   options snd slots=snd-hda-intel
+    #   options snd-intel-dspcfg dsp_driver=1
+    #   options snd_sof sof_debug=128
+    # '';
+    blacklistedKernelModules = [ ]; # "snd_soc_skl" ];
     plymouth.enable          = true;
     tmp = {
       useTmpfs    = true;
@@ -112,7 +114,6 @@ in
       alsa.enable        = true;
       alsa.support32Bit  = true;
       pulse.enable       = true;
-      # jack.enable      = true;
       wireplumber.enable = true;
     };
 

@@ -6,7 +6,7 @@ echo "Select the configuration to apply:"
 
 # Function for NixOS configuration
 apply_nixos_config() {
-    sudo nixos-rebuild --flake .#bolt-nixos switch
+    sudo nixos-rebuild --flake .#bolt-nixos switch --upgrade
 }
 
 build_rpi5_sd_image() {

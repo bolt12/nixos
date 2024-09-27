@@ -32,6 +32,12 @@ let
       sha256 = "sha256-TjGvY3eqpF+DDwatT7A78flyPcTkcLHQ1xcg+MKgCoE="; # Replace with the correct hash
     };
 
+    luaWithPackages = pkgs.lua.withPackages (ps:
+      with ps; [
+        cjson
+        luasocket
+      ]);
+
   # Unstable branch packages
   unstablePkgs = [
     (unstable.agda.withPackages (p: [
@@ -51,6 +57,8 @@ let
   defaultPkgs = with pkgs; [
     alloy                        # model checker
     alsa-utils                   # sound utils
+    arduino                      # arduino toolkit
+    anki                         # anki flashcards
     awscli2                      # aws cli v2
     bash                         # bash
     bc                           # gnu calculator
@@ -70,6 +78,7 @@ let
     fzf                          # fuzzy finder
     gawk                         # text processing programming language
     gh                           # Github CLI
+    git-absorb                   # git commit --fixup, but automatic
     git-annex                    # git annex
     git-extras                   # git extra commands like 'git sed'
     glib                         # gsettings
@@ -92,6 +101,7 @@ let
     libreoffice                  # office suite
     lm_sensors                   # CPU sensors
     lsof                         # A tool to list open files
+    luaWithPackages              # Lua with packages
     lxappearance                 # edit themes
     lxmenu-data                  # desktop menus - enables "open with" options
     manix                        # nix manual

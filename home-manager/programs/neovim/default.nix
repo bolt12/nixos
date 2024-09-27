@@ -80,16 +80,26 @@ let
     '';
   };
 
+  advanced-search = pkgs.vimUtils.buildVimPlugin {
+    name = "advanced-search";
+    src = inputs.advanced-search;
+  };
+
   overriddenPlugins = with pkgs; [ ];
 
   unstablePlugins = with plugins-unstable; [
+    indent-blankline-nvim   # indente blank lines
   ];
 
   myVimPlugins = with plugins; [
+    advanced-search         # advanced git search extension
     barbar-nvim             # fancy status bar
     base16-vim              # colors
     cheatsheet-nvim         # command cheatsheet
     cmp-git                 # auto complete sources
+    cmp-cmdline             # auto complete sources
+    cmp-buffer              # auto complete sources
+    cmp-path                # auto complete sources
     cmp_luasnip             # snippets
     cmp-nvim-lsp            # auto complete sources
     colorizer               # colors
@@ -111,6 +121,7 @@ let
     nvim-lspconfig          # LSP config support
     nvim-spectre            # a search panel for neovim
     nvim-web-devicons       # file icons
+    nui-nvim                # ui building plugin
     plenary-nvim            # lua dependency for other plugins
     popup-nvim              # popups
     rainbow_parentheses-vim # for nested parentheses
@@ -159,5 +170,9 @@ in
 
   xdg.configFile = {
     "nvim/cheatsheet.txt".text = cheatsheetTxt;
+    "nvim/custom-plugins" = {
+      recursive = true;
+      source = ./custom-plugins;
+    };
   };
 }

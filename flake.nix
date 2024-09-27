@@ -83,17 +83,21 @@
       repo = "gh.nvim";
       flake = false;
     };
-
     telescope-ui-select-nvim = {
       type = "github";
       owner = "nvim-telescope";
       repo = "telescope-ui-select.nvim";
       flake = false;
     };
-
     cornelis = {
       url = "github:isovector/cornelis";
       inputs.nixpkgs.follows = "nixpkgs";
+    };
+    advanced-search = {
+      type = "github";
+      owner = "aaronhallaert";
+      repo = "advanced-git-search.nvim";
+      flake = false;
     };
   };
 

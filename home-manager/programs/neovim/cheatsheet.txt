@@ -223,3 +223,43 @@ Copy inferred type to register `"`              | :CornelisHelperFunc <RW>
 
 <RW> | AsIs, Instantiated, HeadNormal, Simplified, Normalised
 <CM> | DefaultCompute, IgnoreAbstract, UseShowInstance, HeadCompute
+
+
+## Git Advanced Search
+
+## Search Log Content
+Search through repository's commit logs              | :AdvancedGitSearch search_log_content
+Open diff of current file with selected commit       | <CR>
+Show entire commit with diff                         | <C-e>
+Open commit in browser                               | <C-o>
+Copy commit hash to clipboard                        | <C-y>
+Toggle date and author in entry                      | <C-w>
+
+## Search Log Content (File)
+Search commit logs related to the current file       | :AdvancedGitSearch search_log_content_file
+Open diff of current file with selected commit       | <CR>
+Show entire commit with diff                         | <C-e>
+Open commit in browser                               | <C-o>
+Copy commit hash to clipboard                        | <C-y>
+Toggle date and author in entry                      | <C-w>
+
+## Diff Commit File
+View differences between a file and its commit       | :AdvancedGitSearch diff_commit_file
+Open diff of current file with selected commit       | <CR>
+Show entire commit with diff                         | <C-e>
+Open commit in browser                               | <C-o>
+Copy commit hash to clipboard                        | <C-y>
+Toggle date and author in entry                      | <C-w>
+
+## Diff Commit Line
+View differences for a specific line of code         | :AdvancedGitSearch diff_commit_line
+Open diff for the selected commit                    | <CR>
+Open commit in browser                               | <C-o>
+
+## Diff Branch File
+View differences between a file and a branch         | :AdvancedGitSearch diff_branch_file
+Open diff for the selected branch                    | <CR>
+
+## Checkout Reflog
+Checkout from reflog entries                         | :AdvancedGitSearch checkout_reflog
+Checkout selected reflog entry                       | <CR>
