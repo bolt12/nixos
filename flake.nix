@@ -93,7 +93,7 @@
       url = "github:isovector/cornelis";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    advanced-search = {
+    advanced-git-search-nvim = {
       type = "github";
       owner = "aaronhallaert";
       repo = "advanced-git-search.nvim";

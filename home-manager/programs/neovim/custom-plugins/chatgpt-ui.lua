@@ -64,7 +64,8 @@ local function create_api_payload(custom_prompt, journal_content)
                 role = "user",
                 content = custom_prompt .. "\n\n```" .. journal_content .. "```"
             }
-        }
+        },
+        temperature = 0.35,
     })
 end
 

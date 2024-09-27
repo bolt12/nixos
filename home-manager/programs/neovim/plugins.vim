@@ -249,6 +249,49 @@ require('telescope').setup{
         preview_height = 0.8,
       },
     },
+    advanced_git_search = {
+      -- Browse command to open commits in browser. Default fugitive GBrowse.
+      -- {commit_hash} is the placeholder for the commit hash.
+      browse_command = "GBrowse {commit_hash}",
+      -- when {commit_hash} is not provided, the commit will be appended to the specified command seperated by a space
+      -- browse_command = "GBrowse",
+      -- => both will result in calling `:GBrowse commit`
+
+      -- fugitive or diffview
+      diff_plugin = "delta",
+      -- customize git in previewer
+      -- e.g. flags such as { "--no-pager" }, or { "-c", "delta.side-by-side=false" }
+      git_flags = {
+        "delta.side-by-side=true",
+        "delta.line-numbers=true",
+        "delta.hyperlinks=true",
+        "delta.true-color='always'"
+      },
+      -- customize git diff in previewer
+      -- e.g. flags such as { "--raw" }
+      git_diff_flags = {},
+      -- Show builtin git pickers when executing "show_custom_functions" or :AdvancedGitSearch
+      show_builtin_git_pickers = false,
+      entry_default_author_or_date = "author", -- one of "author" or "date"
+      keymaps = {
+          -- following keymaps can be overridden
+          toggle_date_author = "<C-w>",
+          open_commit_in_browser = "<C-o>",
+          copy_commit_hash = "<C-y>",
+          show_entire_commit = "<C-e>",
+    },
+    -- Telescope layout setup
+    telescope_theme = {
+        function_name_1 = {
+            -- Theme options
+        },
+        function_name_2 = "dropdown",
+        -- e.g. realistic example
+        show_custom_functions = {
+            layout_config = { width = 0.4, height = 0.4 },
+        },
+    }
+},
     ["ui-select"] = {
       require("telescope.themes").get_dropdown {
         -- even more opts
@@ -317,6 +360,7 @@ require('telescope').setup{
 -- load_extension, somewhere after setup function:
 require("telescope").load_extension("ui-select")
 require("telescope").load_extension("undo")
+require("telescope").load_extension("advanced_git_search")
 EOF
 
 " Find files using Telescope command-line sugar.
@@ -381,17 +425,18 @@ cmp.setup ({
 
    -- ... Your other mappings ...
 
-   ["<CR>"] = cmp.mapping({
-     i = function(fallback)
-       if cmp.visible() and cmp.get_active_entry() then
-         cmp.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = false })
-       else
-         fallback()
-       end
-     end,
-     s = cmp.mapping.confirm({ select = true }),
-     c = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = true }),
-   }),
+   -- ["<CR>"] = cmp.mapping({
+   --   i = function(fallback)
+   --     if cmp.visible() and cmp.get_active_entry() then
+   --       cmp.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = false })
+   --     else
+   --       fallback()
+   --     end
+   --   end,
+   --   s = cmp.mapping.confirm({ select = true }),
+   --   c = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = true }),
+   -- }),
+   ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
 
    ["<Tab>"] = cmp.mapping(function(fallback)
      if cmp.visible() then
@@ -643,53 +688,6 @@ lua << EOF
 local path = "/home/bolt/.config/nvim/custom-plugins/?.lua"
 package.path = package.path .. ";" .. path
 require('chatgpt-ui')
-EOF
-
-lua << EOF
-require('advanced-git-search').setup({
-    -- Browse command to open commits in browser. Default fugitive GBrowse.
-    -- {commit_hash} is the placeholder for the commit hash.
-    browse_command = "GBrowse {commit_hash}",
-    -- when {commit_hash} is not provided, the commit will be appended to the specified command seperated by a space
-    -- browse_command = "GBrowse",
-    -- => both will result in calling `:GBrowse commit`
-
-    -- fugitive or diffview
-    diff_plugin = "delta",
-    -- customize git in previewer
-    -- e.g. flags such as { "--no-pager" }, or { "-c", "delta.side-by-side=false" }
-    git_flags = {
-      "delta.side-by-side=true",
-      "delta.line-numbers=true",
-      "delta.hyperlinks=true",
-      "delta.true-color='always'"
-    },
-    -- customize git diff in previewer
-    -- e.g. flags such as { "--raw" }
-    git_diff_flags = {},
-    -- Show builtin git pickers when executing "show_custom_functions" or :AdvancedGitSearch
-    show_builtin_git_pickers = false,
-    entry_default_author_or_date = "author", -- one of "author" or "date"
-    keymaps = {
-        -- following keymaps can be overridden
-        toggle_date_author = "<C-w>",
-        open_commit_in_browser = "<C-o>",
-        copy_commit_hash = "<C-y>",
-        show_entire_commit = "<C-e>",
-    }
-
-    -- Telescope layout setup
-    telescope_theme = {
-        function_name_1 = {
-            -- Theme options
-        },
-        function_name_2 = "dropdown"
-        -- e.g. realistic example
-        show_custom_functions = {
-            layout_config = { width = 0.4, height = 0.4 },
-        },
-    }
-})
 EOF
 
 au BufRead,BufNewFile *.agda call AgdaFiletype()

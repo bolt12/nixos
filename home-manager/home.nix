@@ -28,7 +28,7 @@ let
   agdaStdlibSrc = pkgs.fetchFromGitHub {
       owner = "agda";
       repo = "agda-stdlib";
-      rev = "v2.0";
+      rev = "v2.1.1";
       sha256 = "sha256-TjGvY3eqpF+DDwatT7A78flyPcTkcLHQ1xcg+MKgCoE="; # Replace with the correct hash
     };
 
@@ -40,9 +40,9 @@ let
 
   # Unstable branch packages
   unstablePkgs = [
-    (unstable.agda.withPackages (p: [
+    (pkgs.agda.withPackages (p: [
       (p.standard-library.overrideAttrs (oldAttrs: {
-        version = "v2.0";
+        version = "v2.1.1";
         src = agdaStdlibSrc;
       }))
     ]))
@@ -57,8 +57,8 @@ let
   defaultPkgs = with pkgs; [
     alloy                        # model checker
     alsa-utils                   # sound utils
-    arduino                      # arduino toolkit
     anki                         # anki flashcards
+    arduino                      # arduino toolkit
     awscli2                      # aws cli v2
     bash                         # bash
     bc                           # gnu calculator
@@ -93,8 +93,8 @@ let
     imv                          # image viewer
     jdk                          # java development kit
     jq                           # JSON processor
-    jujutsu                      # A Git-compatible DVCS that is both simple and powerful
     jre                          # java runtime environment
+    jujutsu                      # A Git-compatible DVCS that is both simple and powerful
     killall                      # kill processes by name
     konsole                      # terminal emulator
     libcamera                    # open source camera stack for linux

@@ -51,9 +51,12 @@ let
   defaultPkgs = with pkgs; [
     alloy                        # model checker
     alsa-utils                   # sound utils
+    anki                         # anki flashcards
+    arduino                      # arduino toolkit
     awscli2                      # aws cli v2
     bash                         # bash
     bc                           # gnu calculator
+    blueman                      # bluetooth applet
     cachix                       # nix caching
     chromium                     # google chrome
     deluge                       # torrent client
@@ -67,36 +70,43 @@ let
     fzf                          # fuzzy finder
     gawk                         # text processing programming language
     gh                           # Github CLI
+    git-absorb                   # git commit --fixup, but automatic
     git-annex                    # git annex
     git-extras                   # git extra commands like 'git sed'
     glib                         # gsettings
     google-chrome                # A freeware web browser developed by Google
     gsettings-desktop-schemas    # theming related
     gtk3                         # gtk3 lib
+    gtk-engine-murrine           # theme engine
+    gtk_engines                  # theme engines
+    helvum                       # sound
     imv                          # image viewer
     jdk                          # java development kit
     jq                           # JSON processor
     jre                          # java runtime environment
+    jujutsu                      # A Git-compatible DVCS that is both simple and powerful
     killall                      # kill processes by name
     konsole                      # terminal emulator
     libcamera                    # open source camera stack for linux
     libreoffice                  # office suite
     lm_sensors                   # CPU sensors
     lsof                         # A tool to list open files
+    luaWithPackages              # Lua with packages
     manix                        # nix manual
     mpv                          # video player
     ncdu                         # disk space info (a better du)
     neofetch                     # command-line system information
-    nettools                     # ifconfig and friends
+    networkmanagerapplet         # nm-applet
     nix-bash-completions         # nix bash completions
     nix-doc                      # nix documentation search tool
     nix-index                    # nix locate files
     nixops                       # nixops
     nix-tree                     # interactively browse a Nix store paths dependencies
-    nixgl.nixGLIntel             # fix driver issues in non-nixos nix setups
     nmap                         # network map
     nodejs                       # nodejs
     noip                         # noip
+    numix-cursor-theme           # icon theme
+    numix-icon-theme-circle      # icon theme
     obs-studio                   # obs-studio
     pamixer                      # pulseaudio cli mixer
     paprefs                      # pulseaudio preferences
@@ -109,19 +119,19 @@ let
     pulsemixer                   # pulseaudio mixer
     python3                      # python3 programming language
     ripgrep                      # ripgrep
-    # rnix-lsp                     # nix lsp server
-    shared-mime-info             # mime info
     silicon                      # create beautiful code imgs
     simplescreenrecorder         # self-explanatory
     skypeforlinux                # skype for linux
     slack                        # slack client
     sof-firmware                 # Sound Open Firmware
+    spotify                      # spotify client
     thunderbird                  # mail client
     tldr                         # summary of a man page
     tree                         # display files in a tree view
     unzip                        # unzip
     vlc                          # media player
     vscode                       # visual studio code
+    weechat                      # weechat irc client
     wget                         # cli wget
     wireguard-tools              # wireguard
     xarchiver                    # xarchiver gtk frontend
