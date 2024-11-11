@@ -28,6 +28,7 @@ in
         export XDG_SESSION_TYPE=wayland
         export XDG_CURRENT_DESKTOP=sway
         export NIXOS_OZONE_WL=1=sway
+        export WLR_DRM_NO_MODIFIERS="1";
 
         export _JAVA_OPTIONS="-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dsun.java2d.xrender=true";
         export MOZ_DISABLE_RDD_SANDBOX="1";

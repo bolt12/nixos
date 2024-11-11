@@ -41,6 +41,16 @@ in
     runSize = "75%"; # Size of useTmpfs defaults to 50% of RAM
   };
 
+  i18n.inputMethod.fcitx5 = {
+    waylandFrontend = true;
+    settings.globalOptions = {
+      SwitchKey = "Shift_L+Shift_R";
+    };
+    quickPhraseFiles = {
+      latex = ../../../home-manager/programs/fcitx5/latex.mb;
+    };
+  };
+
   # Intel UHD 620 Hardware Acceleration
   hardware.opengl = {
     enable = true;
@@ -83,6 +93,8 @@ in
     variables.EDITOR                              = "nvim";
     variables.VISUAL                              = "nvim";
     variables.NIXOS_OZONE_WL                      = "1";
+    variables.WLR_DRM_NO_MODIFIERS                = "1";
+    variables.SDL_IM_MODULE                       = "fcitx5";
 
     # List packages installed in system profile. To search, run:
     # $ nix search wget

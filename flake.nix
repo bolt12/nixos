@@ -9,7 +9,6 @@
   };
 
   inputs = {
-    nixpkgs-23-05.url = "github:NixOS/nixpkgs/nixos-23.05";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     home-manager = {
@@ -26,6 +25,7 @@
     };
 
     raspberry-pi-nix.url = "github:tstat/raspberry-pi-nix";
+    emanote.url = "github:srid/emanote/1.2.0";
 
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
     emacs-overlay.url = "github:nix-community/emacs-overlay";
@@ -174,7 +174,7 @@
             };
 
             # Says we are going to deploy to an already existing NixOS machine
-            deployment.targetHost = "192.168.1.110";
+            deployment.targetHost = "10.100.0.1";
 
             imports = [
               ./system/machine/rpi/rpi5.nix

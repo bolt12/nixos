@@ -105,6 +105,7 @@ let
     colorizer                # colors
     cornelis                 # agda-mode for neovim
     friendly-snippets        # snippets
+    fcitx-vim                # Keep and restore fcitx state when leaving/re-entering insert mode or search mode
     gh-nvim                  # gh code review plugin
     git-messenger-vim        # Check git commits on cursor hover
     gitsigns-nvim            # git integration

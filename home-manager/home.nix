@@ -94,7 +94,6 @@ let
     jdk                          # java development kit
     jq                           # JSON processor
     jre                          # java runtime environment
-    jujutsu                      # A Git-compatible DVCS that is both simple and powerful
     killall                      # kill processes by name
     konsole                      # terminal emulator
     libcamera                    # open source camera stack for linux
@@ -175,7 +174,7 @@ let
     unstable.wl-clipboard
     unstable.wl-gammactl
     unstable.wlogout
-    unstable.wlroots
+    unstable.wlroots_0_18
     unstable.wlsunset
     unstable.wofi
     unstable.xdg-desktop-portal
@@ -254,6 +253,22 @@ in
                                        ];
   };
 
+  i18n = {
+    inputMethod = {
+      enabled = "fcitx5";
+      fcitx5 = {
+        addons = with pkgs;
+          [ fcitx5-gtk
+            fcitx5-configtool
+            fcitx5-mozc
+            fcitx5-nord
+            fcitx5-rime
+          ];
+      };
+    };
+  };
+
+
   home = {
     enableNixpkgsReleaseCheck = true;
 
@@ -292,6 +307,7 @@ in
       VISUAL="nvim";
       XDG_CURRENT_DESKTOP="sway";
       XDG_SESSION_TYPE="wayland";
+      WLR_DRM_NO_MODIFIERS="1";
     };
 
     sessionPath = [
@@ -358,10 +374,6 @@ in
     autorandr.enable = true;
 
     firefox.enable = true;
-
-    jujutsu = {
-      enable = true;
-    };
   };
 
   services = {

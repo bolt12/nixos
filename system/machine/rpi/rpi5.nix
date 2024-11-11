@@ -4,10 +4,9 @@
 
 { config, lib, pkgs, raspberry-pi-nix, inputs, ... }@attrs:
 
-let pkgs-23-05 = import inputs.nixpkgs-23-05 {
-                    system = "aarch64-linux";
-                 };
-in {
+{
+  # bcm2712 for rpi 5
+  raspberry-pi-nix.board = "bcm2712";
 
   systemd = {
     services = {
@@ -22,7 +21,7 @@ in {
 
         serviceConfig = {
           ExecStart = ''
-            ${pkgs-23-05.haskellPackages.emanote}/bin/emanote --layers "/home/bolt/journal" run --host=0.0.0.0 --port=7000
+            ${inputs.emanote}/bin/emanote --layers "/home/bolt/journal" run --host=0.0.0.0 --port=7000
           '';
         };
       };
@@ -36,10 +35,10 @@ in {
       with pkgs; [
         bluez
         bluez-tools
-        pkgs-23-05.emanote
         git
         git-annex
         git-annex-utils
+        inputs.emanote
         iptables
         libraspberrypi
         neovim

@@ -121,9 +121,9 @@ bindsym $mod+Shift+9 move container to workspace $ws9
 bindsym $mod+Shift+0 move container to workspace $ws10
 
 # Assign workspaces to monitors
-workspace $ws1 output HDMI-A-1
-workspace $ws2 output HDMI-A-1
-workspace $ws3 output eDP-1
+workspace $ws1 output "OOO BW-GM3 0000000000001" HDMI-A-1
+workspace $ws2 output "OOO BW-GM3 0000000000001" HDMI-A-1
+workspace $ws3 output eDP-1 "LG Electronics LG HDR 4K 0x000694F9"
 
 # Move currently focused window to scratchpad
 bindsym $mod+Shift+minus move scratchpad
@@ -205,9 +205,15 @@ bar {
 
 #********************************************************************************
 
+# fcixt5 will manage my inputs
+#input "type:keyboard" {
+#    xkb_layout us,pt
+#    xkb_options caps:escape,grp:shifts_toggle
+#}
+
 input "type:keyboard" {
-    xkb_layout us,pt
-    xkb_options caps:escape,grp:shifts_toggle
+    xkb_layout us
+    xkb_options caps:escape
 }
 
 input "type:touchpad" {
@@ -215,7 +221,43 @@ input "type:touchpad" {
     natural_scroll enabled
 }
 
-output HDMI-A-1 scale 1.75
+output eDP-1 {
+  position 0 1326
+}
+
+output HDMI-A-1 {
+   # ...config options...
+   scale 1.75
+   mode 3840x2160@30.000Hz
+   transform 90
+   enable
+}
+output "OOO BW-GM3 0000000000001" {
+   # ...config options...
+   # scale 1.32
+   # mode 3840x2160@60.000Hz
+   mode 2560x1080@60.000Hz
+   position 1920 1326
+   enable
+}
+output "LG Electronics LG HDR 4K 0x000694F9" {
+   # ...config options...
+   # scale 1.75
+   # mode 3840x2160@30.000Hz
+   scale 1.5
+   mode 2560x1440@60.000Hz
+   position 4480 880
+   transform 270
+   enable
+}
+
+focus output "OOO BW-GM3 0000000000001"
+
+set $laptop eDP-1
+bindswitch --reload --locked lid:on output $laptop disable
+bindswitch --reload --locked lid:off output $laptop enable
+
+exec_always ./laptop-lid.sh
 
 output "*" bg ~/Documents/background.png fill
 exec_always flashfocus
@@ -243,6 +285,9 @@ exec_always nm-applet --indicator
 
 # blueman-applet
 exec_always blueman-applet
+
+# fcitx 5
+exec fcitx5
 
 exec --no-startup-id wireplumber
 
