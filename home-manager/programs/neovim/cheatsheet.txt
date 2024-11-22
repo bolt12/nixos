@@ -263,3 +263,17 @@ Open diff for the selected branch                    | <CR>
 ## Checkout Reflog
 Checkout from reflog entries                         | :AdvancedGitSearch checkout_reflog
 Checkout selected reflog entry                       | <CR>
+
+## Which-key
+
+### Which-key Controls
+Show Which-key Popup            | `<leader>?`
+Toggle Which-key Display        | `<leader>wk`
+Refresh Which-key Configuration | `<leader>wr`
+
+### Which-key Settings
+Open Which-key Settings  | `<leader>ws`
+Reset Which-key Mappings | `<leader>wr`
+
+### Help and Documentation
+Open Which-key Documentation | `<leader>wd`

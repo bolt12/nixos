@@ -104,10 +104,10 @@ let
     cmp-path                 # auto complete sources
     colorizer                # colors
     cornelis                 # agda-mode for neovim
-    friendly-snippets        # snippets
     fcitx-vim                # Keep and restore fcitx state when leaving/re-entering insert mode or search mode
+    friendly-snippets        # snippets
     gh-nvim                  # gh code review plugin
-    git-messenger-vim        # Check git commits on cursor hover
+    # git-messenger-vim        # Check git commits on cursor hover
     gitsigns-nvim            # git integration
     gruvbox-community        # color theme
     haskell-snippets         # snippets
@@ -122,6 +122,7 @@ let
     nvim-cmp                 # auto complete
     nvim-lspconfig           # LSP config support
     nvim-spectre             # a search panel for neovim
+    nvim-treesitter.withAllGrammars
     nvim-web-devicons        # file icons
     plenary-nvim             # lua dependency for other plugins
     popup-nvim               # popups
@@ -144,6 +145,8 @@ let
     vim-pandoc-syntax        # pandoc syntax support
     vim-silicon              # vim Silicon integration
     vim-surround             # quickly edit surroundings (brackets, html tags, etc)
+    which-key-nvim           # WhichKey helps you remember your Neovim keymap
+    wilder-nvim              # wild menu enhancements
     zk-nvim                  # zk plugin
   ] ++ unstablePlugins
   ++ overriddenPlugins;
