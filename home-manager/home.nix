@@ -18,6 +18,7 @@ let
     "spotify-unwrapped"
     "steam"
     "steam-original"
+    "steam-unwrapped"
     "unrar"
     "vscode"
     "zoom-us"
@@ -28,7 +29,7 @@ let
   agdaStdlibSrc = pkgs.fetchFromGitHub {
       owner = "agda";
       repo = "agda-stdlib";
-      rev = "v2.1.1";
+      rev = "master";
       sha256 = "sha256-TjGvY3eqpF+DDwatT7A78flyPcTkcLHQ1xcg+MKgCoE="; # Replace with the correct hash
     };
 
@@ -40,12 +41,12 @@ let
 
   # Unstable branch packages
   unstablePkgs = [
-    (pkgs.agda.withPackages (p: [
-      (p.standard-library.overrideAttrs (oldAttrs: {
-        version = "v2.1.1";
-        src = agdaStdlibSrc;
-      }))
-    ]))
+    # (unstable.agda.withPackages (p: [
+    #   (p.standard-library.overrideAttrs (oldAttrs: {
+    #     version = "master";
+    #     src = agdaStdlibSrc;
+    #   }))
+    # ]))
 
     unstable.nixd
   ];
@@ -72,7 +73,7 @@ let
     evince                       # pdf reader
     fd                           # file finder
     feh                          # image viewer
-    ffmpeg_5-full                # A complete, cross-platform solution to record, convert and stream audio and video
+    ffmpeg_6-full                # A complete, cross-platform solution to record, convert and stream audio and video
     findutils                    # find files utilities
     flashfocus                   # focus wm
     fzf                          # fuzzy finder
@@ -104,6 +105,7 @@ let
     lxappearance                 # edit themes
     lxmenu-data                  # desktop menus - enables "open with" options
     manix                        # nix manual
+    mission-center               # hardware monitoring
     mpv                          # video player
     ncdu                         # disk space info (a better du)
     neofetch                     # command-line system information
@@ -127,7 +129,6 @@ let
     pavucontrol                  # pulseaudio volume control
     pcmanfm                      # file manager
     playerctl                    # music player controller
-    psensor                      # hardware monitoring
     pulsemixer                   # pulseaudio mixer
     python3                      # python3 programming language
     ripgrep                      # ripgrep
@@ -187,7 +188,7 @@ let
     diff-so-fancy
   ];
 
-  gnomePkgs = with pkgs.gnome3; [
+  gnomePkgs = with pkgs.gnome; [
     gnome-calendar # calendar
     gnome-control-center
     gnome-power-manager
@@ -224,7 +225,7 @@ let
     pkgs.liberation_ttf
     pkgs.material-icons
     pkgs.noto-fonts
-    pkgs.noto-fonts-cjk
+    pkgs.noto-fonts-cjk-sans
     pkgs.noto-fonts-extra
     pkgs.open-dyslexic
     pkgs.open-sans

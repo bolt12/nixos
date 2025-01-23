@@ -2,17 +2,17 @@
   description = "A flake to build my NixOS configuration";
 
   nixConfig = {
-    extra-substituters = [ "https://raspberry-pi-nix.cachix.org" ];
+    extra-substituters = [ "https://nix-community.cachix.org" ];
     extra-trusted-public-keys = [
-      "raspberry-pi-nix.cachix.org-1:WmV2rdSangxW0rZjY/tBvBDSaNFQ3DyEQsVw8EvHn9o="
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
     ];
   };
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     home-manager = {
-      url = "github:nix-community/home-manager/release-24.05";
+      url = "github:nix-community/home-manager/release-24.11";
       # The `follows` keyword in inputs is used for inheritance.
       # Here, `inputs.nixpkgs` of home-manager is kept consistent with
       # the `inputs.nixpkgs` of the current flake,
@@ -24,7 +24,7 @@
       url = "github:NixOS/nixops";
     };
 
-    raspberry-pi-nix.url = "github:tstat/raspberry-pi-nix";
+    raspberry-pi-nix.url = "github:nix-community/raspberry-pi-nix";
     emanote.url = "github:srid/emanote/1.2.0";
 
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
@@ -122,6 +122,7 @@
 
           specialArgs = {inherit inputs;};
           modules = [ inputs.raspberry-pi-nix.nixosModules.raspberry-pi
+                      inputs.raspberry-pi-nix.nixosModules.sd-image
                       ./system/machine/rpi/rpi-basic.nix
                     ];
         }).config.system.build.sdImage;
@@ -160,7 +161,9 @@
           defaults = { ... }: {
             imports = [
               inputs.raspberry-pi-nix.nixosModules.raspberry-pi
+              ./system/machine/rpi/hardware-configuration.nix
               ./system/machine/rpi/rpi-basic.nix
+              ./system/machine/rpi/rpi5.nix
             ];
           };
 
@@ -174,7 +177,7 @@
             };
 
             # Says we are going to deploy to an already existing NixOS machine
-            deployment.targetHost = "10.100.0.1";
+            deployment.targetHost = "192.168.1.110";
 
             imports = [
               ./system/machine/rpi/rpi5.nix

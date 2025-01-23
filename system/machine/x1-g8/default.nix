@@ -12,7 +12,7 @@ in
 {
   # Use the GRUB 2 boot loader.
   boot = {
-    kernelPackages = pkgs.linuxPackages_latest;
+    kernelPackages = pkgs.linuxPackages_6_12;
     loader         = {
       efi = {
         canTouchEfiVariables = true;
@@ -54,7 +54,6 @@ in
   # Intel UHD 620 Hardware Acceleration
   hardware.opengl = {
     enable = true;
-    driSupport = true;
     driSupport32Bit = true;
     extraPackages = with pkgs; [
       vaapiIntel
@@ -190,8 +189,6 @@ in
     };
   };
 
-  sound.enable = true;
-
   networking = {
     interfaces.wlp0s20f3.useDHCP = true;
     interfaces.enp0s31f6.useDHCP = true;
@@ -216,10 +213,10 @@ in
 
           {
             # Public key of the server (not a file path).
-            publicKey = "MOdy/dZZKa4Ra4zGoQZ30FtXkZxHdpLgBH+DTG2YQRc=";
+            publicKey = "2OIP77a10/Fas+eCvYQNa3ixFNOq0JqZIuSk1tY/QTM=";
 
             # Forward all the traffic via VPN.
-            allowedIPs = [ "0.0.0.0/0" "::0/0" ];
+            allowedIPs = [ "0.0.0.0/0" ];
             # Or forward only particular subnets
             #allowedIPs = [ "10.100.0.1" "91.108.12.0/22" ];
 
