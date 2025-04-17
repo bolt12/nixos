@@ -653,9 +653,13 @@ require("ibl").setup()
 EOF
 
 lua << EOF
-local path = "/home/bolt/.config/nvim/custom-plugins/?.lua"
-package.path = package.path .. ";" .. path
+-- Define the directory containing your custom plugins.
+local plugins_dir = "/home/bolt/.config/nvim/custom-plugins"
+-- Add that directory to package.path.
+package.path = package.path .. ";" .. plugins_dir .. "/?.lua"
+
 require('chatgpt-ui')
+require('journal-wrap-images')
 EOF
 
 lua << EOF

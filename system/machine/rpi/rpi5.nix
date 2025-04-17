@@ -77,6 +77,19 @@
       pulse.enable = true;
     };
 
+    # Google photos clone
+    # Does not work due to page size
+    # postgresql = {
+    #   enable = true;
+    #   package = pkgs.postgresql_16_jit;
+    #   extensions = [ pkgs.postgresql16Packages.pgvecto-rs ];
+    # };
+
+    # immich = {
+    #   enable = false;
+    #   database.enable = false;
+    # };
+
     # Setting up Unbound as a recursive DNS Server
     # Check https://docs.pi-hole.net/guides/dns/unbound/#configure-unbound
     unbound = {
@@ -112,7 +125,9 @@
                               "10.0.0.0/8"
                             ];
 
-          access-control = [ "192.168.0.0/16 allow" ];
+          access-control = [ "192.168.0.0/16 allow"
+                             "10.100.0.0/16 allow"
+                           ];
           qname-minimisation = "yes";
         };
         remote-control = {

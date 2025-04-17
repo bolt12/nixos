@@ -49,6 +49,7 @@ let
     # ]))
 
     unstable.nixd
+    unstable.aider-chat
   ];
 
   # Extra packages from user repos
@@ -389,6 +390,7 @@ in
     swayidle.enable = true;
     poweralertd.enable = true;
     autorandr.enable = true;
+    safeeyes.enable = true;
   };
 
 }
