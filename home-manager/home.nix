@@ -327,6 +327,7 @@ in
     ./programs/git/default.nix
     ./programs/neovim/default.nix
     ./programs/sway/default.nix
+    ./programs/tmux/default.nix
     ./programs/waybar/default.nix
     ./programs/wofi/default.nix
     ./xdg/sway/default.nix

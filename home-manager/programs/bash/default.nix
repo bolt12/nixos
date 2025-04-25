@@ -7,8 +7,6 @@
         # If not running interactively, don't do anything
         [[ $- != *i* ]] && return
 
-        shopt -s progcomp
-
         neofetch
         set -o vi
 

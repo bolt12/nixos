@@ -277,3 +277,42 @@ Reset Which-key Mappings | `<leader>wr`
 
 ### Help and Documentation
 Open Which-key Documentation | `<leader>wd`
+
+## Tmux bindings (Prefix: C-a)
+
+List sessions                          | `C-a s`
+Detach current session                 | `C-a d`
+Save session (tmux-resurrect)          | `C-a C-s`
+Restore last session (tmux-resurrect)  | `C-a C-r`
+Create new window                      | `C-a c`
+Go to next window                      | `C-a n`
+Go to previous window                  | `C-a p`
+Go to window number (0-9)              | `C-a <number>`
+List windows                           | `C-a w`
+Rename current window                  | `C-a ,`
+Kill current window (confirm)          | `C-a &`
+Go to last active window               | `C-a L`
+Split pane vertically (current path)   | `C-a                                                           | `
+Split pane horizontally (current path) | `C-a -`
+Select pane left                       | `C-a h`
+Select pane down                       | `C-a j`
+Select pane up                         | `C-a k`
+Select pane right                      | `C-a l`
+Resize pane left (repeatable)          | `C-a C-h`
+Resize pane down (repeatable)          | `C-a C-j`
+Resize pane up (repeatable)            | `C-a C-k`
+Resize pane right (repeatable)         | `C-a C-l`
+Toggle current pane zoom               | `C-a z`
+Kill current pane (confirm)            | `C-a x`
+Enter copy mode                        | `C-a [`
+*Navigate*                             | Standard Vi keys (`h, j, k, l, w, b, e, G, gg, ^, 0, $`, etc.)
+*Search forward/backward*              | `/`, `?`
+*Next/Previous search result*          | `n`, `N`
+Start visual selection                 | `v`
+Yank selection and exit copy mode      | `y`
+Yank current line and exit copy mode   | `Y`
+Cancel selection / Exit copy mode      | `Escape`
+Paste most recent buffer               | `C-a ]`
+Enter command prompt                   | `C-a :`
+List all keybindings                   | `C-a ?`
+Show large clock                       | `C-a t`
