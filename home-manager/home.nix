@@ -12,7 +12,6 @@ let
     "discord"
     "faac" # part of zoom
     "google-chrome"
-    "skypeforlinux"
     "slack"
     "spotify"
     "spotify-unwrapped"
@@ -97,7 +96,7 @@ let
     jq                           # JSON processor
     jre                          # java runtime environment
     killall                      # kill processes by name
-    konsole                      # terminal emulator
+    kdePackages.konsole          # terminal emulator
     libcamera                    # open source camera stack for linux
     libreoffice                  # office suite
     lm_sensors                   # CPU sensors
@@ -130,13 +129,13 @@ let
     pavucontrol                  # pulseaudio volume control
     pcmanfm                      # file manager
     playerctl                    # music player controller
+    pinentry-all                 # GnuPG’s interface to passphrase input
     pulsemixer                   # pulseaudio mixer
     python3                      # python3 programming language
     ripgrep                      # ripgrep
     # rnix-lsp                     # nix lsp server
     silicon                      # create beautiful code imgs
     simplescreenrecorder         # self-explanatory
-    skypeforlinux                # skype for linux
     slack                        # slack client
     sof-firmware                 # Sound Open Firmware
     spotify                      # spotify client
@@ -189,7 +188,7 @@ let
     diff-so-fancy
   ];
 
-  gnomePkgs = with pkgs.gnome; [
+  gnomePkgs = with pkgs; [
     gnome-calendar # calendar
     gnome-control-center
     gnome-power-manager
@@ -212,12 +211,6 @@ let
   ];
 
   fontsPkgs = [
-    (pkgs.nerdfonts.override {
-      fonts = [
-        "JetBrainsMono"
-        "FiraCode"
-      ];
-    })
     pkgs.dejavu_fonts
     pkgs.emojione
     pkgs.font-awesome
@@ -225,6 +218,8 @@ let
     pkgs.inconsolata
     pkgs.liberation_ttf
     pkgs.material-icons
+    pkgs.nerd-fonts.fira-code
+    pkgs.nerd-fonts.jetbrains-mono
     pkgs.noto-fonts
     pkgs.noto-fonts-cjk-sans
     pkgs.noto-fonts-extra
@@ -257,7 +252,8 @@ in
 
   i18n = {
     inputMethod = {
-      enabled = "fcitx5";
+      enable = true;
+      type = "fcitx5";
       fcitx5 = {
         addons = with pkgs;
           [ fcitx5-gtk
@@ -325,6 +321,7 @@ in
     ./programs/bash/default.nix
     ./programs/emacs/default.nix
     ./programs/git/default.nix
+    ./programs/kimai-client/default.nix
     ./programs/neovim/default.nix
     ./programs/sway/default.nix
     ./programs/tmux/default.nix
@@ -357,7 +354,13 @@ in
       enableBashIntegration = true;
     };
 
-    gpg.enable = true;
+    gpg = {
+      enable = true;
+      settings = {
+        use-agent = true;
+        pinentry-mode = "loopback";
+      };
+    };
 
     home-manager.enable = true;
 

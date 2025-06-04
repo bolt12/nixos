@@ -47,7 +47,7 @@ end
 -- prompt and journal content
 local function create_api_payload(custom_prompt, journal_content)
     return json({
-        model = "gpt-4o-mini",
+        model = "gpt-4.1-mini",
         messages = {
             {
                 role = "system",

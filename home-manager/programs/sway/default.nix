@@ -23,8 +23,8 @@ in
         export QT_QPA_PLATFORM=wayland
         export QT_WAYLAND_DISABLE_WINDOWDECORATION="1"
         export _JAVA_AWT_WM_NONREPARENTING=1
-        export SUDO_ASKPASS="${pkgs.ksshaskpass}/bin/ksshaskpass"
-        export SSH_ASKPASS="${pkgs.ksshaskpass}/bin/ksshaskpass"
+        export SUDO_ASKPASS="${pkgs.kdePackages.ksshaskpass}/bin/ksshaskpass"
+        export SSH_ASKPASS="${pkgs.kdePackages.ksshaskpass}/bin/ksshaskpass"
         export XDG_SESSION_TYPE=wayland
         export XDG_CURRENT_DESKTOP=sway
         export NIXOS_OZONE_WL=1=sway

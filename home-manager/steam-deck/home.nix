@@ -12,7 +12,6 @@ let
     "discord"
     "faac" # part of zoom
     "google-chrome"
-    "skypeforlinux"
     "slack"
     "spotify"
     "spotify-unwrapped"
@@ -121,7 +120,6 @@ let
     ripgrep                      # ripgrep
     silicon                      # create beautiful code imgs
     simplescreenrecorder         # self-explanatory
-    skypeforlinux                # skype for linux
     slack                        # slack client
     sof-firmware                 # Sound Open Firmware
     spotify                      # spotify client

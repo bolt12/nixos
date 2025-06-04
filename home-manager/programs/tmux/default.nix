@@ -8,6 +8,11 @@
     shortcut = "a";
     extraConfig = ''
         set -g default-terminal "screen-256color"
+
+        # Copy and Paste into system clipboard
+
+        set -g set-clipboard on
+
         # Resize panes using Prefix + Ctrl + hjkl (repeatable)
         bind -r C-h resize-pane -L 5
         bind -r C-j resize-pane -D 5
@@ -41,11 +46,18 @@
         extraConfig = ''
           # allow tmux-ressurect to capture pane contents
           set -g @resurrect-capture-pane-contents 'on'
+          # for vim
+          set -g @resurrect-strategy-vim 'session'
+          # for neovim
+          set -g @resurrect-strategy-nvim 'session'
+          set -g @resurrect-processes  '~nvim'
+
           '';
       }
       { plugin = pkgs.tmuxPlugins.continuum;
       extraConfig = ''
           # enable tmux-continuum functionality
+          set -g @continuum-boot 'on'
           set -g @continuum-restore 'on'
           '';
       }

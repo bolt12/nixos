@@ -10,7 +10,6 @@ set $mod Mod1
 # Floating windows
 
 # for_window [title="Wine"] floating enable
-# for_window [title="Skype"] floating enable
 # for_window [title="Discord"] floating enable
 # for_window [title="Slack"] floating enable
 # for_window [title="Copying"] floating enable

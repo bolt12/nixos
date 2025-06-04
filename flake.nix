@@ -9,10 +9,10 @@
   };
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     home-manager = {
-      url = "github:nix-community/home-manager/release-24.11";
+      url = "github:nix-community/home-manager/release-25.05";
       # The `follows` keyword in inputs is used for inheritance.
       # Here, `inputs.nixpkgs` of home-manager is kept consistent with
       # the `inputs.nixpkgs` of the current flake,
@@ -30,11 +30,12 @@
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
     emacs-overlay.url = "github:nix-community/emacs-overlay";
 
+    kimai-client.url = "git+ssh://git@gitlab.well-typed.com/well-typed/kimai-client.git?ref=bolt12/patch";
+
     # Needed for steam-deck
     nixgl.url = "github:guibou/nixGL";
 
     # Neovim plugins
-    haskell-tools.url = "github:MrcJkb/haskell-tools.nvim";
     vim-bujo = {
       type = "github";
       owner = "vuciv";
@@ -65,24 +66,6 @@
       repo = "HighStr.nvim";
       flake = false;
     };
-    cheatsheet-nvim = {
-      type = "github";
-      owner = "sudormrfbin";
-      repo = "cheatsheet.nvim";
-      flake = false;
-    };
-    haskell-snippets-nvim = {
-      type = "github";
-      owner = "mrcjkb";
-      repo = "haskell-snippets.nvim";
-      flake = false;
-    };
-    gh-nvim = {
-      type = "github";
-      owner = "ldelossa";
-      repo = "gh.nvim";
-      flake = false;
-    };
     telescope-ui-select-nvim = {
       type = "github";
       owner = "nvim-telescope";
@@ -93,10 +76,10 @@
       url = "github:isovector/cornelis";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    advanced-git-search-nvim = {
+    e-ink-nvim = {
       type = "github";
-      owner = "aaronhallaert";
-      repo = "advanced-git-search.nvim";
+      owner = "alexxGmZ";
+      repo = "e-ink.nvim";
       flake = false;
     };
   };

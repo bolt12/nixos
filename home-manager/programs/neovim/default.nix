@@ -14,11 +14,6 @@ let
   plugins = pkgs.vimPlugins;
   plugins-unstable = unstable.vimPlugins;
 
-  haskell-tools = pkgs.vimUtils.buildVimPlugin {
-    name = "haskell-tools";
-    src = inputs.haskell-tools;
-  };
-
   vim-bujo = pkgs.vimUtils.buildVimPlugin {
     name = "vim-bujo";
     src = inputs.vim-bujo;
@@ -44,24 +39,14 @@ let
     src = inputs.HighStr-nvim;
   };
 
-  cheatsheet-nvim = pkgs.vimUtils.buildVimPlugin {
-    name = "cheatsheet-nvim";
-    src = inputs.cheatsheet-nvim;
-  };
-
-  haskell-snippets = pkgs.vimUtils.buildVimPlugin {
-    name = "haskell-snippets";
-    src = inputs.haskell-snippets-nvim;
-  };
-
-  gh-nvim = pkgs.vimUtils.buildVimPlugin {
-    name = "gh-nvim";
-    src = inputs.gh-nvim;
-  };
-
   telescope-ui-select = pkgs.vimUtils.buildVimPlugin {
     name = "telescope-ui-select-nvim";
     src = inputs.telescope-ui-select-nvim;
+  };
+
+  e-ink = pkgs.vimUtils.buildVimPlugin {
+    name = "e-ink-nvim";
+    src = inputs.e-ink-nvim;
   };
 
   cornelis = {
@@ -80,11 +65,6 @@ let
     '';
   };
 
-  advanced-git-search-nvim = pkgs.vimUtils.buildVimPlugin {
-    name = "advanced-git-search-nvim";
-    src = inputs.advanced-git-search-nvim;
-  };
-
   overriddenPlugins = with pkgs; [ ];
 
   unstablePlugins = with plugins-unstable; [
@@ -92,7 +72,6 @@ let
   ];
 
   myVimPlugins = with plugins; [
-    advanced-git-search-nvim # advanced git search extension
     barbar-nvim              # fancy status bar
     base16-vim               # colors
     cheatsheet-nvim          # command cheatsheet
@@ -104,14 +83,13 @@ let
     cmp-path                 # auto complete sources
     colorizer                # colors
     cornelis                 # agda-mode for neovim
+    e-ink                    # e-ink colorscheme
     fcitx-vim                # Keep and restore fcitx state when leaving/re-entering insert mode or search mode
     friendly-snippets        # snippets
-    gh-nvim                  # gh code review plugin
-    # git-messenger-vim        # Check git commits on cursor hover
     gitsigns-nvim            # git integration
     gruvbox-community        # color theme
-    haskell-snippets         # snippets
-    haskell-tools            # haskell lsp tools
+    haskell-snippets-nvim    # snippets
+    haskell-tools-nvim       # haskell lsp tools
     haskell-vim              # haskell vim
     highstr                  # highlight stuff
     litee-nvim               # Litee library
@@ -142,6 +120,7 @@ let
     vim-hoogle               # haskell hoogle
     vim-markdown             # markdown support
     vim-nix                  # nix support (highlighting, etc)
+    vim-obsession            # save vim session
     vim-pandoc-syntax        # pandoc syntax support
     vim-silicon              # vim Silicon integration
     vim-surround             # quickly edit surroundings (brackets, html tags, etc)
