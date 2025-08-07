@@ -97,9 +97,9 @@ in
           lib.concatStringsSep "," [ "Source" "Sink" "Media" "Socket" ];
       };
     };
-    opengl = {
-      enable          = true;
-      driSupport32Bit = true;
+    graphics = {
+      enable      = true;
+      enable32Bit = true;
     };
     enableRedistributableFirmware = true;
     enableAllFirmware             = true;

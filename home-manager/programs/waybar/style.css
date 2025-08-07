@@ -6,12 +6,12 @@ window#waybar {
     box-shadow:    none;
     text-shadow:   none;
     transition-duration: 0s;
-    color:      rgba(217, 216, 216, 1);
-    background: rgba(0, 0, 0, 0.5);
+    color:      #CDD6F4; /* cat-text */
+    background: rgba(30, 30, 46, 0.7); /* cat-base with transparency */
 }
 
 window#waybar.solo {
-    background: rgb(35, 31, 32);
+    background: #181825; /* cat-mantle */
 }
 
 #workspaces {
@@ -20,30 +20,23 @@ window#waybar.solo {
 
 #workspaces button {
     padding:    0 5px;
-    color:      rgba(217, 216, 216, 0.4);
+    color:      #A6ADC8; /* cat-subtext0 */
 }
 
 #workspaces button.visible {
-    color:      rgba(217, 216, 216, 1);
+    color:      #CDD6F4; /* cat-text */
 }
 
 #workspaces button.focused {
-    border-top: 3px solid rgba(217, 216, 216, 1);
-    border-bottom: 3px solid rgba(217, 216, 216, 0);
+    border-top: 3px solid #89B4FA; /* cat-blue for focused indicator */
+    border-bottom: 3px solid rgba(0, 0, 0, 0); /* fully transparent */
 }
 
 #workspaces button.urgent {
-    color:      rgba(238, 46, 36, 1);
+    color:      #F38BA8; /* cat-red for urgent */
 }
 
-#pulseaudio {
-    /* font-size: 26px; */
-}
-
-#custom-cpu_speed {
-    min-width: 82px;
-}
-
+/* Common styling for most modules */
 #tray,
 #mode,
 #battery,
@@ -57,56 +50,93 @@ window#waybar.solo {
 #custom-spotify,
 #custom-weather,
 #custom-mail,
-#custom-media {
-    margin:     0px 0px 0px 10px;
-    padding: 0 5px;
-    border-top: 3px solid rgba(217, 216, 216, 0.5);
-}
-
+#custom-media,
 #temperature,
 #memory,
 #clock,
-#custom-storage {
+#custom-storage,
+#custom-network_speed { /* Added custom-network_speed */
     margin:     0px 0px 0px 10px;
     padding: 0 5px;
+    border-top: 3px solid rgba(0, 0, 0, 0); /* Start with no top border for most */
+    border-bottom: 3px solid rgba(0, 0, 0, 0); /* Start with no bottom border for most */
 }
 
+/* Specific module adjustments for consistency if needed */
 #battery.warning {
-   color:       rgba(255, 210, 4, 1);
+   color:       #F9E2AF; /* cat-yellow */
 }
 
 #battery.critical {
-    color:      rgba(238, 46, 36, 1);
+    color:      #F38BA8; /* cat-red */
 }
 
 #battery.charging {
-    color:      rgba(217, 216, 216, 1);
+    color:      #A6E3AF; /* cat-green for charging */
 }
 
 #custom-storage.warning {
-    color:      rgba(255, 210, 4, 1);
+    color:      #F9E2AF; /* cat-yellow */
 }
 
 #custom-storage.critical {
-    color:      rgba(238, 46, 36, 1);
+    color:      #F38BA8; /* cat-red */
 }
 
 @keyframes blink {
     to {
-        background-color: #ffffff;
-        color: black;
+        background-color: #CDD6F4; /* cat-text */
+        color: #1E1E2E; /* cat-base */
     }
 }
 
 #workspaces button:hover {
     box-shadow: inherit;
-    border-bottom: 3px solid #ffffff;
+    border-bottom: 3px solid #89B4FA; /* cat-blue on hover */
 }
 
 #workspaces button.focused {
-    border-bottom: 3px solid #ffffff;
+    border-bottom: 3px solid #89B4FA; /* cat-blue for focused */
+    color: #CDD6F4; /* Ensure text is visible for focused */
 }
 
 #workspaces button.urgent {
-    background-color: #eb4d4b;
+    background-color: #F38BA8; /* cat-red background for urgent */
+    color: #1E1E2E; /* Dark text on red background */
+}
+
+/* Optional: Add a subtle border to all modules for a 'slick' look */
+#tray,
+#mode,
+#battery,
+#cpu,
+#network,
+#pulseaudio,
+#idle_inhibitor,
+#backlight,
+#custom-cpu_speed,
+#custom-powermenu,
+#custom-spotify,
+#custom-weather,
+#custom-mail,
+#custom-media,
+#temperature,
+#memory,
+#clock,
+#custom-storage,
+#custom-network_speed {
+    border-bottom: 1px solid #313244; /* cat-surface0 for a subtle separator */
+}
+
+/* Let's refine the focused workspace to make it stand out subtly */
+#workspaces button.focused {
+    background-color: #313244; /* cat-surface0 */
+    border-bottom: 3px solid #89B4FA; /* cat-blue */
+    color: #CDD6F4;
+}
+
+#workspaces button.active { /* Use 'active' for current workspace if available, or focused */
+    background-color: #313244; /* cat-surface0 */
+    border-bottom: 3px solid #89B4FA; /* cat-blue */
+    color: #CDD6F4;
 }

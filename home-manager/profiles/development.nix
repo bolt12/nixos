@@ -1,13 +1,14 @@
 # Development profile - Programming tools and development environment
 # This profile contains tools for software development across multiple languages
 
-{ inputs, pkgs, ... }: 
+{ inputs, pkgs, system, ... }:
 let
   # Import unstable packages for bleeding-edge development tools
   unstable = import inputs.nixpkgs-unstable {
     inherit (pkgs) system;
     overlays = [];
   };
+  nixops = inputs.nixops.defaultPackage.${system};
 in {
   home.packages = with pkgs; [
     # Version control and project management
@@ -24,30 +25,30 @@ in {
     jq                           # JSON processor
     nodejs                       # JavaScript runtime
     python3                      # Python programming language
-    
+
     # System development tools
     patchelf                     # ELF patcher for binaries
-    
+
     # Documentation and reference
     tldr                         # Concise man pages
     manix                        # Nix documentation search
     nix-doc                      # Nix documentation tool
     nix-index                    # Nix package search
     nix-tree                     # Nix dependency visualization
-    
+
     # Build and packaging tools
     cachix                       # Nix binary cache
     home-manager                 # User environment management
     nixops                       # NixOS deployment tool
-    
+
     # Container and virtualization
     # Note: Docker is enabled at system level
-    
+
     # Network and cloud tools
     awscli2                      # AWS CLI
     wireguard-tools              # VPN tools
     noip                         # Dynamic DNS client
-    
+
     # Haskell development environment - comprehensive toolchain
     cabal2nix                                 # Convert cabal projects to nix
     cabal-install                             # Cabal package manager

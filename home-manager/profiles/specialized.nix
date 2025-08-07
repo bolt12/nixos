@@ -1,9 +1,8 @@
 # Specialized tools profile - Domain-specific applications and tools
 # This profile contains tools for specific use cases and specialized workflows
 
-{ pkgs, ... }: {
+{ pkgs, ... }:
   let
-
     luaWithPackages = pkgs.lua.withPackages (ps:
       with ps; [
         cjson

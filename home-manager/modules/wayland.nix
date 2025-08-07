@@ -23,9 +23,6 @@
     # Graphics and performance
     WLR_DRM_NO_MODIFIERS = "1";                     # Fix some graphics driver issues
 
-    # Input method framework
-    SDL_IM_MODULE = "fcitx5";                       # Input method for SDL applications
-
     # Editor preferences
     EDITOR = "nvim";
     VISUAL = "nvim";

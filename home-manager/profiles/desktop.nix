@@ -20,17 +20,17 @@
 
     # Office and productivity
     libreoffice                  # Office suite (also handles PDFs)
-    
+
     # File management and archiving
-    kdePackages.thunar           # File manager
+    xfce.thunar                  # File manager
     xarchiver                    # Archive manager
-    
+
     # Graphics and design
     silicon                      # Beautiful code screenshots
-    
+
     # Games and entertainment
     steam                        # Gaming platform
-    
+
     # Desktop theming and appearance
     lxappearance                 # Theme configuration
     numix-cursor-theme           # Cursor theme
@@ -39,19 +39,19 @@
     gtk3                         # GTK3 library
     gtk-engine-murrine           # Theme engine
     gtk_engines                  # Additional theme engines
-    
+
     # Desktop integration
     lxmenu-data                  # Desktop menu integration
     greetd.gtkgreet              # Login greeter
     xsettingsd                   # X11 settings daemon
-    
+
     # GNOME applications and utilities
     gnome-calendar               # Calendar application
     gnome-control-center         # System settings
     gnome-power-manager          # Power management
-    gnome-weather                # Weather application  
+    gnome-weather                # Weather application
     zenity                       # Display dialogs from shell scripts
-    
+
     # Font packages - system-wide typography configuration
     dejavu_fonts                 # Standard fonts
     emojione                     # Emoji support

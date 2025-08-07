@@ -2,19 +2,21 @@
 # This module manages wofi configuration files and settings
 
 { pkgs, ... }: {
-  # Copy configuration files to appropriate locations  
+  # Copy configuration files to appropriate locations
   xdg.configFile = {
     "wofi/config" = {
       source = ./config;
       # Main configuration file defining wofi behavior and appearance
+      force = true;
     };
-    
+
     "wofi/style.css" = {
       source = ./style.css;
       # CSS styling for wofi's visual appearance and theming
+      force = true;
     };
   };
-  
+
   # Wofi package is included in profiles/wayland.nix
   # This module only handles configuration files
 }

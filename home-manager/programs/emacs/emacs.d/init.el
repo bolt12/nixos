@@ -497,8 +497,8 @@ to start up a shell process, and is also more consistent."
 ;; Fonts
 
 (add-to-list 'default-frame-alist
-  '(font . "JetBrainsMono Nerd Font Mono"))
-(set-face-attribute 'default t :font "JetBrainsMono Nerd Font Mono" )
+  '(font . "JetBrainsMono Font Mono"))
+(set-face-attribute 'default t :font "JetBrainsMono Font Mono" )
 
 ;;; init.el ends here
 

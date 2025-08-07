@@ -18,7 +18,7 @@ set $mod Mod1
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
 
-font pango:JetBrains Mono 8
+font pango:JetBrainsMono Font 9
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
@@ -265,9 +265,9 @@ set $gnome-schema org.gnome.desktop.interface
 
 exec_always {
     gsettings set $gnome-schema gtk-theme 'Adwaita-dark'
-    gsettings set $gnome-schema icon-theme 'Numix-Circle'
-    gsettings set $gnome-schema cursor-theme 'Numix-Cursor-Light'
-    gsettings set $gnome-schema font-name 'JetBrainsMono Nerd Font 13'
+    gsettings set $gnome-schema icon-theme 'Papirus-Dark'
+    gsettings set $gnome-schema cursor-theme 'Numix-Cursor'
+    gsettings set $gnome-schema font-name 'JetBrainsMono Font 11'
 }
 
 #
@@ -296,20 +296,21 @@ exec --no-startup-id wireplumber
 
 #********************************************************************************
 
-# Theme colors
+# Modern catppuccin-inspired theme colors
+
 # class                   border  backgr. text    indic.   child_border
-client.focused          #4c7899 #285577 #ffffff #2e9ef4   #285577
-client.focused_inactive #333333 #5f676a #ffffff #484e50   #5f676a
-client.unfocused        #333333 #222222 #888888 #292d2e   #222222
-client.urgent           #2f343a #900000 #ffffff #900000   #900000
-client.placeholder      #000000 #0c0c0c #ffffff #000000   #0c0c0c
+client.focused          #89b4fa #313244 #cdd6f4 #89b4fa   #89b4fa
+client.focused_inactive #6c7086 #45475a #cdd6f4 #6c7086   #6c7086
+client.unfocused        #45475a #1e1e2e #6c7086 #45475a   #45475a
+client.urgent           #f38ba8 #1e1e2e #cdd6f4 #f38ba8   #f38ba8
+client.placeholder      #1e1e2e #11111b #cdd6f4 #1e1e2e   #1e1e2e
 
-# Configure border style <normal|1pixel|pixel xx|none|pixel>
-default_border pixel 2
-default_floating_border normal
+# Configure border style - thinner modern borders
+default_border pixel 1
+default_floating_border pixel 2
 
-# Hide borders
-hide_edge_borders none
+# Hide borders when only one window
+hide_edge_borders smart
 
 # change borders
 bindsym $mod+y border none
@@ -323,9 +324,9 @@ bindsym $mod+i border normal
 
 #############################
 
-# Set inner/outer gaps
-gaps inner 6
-gaps outer 6
+# Set inner/outer gaps for modern aesthetics
+gaps inner 8
+gaps outer 4
 
 # Activate smart borders (always)
 smart_borders on
