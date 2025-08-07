@@ -10,7 +10,6 @@ let
 
   unfreePackages = [
     "discord"
-    "faac" # part of zoom
     "google-chrome"
     "slack"
     "spotify"
@@ -19,7 +18,6 @@ let
     "steam-original"
     "unrar"
     "vscode"
-    "zoom-us"
   ];
 
   agdaStdlibSrc = pkgs.fetchFromGitHub {
@@ -32,159 +30,15 @@ let
   nixops = inputs.nixops.defaultPackage.${pkgs.system};
 
   # Unstable branch packages
-  unstablePkgs = [
-    (unstable.agda.withPackages (p: [
-      (p.standard-library.overrideAttrs (oldAttrs: {
-        version = "v2.0";
-        src = agdaStdlibSrc;
-      }))
-    ]))
+  # Package lists moved to profiles for better organization
 
-    unstable.nixd
-  ];
+  # Package lists removed - use profiles for organization
 
-  # Extra packages from user repos
-  extraPkgs = [
-  ];
+  # Git packages moved to profiles
 
-  defaultPkgs = with pkgs; [
-    alloy                        # model checker
-    alsa-utils                   # sound utils
-    anki                         # anki flashcards
-    arduino                      # arduino toolkit
-    awscli2                      # aws cli v2
-    bash                         # bash
-    bc                           # gnu calculator
-    blueman                      # bluetooth applet
-    cachix                       # nix caching
-    chromium                     # google chrome
-    deluge                       # torrent client
-    dig                          # dns tool
-    discord                      # discord client
-    evince                       # pdf reader
-    fd                           # file finder
-    feh                          # image viewer
-    ffmpeg_5-full                # A complete, cross-platform solution to record, convert and stream audio and video
-    findutils                    # find files utilities
-    fzf                          # fuzzy finder
-    gawk                         # text processing programming language
-    gh                           # Github CLI
-    git-absorb                   # git commit --fixup, but automatic
-    git-annex                    # git annex
-    git-extras                   # git extra commands like 'git sed'
-    glib                         # gsettings
-    google-chrome                # A freeware web browser developed by Google
-    gsettings-desktop-schemas    # theming related
-    gtk3                         # gtk3 lib
-    gtk-engine-murrine           # theme engine
-    gtk_engines                  # theme engines
-    helvum                       # sound
-    imv                          # image viewer
-    jdk                          # java development kit
-    jq                           # JSON processor
-    jre                          # java runtime environment
-    jujutsu                      # A Git-compatible DVCS that is both simple and powerful
-    killall                      # kill processes by name
-    konsole                      # terminal emulator
-    libcamera                    # open source camera stack for linux
-    libreoffice                  # office suite
-    lm_sensors                   # CPU sensors
-    lsof                         # A tool to list open files
-    luaWithPackages              # Lua with packages
-    manix                        # nix manual
-    mpv                          # video player
-    ncdu                         # disk space info (a better du)
-    neofetch                     # command-line system information
-    networkmanagerapplet         # nm-applet
-    nix-bash-completions         # nix bash completions
-    nix-doc                      # nix documentation search tool
-    nix-index                    # nix locate files
-    nixops                       # nixops
-    nix-tree                     # interactively browse a Nix store paths dependencies
-    nmap                         # network map
-    nodejs                       # nodejs
-    noip                         # noip
-    numix-cursor-theme           # icon theme
-    numix-icon-theme-circle      # icon theme
-    obs-studio                   # obs-studio
-    pamixer                      # pulseaudio cli mixer
-    paprefs                      # pulseaudio preferences
-    pasystray                    # pulseaudio systray
-    patchelf                     # dynamic linker and RPATH of ELF executables
-    pavucontrol                  # pulseaudio volume control
-    pcmanfm                      # file manager
-    playerctl                    # music player controller
-    psensor                      # hardware monitoring
-    pulsemixer                   # pulseaudio mixer
-    python3                      # python3 programming language
-    ripgrep                      # ripgrep
-    silicon                      # create beautiful code imgs
-    simplescreenrecorder         # self-explanatory
-    slack                        # slack client
-    sof-firmware                 # Sound Open Firmware
-    spotify                      # spotify client
-    thunderbird                  # mail client
-    tldr                         # summary of a man page
-    tree                         # display files in a tree view
-    unzip                        # unzip
-    vlc                          # media player
-    vscode                       # visual studio code
-    weechat                      # weechat irc client
-    wget                         # cli wget
-    wireguard-tools              # wireguard
-    xarchiver                    # xarchiver gtk frontend
-    xclip                        # clipboard support (also for neovim)
-    xorg.xmodmap                 # Keyboard
-    xsettingsd                   # theming
-    zip                          # zip
-    zk                           # zettelkasten note taking
-    zlib                         # zlib
-    zoom                         # video conferencing
-  ];
+  # Haskell packages moved to profiles
 
-  gitPkgs = with pkgs.gitAndTools; [
-    diff-so-fancy
-  ];
-
-  haskellPkgs = [
-    pkgs.cabal2nix                # convert cabal projects to nix
-    pkgs.cabal-install            # package manager
-    pkgs.haskellPackages.eventlog2html
-    pkgs.haskellPackages.fast-tags
-    pkgs.haskellPackages.fourmolu # code formatter
-    pkgs.haskellPackages.ghc      # compiler
-    pkgs.haskellPackages.ghcide   # compiler
-    pkgs.haskellPackages.haskell-language-server
-    pkgs.haskellPackages.hoogle   # documentation
-    pkgs.stack                    # package manager
-    pkgs.stylish-haskell          # code formatter
-  ];
-
-  fontsPkgs = [
-    (pkgs.nerdfonts.override {
-      fonts = [
-        "JetBrainsMono"
-        "FiraCode"
-      ];
-    })
-    pkgs.dejavu_fonts
-    pkgs.emojione
-    pkgs.font-awesome
-    pkgs.hack-font
-    pkgs.inconsolata
-    pkgs.liberation_ttf
-    pkgs.material-icons
-    pkgs.noto-fonts
-    pkgs.noto-fonts-cjk
-    pkgs.noto-fonts-extra
-    pkgs.open-dyslexic
-    pkgs.open-sans
-    pkgs.siji
-    pkgs.terminus_font
-    pkgs.ubuntu_font_family
-    pkgs.unifont
-    pkgs.xits-math
-  ];
+  # Font packages moved to profiles
 
 in
 {
@@ -221,13 +75,9 @@ in
       ];
     };
 
-    packages =
-      defaultPkgs
-      ++ extraPkgs
-      ++ fontsPkgs
-      ++ gitPkgs
-      ++ haskellPkgs
-      ++ unstablePkgs;
+    # Package management handled by profiles - import as needed:
+    # ../profiles/desktop.nix, ../profiles/development.nix, ../profiles/system-tools.nix etc.
+    packages = [];
 
     sessionVariables = {
       EDITOR="nvim";

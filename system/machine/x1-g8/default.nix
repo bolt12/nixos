@@ -41,6 +41,17 @@ in
     runSize = "75%"; # Size of useTmpfs defaults to 50% of RAM
   };
 
+  # Performance optimizations for better system responsiveness and SSD longevity
+  boot.kernel.sysctl = {
+    # Reduce SSD wear by writing dirty pages less frequently (1.5s vs default 5s)
+    # Better for systems with sufficient RAM - improves I/O performance
+    "vm.dirty_writeback_centisecs" = 1500;
+
+    # Disable NMI watchdog to save CPU cycles and improve power efficiency
+    # Trade-off: slightly less debugging capability if system hard-locks
+    "kernel.nmi_watchdog" = 0;
+  };
+
   i18n.inputMethod.fcitx5 = {
     waylandFrontend = true;
     settings.globalOptions = {
@@ -76,24 +87,11 @@ in
     '';
     };
 
-    # Needed for java apps/fonts
+    # Most variables moved to home-manager modules/wayland.nix for centralization
+    # Keeping only system-level Java configuration here
     variables._JAVA_OPTIONS                       =
-      "-Dawt.useSystemAAFontSettings = on -Dswing.aatext = true -Dsun.java2d.xrender = true";
+      "-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dsun.java2d.xrender=true";
     variables._JAVA_AWT_WM_NONREPARENTING         = "1";
-    variables.MOZ_DISABLE_RDD_SANDBOX             = "1";
-    variables.MOZ_ENABLE_WAYLAND                  = "1";
-    variables.XDG_CURRENT_DESKTOP                 = "sway";
-    variables.XDG_SESSION_TYPE                    = "wayland";
-    variables.SDL_VIDEODRIVER                     = "wayland";
-    variables.QT_QPA_PLATFORM                     = "wayland";
-    variables.QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
-    variables.ECORE_EVAS_ENGINE                   = "wayland_egl";
-    variables.ELM_ENGINE                          = "wayland_egl";
-    variables.EDITOR                              = "nvim";
-    variables.VISUAL                              = "nvim";
-    variables.NIXOS_OZONE_WL                      = "1";
-    variables.WLR_DRM_NO_MODIFIERS                = "1";
-    variables.SDL_IM_MODULE                       = "fcitx5";
 
     # List packages installed in system profile. To search, run:
     # $ nix search wget
@@ -165,8 +163,23 @@ in
     tlp = {
       enable   = true;
       settings = {
-        START_CHARGE_THRESH_BAT0 = 85;
-        STOP_CHARGE_THRESH_BAT0  = 90;
+        # Battery charge thresholds to preserve battery longevity
+        START_CHARGE_THRESH_BAT0 = 85;        # Start charging when battery drops below 85%
+        STOP_CHARGE_THRESH_BAT0  = 90;        # Stop charging at 90% to reduce battery wear
+
+        # CPU scaling governors for optimal performance vs battery life balance
+        CPU_SCALING_GOVERNOR_ON_AC  = "performance"; # Max performance when plugged in
+        CPU_SCALING_GOVERNOR_ON_BAT = "powersave";   # Conserve battery when unplugged
+
+        # Runtime power management - automatically manages device power states
+        RUNTIME_PM_ON_AC  = "on";   # Enable power management on AC (small savings)
+        RUNTIME_PM_ON_BAT = "auto"; # Aggressive power management on battery
+
+        # Additional power saving tweaks for better battery life
+        WIFI_PWR_ON_AC = "off";               # Keep WiFi at full power on AC
+        WIFI_PWR_ON_BAT = "on";               # Enable WiFi power saving on battery
+        SOUND_POWER_SAVE_ON_AC = 0;           # Disable audio power saving on AC
+        SOUND_POWER_SAVE_ON_BAT = 1;          # Enable audio power saving on battery
       };
     };
 

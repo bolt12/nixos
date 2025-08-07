@@ -10,7 +10,6 @@ let
 
   unfreePackages = [
     "discord"
-    "faac" # part of zoom
     "google-chrome"
     "slack"
     "spotify"
@@ -20,217 +19,16 @@ let
     "steam-unwrapped"
     "unrar"
     "vscode"
-    "zoom-us"
   ];
 
   nixops = inputs.nixops.defaultPackage.${system};
 
   agdaStdlibSrc = pkgs.fetchFromGitHub {
-      owner = "agda";
-      repo = "agda-stdlib";
-      rev = "master";
-      sha256 = "sha256-TjGvY3eqpF+DDwatT7A78flyPcTkcLHQ1xcg+MKgCoE="; # Replace with the correct hash
+      owner  = "agda";
+      repo   = "agda-stdlib";
+      rev    = "master";
+      sha256 = "sha256-TjGvY3eqpF+DDwatT7A78flyPcTkcLHQ1xcg+MKgCoE = "; # Replace with the correct hash
     };
-
-    luaWithPackages = pkgs.lua.withPackages (ps:
-      with ps; [
-        cjson
-        luasocket
-      ]);
-
-  # Unstable branch packages
-  unstablePkgs = [
-    # (unstable.agda.withPackages (p: [
-    #   (p.standard-library.overrideAttrs (oldAttrs: {
-    #     version = "master";
-    #     src = agdaStdlibSrc;
-    #   }))
-    # ]))
-
-    unstable.nixd
-    unstable.aider-chat
-  ];
-
-  # Extra packages from user repos
-  extraPkgs = [
-  ];
-
-  defaultPkgs = with pkgs; [
-    alloy                        # model checker
-    alsa-utils                   # sound utils
-    anki                         # anki flashcards
-    arduino                      # arduino toolkit
-    awscli2                      # aws cli v2
-    bash                         # bash
-    bc                           # gnu calculator
-    blueman                      # bluetooth applet
-    cachix                       # nix caching
-    cage                         # Wayland kiosk compositor
-    chromium                     # google chrome
-    deluge                       # torrent client
-    dig                          # dns tool
-    discord                      # discord client
-    evince                       # pdf reader
-    fd                           # file finder
-    feh                          # image viewer
-    ffmpeg_6-full                # A complete, cross-platform solution to record, convert and stream audio and video
-    findutils                    # find files utilities
-    flashfocus                   # focus wm
-    fzf                          # fuzzy finder
-    gawk                         # text processing programming language
-    gh                           # Github CLI
-    git-absorb                   # git commit --fixup, but automatic
-    git-annex                    # git annex
-    git-extras                   # git extra commands like 'git sed'
-    glib                         # gsettings
-    google-chrome                # A freeware web browser developed by Google
-    greetd.gtkgreet              # a gtk based greeter for greetd
-    gsettings-desktop-schemas    # theming related
-    gtk3                         # gtk3 lib
-    gtk-engine-murrine           # theme engine
-    gtk_engines                  # theme engines
-    helvum                       # sound
-    home-manager                 # home-manager
-    imv                          # image viewer
-    jdk                          # java development kit
-    jq                           # JSON processor
-    jre                          # java runtime environment
-    killall                      # kill processes by name
-    kdePackages.konsole          # terminal emulator
-    libcamera                    # open source camera stack for linux
-    libreoffice                  # office suite
-    lm_sensors                   # CPU sensors
-    lsof                         # A tool to list open files
-    luaWithPackages              # Lua with packages
-    lxappearance                 # edit themes
-    lxmenu-data                  # desktop menus - enables "open with" options
-    manix                        # nix manual
-    mission-center               # hardware monitoring
-    mpv                          # video player
-    ncdu                         # disk space info (a better du)
-    neofetch                     # command-line system information
-    networkmanagerapplet         # nm-applet
-    nix-bash-completions         # nix bash completions
-    nix-doc                      # nix documentation search tool
-    nix-index                    # nix locate files
-    nixops                       # nixops
-    nix-tree                     # interactively browse a Nix store paths dependencies
-    nmap                         # network map
-    nodejs                       # nodejs
-    noip                         # noip
-    numix-cursor-theme           # icon theme
-    numix-icon-theme-circle      # icon theme
-    obs-studio                   # obs-studio
-    obs-studio-plugins.wlrobs    # obs wayland protocol
-    pamixer                      # pulseaudio cli mixer
-    paprefs                      # pulseaudio preferences
-    pasystray                    # pulseaudio systray
-    patchelf                     # dynamic linker and RPATH of ELF executables
-    pavucontrol                  # pulseaudio volume control
-    pcmanfm                      # file manager
-    playerctl                    # music player controller
-    pinentry-all                 # GnuPG’s interface to passphrase input
-    pulsemixer                   # pulseaudio mixer
-    python3                      # python3 programming language
-    ripgrep                      # ripgrep
-    # rnix-lsp                     # nix lsp server
-    silicon                      # create beautiful code imgs
-    simplescreenrecorder         # self-explanatory
-    slack                        # slack client
-    sof-firmware                 # Sound Open Firmware
-    spotify                      # spotify client
-    steam                        # game library
-    thunderbird                  # mail client
-    tldr                         # summary of a man page
-    tree                         # display files in a tree view
-    unzip                        # unzip
-    vlc                          # media player
-    vscode                       # visual studio code
-    weechat                      # weechat irc client
-    wget                         # cli wget
-    wireguard-tools              # wireguard
-    xarchiver                    # xarchiver gtk frontend
-    xclip                        # clipboard support (also for neovim)
-    xorg.xmodmap                 # Keyboard
-    xsettingsd                   # theming
-    zip                          # zip
-    zk                           # zettelkasten note taking
-    zlib                         # zlib
-    zoom                         # video conferencing
-  ];
-
-  # Wayland Packages
-  waylandPkgs = [
-    unstable.brightnessctl
-    unstable.grim
-    unstable.mako
-    unstable.pipewire
-    unstable.slurp
-    unstable.swayidle
-    unstable.swaylock-fancy
-    unstable.waybar
-    unstable.wayland-protocols
-    unstable.wdisplays
-    unstable.wireplumber
-    unstable.wl-clipboard
-    unstable.wl-gammactl
-    unstable.wlogout
-    unstable.wlroots_0_18
-    unstable.wlsunset
-    unstable.wofi
-    unstable.xdg-desktop-portal
-    unstable.xdg-desktop-portal-gtk
-    unstable.xdg-desktop-portal-wlr
-    unstable.xdg-desktop-portal-gnome
-  ];
-
-  gitPkgs = with pkgs.gitAndTools; [
-    diff-so-fancy
-  ];
-
-  gnomePkgs = with pkgs; [
-    gnome-calendar # calendar
-    gnome-control-center
-    gnome-power-manager
-    gnome-weather
-    zenity         # display dialogs
-  ];
-
-  haskellPkgs = [
-    pkgs.cabal2nix                # convert cabal projects to nix
-    pkgs.cabal-install            # package manager
-    pkgs.haskellPackages.eventlog2html
-    pkgs.haskellPackages.fast-tags
-    pkgs.haskellPackages.fourmolu # code formatter
-    pkgs.haskellPackages.ghc      # compiler
-    pkgs.haskellPackages.ghcide   # compiler
-    pkgs.haskellPackages.haskell-language-server
-    pkgs.haskellPackages.hoogle   # documentation
-    pkgs.stack                    # package manager
-    pkgs.stylish-haskell          # code formatter
-  ];
-
-  fontsPkgs = [
-    pkgs.dejavu_fonts
-    pkgs.emojione
-    pkgs.font-awesome
-    pkgs.hack-font
-    pkgs.inconsolata
-    pkgs.liberation_ttf
-    pkgs.material-icons
-    pkgs.nerd-fonts.fira-code
-    pkgs.nerd-fonts.jetbrains-mono
-    pkgs.noto-fonts
-    pkgs.noto-fonts-cjk-sans
-    pkgs.noto-fonts-extra
-    pkgs.open-dyslexic
-    pkgs.open-sans
-    pkgs.siji
-    pkgs.terminus_font
-    pkgs.ubuntu_font_family
-    pkgs.unifont
-    pkgs.xits-math
-  ];
 
 in
 {
@@ -266,7 +64,6 @@ in
     };
   };
 
-
   home = {
     enableNixpkgsReleaseCheck = true;
 
@@ -282,41 +79,29 @@ in
       ];
     };
 
-    packages =
-      defaultPkgs
-      ++ extraPkgs
-      ++ fontsPkgs
-      ++ gitPkgs
-      ++ gnomePkgs
-      ++ haskellPkgs
-      ++ unstablePkgs
-      ++ waylandPkgs;
-
-    sessionVariables = {
-      ECORE_EVAS_ENGINE="wayland_egl";
-      EDITOR="nvim";
-      ELM_ENGINE="wayland_egl";
-      MOZ_DISABLE_RDD_SANDBOX="1";
-      MOZ_ENABLE_WAYLAND="1";
-      NIXOS_OZONE_WL="1";
-      QT_QPA_PLATFORM="wayland";
-      QT_WAYLAND_DISABLE_WINDOWDECORATION="1";
-      SDL_VIDEODRIVER="wayland";
-      VISUAL="nvim";
-      XDG_CURRENT_DESKTOP="sway";
-      XDG_SESSION_TYPE="wayland";
-      WLR_DRM_NO_MODIFIERS="1";
-    };
+    # All packages now managed through modular profiles in ./profiles/
+    # This provides better organization and eliminates all redundancy
+    packages = [];
 
     sessionPath = [
       "/home/bolt/.local/bin"
       "/home/bolt/.cabal/bin"
       "/home/bolt/.cargo/bin"
     ];
-
   };
 
   imports = [
+    # Core modules
+    ./modules/wayland.nix                # Centralized Wayland environment variables
+
+    # Modular package profiles - mix and match as needed
+    ./profiles/desktop.nix               # GUI applications and desktop tools
+    ./profiles/development.nix           # Programming and development tools
+    ./profiles/system-tools.nix          # Core utilities and system administration
+    ./profiles/specialized.nix           # Domain-specific and specialized tools
+    ./profiles/wayland.nix               # Wayland compositor and related packages
+
+    # Program configurations
     ./programs/agda/default.nix
     ./programs/bash/default.nix
     ./programs/emacs/default.nix
@@ -340,6 +125,12 @@ in
   # extract it into a different file
   programs = {
 
+    home-manager.enable = true;
+    htop.enable         = true;
+    ssh.enable          = true;
+    autorandr.enable    = true;
+    firefox.enable      = true;
+
     ssh = {
       matchBlocks = {
         "rpi" = {
@@ -362,39 +153,27 @@ in
       };
     };
 
-    home-manager.enable = true;
-
-    htop = {
-      enable = true;
-      # sortDescending = true;
-      # sortKey = "PERCENT_CPU";
-    };
-
-    ssh.enable = true;
-
     atuin = {
-      enable = true;
+      enable                = true;
       enableBashIntegration = true;
     };
-
-    autorandr.enable = true;
-
-    firefox.enable = true;
   };
 
   services = {
-    lorri.enable = true;
+
+    lorri.enable          = true;
     blueman-applet.enable = true;
-    udiskie.enable = true;
+    udiskie.enable        = true;
+    swayidle.enable       = true;
+    poweralertd.enable    = true;
+    autorandr.enable      = true;
+    safeeyes.enable       = true;
+
     wlsunset = {
-      enable = true;
-      latitude = "39" ;
+      enable    = true;
+      latitude  = "39" ;
       longitude = "-8" ;
     };
-    swayidle.enable = true;
-    poweralertd.enable = true;
-    autorandr.enable = true;
-    safeeyes.enable = true;
   };
 
 }

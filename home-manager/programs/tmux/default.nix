@@ -6,6 +6,7 @@
     keyMode = "vi";
     mouse = true;
     shortcut = "a";
+    historyLimit = 9999999;
     extraConfig = ''
         set -g default-terminal "screen-256color"
 
