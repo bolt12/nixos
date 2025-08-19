@@ -25,7 +25,12 @@
     };
 
     raspberry-pi-nix.url = "github:nix-community/raspberry-pi-nix";
-    emanote.url = "github:srid/emanote/1.2.0";
+
+    # Pin emanote to version 1.4.0.0
+    emanote = {
+      url = "github:srid/emanote/1.4.0.0";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
     emacs-overlay.url = "github:nix-community/emacs-overlay";
@@ -95,19 +100,18 @@
       nixosConfigurations = {
         bolt-nixos = nixpkgs.lib.nixosSystem {
           inherit system;
-
           specialArgs = {inherit inputs system;};
-          modules     = [ ./system/configuration.nix ];
+          modules = [ ./system/configuration.nix ];
         };
 
         bolt-rpi5-sd-image = (nixpkgs.lib.nixosSystem {
           system = "aarch64-linux";
-
           specialArgs = {inherit inputs;};
-          modules = [ inputs.raspberry-pi-nix.nixosModules.raspberry-pi
-                      inputs.raspberry-pi-nix.nixosModules.sd-image
-                      ./system/machine/rpi/rpi-basic.nix
-                    ];
+          modules = [
+            inputs.raspberry-pi-nix.nixosModules.raspberry-pi
+            inputs.raspberry-pi-nix.nixosModules.sd-image
+            ./system/machine/rpi/rpi-basic.nix
+          ];
         }).config.system.build.sdImage;
       };
 
@@ -116,13 +120,7 @@
         # SteamDeck home-manager configuration
         steam-deck = home-manager.lib.homeManagerConfiguration {
           pkgs = nixpkgs.legacyPackages.x86_64-linux;
-
-          # Specify your home configuration modules here, for example,
-          # the path to your home.nix.
           modules = [ ./home-manager/steam-deck/home.nix ];
-
-          # Optionally use extraSpecialArgs
-          # to pass through arguments to home.nix
           extraSpecialArgs = {inherit inputs;};
         };
       };
@@ -132,11 +130,7 @@
           inherit (inputs) nixpkgs;
           network = {
             description = "My remote machines";
-
             storage.legacy = {};
-
-            # Each deployment creates a new profile generation to able to run nixops
-            # rollback
             enableRollback = true;
           };
 
@@ -151,9 +145,7 @@
           };
 
           # Server definitions
-
           rpi-5 = { ... }: {
-
             # Augment standard NixOS module arguments.
             _module.args = {
               inherit inputs;

@@ -1,11 +1,14 @@
 # Edit this configuration file to define what should be installed on
 # your system.  Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running ‘nixos-help’).
+# and in the NixOS manual (accessible by running 'nixos-help').
 
 { config, lib, pkgs, raspberry-pi-nix, inputs, ... }@attrs:
 
+let
+  # Get emanote from the flake input
+  emanotePackage = inputs.emanote.packages.${pkgs.system}.default;
+in
 {
-
   nixpkgs = {
     config.allowUnfree = true;
   };
@@ -23,13 +26,14 @@
     ];
     # Required by Cachix to be used as non-root user
     settings.trusted-users = [ "bolt" "deck" "root" "@wheel" ];
+    settings.experimental-features = [ "nix-command" "flakes" ];
   };
 
   systemd = {
     services = {
       iwd.serviceConfig.Restart = "always";
 
-      # Emanote systemd service
+      # Emanote systemd service - now using the flake input version
       emanote = {
         enable = true;
         description = "Emanote web server";
@@ -37,9 +41,24 @@
         wantedBy = [ "default.target" ];
 
         serviceConfig = {
+          Type = "simple";
+          User = "bolt";
+          Group = "users";
+          # Ensure the journal directory exists and is owned by bolt
+          ExecStartPre = "${pkgs.coreutils}/bin/mkdir -p /home/bolt/journal";
           ExecStart = ''
-            ${pkgs.emanote}/bin/emanote --layers "/home/bolt/journal" run --host=0.0.0.0 --port=7000
+            ${emanotePackage}/bin/emanote --layers "/home/bolt/journal" run --no-ws --host=0.0.0.0 --port=7000
           '';
+          Restart = "always";
+          RestartSec = "10";
+
+          # Security hardening
+          NoNewPrivileges = true;
+          PrivateTmp = true;
+          ProtectSystem = "strict";
+          ProtectHome = "tmpfs";
+          ReadWritePaths = [ "/home/bolt/journal" ];
+          BindReadOnlyPaths = [ "/home/bolt/journal" ];
         };
       };
     };
@@ -54,8 +73,6 @@
         bluez-tools
         git
         git-annex
-        git-annex-utils
-        inputs.emanote
         iptables
         libraspberrypi
         neovim
@@ -63,13 +80,14 @@
         unzip
         wget
         wireguard-tools
+        # Add emanote to system packages as well for manual use
+        emanotePackage
       ];
 
     etc."unbound/unbound-ads".text = builtins.readFile ./unbound-ads/unbound_ad_servers;
   };
 
   services = {
-
     pipewire = {
       enable = true;
       alsa.enable = true;
@@ -86,7 +104,7 @@
         include = "/etc/unbound/unbound-ads";
         server = {
           verbosity = 2;
-          log-queries= "yes";
+          log-queries = "yes";
 
           serve-expired = "yes";
           serve-expired-ttl = 86400;
@@ -95,7 +113,6 @@
           do-ip4 = "yes";
           do-udp = "yes";
           do-tcp = "yes";
-
 
           harden-glue = "yes";
           harden-dnssec-stripped = "yes";
@@ -106,15 +123,17 @@
           num-threads = 1;
           so-rcvbuf = "1m";
 
-          private-address = [ "192.168.0.0/16"
-                              "169.254.0.0/16"
-                              "172.16.0.0/12"
-                              "10.0.0.0/8"
-                            ];
+          private-address = [
+            "192.168.0.0/16"
+            "169.254.0.0/16"
+            "172.16.0.0/12"
+            "10.0.0.0/8"
+          ];
 
-          access-control = [ "192.168.0.0/16 allow"
-                             "10.100.0.0/16 allow"
-                           ];
+          access-control = [
+            "192.168.0.0/16 allow"
+            "10.100.0.0/16 allow"
+          ];
           qname-minimisation = "yes";
         };
         remote-control = {
@@ -125,23 +144,21 @@
   };
 
   networking = {
-
     nameservers = [ "127.0.0.1" "1.1.1.1" "192.168.1.254" ];
 
     # enable NAT
     nat = {
-      enable             = true;
-      externalInterface  = "wlan0";
+      enable = true;
+      externalInterface = "wlan0";
       internalInterfaces = [ "wg0" ];
     };
 
     # Open ports in the firewall.
     firewall = {
-      enable          = true;
+      enable = true;
       allowedTCPPorts = [ 22 25 53 465 587 7000 ];
       allowedUDPPorts = [ 53 51820 ];
     };
-
 
     wireguard.interfaces = {
       # "wg0" is the network interface name. You can name the interface arbitrarily.
@@ -165,36 +182,24 @@
         '';
 
         # Path to the private key file.
-        #
-        # Note: The private key can also be included inline via the privateKey option,
-        # but this makes the private key world-readable; thus, using privateKeyFile is
-        # recommended.
         privateKeyFile = "/home/bolt/wireguard-keys/privatekey";
 
         peers = [
           # List of allowed peers.
           { # X1 G8 Carbon
-            # Public key of the peer (not a file path).
             publicKey = "hUUAT7Dny5aFJHvwUE9poaaAcEheyEDMhff5AwQPiRk=";
-            # List of IPs assigned to this peer within the tunnel subnet. Used to configure routing.
             allowedIPs = [ "10.100.0.2/32" ];
           }
           { # Android phone
-            # Public key of the peer (not a file path).
             publicKey = "KP3wpBB2zEsJnSHzVISjJ1gmUAAWS/rOa1rgBJ5uBkM=";
-            # List of IPs assigned to this peer within the tunnel subnet. Used to configure routing.
             allowedIPs = [ "10.100.0.3/32" ];
           }
-          { # Steam DEck
-            # Public key of the peer (not a file path).
+          { # Steam Deck
             publicKey = "N1VIBzM8r1g0ItVXPrAopAGN8R+Dpqcmm8BbPKHOBx8=";
-            # List of IPs assigned to this peer within the tunnel subnet. Used to configure routing.
             allowedIPs = [ "10.100.0.4/32" ];
           }
           { # Supernote
-            # Public key of the peer (not a file path).
             publicKey = "OcLbbW78TqTqFSdn24oCAfRt1U+VlSilAfeEspiqUR4=";
-            # List of IPs assigned to this peer within the tunnel subnet. Used to configure routing.
             allowedIPs = [ "10.100.0.5/32" ];
           }
         ];
