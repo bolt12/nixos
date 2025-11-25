@@ -92,6 +92,7 @@ let
     haskell-tools-nvim       # haskell lsp tools
     haskell-vim              # haskell vim
     highstr                  # highlight stuff
+    lean-nvim                # Lean NVim plugin
     litee-nvim               # Litee library
     luasnip                  # snippets
     matchit-zip              # match parentheses

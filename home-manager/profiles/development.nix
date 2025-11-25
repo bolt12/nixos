@@ -8,7 +8,9 @@ let
     inherit (pkgs) system;
     overlays = [];
   };
+
   nixops = inputs.nixops.defaultPackage.${system};
+
 in {
   home.packages = with pkgs; [
     # Version control and project management
@@ -61,6 +63,9 @@ in {
     haskellPackages.hoogle                    # Documentation search
     stack                                     # Stack package manager
     stylish-haskell                           # Code formatter
+
+    # Lean development
+    lean4
   ] ++ [
     # Bleeding-edge development tools from unstable channel
     unstable.nixd                             # Nix language server for IDE integration

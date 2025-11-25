@@ -35,7 +35,7 @@
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
     emacs-overlay.url = "github:nix-community/emacs-overlay";
 
-    kimai-client.url = "git+ssh://git@gitlab.well-typed.com/well-typed/kimai-client.git?ref=bolt12/patch";
+    # kimai-client.url = "git+ssh://git@gitlab.well-typed.com/well-typed/kimai-client.git?ref=bolt12/patch";
 
     # Needed for steam-deck
     nixgl.url = "github:guibou/nixGL";
@@ -113,6 +113,12 @@
             ./system/machine/rpi/rpi-basic.nix
           ];
         }).config.system.build.sdImage;
+
+        ninho-nixos = nixpkgs.lib.nixosSystem {
+          inherit system;
+          specialArgs = {inherit inputs system;};
+          modules = [ ./system/machine/ninho/configuration.nix ];
+        };
       };
 
       # Home Manager activation script
@@ -152,7 +158,7 @@
             };
 
             # Says we are going to deploy to an already existing NixOS machine
-            deployment.targetHost = "192.168.1.110";
+            deployment.targetHost = "10.100.0.1";
 
             imports = [
               ./system/machine/rpi/rpi5.nix

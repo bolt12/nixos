@@ -676,6 +676,11 @@ endfunction
 " Start Obsession on vim start
 autocmd VimEnter * Obsession
 
+" Lean nvim config
+lua << EOF
+require('lean').setup{ mappings = true }
+EOF
+
 " SUMMARY
 " a= -> Align on equal sign
 " a- -> Align on case match

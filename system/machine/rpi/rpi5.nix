@@ -88,6 +88,34 @@ in
   };
 
   services = {
+    # PostgreSQL configuration for RPI 5 (16KB page size compatibility)
+    postgresql = {
+      enable = true;
+      enableJIT = false; # Disable JIT on ARM for stability
+    };
+
+    # Immich - Self-hosted photo and video backup solution
+    # Access at http://<rpi-ip>:2283
+    immich = {
+      enable = true;
+      host = "0.0.0.0"; # Listen on all interfaces
+      port = 2283; # Default Immich port
+      openFirewall = true; # Automatically opens port 2283 in firewall
+
+      # Database settings (uses PostgreSQL configured above)
+      database = {
+        enable = true;
+        createDB = true;
+        # Disable Vectors to avoid jemalloc 16KB page size issues on RPI 5
+        enableVectors = false;
+      };
+
+      machine-learning.enable = false;
+
+      # Redis for job queuing and caching
+      redis.enable = true;
+    };
+
     pipewire = {
       enable = true;
       alsa.enable = true;
@@ -190,7 +218,7 @@ in
             publicKey = "hUUAT7Dny5aFJHvwUE9poaaAcEheyEDMhff5AwQPiRk=";
             allowedIPs = [ "10.100.0.2/32" ];
           }
-          { # Android phone
+          { # Bolt Android phone
             publicKey = "KP3wpBB2zEsJnSHzVISjJ1gmUAAWS/rOa1rgBJ5uBkM=";
             allowedIPs = [ "10.100.0.3/32" ];
           }
@@ -201,6 +229,14 @@ in
           { # Supernote
             publicKey = "OcLbbW78TqTqFSdn24oCAfRt1U+VlSilAfeEspiqUR4=";
             allowedIPs = [ "10.100.0.5/32" ];
+          }
+          { # Pollard Android phone
+            publicKey = "QFbI4k1IANbEVUpPEE71QF71aSQRgdr4OqJnwtxUkn0=";
+            allowedIPs = [ "10.100.0.6/32" ];
+          }
+          { # Ninho Home Server
+            publicKey = "xSZiLvopp4Q/eMMxYyzQrdmvt/dyejc2CR4/dzsm5gw=";
+            allowedIPs = [ "10.100.0.100/32" ];
           }
         ];
       };

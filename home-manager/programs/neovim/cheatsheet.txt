@@ -316,3 +316,30 @@ Paste most recent buffer               | `C-a ]`
 Enter command prompt                   | `C-a :`
 List all keybindings                   | `C-a ?`
 Show large clock                       | `C-a t`
+
+## Lean Files (<LocalLeader> prefix)
+
+Toggle the infoview open or closed     | <LocalLeader>i
+Pause the current infoview             | <LocalLeader>p
+Restart the Lean server                | <LocalLeader>r
+Configure infoview options             | <LocalLeader>v
+Place an infoview pin                  | <LocalLeader>x
+Clear all infoview pins                | <LocalLeader>c
+Place an infoview diff pin             | <LocalLeader>dx
+Clear current infoview diff pin        | <LocalLeader>dc
+Toggle auto diff pin mode              | <LocalLeader>dd
+Toggle auto diff pin (no clear)        | <LocalLeader>dt
+Jump into the infoview window          | <LocalLeader><Tab>
+Show abbreviation for symbol           | <LocalLeader>\\
+
+### In Infoview Windows
+
+Click a widget/interactive area      | <CR> or K
+"Select" a widget ("shift+click")    | gK
+Go-to-definition                     | gd
+Go-to-declaration                    | gD
+Go-to-type                           | gy
+Jump into a tooltip                  | <Tab> or J
+Jump out of a tooltip                | <Shift-Tab>
+Clear all open tooltips              | <Esc> or C
+Jump to the associated lean file     | <LocalLeader><Tab>
