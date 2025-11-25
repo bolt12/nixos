@@ -7,6 +7,148 @@ My current - and always evolving - NixOS configuration files, home-manager, neov
 
 ![desktop-1](imgs/desktop-1.png)
 
+## What is Nix/NixOS?
+
+**Nix** is a purely functional package manager, and **NixOS** is a Linux distribution built on top of it. Unlike traditional package managers that mutate system state, Nix treats packages as immutable values in a pure functional language.
+
+### Why Nix? A Functional Programmer's Perspective
+
+If you value **functional programming principles**, Nix will feel like home:
+
+#### Immutability
+- Packages are never modified after installation - they're **immutable values**
+- Each package is stored in `/nix/store/` with a cryptographic hash: `/nix/store/abc123-package-1.2.3/`
+- Installing a new version doesn't overwrite the old one - both coexist peacefully
+- No more "it works on my machine" - if the hash matches, the package is identical
+
+#### Determinism
+- **Reproducible builds**: Same inputs → Same outputs, always
+- Package definitions are pure functions: `package = f(dependencies, source, buildScript)`
+- No hidden global state, no implicit dependencies
+- Rollbacks are instant - just switch to a previous generation's closure
+
+#### Referential Transparency
+- Dependencies are explicit in the derivation (Nix's "build recipe")
+- No `/usr/lib` pollution - each package references its exact dependencies by hash
+- Change a dependency? The hash changes, giving you a new package - old one unaffected
+
+#### Composability
+- Mix and match packages from different versions (stable, unstable, specific commits)
+- Layer configurations: common base + user-specific + machine-specific
+- Override packages without forking: `package.override { enableFeature = true; }`
+
+### Development Environments: Why Everything Else Falls Short
+
+#### The Problem with Traditional Tools
+
+**Virtualenv/venv (Python)**:
+```bash
+# Global pollution, version conflicts, manual management
+python -m venv myenv
+source myenv/bin/activate  # Pollutes your shell
+pip install requests==2.28.0  # Hope it doesn't conflict with system packages!
+```
+- ❌ Only isolates Python packages, not system dependencies (libssl, gcc, etc.)
+- ❌ Breaks when you upgrade system Python
+- ❌ Doesn't handle non-Python dependencies (postgres, redis, etc.)
+- ❌ State lives in a directory you must remember to activate
+
+**Docker**:
+```dockerfile
+# Heavy, slow, requires root/daemon, not reproducible
+FROM ubuntu:latest  # "latest" = non-deterministic
+RUN apt-get update && apt-get install -y nodejs  # which version? ¯\_(ツ)_/¯
+```
+- ❌ "Works on my machine" still applies (base image differences)
+- ❌ Massive overhead (full OS, container runtime, daemon)
+- ❌ Can't easily mix with host tools (editor, git, etc.)
+- ❌ Dockerfile layer caching is fragile and non-deterministic
+
+**asdf/mise**:
+```bash
+# Better, but still imperative and stateful
+asdf install nodejs 18.0.0
+asdf global nodejs 18.0.0  # Mutates global state
+```
+- ❌ Still doesn't handle system dependencies
+- ❌ Installation is imperative and can fail midway
+- ❌ No guarantees about reproducibility across machines
+
+#### The Nix Way
+
+**Declarative, Pure, Reproducible**:
+
+Create a `shell.nix`:
+```nix
+{ pkgs ? import <nixpkgs> {} }:
+
+pkgs.mkShell {
+  buildInputs = with pkgs; [
+    nodejs_18      # Exact version
+    postgresql_15  # Including system dependencies
+    redis
+    python311      # Multiple Pythons? No problem
+  ];
+
+  shellHook = ''
+    export DATABASE_URL="postgresql://localhost/mydb"
+    echo "Welcome to the project environment!"
+  '';
+}
+```
+
+Enter the environment:
+```bash
+nix-shell  # Downloads and activates everything, instantly
+# OR
+nix develop  # With flakes - even more reproducible
+```
+
+**What you get**:
+- ✅ **Instant, deterministic environments**: Same hash = identical environment
+- ✅ **No global pollution**: Exit the shell, environment vanishes
+- ✅ **Complete isolation**: All dependencies (including system libs) are isolated
+- ✅ **Composition**: Overlay environments, share common bases
+- ✅ **Cross-project**: Multiple projects with conflicting dependencies? No problem
+- ✅ **Garbage collected**: Unused environments are automatically cleaned up
+- ✅ **Zero daemon**: No Docker daemon, no background processes
+
+**Real example from this repo**:
+```nix
+# Any contributor can get the exact environment:
+nix develop
+# Now they have the same tools, same versions, same everything
+```
+
+### Practical Benefits
+
+**For Users**:
+- Atomic upgrades: Either everything updates or nothing does
+- Instant rollbacks: Boot into previous system state from GRUB
+- Multiple users, multiple environments, zero conflicts
+- Test changes safely: `nixos-rebuild test` (doesn't modify boot)
+
+**For Developers**:
+- One `shell.nix` replaces: venv, rbenv, nvm, docker-compose, Makefile setup
+- CI/CD is just: `nix build` - if it builds locally, it builds in CI
+- Share exact environments with teammates via a single file
+- No "setup instructions" doc - just `nix develop`
+
+**For Operations**:
+- Entire server config in one repo (system + users + services)
+- Deploy with `nixos-rebuild switch --flake .#server`
+- Rollback failed deploys: just reboot and select previous generation
+- No config drift: Nix derivation = exact system state
+
+### Why This Repository Demonstrates Nix's Power
+
+This configuration shows Nix at its best:
+- **Multiple users** (bolt, pollard) with different needs, zero conflicts
+- **Multiple machines** (desktop, server, Raspberry Pi) from one repo
+- **Composable configs**: bolt-with-de imports bolt + adds desktop (DRY principle)
+- **Reproducible**: Clone this repo, run `nixos-rebuild`, get the exact same system
+- **Type-safe**: Options module validates configuration at evaluation time
+
 ## Programs
 
 The home-manager configuration contains details about all the software I use. Here's a shout-out to the ones I use the most and that are customized to my needs.
