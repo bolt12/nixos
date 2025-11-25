@@ -230,11 +230,11 @@ in
     };
 
     users.bolt = { nixpkgs, ... }: {
-      imports = [ ../home-manager/bolt/home.nix ];
+      imports = [ ../../../home-manager/users/bolt/home.nix ];
     };
 
     users.pollard = { nixpkgs, ... }: {
-      imports = [ ../home-manager/pollard.nix ];
+      imports = [ ../../../home-manager/users/pollard/home.nix ];
     };
   };
 

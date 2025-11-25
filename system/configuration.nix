@@ -146,7 +146,7 @@ in
     };
 
     users.bolt = { nixpkgs, ... }: {
-      imports = [ ../home-manager/home.nix ];
+      imports = [ ../home-manager/users/bolt-with-de/home.nix ];
     };
   };
 

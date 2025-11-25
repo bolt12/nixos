@@ -123,11 +123,32 @@
 
       # Home Manager activation script
       homeConfigurations = {
+        # Bolt headless configuration for ninho server
+        bolt = home-manager.lib.homeManagerConfiguration {
+          pkgs = nixpkgs.legacyPackages.${system};
+          modules = [ ./home-manager/users/bolt/home.nix ];
+          extraSpecialArgs = { inherit inputs system; };
+        };
+
+        # Bolt desktop configuration for bolt-nixos
+        bolt-with-de = home-manager.lib.homeManagerConfiguration {
+          pkgs = nixpkgs.legacyPackages.${system};
+          modules = [ ./home-manager/users/bolt-with-de/home.nix ];
+          extraSpecialArgs = { inherit inputs system; };
+        };
+
+        # Pollard configuration for ninho server
+        pollard = home-manager.lib.homeManagerConfiguration {
+          pkgs = nixpkgs.legacyPackages.${system};
+          modules = [ ./home-manager/users/pollard/home.nix ];
+          extraSpecialArgs = { inherit inputs system; };
+        };
+
         # SteamDeck home-manager configuration
         steam-deck = home-manager.lib.homeManagerConfiguration {
           pkgs = nixpkgs.legacyPackages.x86_64-linux;
-          modules = [ ./home-manager/steam-deck/home.nix ];
-          extraSpecialArgs = {inherit inputs;};
+          modules = [ ./home-manager/users/steam-deck/home.nix ];
+          extraSpecialArgs = { inherit inputs; };
         };
       };
 

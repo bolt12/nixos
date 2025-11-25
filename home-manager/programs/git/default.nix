@@ -1,4 +1,8 @@
-{ ... }:
+{ config, lib, ... }:
+
+# Git configuration with user-specific parameterization
+# Common git settings are defined here, while user-specific values
+# (name, email, signing key) are pulled from config.userConfig.git
 
 let
   gitConfig = {
@@ -50,11 +54,12 @@ in
       "*.vim"
       "tags"
     ];
-    userEmail = "armandoifsantos@gmail.com";
-    userName = "Armando Santos";
 
-    signing.key = null;
-    signing.signByDefault = true;
+    # User-specific configuration pulled from userConfig options
+    userName = lib.mkDefault (config.userConfig.git.userName or "");
+    userEmail = lib.mkDefault (config.userConfig.git.userEmail or "");
+    signing.key = lib.mkDefault (config.userConfig.git.signingKey or null);
+    signing.signByDefault = lib.mkDefault true;
 
     delta = {
       enable = true;

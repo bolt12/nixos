@@ -4,6 +4,7 @@
 { pkgs, ... }: {
   home.packages = with pkgs; [
     # Core shell utilities
+    bat                          # Better cat with syntax highlighting
     bash                         # Bash shell
     gawk                         # Text processing
     bc                           # Calculator
