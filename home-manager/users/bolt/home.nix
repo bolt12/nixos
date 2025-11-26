@@ -46,6 +46,7 @@ in
     };
   };
 
+
   home = {
     username = config.userConfig.username;
     homeDirectory = config.userConfig.homeDirectory;
@@ -57,6 +58,11 @@ in
         "caps:escape"
         "grp:shifts_toggle"
       ];
+    };
+
+    sessionVariables = {
+      EDITOR="nvim";
+      VISUAL="nvim";
     };
 
     sessionPath = [
