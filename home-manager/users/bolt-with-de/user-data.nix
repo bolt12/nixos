@@ -1,4 +1,4 @@
-{ config, ... }:
+{ pkgs, config, lib, ... }:
 
 # User-specific data for bolt-with-de (X1 Carbon laptop)
 # Contains Syncthing configuration for syncing with ninho server
@@ -47,6 +47,7 @@ in
   };
 
   # Syncthing configuration for X1 laptop
+  # This overrides the base bolt configuration from bolt/user-data.nix
   services.syncthing = {
     overrideDevices = true;
     overrideFolders = true;
@@ -54,24 +55,18 @@ in
     tray.enable = true;
 
     settings = {
-      devices = {
+      devices = lib.mkForce {
         "ninho-server" = {
-          id = "REX7TVF-RYLC5YI-HS23IDX-XIXTH7Y-5ETUCHQ-4PHPOC4-RIUYV75-L4UXFAN"; # Fill with device ID from ninho server after first connection
-          autoAcceptFolders = true; # Optional: auto-accept new folders from this device
+          id = "REX7TVF-RYLC5YI-HS23IDX-XIXTH7Y-5ETUCHQ-4PHPOC4-RIUYV75-L4UXFAN";
+          autoAcceptFolders = true;
         };
       };
 
-      folders = {
+      folders = lib.mkForce {
         "x1-laptop-desktop-folder" = {
           path = "${config.userConfig.homeDirectory}/Desktop";
           devices = [ "ninho-server" ];
-          };
-        # TODO: Figure out what to do with this folder and immich.
-        # "x1-laptop-documents-folder" = {
-        #   path = "${config.userConfig.homeDirectory}/Documents/OsmoAction";
-        #   devices = [ "ninho-server" ];
-        #   };
-        # };
+        };
       };
     };
   };
