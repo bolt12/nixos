@@ -51,8 +51,18 @@ in
     firewall = {
       enable            = true;
       trustedInterfaces = [ "wg0" ];
-      allowedTCPPorts   = [ 20 21 8000 ];
-      allowedUDPPorts   = [ 51820 ];
+      allowedTCPPorts   = [
+        20    # FTP
+        21    # FTP
+        8000  # Development
+        8384  # Syncthing web UI
+        22000 # Syncthing file transfers
+      ];
+      allowedUDPPorts   = [
+        51820 # WireGuard
+        22000 # Syncthing discovery
+        21027 # Syncthing discovery
+      ];
     };
 
   };

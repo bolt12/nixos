@@ -23,6 +23,9 @@
 
     # Add XDG desktop configurations
     ../../xdg/sway/default.nix
+
+    # Desktop-specific user data (Syncthing configuration)
+    ./user-data.nix
   ];
 
   # Desktop-specific input method configuration

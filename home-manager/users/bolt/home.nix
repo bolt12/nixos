@@ -28,9 +28,10 @@ in
     ../../programs/git/default.nix
     ../../programs/kimai-client/default.nix
     ../../programs/neovim/default.nix
+    ../../programs/syncthing/default.nix
     ../../programs/tmux/default.nix
 
-    # User-specific data (git email, bash aliases, etc.)
+    # User-specific data (git email, bash aliases, Syncthing config, etc.)
     ./user-data.nix
   ];
 

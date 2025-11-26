@@ -1,7 +1,7 @@
 { config, ... }:
 
 # User-specific data for bolt
-# Contains personal aliases and directory shortcuts
+# Contains personal aliases, directory shortcuts, and Syncthing configuration
 
 {
   userConfig.bash.extraAliases = {
@@ -20,5 +20,33 @@
 
     # Tool shortcuts
     doom = "${config.userConfig.homeDirectory}/.emacs.d/bin/doom";
+  };
+
+  # Syncthing configuration for ninho server
+  services.syncthing = {
+    overrideDevices = true;
+    overrideFolders = true;
+
+    settings = {
+      # devices = {
+      #   "x1-g8-laptop" = {
+      #     id = "OZ4BCQS-3HVVW2H-RSOS7MV-EHDC2HY-I42ZTYP-K2EWHTS-PHPOHKK-7MZL6Q5"; # Fill with device ID from x1 laptop after first connection
+      #   };
+      # };
+
+      # folders = {
+      #   "x1-laptop-sync" = {
+      #     path = "${config.userConfig.homeDirectory}/X1-G8-Laptop";
+      #     devices = [ "x1-g8-laptop" ];
+      #     versioning = {
+      #       type = "simple";
+      #       params = {
+      #         keep = "10";  # Keep 10 versions of each file
+      #       };
+      #     };
+      #   };
+      # };
+
+    };
   };
 }
