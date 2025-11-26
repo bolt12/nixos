@@ -1,5 +1,8 @@
 { config, pkgs, ... }:
 {
+  # Change port number
+  services.nginx.virtualHosts."nextcloud.ninho.local".listen = [ { addr = "127.0.0.1"; port = 8080; } ];
+
   services.nextcloud = {
     enable = true;
     hostName = "nextcloud.ninho.local";  # Domain for Nextcloud

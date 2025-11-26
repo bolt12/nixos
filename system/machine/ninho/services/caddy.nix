@@ -17,7 +17,7 @@
       '';
 
       "nextcloud.ninho.local".extraConfig = ''
-        reverse_proxy localhost:80
+        reverse_proxy localhost:8080
         tls internal
       '';
 
