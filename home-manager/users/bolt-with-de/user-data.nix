@@ -15,10 +15,6 @@ let
     *~
     *.lock
 
-    // --- Git ---
-    // Only ignore the .git folder at the root of a repo, not the files inside
-    .git/
-
     // --- Haskell (Cabal / Stack) ---
     dist/
     dist-newstyle/
@@ -44,6 +40,24 @@ in
   # Syncthing will read this file to know what to skip.
   home.file."Desktop/.stignore" = {
     source = docsIgnorePatterns;
+  };
+
+  userConfig.bash.extraAliases = lib.mkForce {
+    # Project directories
+    uminho    = "cd ${config.userConfig.homeDirectory}/x1-g8-laptop/Desktop/Bolt/UMinho/";
+    tese      = "cd ${config.userConfig.homeDirectory}/x1-g8-laptop/Desktop/Bolt/UMinho/5ºAno/Tese";
+    haskell   = "cd ${config.userConfig.homeDirectory}/x1-g8-laptop/Desktop/Bolt/Playground/Haskell/";
+    talks     = "cd ${config.userConfig.homeDirectory}/x1-g8-laptop/Desktop/Bolt/Playground/Talks/";
+    agdacd    = "cd ${config.userConfig.homeDirectory}/x1-g8-laptop/Desktop/Bolt/Playground/Agda/";
+    playg     = "cd ${config.userConfig.homeDirectory}/x1-g8-laptop/Desktop/Bolt/Playground/";
+
+    # Work directories
+    welltyped = "cd ${config.userConfig.homeDirectory}/x1-g8-laptop/Desktop/Bolt/UMinho/Profissional/Well-Typed/";
+    iohk      = "cd ${config.userConfig.homeDirectory}/x1-g8-laptop/Desktop/Bolt/UMinho/Profissional/Well-Typed/Projects/IOHK";
+    hsbindgen = "cd ${config.userConfig.homeDirectory}/x1-g8-laptop/Desktop/Bolt/UMinho/Profissional/Well-Typed/Projects/hs-bindgen";
+
+    # Tool shortcuts
+    doom = "${config.userConfig.homeDirectory}/.emacs.d/bin/doom";
   };
 
   # Syncthing configuration for X1 laptop

@@ -141,8 +141,6 @@ in
 
     # NVIDIA RTX 5090 Configuration
     nvidia = {
-      enabled = true;
-
       # Use latest driver for RTX 5090 (Blackwell architecture requires 565+)
       package = config.boot.kernelPackages.nvidiaPackages.latest;
 
