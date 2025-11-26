@@ -48,6 +48,12 @@
               description = "LLM API";
             };
           }
+          {
+            Grafana = {
+              href = "https://grafana.ninho.local";
+              description = "Monitoring";
+            };
+          }
         ];
       }
     ];

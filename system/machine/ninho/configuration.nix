@@ -178,7 +178,10 @@ in
   # ==========================================================================
 
   networking = {
-    networkmanager.enable = true;
+    networkmanager = {
+      enable = true;
+      dns = "none";
+    };
 
     # DNS servers
     nameservers = [
@@ -487,6 +490,7 @@ in
       fi
     '';
 
+    # Runs on port 11987
     coolercontrol.enable = true;
   };
 

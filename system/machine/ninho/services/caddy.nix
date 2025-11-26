@@ -45,6 +45,16 @@
         reverse_proxy localhost:8384
         tls internal
       '';
+
+      "grafana.ninho.local".extraConfig = ''
+        reverse_proxy localhost:3000
+        tls internal
+      '';
+
+      "coolercontrol.ninho.local".extraConfig = ''
+        reverse_proxy localhost:11987
+        tls internal
+      '';
     };
   };
 
