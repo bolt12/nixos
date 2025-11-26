@@ -17,6 +17,7 @@ in
 
     # Package profiles (minimal for learning)
     ../../profiles/system-tools.nix
+    ../../profiles/development.nix
 
     # Development programs (she's a software engineer)
     ../../programs/neovim/default.nix
