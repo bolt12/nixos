@@ -1,4 +1,4 @@
-{ config, ... }:
+{ pkgs, config, ... }:
 
 # User-specific data for bolt
 # Contains personal aliases, directory shortcuts, and Syncthing configuration
@@ -70,16 +70,18 @@ in
   };
 
   # Syncthing configuration for ninho server
+  # Note: This is only used when bolt/home.nix is loaded directly on ninho
+  # When bolt-with-de imports this file, the laptop's user-data.nix overrides this
   services.syncthing = {
     overrideDevices = true;
     overrideFolders = true;
 
-    guiAddress = "0.0.0.0:8384"
+    guiAddress = "0.0.0.0:8384";
 
     settings = {
       devices = {
         "x1-g8-laptop" = {
-          id = "OZ4BCQS-3HVVW2H-RSOS7MV-EHDC2HY-I42ZTYP-K2EWHTS-PHPOHKK-7MZL6Q5"; # Fill with device ID from x1 laptop after first connection
+          id = "OZ4BCQS-3HVVW2H-RSOS7MV-EHDC2HY-I42ZTYP-K2EWHTS-PHPOHKK-7MZL6Q5";
         };
       };
 
@@ -87,16 +89,8 @@ in
         "x1-laptop-desktop-folder" = {
           path = "${config.userConfig.homeDirectory}/x1-g8-laptop/Desktop";
           devices = [ "x1-g8-laptop" ];
-          };
-
-        # TODO: Figure out what to do with this folder and immich.
-        # "x1-laptop-documents-folder" = {
-        #   path = "/storage/media/bolt/x1-g8-laptop";
-        #   devices = [ "x1-g8-laptop" ];
-        #   };
-        # };
+        };
       };
-
     };
   };
 }
