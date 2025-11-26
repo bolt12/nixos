@@ -43,7 +43,7 @@ in
 {
   # This places the file at ~/Documents/.stignore
   # Syncthing will read this file to know what to skip.
-  home.file."Documents/.stignore" = {
+  home.file."x1-g8-laptop/Desktop/.stignore" = {
     source = docsIgnorePatterns;
   };
 
