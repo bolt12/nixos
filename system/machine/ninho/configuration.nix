@@ -16,6 +16,7 @@ in
 {
   imports = [
     ./hardware-configuration.nix
+    ./services  # All service modules (Caddy, Nextcloud, Immich, Ollama, etc.)
     inputs.home-manager.nixosModules.home-manager
   ];
 
@@ -177,7 +178,10 @@ in
   # ==========================================================================
 
   networking = {
-    networkmanager.enable = true;
+    networkmanager = {
+      enable = true;
+      dns = "none";
+    };
 
     # DNS servers
     nameservers = [
@@ -486,6 +490,7 @@ in
       fi
     '';
 
+    # Runs on port 11987
     coolercontrol.enable = true;
   };
 
