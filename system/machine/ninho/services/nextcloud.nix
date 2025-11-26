@@ -12,7 +12,6 @@
     # Increase the maximum file upload size to avoid problems uploading videos.
     maxUploadSize = "16G";
     https = true;
-    enableBrokenCiphersForSSE = false;
 
     appstoreEnable = true;
     extraAppsEnable = true;
@@ -61,6 +60,9 @@
   services.onlyoffice = {
     enable = true;
     hostname = "onlyoffice.ninho.local";
+    securityNonceFile = "${pkgs.writeText "nixos-test-onlyoffice-nonce.conf" ''
+      set $secure_link_secret "ninho-nixos";
+    ''}";
   };
 
   # Create admin password file

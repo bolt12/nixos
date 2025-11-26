@@ -1,4 +1,4 @@
-{ config, ... }:
+{ pkgs, config, ... }:
 
 # User-specific data for pollard
 # Contains ZFS learning aliases and helpful shortcuts

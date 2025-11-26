@@ -13,7 +13,7 @@
       };
 
       # GPU metrics (RTX 5090)
-      nvidia = {
+      nvidia-gpu = {
         enable = true;
         port = 9835;
       };
