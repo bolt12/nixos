@@ -488,7 +488,7 @@ to start up a shell process, and is also more consistent."
 ;; to have it loaded on startup.
 
 (use-package doom-themes
-  :straight t
+  ;; Already installed via NixOS, no need for :straight t
   :config
   ;; Let's load the Gruvbox theme for now.
   (load-theme 'doom-gruvbox t))

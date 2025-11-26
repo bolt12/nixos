@@ -16,7 +16,7 @@ in {
       use-package
       nix-mode
       all-the-icons-ivy
-      doom-themes
+      doom-themes  # Add doom-themes from nixpkgs
     ];
   };
   home.file.".emacs.d" = {
