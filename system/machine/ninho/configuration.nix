@@ -16,6 +16,7 @@ in
 {
   imports = [
     ./hardware-configuration.nix
+    ./services  # All service modules (Caddy, Nextcloud, Immich, Ollama, etc.)
     inputs.home-manager.nixosModules.home-manager
   ];
 
