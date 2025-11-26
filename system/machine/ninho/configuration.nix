@@ -1,13 +1,17 @@
 { config, lib, pkgs, inputs, system, ... }@attrs:
 
-let
+# ============================================================================
+# Ninho Server Configuration
+# ============================================================================
+# Home server with AMD Ryzen 9 9950X3D, 128GB RAM, RTX 5090
+# Multi-user setup (bolt, pollard) with ZFS RAID storage
+# ============================================================================
 
+let
   unstable = import inputs.nixpkgs-unstable {
-    overlays = [
-    ];
+    overlays = [];
     system = system;
   };
-
 in
 {
   imports = [
@@ -15,32 +19,53 @@ in
     inputs.home-manager.nixosModules.home-manager
   ];
 
-  # ===== BOOT CONFIGURATION =====
+  # ==========================================================================
+  # SYSTEM INFO
+  # ==========================================================================
+
+  system.stateVersion = "25.05";
+
+  networking = {
+    hostName = "nixos-ninho";
+    # Required for ZFS (generated with: head -c4 /dev/urandom | od -A none -t x4)
+    hostId = "d8e24c1d";
+  };
+
+  time.timeZone = "Europe/Lisbon";
+  i18n.defaultLocale = "en_US.UTF-8";
+
+  # ==========================================================================
+  # BOOT & KERNEL
+  # ==========================================================================
+
   boot = {
-    # Support ZFS
+    # Supported filesystems
     supportedFilesystems = [ "zfs" ];
 
-    # ZFS-specific settings
+    # Kernel modules
+    kernelModules = [ "kvm-amd" "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ];
+
+    # Kernel parameters
+    kernelParams = [
+      # ZFS ARC cache: With 128GB RAM, default (50%) = 64GB is fine
+      # Uncomment to limit for GPU workloads:
+      # "zfs.zfs_arc_max=34359738368"  # 32GB in bytes
+
+      # NVIDIA configuration
+      "nvidia-drm.modeset=1"
+      "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
+    ];
+
+    # ZFS configuration
     zfs = {
       forceImportRoot = false;
-
-      # Recommended: Don't force import all pools at boot
-      # Only import pools that are configured in hardware-configuration.nix
       forceImportAll = false;
-
-      # ZFS kernel module parameters (optional tuning)
-      # Limit ARC cache to prevent OOM on systems with limited RAM
-      # Default is 50% of RAM, adjust based on your needs
-      # With 128GB RAM, you can afford to give ZFS more cache
-      # extraPools = [ "storage" ];  # Auto-import additional pools
+      # extraPools = [ "storage" ];  # Auto-import additional pools if needed
     };
 
-    # NVIDIA kernel modules
-    kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ];
-
-    # LUKS devices (decrypt at boot)
+    # LUKS encrypted devices
     initrd.luks.devices = {
-      # OS pool devices
+      # Root pool (NVMe mirror)
       "luks-rpool-nvme0n1-part2" = {
         device = "/dev/disk/by-uuid/e3b307b9-0ab9-4032-8db0-9674ebd53e00";
         preLVM = true;
@@ -50,7 +75,7 @@ in
         preLVM = true;
       };
 
-      # Storage pool devices
+      # Storage pool (HDD RAIDZ1)
       "luks-storage-sda-part2" = {
         device = "/dev/disk/by-uuid/23001c3e-c434-4ca3-a289-22942510bfca";
         preLVM = true;
@@ -76,7 +101,7 @@ in
         enable = true;
         device = "nodev";
         efiSupport = true;
-        enableCryptodisk = true;  # Required for LUKS
+        enableCryptodisk = true;
         zfsSupport = true;
 
         # Mirror boot to second drive for redundancy
@@ -89,183 +114,262 @@ in
         ];
       };
     };
-
-    # Kernel parameters
-    kernelParams = [
-      # Optional: Limit ZFS ARC cache
-      # With 128GB RAM, default (50%) = 64GB for ZFS ARC is fine
-      # If you want to limit it for GPU workloads, uncomment:
-      # "zfs.zfs_arc_max=34359738368"  # 32GB in bytes
-
-      # NVIDIA DRM kernel mode setting (required for some applications)
-      "nvidia-drm.modeset=1"
-
-      # Disable GPU power saving during boot for stability
-      "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
-    ];
   };
 
-  nix = {
-    channel.enable = true;
-    settings = {
-      auto-optimise-store = true;
-      trusted-users = [ "root" "bolt" "pollard" ];
-      experimental-features = [ "nix-command" "flakes" ];
+  # ==========================================================================
+  # HARDWARE
+  # ==========================================================================
 
-      # Parallel builds
-      max-jobs = "auto";
-      cores = 0;
-
-      # Keep build logs small
-      keep-going = true;
-      log-lines = 25;
+  hardware = {
+    # Bluetooth
+    bluetooth = {
+      enable = true;
+      hsphfpd.enable = false;
+      settings = {
+        General.Enable = lib.concatStringsSep "," [ "Source" "Sink" "Media" "Socket" ];
+      };
     };
 
-    # Daily garbage collection (aggressive)
-    gc = {
-      automatic = true;
-      dates = "daily";
-      options = "--delete-older-than 30d";
-      persistent = true;  # Run even if system was off
+    # Graphics/GPU
+    graphics = {
+      enable = true;
+      enable32Bit = true;  # For Steam and 32-bit applications
     };
 
-    # Weekly optimization
-    optimise = {
-      automatic = true;
-      dates = [ "weekly" ];
+    # NVIDIA RTX 5090 Configuration
+    nvidia = {
+      # Use latest driver for RTX 5090 (Blackwell architecture requires 565+)
+      package = config.boot.kernelPackages.nvidiaPackages.latest;
+
+      # Enable modesetting (required for Wayland)
+      modesetting.enable = true;
+
+      # Power management
+      powerManagement = {
+        enable = true;
+        # finegrained = true;  # Experimental - uncomment for better Blackwell power control
+      };
+
+      # Use open-source kernel module (better for RTX 40/50 series)
+      open = true;
+
+      # Persistence daemon (required for headless)
+      nvidiaPersistenced = true;
     };
   };
 
-  # ===== NETWORK CONFIGURATION =====
+  # Load NVIDIA driver
+  services.xserver.videoDrivers = [ "nvidia" ];
+
+  # ==========================================================================
+  # NETWORKING
+  # ==========================================================================
+
   networking = {
-    # Required: Unique ID for ZFS
-    # Generate with: head -c4 /dev/urandom | od -A none -t x4
-    hostId = "d8e24c1d";  # e.g., "a1b2c3d4"
+    networkmanager.enable = true;
 
-    hostName = "nixos-ninho";  # Change as desired
-    networkmanager.enable = true;  # Or use systemd-networkd
-
-    nameservers =
-    [ "10.100.0.1" # RPI 5 VPN IP
+    # DNS servers
+    nameservers = [
+      "10.100.0.1"  # RPI 5 VPN gateway
       "1.1.1.1"
       "8.8.8.8"
       "8.8.4.4"
     ];
 
-    # Enable WireGuard
+    # Firewall
     firewall = {
-      enable            = true;
-      trustedInterfaces = [ "wg0" ];
-      allowedTCPPorts   = [ 20 21 8000 ];
-      allowedUDPPorts   = [ 51820 ];
-    };
-
-    wireguard.interfaces = {
-      # "wg0" is the network interface name. You can name the interface arbitrarily.
-      wg0 = {
-        # Determines the IP address and subnet of the client's end of the tunnel interface.
-        ips = [ "10.100.0.100/24" ];
-        listenPort = 51820; # to match firewall allowedUDPPorts (without this wg uses random port numbers)
-
-        # Path to the private key file.
-        #
-        # Note: The private key can also be included inline via the privateKey option,
-        # but this makes the private key world-readable; thus, using privateKeyFile is
-        # recommended.
-        privateKeyFile = "/home/wireguard-keys/private";
-
-        peers = [
-          # For a client configuration, one peer entry for the server will suffice.
-
-          {
-            # Public key of the server (not a file path).
-            publicKey = "2OIP77a10/Fas+eCvYQNa3ixFNOq0JqZIuSk1tY/QTM=";
-
-            # Forward all the traffic via VPN.
-            allowedIPs = [ "0.0.0.0/0" ];
-            # Or forward only particular subnets
-            #allowedIPs = [ "10.100.0.1" "91.108.12.0/22" ];
-
-            # Set this to the server IP and port.
-            endpoint = "rpi-nixos.ddns.net:51820";
-
-            # Send keepalives every 25 seconds. Important to keep NAT tables alive.
-            persistentKeepalive = 25;
-          }
-        ];
-      };
-    };
-  };
-
-  # Select internationalisation properties.
-  i18n.defaultLocale = "en_US.UTF-8";
-
-  # Set your time zone.
-  time.timeZone = "Europe/Lisbon";
-
-  # Enable Docker support.
-  virtualisation = {
-    docker = {
       enable = true;
+      trustedInterfaces = [ "wg0" ];
+      allowedTCPPorts = [ 20 21 8000 ];
+      allowedUDPPorts = [ 51820 ];
+    };
+
+    # WireGuard VPN
+    wireguard.interfaces.wg0 = {
+      ips = [ "10.100.0.100/24" ];
+      listenPort = 51820;
+      privateKeyFile = "/home/wireguard-keys/private";
+
+      peers = [
+        {
+          publicKey = "2OIP77a10/Fas+eCvYQNa3ixFNOq0JqZIuSk1tY/QTM=";
+          allowedIPs = [ "0.0.0.0/0" ];  # Full tunnel
+          endpoint = "rpi-nixos.ddns.net:51820";
+          persistentKeepalive = 25;
+        }
+      ];
     };
   };
 
-  hardware = {
-    bluetooth = {
-      enable         = true;
-      hsphfpd.enable = false;
-      settings       = {
-        General.Enable =
-          lib.concatStringsSep "," [ "Source" "Sink" "Media" "Socket" ];
+  # ==========================================================================
+  # STORAGE & ZFS
+  # ==========================================================================
+
+  services.zfs = {
+    # Auto-scrub pools weekly
+    autoScrub = {
+      enable = true;
+      pools = [ "rpool" "storage" ];
+      interval = "Sun *-*-* 02:00:00";  # Sunday 2 AM
+    };
+  };
+
+  # Advanced snapshot management with Sanoid
+  services.sanoid = {
+    enable = true;
+    interval = "*:00,15,30,45";  # Every 15 minutes
+
+    datasets = {
+      # Root filesystem - conservative snapshots
+      "rpool/root" = {
+        useTemplate = [ "system" ];
+        recursive = false;
+      };
+
+      # Nix store - no snapshots (reproducible)
+      "rpool/nix" = {
+        autosnap = false;
+        autoprune = false;
+      };
+
+      # Home directories - frequent snapshots
+      "rpool/home" = {
+        useTemplate = [ "production" ];
+        recursive = true;
+      };
+
+      # Storage data - daily snapshots with long retention
+      "storage/data" = {
+        useTemplate = [ "storage" ];
+        recursive = true;
       };
     };
 
-    # NVIDIA RTX 5090 GPU Configuration
-    graphics = {
-      enable      = true;
-      enable32Bit = true;  # Required for Steam and 32-bit applications
-    };
-
-    nvidia = {
-      # Use the latest production driver for RTX 5090 (Blackwell architecture)
-      # RTX 5090 requires driver 565+ for full support
-      package = config.boot.kernelPackages.nvidiaPackages.latest;
-
-      # Modesetting is required for Wayland support (if ever needed)
-      modesetting.enable = true;
-
-      # Power management - recommended for modern GPUs
-      powerManagement = {
-        enable = true;
-        # Fine-grained power management (experimental but recommended for Blackwell)
-        # finegrained = true;
+    templates = {
+      # System datasets (root)
+      system = {
+        frequently = 0;
+        hourly = 24;      # 24 hours
+        daily = 7;        # 7 days
+        weekly = 4;       # 4 weeks
+        monthly = 3;      # 3 months
+        yearly = 0;
+        autosnap = true;
+        autoprune = true;
       };
 
-      # Enable the open-source kernel module (available for RTX 40/50 series)
-      # This provides better performance and stability for modern cards
-      open = true;
+      # User data (home)
+      production = {
+        frequently = 4;   # 4 x 15min = 1 hour
+        hourly = 48;      # 2 days
+        daily = 14;       # 2 weeks
+        weekly = 8;       # 2 months
+        monthly = 12;     # 1 year
+        yearly = 2;       # 2 years
+        autosnap = true;
+        autoprune = true;
+      };
 
-      # NVreg_PreserveVideoMemoryAllocations=1 is required for suspend/resume
-      # with power management enabled
-      nvidiaPersistenced = true;
+      # Bulk storage
+      storage = {
+        frequently = 0;
+        hourly = 0;
+        daily = 30;       # 1 month
+        weekly = 8;       # 2 months
+        monthly = 24;     # 2 years
+        yearly = 5;       # 5 years
+        autosnap = true;
+        autoprune = true;
+      };
+    };
+
+    extraArgs = [ "--verbose" ];
+  };
+
+  # ==========================================================================
+  # SERVICES
+  # ==========================================================================
+
+  services = {
+    # SSH server
+    openssh = {
+      enable = true;
+      settings = {
+        PermitRootLogin = "no";
+        X11Forwarding = true;
+        UseDNS = "no";
+      };
+      extraConfig = ''
+        ClientAliveInterval 60
+        ClientAliveCountMax 3
+      '';
+    };
+
+    # Getty (login banner)
+    getty.helpLine = ''
+      ╔═══════════════════════════════════════════════════╗
+      ║             Welcome to Ninho Server               ║
+      ╚═══════════════════════════════════════════════════╝
+    '';
+  };
+
+  # ==========================================================================
+  # VIRTUALIZATION
+  # ==========================================================================
+
+  virtualisation.docker.enable = true;
+
+  # ==========================================================================
+  # USERS
+  # ==========================================================================
+
+  users.users = {
+    bolt = {
+      isNormalUser = true;
+      description = "Armando";
+      extraGroups = [
+        "wheel"           # sudo access
+        "networkmanager"
+        "docker"
+        "audio"
+        "video"
+        "sway"
+        "plugdev"
+      ];
+      initialPassword = "ninho";  # CHANGE AFTER FIRST LOGIN
+      openssh.authorizedKeys.keys = [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHKTf4Bb2BBymwZvxPtxEefspOPTACPn3HqrRiWAMJEJ armandoifsantos@gmail.com"
+      ];
+    };
+
+    pollard = {
+      isNormalUser = true;
+      description = "Claudia";
+      extraGroups = [
+        "wheel"           # sudo access
+        "networkmanager"
+        "docker"
+        "audio"
+        "video"
+        "sway"
+        "plugdev"
+      ];
+      initialPassword = "ninho";  # CHANGE AFTER FIRST LOGIN
+
+      # openssh.authorizedKeys.keys = [
+      #   "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... pollard@computer"
+      # ];
     };
   };
 
-  # Making fonts accessible to applications.
-  fonts = {
-    fontDir.enable         = true;
-    enableGhostscriptFonts = true;
-    enableDefaultPackages  = true;
-  };
+  # ==========================================================================
+  # HOME-MANAGER
+  # ==========================================================================
 
-  # Home Manager Configuration:
   home-manager = {
-    useGlobalPkgs   = false;
+    useGlobalPkgs = false;
     useUserPackages = true;
-
-    extraSpecialArgs = {
-      inherit inputs system;
-    };
+    extraSpecialArgs = { inherit inputs system; };
 
     users.bolt = { nixpkgs, ... }: {
       imports = [ ../../../home-manager/users/bolt/home.nix ];
@@ -276,137 +380,94 @@ in
     };
   };
 
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
+  # ==========================================================================
+  # NIX CONFIGURATION
+  # ==========================================================================
 
-  # ===== SERVICES =====
-  services = {
-    # Enable ZFS services
-    zfs = {
-      autoScrub = {
-        enable = true;
-        pools = [ "rpool" "storage" ];
-        interval = "Sun *-*-* 02:00:00";  # Weekly on Sunday at 2 AM
-      };
+  nix = {
+    channel.enable = true;
 
-      # Optional: Automatic snapshots
-      # autoSnapshot = {
-      #   enable = true;
-      #   frequent = 4;  # Keep 4 15-minute snapshots
-      #   hourly = 24;   # Keep 24 hourly snapshots
-      #   daily = 7;     # Keep 7 daily snapshots
-      #   weekly = 4;    # Keep 4 weekly snapshots
-      #   monthly = 12;  # Keep 12 monthly snapshots
-      # };
+    settings = {
+      auto-optimise-store = true;
+      trusted-users = [ "root" "bolt" "pollard" ];
+      experimental-features = [ "nix-command" "flakes" ];
+
+      # Parallel builds
+      max-jobs = "auto";
+      cores = 0;
+
+      # Build log settings
+      keep-going = true;
+      log-lines = 25;
     };
 
-    # Optional: Sanoid - more advanced snapshot management
-    # Uncomment if you want more control than autoSnapshot provides
-   sanoid = {
-      enable = true;
-
-      # Snapshot intervals (in minutes for frequent, hours for hourly, etc.)
-      interval = "*:00,15,30,45";  # Run every 15 minutes
-
-      # Dataset configurations
-      datasets = {
-        # Root filesystem - conservative snapshots
-        "rpool/root" = {
-          useTemplate = [ "system" ];
-          recursive = false;
-        };
-
-        # Nix store - no snapshots (reproducible)
-        "rpool/nix" = {
-          autosnap = false;
-          autoprune = false;
-        };
-
-        # Home directories - frequent snapshots
-        "rpool/home" = {
-          useTemplate = [ "production" ];
-          recursive = true;  # Includes any per-user datasets
-        };
-
-        # Storage data - daily snapshots with long retention
-        "storage/data" = {
-          useTemplate = [ "storage" ];
-          recursive = true;
-        };
-      };
-
-      # Snapshot retention templates
-      templates = {
-        # For system datasets (root)
-        system = {
-          frequently = 0;      # No frequent snapshots
-          hourly = 24;         # Keep 24 hours
-          daily = 7;           # Keep 7 days
-          weekly = 4;          # Keep 4 weeks
-          monthly = 3;         # Keep 3 months
-          yearly = 0;          # No yearly
-          autosnap = true;
-          autoprune = true;
-        };
-
-        # For user data (home)
-        production = {
-          frequently = 4;      # Keep 4 x 15min = 1 hour
-          hourly = 48;         # Keep 48 hours = 2 days
-          daily = 14;          # Keep 14 days = 2 weeks
-          weekly = 8;          # Keep 8 weeks = 2 months
-          monthly = 12;        # Keep 12 months = 1 year
-          yearly = 2;          # Keep 2 years
-          autosnap = true;
-          autoprune = true;
-        };
-
-        # For bulk storage
-        storage = {
-          frequently = 0;      # No frequent snapshots
-          hourly = 0;          # No hourly
-          daily = 30;          # Keep 30 days = 1 month
-          weekly = 8;          # Keep 8 weeks = 2 months
-          monthly = 24;        # Keep 24 months = 2 years
-          yearly = 5;          # Keep 5 years
-          autosnap = true;
-          autoprune = true;
-        };
-      };
-
-      # Extra Sanoid config options
-      extraArgs = [ "--verbose" ];
+    # Garbage collection
+    gc = {
+      automatic = true;
+      dates = "daily";
+      options = "--delete-older-than 30d";
+      persistent = true;
     };
 
-    # Show issue (pre-login banner)
-    getty.helpLine = ''
-      ╔═══════════════════════════════════════════════════╗
-      ║             Welcome to Ninho Server               ║
-      ╚═══════════════════════════════════════════════════╝
-    '';
-
-    # Enable SSH for remote management
-    openssh = {
-      enable = true;
-      settings = {
-        PermitRootLogin = "no";
-        X11Forwarding = true;
-        UseDNS = "no";
-      };
-
-      # Keep connections alive - important for remote management
-      extraConfig = ''
-        ClientAliveInterval 60
-        ClientAliveCountMax 3
-      '';
+    # Store optimization
+    optimise = {
+      automatic = true;
+      dates = [ "weekly" ];
     };
   };
 
+  nixpkgs.config.allowUnfree = true;
+
+  # ==========================================================================
+  # SYSTEM PACKAGES
+  # ==========================================================================
+
+  environment.systemPackages = with pkgs; [
+    # Essential utilities
+    vim
+    wget
+    git
+    htop
+    tmux
+    tree
+
+    # ZFS tools
+    zfs
+    zfstools
+
+    # System monitoring
+    iotop
+    ncdu
+
+    # NVIDIA tools
+    nvtopPackages.nvidia     # GPU monitoring
+    cudaPackages.cudatoolkit # CUDA toolkit
+  ];
+
+  # ==========================================================================
+  # FONTS
+  # ==========================================================================
+
+  fonts = {
+    fontDir.enable = true;
+    enableGhostscriptFonts = true;
+    enableDefaultPackages = true;
+  };
+
+  # ==========================================================================
+  # SHELL CONFIGURATION
+  # ==========================================================================
+
+  programs.bash.interactiveShellInit = ''
+    # Run MOTD for interactive shells (SSH or login)
+    if [[ $- == *i* ]] && [ -z "$TMUX" ]; then
+      bash /etc/nixos/ninho-motd.sh | less
+    fi
+  '';
+
+  # Install MOTD scripts
   environment.etc = {
-    "scripts/ninho-logo.ansi" = {
-      source = ./scripts/ninho-logo.ansi;
-      mode = "0755";
-    };
+    "scripts/ninho-logo.ansi".source = ./scripts/ninho-logo.ansi;
     "scripts/ninho-banner.sh" = {
       source = ./scripts/ninho-banner.sh;
       mode = "0755";
@@ -425,106 +486,12 @@ in
     };
   };
 
-  programs.bash = {
-    interactiveShellInit = ''
-      # Run MOTD for interactive shells (SSH or login)
-      if [[ $- == *i* ]] && [ -z "$TMUX" ]; then
-        bash /etc/nixos/ninho-motd.sh | less
-      fi
-    '';
+  # ==========================================================================
+  # SECURITY
+  # ==========================================================================
+
+  security.sudo = {
+    enable = true;
+    wheelNeedsPassword = true;
   };
-
-  # ===== SYSTEM PACKAGES =====
-  environment.systemPackages = with pkgs; [
-    vim
-    wget
-    git
-    htop
-    tmux
-    zfs  # ZFS utilities
-    tree
-
-    # ZFS management tools
-    zfstools
-
-    # Optional: useful for ZFS monitoring
-    # zfs-auto-snapshot  # If not using services.zfs.autoSnapshot
-
-    # System monitoring
-    iotop
-    ncdu  # Disk usage analyzer
-
-    # NVIDIA tools and utilities
-    nvtopPackages.nvidia  # GPU monitoring (like htop for GPU)
-    cudaPackages.cudatoolkit  # CUDA toolkit for GPU computing
-  ];
-
-  # ===== USER CONFIGURATION =====
-    users.users = {
-      bolt = {
-        isNormalUser = true;
-        description = "Armando";
-        extraGroups = [
-          "audio"
-          "sound"
-          "video"
-          "wheel"
-          "networkmanager"
-          "docker"
-          "podman"
-          "sway"
-          "plugdev"
-          "root"
-        ];
-
-        # IMPORTANT: Change this password after first login!
-        initialPassword = "ninho";
-
-        openssh.authorizedKeys.keys = [
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHKTf4Bb2BBymwZvxPtxEefspOPTACPn3HqrRiWAMJEJ armandoifsantos@gmail.com"
-        ];
-
-      };
-
-      pollard = {
-        isNormalUser = true;
-        description = "Claudia";
-        extraGroups = [
-          "audio"
-          "sound"
-          "video"
-          "wheel"
-          "networkmanager"
-          "docker"
-          "podman"
-          "sway"
-          "plugdev"
-          "root"
-        ];
-
-        # IMPORTANT: Change this password after first login!
-        initialPassword = "ninho";
-
-        # Recommended: Add SSH public key for secure access
-        # openssh.authorizedKeys.keys = [
-        #   "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... pollard@computer"
-        # ];
-      };
-  };
-
-  # ===== SECURITY =====
-  security = {
-    sudo = {
-      enable = true;
-      wheelNeedsPassword = true;  # Require password for sudo
-    };
-  };
-
-  # ===== VIDEO DRIVERS =====
-  # Load NVIDIA driver for Xorg and Wayland
-  services.xserver.videoDrivers = [ "nvidia" ];
-
-  # ===== MISC =====
-  # NixOS release
-  system.stateVersion = "25.05";
 }
