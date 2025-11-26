@@ -12,6 +12,9 @@ let
   nixops = inputs.nixops.defaultPackage.${system};
 
 in {
+  # Add claude-code overlay to nixpkgs
+  nixpkgs.overlays = [ inputs.claude-code.overlays.default ];
+
   home.packages = with pkgs; [
     # Version control and project management
     gh                           # GitHub CLI
@@ -27,6 +30,9 @@ in {
     jq                           # JSON processor
     nodejs                       # JavaScript runtime
     python3                      # Python programming language
+
+    # AI tools
+    claude-code                  # Now available via overlay
 
     # System development tools
     patchelf                     # ELF patcher for binaries

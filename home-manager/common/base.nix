@@ -15,6 +15,7 @@ let
     "steam-unwrapped"
     "unrar"
     "vscode"
+    "claude-code"
   ];
 in
 {

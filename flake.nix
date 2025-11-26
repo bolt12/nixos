@@ -37,6 +37,8 @@
 
     # kimai-client.url = "git+ssh://git@gitlab.well-typed.com/well-typed/kimai-client.git?ref=bolt12/patch";
 
+    claude-code.url = "github:sadjow/claude-code-nix";
+
     # Needed for steam-deck
     nixgl.url = "github:guibou/nixGL";
 

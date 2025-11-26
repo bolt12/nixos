@@ -31,8 +31,12 @@ in
       # ZFS kernel module parameters (optional tuning)
       # Limit ARC cache to prevent OOM on systems with limited RAM
       # Default is 50% of RAM, adjust based on your needs
+      # With 128GB RAM, you can afford to give ZFS more cache
       # extraPools = [ "storage" ];  # Auto-import additional pools
     };
+
+    # NVIDIA kernel modules
+    kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ];
 
     # LUKS devices (decrypt at boot)
     initrd.luks.devices = {
@@ -88,8 +92,16 @@ in
 
     # Kernel parameters
     kernelParams = [
-      # Optional: Limit ZFS ARC cache (useful if you have limited RAM)
-      # "zfs.zfs_arc_max=4294967296"  # 4GB in bytes
+      # Optional: Limit ZFS ARC cache
+      # With 128GB RAM, default (50%) = 64GB for ZFS ARC is fine
+      # If you want to limit it for GPU workloads, uncomment:
+      # "zfs.zfs_arc_max=34359738368"  # 32GB in bytes
+
+      # NVIDIA DRM kernel mode setting (required for some applications)
+      "nvidia-drm.modeset=1"
+
+      # Disable GPU power saving during boot for stability
+      "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
     ];
   };
 
@@ -207,9 +219,35 @@ in
           lib.concatStringsSep "," [ "Source" "Sink" "Media" "Socket" ];
       };
     };
+
+    # NVIDIA RTX 5090 GPU Configuration
     graphics = {
       enable      = true;
-      enable32Bit = true;
+      enable32Bit = true;  # Required for Steam and 32-bit applications
+    };
+
+    nvidia = {
+      # Use the latest production driver for RTX 5090 (Blackwell architecture)
+      # RTX 5090 requires driver 565+ for full support
+      package = config.boot.kernelPackages.nvidiaPackages.latest;
+
+      # Modesetting is required for Wayland support (if ever needed)
+      modesetting.enable = true;
+
+      # Power management - recommended for modern GPUs
+      powerManagement = {
+        enable = true;
+        # Fine-grained power management (experimental but recommended for Blackwell)
+        # finegrained = true;
+      };
+
+      # Enable the open-source kernel module (available for RTX 40/50 series)
+      # This provides better performance and stability for modern cards
+      open = true;
+
+      # NVreg_PreserveVideoMemoryAllocations=1 is required for suspend/resume
+      # with power management enabled
+      nvidiaPersistenced = true;
     };
   };
 
@@ -415,6 +453,10 @@ in
     # System monitoring
     iotop
     ncdu  # Disk usage analyzer
+
+    # NVIDIA tools and utilities
+    nvtopPackages.nvidia  # GPU monitoring (like htop for GPU)
+    cudaPackages.cudatoolkit  # CUDA toolkit for GPU computing
   ];
 
   # ===== USER CONFIGURATION =====
@@ -477,6 +519,10 @@ in
       wheelNeedsPassword = true;  # Require password for sudo
     };
   };
+
+  # ===== VIDEO DRIVERS =====
+  # Load NVIDIA driver for Xorg and Wayland
+  services.xserver.videoDrivers = [ "nvidia" ];
 
   # ===== MISC =====
   # NixOS release
