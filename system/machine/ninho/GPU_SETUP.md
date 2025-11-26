@@ -6,14 +6,45 @@
 - **VRAM**: 32GB GDDR7
 - **System RAM**: 128GB DDR5
 - **CPU**: AMD Ryzen 9 9950X3D
+- **Configuration**: Headless server (no display manager)
 
 ## NixOS Configuration
 
-The ninho server is configured with comprehensive NVIDIA GPU support for the RTX 5090.
+The ninho server is configured with comprehensive NVIDIA GPU support for the RTX 5090 in a **headless** configuration (no X11/Wayland display server).
 
 ### Key Configuration Elements
 
-#### 1. NVIDIA Driver (Latest)
+#### 1. Kernel Module Loading (Critical for Headless)
+
+```nix
+# Force load NVIDIA modules in initrd (required for headless servers)
+boot.initrd.kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ];
+
+# Kernel parameters
+boot.kernelParams = [
+  "nvidia-drm.modeset=1"
+  "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
+];
+```
+
+**Why**: On headless servers without a display manager, NVIDIA modules don't auto-load via X11. Loading them in `initrd.kernelModules` ensures they're available at boot time, before any services need GPU access.
+
+#### 2. X Server Configuration (Required Even for Headless)
+
+```nix
+services.xserver = {
+  enable = true;  # Required for videoDrivers to work
+  videoDrivers = [ "nvidia" ];
+
+  # Headless configuration - no actual X server running
+  displayManager.startx.enable = false;
+  desktopManager.gnome.enable = false;
+};
+```
+
+**Why**: NixOS requires `services.xserver.enable = true` for `videoDrivers` to load the NVIDIA kernel modules, even on headless systems. No actual X server will run.
+
+#### 3. NVIDIA Driver (Latest)
 
 ```nix
 hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.latest;
@@ -21,7 +52,7 @@ hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.latest;
 
 **Why**: RTX 5090 (Blackwell) requires driver version 565 or later for full support. The `latest` package ensures you get the most recent production driver with Blackwell optimizations.
 
-#### 2. Open-Source Kernel Module
+#### 4. Open-Source Kernel Module
 
 ```nix
 hardware.nvidia.open = true;
@@ -33,12 +64,12 @@ hardware.nvidia.open = true;
 - Better integration with the Linux kernel
 - Required for some advanced features on Blackwell architecture
 
-#### 3. Power Management
+#### 5. Power Management
 
 ```nix
 hardware.nvidia.powerManagement = {
   enable = true;
-  finegrained = true;  # Experimental, recommended for Blackwell
+  # finegrained = true;  # Experimental, uncomment for better Blackwell power control
 };
 ```
 

@@ -42,8 +42,11 @@ in
     # Supported filesystems
     supportedFilesystems = [ "zfs" ];
 
-    # Kernel modules
-    kernelModules = [ "kvm-amd" "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ];
+    # Kernel modules - Load NVIDIA modules on boot (required for headless)
+    kernelModules = [ "kvm-amd" ];
+
+    # Force load NVIDIA modules early in boot (critical for headless servers)
+    initrd.kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ];
 
     # Kernel parameters
     kernelParams = [
@@ -138,6 +141,8 @@ in
 
     # NVIDIA RTX 5090 Configuration
     nvidia = {
+      enabled = true;
+
       # Use latest driver for RTX 5090 (Blackwell architecture requires 565+)
       package = config.boot.kernelPackages.nvidiaPackages.latest;
 
@@ -158,8 +163,16 @@ in
     };
   };
 
-  # Load NVIDIA driver
-  services.xserver.videoDrivers = [ "nvidia" ];
+  # Enable NVIDIA drivers for headless server (no X11/Wayland)
+  # This ensures the kernel modules are loaded and available
+  services.xserver = {
+    enable = true;  # Required for videoDrivers to work
+    videoDrivers = [ "nvidia" ];
+
+    # Headless configuration - no display manager
+    displayManager.startx.enable = false;
+    desktopManager.gnome.enable = false;
+  };
 
   # ==========================================================================
   # NETWORKING
@@ -307,7 +320,6 @@ in
       settings = {
         PermitRootLogin = "no";
         X11Forwarding = true;
-        UseDNS = "no";
       };
       extraConfig = ''
         ClientAliveInterval 60
@@ -468,31 +480,42 @@ in
   # SHELL CONFIGURATION
   # ==========================================================================
 
-  programs.bash.interactiveShellInit = ''
-    # Run MOTD for interactive shells (SSH or login)
-    if [[ $- == *i* ]] && [ -z "$TMUX" ]; then
-      bash /etc/nixos/ninho-motd.sh | less
-    fi
-  '';
+  programs = {
+    bash.interactiveShellInit = ''
+      # Run MOTD for interactive shells (SSH or login)
+      if [[ $- == *i* ]] && [ -z "$TMUX" ]; then
+        bash /etc/nixos/ninho-motd.sh | less
+      fi
+    '';
+
+    coolercontrol.enable = true;
+  };
 
   # Install MOTD scripts
-  environment.etc = {
-    "scripts/ninho-logo.ansi".source = ./scripts/ninho-logo.ansi;
-    "scripts/ninho-banner.sh" = {
-      source = ./scripts/ninho-banner.sh;
-      mode = "0755";
+  environment = {
+    sessionVariables = {
+      # coolerd variables
+      "CC_HOST_IP4"="0.0.0.0";
+      "CC_HOST_IP6"="::";
     };
-    "scripts/ninho-motd.sh" = {
-      source = ./scripts/ninho-motd.sh;
-      mode = "0755";
-    };
-    "scripts/ninho-cheat.sh" = {
-      source = ./scripts/ninho-cheat.sh;
-      mode = "0755";
-    };
-    "scripts/ninho-status.sh" = {
-      source = ./scripts/ninho-status.sh;
-      mode = "0755";
+    etc = {
+      "scripts/ninho-logo.ansi".source = ./scripts/ninho-logo.ansi;
+      "scripts/ninho-banner.sh" = {
+        source = ./scripts/ninho-banner.sh;
+        mode = "0755";
+      };
+      "scripts/ninho-motd.sh" = {
+        source = ./scripts/ninho-motd.sh;
+        mode = "0755";
+      };
+      "scripts/ninho-cheat.sh" = {
+        source = ./scripts/ninho-cheat.sh;
+        mode = "0755";
+      };
+      "scripts/ninho-status.sh" = {
+        source = ./scripts/ninho-status.sh;
+        mode = "0755";
+      };
     };
   };
 
