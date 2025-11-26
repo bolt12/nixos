@@ -11,7 +11,7 @@
     database = {
       enable = true;
       createDB = true;  # Auto-creates database
-      enableVectors = true;  # x86_64 supports this
+      enableVectors = false;  # x86_64 supports this
     };
 
     machine-learning.enable = true;
@@ -21,6 +21,11 @@
     accelerationDevices = null;
   };
 
+  systemd.tmpfiles.rules = [
+    "d /storage/data/immich/ 0600 immich immich"
+  ];
+
   # Create media group for Nextcloud integration
-  users.groups.media.members = [ "immich" "nextcloud" "video" "render" ];
+  users.groups.media.members = [ "immich" "nextcloud" "video" "render" "storage-users" ];
+  users.groups.immich.members = [ "immich" "nextcloud" "video" "render" "storage-users" "media" ];
 }

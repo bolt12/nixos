@@ -198,6 +198,7 @@ in
       allowedTCPPorts = [
         20    # FTP
         21    # FTP
+        80    # HTTP
         8000  # Development
         8384  # Syncthing web UI
         22000 # Syncthing file transfers
@@ -347,44 +348,62 @@ in
   # USERS
   # ==========================================================================
 
-  users.users = {
-    bolt = {
-      isNormalUser = true;
-      description = "Armando";
-      extraGroups = [
-        "wheel"           # sudo access
-        "networkmanager"
-        "docker"
-        "audio"
-        "video"
-        "sway"
-        "plugdev"
-      ];
-      initialPassword = "ninho";  # CHANGE AFTER FIRST LOGIN
-      openssh.authorizedKeys.keys = [
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHKTf4Bb2BBymwZvxPtxEefspOPTACPn3HqrRiWAMJEJ armandoifsantos@gmail.com"
-      ];
+  users = {
+    groups = {
+      storage-users = {};
     };
 
-    pollard = {
-      isNormalUser = true;
-      description = "Claudia";
-      extraGroups = [
-        "wheel"           # sudo access
-        "networkmanager"
-        "docker"
-        "audio"
-        "video"
-        "sway"
-        "plugdev"
-      ];
-      initialPassword = "ninho";  # CHANGE AFTER FIRST LOGIN
+    users = {
+      bolt = {
+        isNormalUser = true;
+        description = "Armando";
+        extraGroups = [
+          "wheel"           # sudo access
+          "networkmanager"
+          "docker"
+          "audio"
+          "video"
+          "sway"
+          "plugdev"
+          "storage-users"
+          "media"
+        ];
+        initialPassword = "ninho";  # CHANGE AFTER FIRST LOGIN
+        openssh.authorizedKeys.keys = [
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHKTf4Bb2BBymwZvxPtxEefspOPTACPn3HqrRiWAMJEJ armandoifsantos@gmail.com"
+        ];
+      };
 
-      # openssh.authorizedKeys.keys = [
-      #   "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... pollard@computer"
-      # ];
+      pollard = {
+        isNormalUser = true;
+        description = "Claudia";
+        extraGroups = [
+          "wheel"           # sudo access
+          "networkmanager"
+          "docker"
+          "audio"
+          "video"
+          "sway"
+          "plugdev"
+          "storage-users"
+          "media"
+        ];
+        initialPassword = "ninho";  # CHANGE AFTER FIRST LOGIN
+
+        # openssh.authorizedKeys.keys = [
+        #   "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... pollard@computer"
+        # ];
+      };
     };
   };
+
+  # This creates the dir if missing, sets ownership, and sets the SGID bit.
+  systemd.tmpfiles.rules = [
+    "d /storage 2775 root storage-users - -"
+    "d /storage/backup 2775 root storage-users - -"
+    "d /storage/media 2775 root storage-users - -"
+    "d /storage/data 2775 root storage-users - -"
+  ];
 
   # ==========================================================================
   # HOME-MANAGER
@@ -454,6 +473,8 @@ in
     htop
     tmux
     tree
+    nss
+    nssTools
 
     # ZFS tools
     zfs

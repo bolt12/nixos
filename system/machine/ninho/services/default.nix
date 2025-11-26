@@ -2,7 +2,6 @@
 {
   imports = [
     ./databases.nix  # PostgreSQL
-    ./caddy.nix      # Reverse proxy with HTTPS
     ./emanote.nix    # Personal journal
     ./nextcloud.nix  # File sync (includes OnlyOffice)
     ./immich.nix     # Photo backup

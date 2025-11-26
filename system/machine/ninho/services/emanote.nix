@@ -18,7 +18,7 @@ in
       ExecStart = ''
         ${emanotePackage}/bin/emanote \
           --layers "/home/bolt/journal" \
-          run --no-ws --host=127.0.0.1 --port=7000
+          run --no-ws --host=0.0.0.0 --port=7000
       '';
 
       Restart = "always";

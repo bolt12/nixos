@@ -1,7 +1,14 @@
 { config, pkgs, ... }:
 {
   # Change port number
-  services.nginx.virtualHosts."nextcloud.ninho.local".listen = [ { addr = "127.0.0.1"; port = 8080; } ];
+  services.nginx.virtualHosts."nextcloud.ninho.local" = {
+    # Force Nginx to listen ONLY on localhost port 8081
+    listen = [ { addr = "0.0.0.0"; port = 8081; } ];
+
+    # Disable SSL and Let's Encrypt here (Caddy will handle it)
+    forceSSL = false;
+    enableACME = false;
+  };
 
   services.nextcloud = {
     enable = true;
@@ -62,7 +69,7 @@
 
   services.onlyoffice = {
     enable = true;
-    hostname = "onlyoffice.ninho.local";
+    hostname = "0.0.0.0";
     securityNonceFile = "${pkgs.writeText "nixos-test-onlyoffice-nonce.conf" ''
       set $secure_link_secret "ninho-nixos";
     ''}";
@@ -74,5 +81,5 @@
   ];
 
   # Allow reading Immich photos (for integration)
-  users.users.nextcloud.extraGroups = [ "media" ];
+  users.users.nextcloud.extraGroups = [ "media" "immich" "storage-users" ];
 }
