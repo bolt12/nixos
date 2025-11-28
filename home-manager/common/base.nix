@@ -5,6 +5,9 @@
 
 let
   unfreePackages = [
+    "claude-code"
+    "cuda_cudart"
+    "cuda12.8-cuda_cudart-12.8.90"
     "discord"
     "google-chrome"
     "slack"
@@ -15,7 +18,6 @@ let
     "steam-unwrapped"
     "unrar"
     "vscode"
-    "claude-code"
   ];
 in
 {

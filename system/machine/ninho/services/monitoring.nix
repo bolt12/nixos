@@ -89,12 +89,6 @@
           targets = [ "localhost:9558" ];
         }];
       }
-      {
-        job_name = "caddy";
-        static_configs = [{
-          targets = [ "localhost:2019" ];
-        }];
-      }
     ];
   };
 
@@ -115,9 +109,15 @@
         type = "prometheus";
         url = "http://localhost:9090";
         isDefault = true;
+        uid = "prometheus";  # Set a fixed UID for dashboard references
       }];
     };
   };
+
+  # Download popular Grafana dashboards
+  systemd.tmpfiles.rules = [
+    "d /var/lib/grafana/dashboards 0755 grafana grafana -"
+  ];
 
   # Ensure postgres user exists for exporter
   users.users.prometheus = {

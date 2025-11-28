@@ -199,8 +199,16 @@ in
         20    # FTP
         21    # FTP
         80    # HTTP
-        8000  # Development
+        2283  # Immich
+        3000  # Grafana
+        7000  # Emanote
+        8000  # OnlyOffice
+        8080  # Open-WebUI
+        8081  # Nextcloud
+        8082  # Homepage Dashboard
         8384  # Syncthing web UI
+        11434 # Ollama
+        11987 # CoolerControl
         22000 # Syncthing file transfers
       ];
       allowedUDPPorts = [
@@ -515,13 +523,26 @@ in
     coolercontrol.enable = true;
   };
 
+  # Configure CoolerControl to listen on all interfaces
+  # CoolerControl uses a config file, not environment variables
+  systemd.services.coolercontrold = {
+    preStart = ''
+      # Create config directory if it doesn't exist
+      mkdir -p /etc/coolercontrol
+
+      # Add API binding configuration if not present
+      if [ -f /etc/coolercontrol/config.toml ]; then
+        # Check if ipv4_address is already configured
+        if ! grep -q "^ipv4_address" /etc/coolercontrol/config.toml; then
+          # Add network settings to the [settings] section
+          sed -i '/^\[settings\]/a ipv4_address = "0.0.0.0"\nipv6_address = "::"' /etc/coolercontrol/config.toml
+        fi
+      fi
+    '';
+  };
+
   # Install MOTD scripts
   environment = {
-    sessionVariables = {
-      # coolerd variables
-      "CC_HOST_IP4"="0.0.0.0";
-      "CC_HOST_IP6"="::";
-    };
     etc = {
       "scripts/ninho-logo.ansi".source = ./scripts/ninho-logo.ansi;
       "scripts/ninho-banner.sh" = {
