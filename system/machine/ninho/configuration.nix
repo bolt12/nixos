@@ -17,6 +17,7 @@ in
   imports = [
     ./hardware-configuration.nix
     ./services  # All service modules (Caddy, Nextcloud, Immich, Ollama, etc.)
+    ./package-overrides.nix  # Custom package overrides and patches
     inputs.home-manager.nixosModules.home-manager
   ];
 
@@ -44,7 +45,8 @@ in
     supportedFilesystems = [ "zfs" ];
 
     # Kernel modules - Load NVIDIA modules on boot (required for headless)
-    kernelModules = [ "kvm-amd" ];
+    # Also load rapl for energy consumption analysis
+    kernelModules = [ "kvm-amd" "intel_rapl_common" ];
 
     # Force load NVIDIA modules early in boot (critical for headless servers)
     initrd.kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ];
@@ -375,6 +377,7 @@ in
           "plugdev"
           "storage-users"
           "media"
+          "root"
         ];
         initialPassword = "ninho";  # CHANGE AFTER FIRST LOGIN
         openssh.authorizedKeys.keys = [
@@ -395,6 +398,7 @@ in
           "plugdev"
           "storage-users"
           "media"
+          "root"
         ];
         initialPassword = "ninho";  # CHANGE AFTER FIRST LOGIN
 
@@ -560,6 +564,10 @@ in
       };
       "scripts/ninho-status.sh" = {
         source = ./scripts/ninho-status.sh;
+        mode = "0755";
+      };
+      "scripts/aio-gif-carousel.sh" = {
+        source = ./scripts/aio-gif-carousel.sh;
         mode = "0755";
       };
     };

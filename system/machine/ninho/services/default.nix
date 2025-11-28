@@ -8,5 +8,6 @@
     ./ollama.nix     # LLM inference
     ./homepage.nix   # Dashboard
     ./monitoring.nix # Grafana + Prometheus
+    ./aio-lcd.nix    # AIO LCD GIF carousel
   ];
 }

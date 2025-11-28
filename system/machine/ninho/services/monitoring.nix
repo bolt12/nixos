@@ -8,7 +8,7 @@
       # System metrics (CPU, RAM, Disk, Network)
       node = {
         enable = true;
-        enabledCollectors = [ "systemd" "processes" "zfs" ];
+        enabledCollectors = [ "wifi" "systemd" "processes" "zfs" ];
         port = 9100;
       };
 
@@ -50,6 +50,12 @@
         enable = true;
         port = 9558;
       };
+
+      # Energy consumption
+      scaphandre = {
+        enable = true;
+        port = 9606;
+      };
     };
 
     scrapeConfigs = [
@@ -87,6 +93,13 @@
         job_name = "systemd";
         static_configs = [{
           targets = [ "localhost:9558" ];
+        }];
+      }
+      {
+        job_name = "scaphandre";
+        metrics_path = "//metrics";
+        static_configs = [{
+          targets = [ "localhost:9606" ];
         }];
       }
     ];
