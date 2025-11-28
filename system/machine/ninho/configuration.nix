@@ -483,6 +483,7 @@ in
     tree
     nss
     nssTools
+    liquidctl
 
     # ZFS tools
     zfs

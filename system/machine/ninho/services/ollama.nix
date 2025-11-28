@@ -8,6 +8,13 @@ let
   };
 in
 {
+  # Disable the stable service
+  disabledModules = [ "${inputs.nixpkgs}/nixos/modules/services/misc/open-webui.nix" ];
+  # Get the unstable service version
+  imports = [
+    "${inputs.nixpkgs-unstable}/nixos/modules/services/misc/open-webui.nix"
+  ];
+
   services = {
     ollama = {
       enable = true;
