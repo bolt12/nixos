@@ -22,10 +22,6 @@
   };
 
   systemd.tmpfiles.rules = [
-    "d /storage/data/immich/ 0600 immich immich"
+    "d /storage/data/immich/ 0750 immich immich"
   ];
-
-  # Create media group for Nextcloud integration
-  users.groups.media.members = [ "immich" "nextcloud" "video" "render" "storage-users" ];
-  users.groups.immich.members = [ "immich" "nextcloud" "video" "render" "storage-users" "media" ];
 }

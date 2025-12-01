@@ -208,6 +208,16 @@ in
         8080  # Open-WebUI
         8081  # Nextcloud
         8082  # Homepage Dashboard
+        8085  # Grocy Dashboard
+        8096  # Jellyfin
+        8920  # Jellyfin
+        8097  # Prowlarr
+        8098  # Radarr
+        8199  # Sonarr
+        8100  # Lidarr
+        8101  # Readarr
+        3333  # Bitmagnet
+        8103  # Deluge
         8384  # Syncthing web UI
         11434 # Ollama
         11987 # CoolerControl
@@ -217,6 +227,8 @@ in
         51820 # WireGuard
         22000 # Syncthing discovery
         21027 # Syncthing discovery
+        1900  # Jellyfin
+        7359  # Jellyfin
       ];
     };
 

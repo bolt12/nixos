@@ -24,12 +24,6 @@
               };
             }
             {
-              OnlyOffice = {
-                href = "http://10.100.0.100:8000";
-                description = "Documents";
-              };
-            }
-            {
               Immich = {
                 href = "http://10.100.0.100:2283";
                 description = "Photos";
@@ -42,6 +36,60 @@
                   version = 2;
                   fields = ["photos" "videos" "storage" "users"];
                 };
+              };
+            }
+            {
+              Bitmagnet = {
+                href = "http://10.100.0.100:8102";
+                description = "Self Hosted Torrent Indexer";
+              };
+            }
+            {
+              Deluge = {
+                href = "http://10.100.0.100:8103";
+                description = "Torrent Download Client";
+              };
+            }
+            {
+              Jellyfin = {
+                href = "http://10.100.0.100:8096";
+                description = "Jellyfin Media Server";
+              };
+            }
+            {
+              Prowlarr = {
+                href = "http://10.100.0.100:8097";
+                description = "*Arr services indexer";
+              };
+            }
+            {
+              Radarr = {
+                href = "http://10.100.0.100:8098";
+                description = "Usenet/BitTorrent movie downloader";
+              };
+            }
+            {
+              Sonarr = {
+                href = "http://10.100.0.100:8099";
+                description = "Smart PVR for newsgroup and bittorrent users (TV)";
+              };
+            }
+            {
+              Lidarr = {
+                href = "http://10.100.0.100:8100";
+                description = "Usenet/BitTorrent music downloader";
+              };
+            }
+            {
+              Readarr = {
+                href = "http://10.100.0.100:8101";
+                description = "Usenet/BitTorrent ebook downloader";
+              };
+            }
+            {
+              Grocy = {
+                href = "http://10.100.0.100:8085";
+                description = "Groceries";
               };
             }
             {

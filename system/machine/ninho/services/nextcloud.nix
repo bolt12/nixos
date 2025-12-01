@@ -110,7 +110,4 @@
   systemd.tmpfiles.rules = [
     "f /storage/data/nextcloud/admin-password 0600 nextcloud nextcloud - 'ChangeMe123!'"
   ];
-
-  # Allow reading Immich photos (for integration)
-  users.users.nextcloud.extraGroups = [ "media" "immich" "storage-users" ];
 }
