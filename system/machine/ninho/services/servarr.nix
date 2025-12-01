@@ -68,6 +68,10 @@ in
       enable = true;
       useLocalPostgresDB = true;
       openFirewall = true;
+      settings = {
+        # The default value F***ed my router
+        dht_crawler.scaling_factor = 2;
+      };
     };
 
     deluge = {
