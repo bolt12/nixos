@@ -17,7 +17,18 @@ in
   ];
 
   systemd.tmpfiles.rules = [
+    # Deluge auth file
     "f /var/lib/secrets/deluge-auth 0600 deluge deluge - deluge:deluge:10"
+
+    # Create organized media directories with proper ownership
+    # These are where *Arr services will organize and hardlink media
+    "d /storage/media/movies 0775 radarr storage-users - -"
+    "d /storage/media/tv 0775 sonarr storage-users - -"
+    "d /storage/media/music 0775 lidarr storage-users - -"
+    "d /storage/media/books 0775 readarr storage-users - -"
+
+    # Ensure torrents directory exists with proper permissions
+    "d /storage/torrents 0775 deluge storage-users - -"
   ];
 
   services = {
@@ -58,6 +69,7 @@ in
 
     readarr = {
       enable = true;
+      package = unstable.readarr;
       openFirewall = true;
       settings = {
         server.port = 8101;
@@ -70,7 +82,7 @@ in
       openFirewall = true;
       settings = {
         # The default value F***ed my router
-        dht_crawler.scaling_factor = 2;
+        dht_crawler.scaling_factor = 1;
       };
     };
 

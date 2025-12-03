@@ -13,6 +13,13 @@ in
       enable = true;
       openFirewall = true;
     };
+
+    jellyseerr = {
+      enable = true;
+      openFirewall = true;
+      port = 8200;
+      package = unstable.jellyseerr;
+    };
   };
 }
 

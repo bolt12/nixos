@@ -40,7 +40,7 @@
             }
             {
               Bitmagnet = {
-                href = "http://10.100.0.100:8102";
+                href = "http://10.100.0.100:3333";
                 description = "Self Hosted Torrent Indexer";
               };
             }
@@ -54,6 +54,12 @@
               Jellyfin = {
                 href = "http://10.100.0.100:8096";
                 description = "Jellyfin Media Server";
+              };
+            }
+            {
+              Jellyseer = {
+                href = "http://10.100.0.100:8200";
+                description = "Media request tool for Jellyfin";
               };
             }
             {

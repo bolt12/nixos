@@ -218,6 +218,7 @@ in
         8101  # Readarr
         3333  # Bitmagnet
         8103  # Deluge
+        8200  # Jellyseer
         8384  # Syncthing web UI
         11434 # Ollama
         11987 # CoolerControl

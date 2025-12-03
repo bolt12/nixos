@@ -10,10 +10,9 @@ let
   };
 
   nixops = inputs.nixops.defaultPackage.${system};
+  nix-ai-tools = inputs.nix-ai-tools.packages.${system};
 
 in {
-  # Add claude-code overlay to nixpkgs
-  nixpkgs.overlays = [ inputs.claude-code.overlays.default ];
 
   home.packages = with pkgs; [
     # Version control and project management
@@ -32,7 +31,9 @@ in {
     python3                      # Python programming language
 
     # AI tools
-    claude-code                  # Now available via overlay
+    nix-ai-tools.ccstatusline       # Claude code statusline
+    nix-ai-tools.claude-code        # Claude code
+    nix-ai-tools.claude-code-router # Claude code router
 
     # System development tools
     patchelf                     # ELF patcher for binaries
