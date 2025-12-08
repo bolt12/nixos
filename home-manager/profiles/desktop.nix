@@ -30,6 +30,7 @@
 
     # Games and entertainment
     steam                        # Gaming platform
+    moonlight-qt                 # Game streaming platform
 
     # Desktop theming and appearance
     lxappearance                 # Theme configuration
