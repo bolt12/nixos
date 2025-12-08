@@ -13,5 +13,6 @@
     ./grocy.nix       # Grocy
     ./jellyfin.nix    # Jellyfin
     ./servarr.nix     # *Arr services
+    ./gaming.nix      # Game streaming (Steam + Sunshine)
   ];
 }

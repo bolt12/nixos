@@ -128,6 +128,18 @@
                 description = "Monitoring";
               };
             }
+            {
+              Sunshine = {
+                href = "http://10.100.0.100:47990";
+                description = "Game Streaming Server";
+              };
+            }
+            {
+              Steam = {
+                href = "steam://open/bigpicture";
+                description = "Steam Big Picture (via streaming)";
+              };
+            }
           ];
         }
       ];

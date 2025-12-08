@@ -164,15 +164,11 @@ in
     };
   };
 
-  # Enable NVIDIA drivers for headless server (no X11/Wayland)
-  # This ensures the kernel modules are loaded and available
+  # Enable NVIDIA drivers (required for game streaming with Sunshine)
+  # Display manager and desktop are configured in services/gaming.nix
   services.xserver = {
-    enable = true;  # Required for videoDrivers to work
+    enable = true;
     videoDrivers = [ "nvidia" ];
-
-    # Headless configuration - no display manager
-    displayManager.startx.enable = false;
-    desktopManager.gnome.enable = false;
   };
 
   # ==========================================================================
