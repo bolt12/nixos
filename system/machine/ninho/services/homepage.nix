@@ -32,7 +32,7 @@
                   url = "http://10.100.0.100:2283";
                   # Create API key in Immich: Account Settings > API Keys
                   # Requires "server.statistics" permission
-                  key = "71rEwGgElTLalNQJ3aQRJsqMYMWoGBJTfJGqBFIDotw";
+                  key = "415bvASyoUx0AhP157r3rbRzufa9Y76CXXvCRy88OrE";
                   version = 2;
                   fields = ["photos" "videos" "storage" "users"];
                 };
@@ -132,12 +132,6 @@
               Sunshine = {
                 href = "http://10.100.0.100:47990";
                 description = "Game Streaming Server";
-              };
-            }
-            {
-              Steam = {
-                href = "steam://open/bigpicture";
-                description = "Steam Big Picture (via streaming)";
               };
             }
           ];

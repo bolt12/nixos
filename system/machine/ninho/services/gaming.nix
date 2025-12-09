@@ -32,6 +32,13 @@
     };
   };
 
+  # Set display resolution early (runs when X server starts, before session)
+  services.xserver.displayManager.setupCommands = ''
+    ${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-0 --mode 1920x1080 --rate 60 || \
+    ${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-0 --mode 1920x1080 || \
+    true
+  '';
+
   # Start a minimal desktop session (required for Sunshine)
   services.xserver.desktopManager.xfce = {
     enable = true;
@@ -43,12 +50,6 @@
   # This is needed for Sunshine to access the display
   services.xserver.displayManager.sessionCommands = ''
     ${pkgs.xorg.xhost}/bin/xhost +local:
-
-    # Set desktop to 1080p for readable UI (games will override this)
-    # Sunshine will transcode to client's requested resolution automatically
-    ${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-0 --mode 1920x1080 --rate 60 || \
-    ${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-0 --mode 1920x1080 || \
-    true
   '';
 
   # ==========================================================================
@@ -118,6 +119,7 @@
     enable = true;
     autoStart = true;
     openFirewall = true;  # Automatically opens required ports
+    package = pkgs.sunshine.override { cudaSupport = true; };
 
     # Enable hardware capabilities for best performance
     capSysAdmin = true;
@@ -316,13 +318,19 @@
   users.users.pollard.extraGroups = [ "input" "render" ];
 
   # ==========================================================================
-  # USER LINGERING
+  # USER LINGERING & NVIDIA PERMISSIONS
   # ==========================================================================
   # Enable lingering so user services (like Sunshine) start at boot
   # without requiring an active login session
+  # Also ensure NVIDIA capabilities devices have correct permissions (for NVENC/NVDEC)
 
   systemd.tmpfiles.rules = [
+    # User lingering
     "f /var/lib/systemd/linger/bolt - - - -"
     "f /var/lib/systemd/linger/pollard - - - -"
+
+    # NVIDIA capabilities permissions (required for hardware encoding)
+    "z /dev/nvidia-caps/nvidia-cap1 0666 - - - -"
+    "z /dev/nvidia-caps/nvidia-cap2 0666 - - - -"
   ];
 }
