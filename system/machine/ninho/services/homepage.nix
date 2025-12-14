@@ -130,7 +130,7 @@
             }
             {
               Sunshine = {
-                href = "http://10.100.0.100:47990";
+                href = "https://10.100.0.100:47990";
                 description = "Game Streaming Server";
               };
             }

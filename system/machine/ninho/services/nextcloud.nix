@@ -59,14 +59,13 @@
 
     config = {
       dbtype = "pgsql";  # Auto-creates database
-      overwriteProtocol = "http";
-      defaultPhoneRegion = "PT";
       adminuser = "admin";
       adminpassFile = "/storage/data/nextcloud/admin-password";
     };
 
     settings = {
       overwriteprotocol = "http";
+      default_phone_region = "PT";
       trusted_proxies = [ "127.0.0.1" ];
       trusted_domains = [ "10.100.0.100" ];
     };
