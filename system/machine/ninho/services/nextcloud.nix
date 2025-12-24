@@ -1,11 +1,16 @@
-{ config, pkgs, ... }:
+{ config, pkgs, constants, ... }:
+let
+  inherit (constants) network ports storage;
+  nextcloudHostname = "nextcloud.${network.ninho.hostname}";
+  nextcloudHome = "${storage.data}/nextcloud";
+in
 {
   # Configure Nginx to listen on all interfaces
-  services.nginx.virtualHosts."nextcloud.ninho.local" = {
-    # Listen on all interfaces (0.0.0.0) on port 8081
+  services.nginx.virtualHosts."${nextcloudHostname}" = {
+    # Listen on all interfaces (0.0.0.0)
     listen = [
-      { addr = "0.0.0.0"; port = 8081; }
-      { addr = "[::]"; port = 8081; }  # IPv6 support
+      { addr = "0.0.0.0"; port = ports.nextcloud; }
+      { addr = "[::]"; port = ports.nextcloud; }  # IPv6 support
     ];
 
     # Disable SSL (internal network access only)
@@ -15,8 +20,8 @@
 
   services.nextcloud = {
     enable = true;
-    hostName = "nextcloud.ninho.local";  # Domain for Nextcloud
-    home = "/storage/data/nextcloud";
+    hostName = nextcloudHostname;
+    home = nextcloudHome;
     package = pkgs.nextcloud32;
 
     database.createLocally = true;
@@ -60,14 +65,14 @@
     config = {
       dbtype = "pgsql";  # Auto-creates database
       adminuser = "admin";
-      adminpassFile = "/storage/data/nextcloud/admin-password";
+      adminpassFile = "${nextcloudHome}/admin-password";
     };
 
     settings = {
       overwriteprotocol = "http";
       default_phone_region = "PT";
       trusted_proxies = [ "127.0.0.1" ];
-      trusted_domains = [ "10.100.0.100" ];
+      trusted_domains = [ network.ninho.vpnIp ];
     };
   };
 
@@ -75,7 +80,7 @@
     enable = true;
     # OnlyOffice needs a proper hostname internally (not an IP)
     # The nginx proxy below will handle IP-based access
-    hostname = "onlyoffice.ninho.local";
+    hostname = "onlyoffice.${network.ninho.hostname}";
     port = 8001;  # Internal port (not exposed)
     securityNonceFile = "${pkgs.writeText "nixos-test-onlyoffice-nonce.conf" ''
       set $secure_link_secret "ninho-nixos";
@@ -86,15 +91,15 @@
   # Listens on port 8000 and proxies to OnlyOffice's internal port 8001
   services.nginx.virtualHosts."onlyoffice-ip-access" = {
     listen = [
-      { addr = "0.0.0.0"; port = 8000; }
-      { addr = "[::]"; port = 8000; }
+      { addr = "0.0.0.0"; port = ports.onlyoffice; }
+      { addr = "[::]"; port = ports.onlyoffice; }
     ];
     serverName = "_";  # Match any hostname (catch-all)
 
     locations."/" = {
       proxyPass = "http://127.0.0.1:8001";
       extraConfig = ''
-        proxy_set_header Host onlyoffice.ninho.local;
+        proxy_set_header Host onlyoffice.${network.ninho.hostname};
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
@@ -106,7 +111,8 @@
   };
 
   # Create admin password file
+  # TODO: Move to secret management (user will handle separately)
   systemd.tmpfiles.rules = [
-    "f /storage/data/nextcloud/admin-password 0600 nextcloud nextcloud - 'ChangeMe123!'"
+    "f ${nextcloudHome}/admin-password 0600 nextcloud nextcloud - 'ChangeMe123!'"
   ];
 }

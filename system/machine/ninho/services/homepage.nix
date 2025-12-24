@@ -1,37 +1,42 @@
-{ config, ... }:
+{ config, constants, ... }:
+let
+  inherit (constants) network ports storage;
+  ninhoIp = network.ninho.vpnIp;
+in
 {
   services = {
     homepage-dashboard = {
       enable = true;
 
-      # Listen on all interfaces (default port 8082)
-      listenPort = 8082;
+      # Listen on all interfaces
+      listenPort = ports.homepage;
 
       settings = {
         title = "Ninho Server";
         theme = "dark";
       };
 
-      allowedHosts = "localhost:8082,127.0.0.1:8082,10.100.0.100,10.100.0.100:8082";
+      allowedHosts = "localhost:${toString ports.homepage},127.0.0.1:${toString ports.homepage},${ninhoIp},${ninhoIp}:${toString ports.homepage}";
 
       services = [
         {
           Services = [
             {
               Nextcloud = {
-                href = "http://10.100.0.100:8081";
+                href = "http://${ninhoIp}:${toString ports.nextcloud}";
                 description = "Files & Sync";
               };
             }
             {
               Immich = {
-                href = "http://10.100.0.100:2283";
+                href = "http://${ninhoIp}:${toString ports.immich}";
                 description = "Photos";
                 widget = {
                   type = "immich";
-                  url = "http://10.100.0.100:2283";
+                  url = "http://${ninhoIp}:${toString ports.immich}";
                   # Create API key in Immich: Account Settings > API Keys
                   # Requires "server.statistics" permission
+                  # TODO: Move to secret management (user will handle separately)
                   key = "415bvASyoUx0AhP157r3rbRzufa9Y76CXXvCRy88OrE";
                   version = 2;
                   fields = ["photos" "videos" "storage" "users"];
@@ -40,97 +45,97 @@
             }
             {
               Bitmagnet = {
-                href = "http://10.100.0.100:3333";
+                href = "http://${ninhoIp}:${toString ports.bitmagnet}";
                 description = "Self Hosted Torrent Indexer";
               };
             }
             {
               Deluge = {
-                href = "http://10.100.0.100:8103";
+                href = "http://${ninhoIp}:${toString ports.deluge}";
                 description = "Torrent Download Client";
               };
             }
             {
               Jellyfin = {
-                href = "http://10.100.0.100:8096";
+                href = "http://${ninhoIp}:${toString ports.jellyfin}";
                 description = "Jellyfin Media Server";
               };
             }
             {
               Jellyseer = {
-                href = "http://10.100.0.100:8200";
+                href = "http://${ninhoIp}:${toString ports.jellyseerr}";
                 description = "Media request tool for Jellyfin";
               };
             }
             {
               Prowlarr = {
-                href = "http://10.100.0.100:8097";
+                href = "http://${ninhoIp}:${toString ports.prowlarr}";
                 description = "*Arr services indexer";
               };
             }
             {
               Radarr = {
-                href = "http://10.100.0.100:8098";
+                href = "http://${ninhoIp}:${toString ports.radarr}";
                 description = "Usenet/BitTorrent movie downloader";
               };
             }
             {
               Sonarr = {
-                href = "http://10.100.0.100:8099";
+                href = "http://${ninhoIp}:${toString ports.sonarr}";
                 description = "Smart PVR for newsgroup and bittorrent users (TV)";
               };
             }
             {
               Lidarr = {
-                href = "http://10.100.0.100:8100";
+                href = "http://${ninhoIp}:${toString ports.lidarr}";
                 description = "Usenet/BitTorrent music downloader";
               };
             }
             {
               Readarr = {
-                href = "http://10.100.0.100:8101";
+                href = "http://${ninhoIp}:${toString ports.readarr}";
                 description = "Usenet/BitTorrent ebook downloader";
               };
             }
             {
               Grocy = {
-                href = "http://10.100.0.100:8085";
+                href = "http://${ninhoIp}:8085";
                 description = "Groceries";
               };
             }
             {
               Emanote = {
-                href = "http://10.100.0.100:7000";
+                href = "http://${ninhoIp}:${toString ports.emanote}";
                 description = "Journal";
               };
             }
             {
               Syncthing = {
-                href = "http://10.100.0.100:8384";
+                href = "http://${ninhoIp}:${toString ports.syncthing}";
                 description = "P2P Sync";
               };
             }
             {
               Ollama = {
-                href = "http://10.100.0.100:8080";
+                href = "http://${ninhoIp}:${toString ports.ollama}";
                 description = "LLM API";
               };
             }
             {
               Grafana = {
-                href = "http://10.100.0.100:3000";
+                href = "http://${ninhoIp}:${toString ports.grafana}";
                 description = "Monitoring";
               };
             }
             {
               CoolerControl = {
-                href = "http://10.100.0.100:11987";
+                href = "http://${ninhoIp}:${toString ports.coolercontrol}";
                 description = "Monitoring";
               };
             }
             {
               Sunshine = {
-                href = "https://10.100.0.100:47990";
+                href = "https://${ninhoIp}:47990";
                 description = "Game Streaming Server";
               };
             }
@@ -155,7 +160,7 @@
         {
           resources = {
             label = "Storage Pool";
-            disk = "/storage";
+            disk = storage.root;
             diskUnits = "bytes";
           };
         }
@@ -174,12 +179,12 @@
     # Nginx reverse proxy for convenient access via IP
     nginx = {
       enable = true;
-      virtualHosts."10.100.0.100" = {
+      virtualHosts."${ninhoIp}" = {
         listen = [
-          { addr = "10.100.0.100"; port = 80; }
+          { addr = ninhoIp; port = 80; }
         ];
         locations."/" = {
-          proxyPass = "http://127.0.0.1:8082";
+          proxyPass = "http://127.0.0.1:${toString ports.homepage}";
           proxyWebsockets = true;
         };
       };

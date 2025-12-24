@@ -3,15 +3,8 @@
 
 { inputs, pkgs, system, ... }:
 let
-  # Import unstable packages for bleeding-edge development tools
-  unstable = import inputs.nixpkgs-unstable {
-    inherit (pkgs) system;
-    overlays = [];
-  };
-
   nixops = inputs.nixops.defaultPackage.${system};
   nix-ai-tools = inputs.nix-ai-tools.packages.${system};
-
 in {
 
   home.packages = with pkgs; [
@@ -31,9 +24,9 @@ in {
     python3                      # Python programming language
 
     # AI tools
-    nix-ai-tools.ccstatusline       # Claude code statusline
-    nix-ai-tools.claude-code        # Claude code
-    nix-ai-tools.claude-code-router # Claude code router
+    nix-ai-tools.ccstatusline # Claude code statusline
+    nix-ai-tools.claude-code  # Claude code
+    nix-ai-tools.opencode    # Claude code router
 
     # System development tools
     patchelf                     # ELF patcher for binaries
@@ -75,6 +68,6 @@ in {
     lean4
   ] ++ [
     # Bleeding-edge development tools from unstable channel
-    unstable.nixd                             # Nix language server for IDE integration
+    pkgs.unstable.nixd                             # Nix language server for IDE integration
   ];
 }

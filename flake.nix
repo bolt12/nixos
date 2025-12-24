@@ -99,13 +99,18 @@
             , ... }@inputs:
     let
       system = "x86_64-linux";
+      # Import centralized constants
+      constants = import ./system/common/constants.nix { lib = nixpkgs.lib; };
     in {
       # NixOS x86 configurations
       nixosConfigurations = {
         bolt-nixos = nixpkgs.lib.nixosSystem {
           inherit system;
-          specialArgs = {inherit inputs system;};
-          modules = [ ./system/configuration.nix ];
+          specialArgs = {inherit inputs system constants;};
+          modules = [
+            ./system/configuration.nix
+            ./system/common/overlays.nix
+          ];
         };
 
         bolt-rpi5-sd-image = (nixpkgs.lib.nixosSystem {
@@ -120,8 +125,11 @@
 
         ninho-nixos = nixpkgs.lib.nixosSystem {
           inherit system;
-          specialArgs = {inherit inputs system;};
-          modules = [ ./system/machine/ninho/configuration.nix ];
+          specialArgs = {inherit inputs system constants;};
+          modules = [
+            ./system/machine/ninho/configuration.nix
+            ./system/common/overlays.nix
+          ];
         };
       };
 

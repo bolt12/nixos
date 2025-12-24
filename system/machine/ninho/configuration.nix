@@ -7,12 +7,6 @@
 # Multi-user setup (bolt, pollard) with ZFS RAID storage
 # ============================================================================
 
-let
-  unstable = import inputs.nixpkgs-unstable {
-    overlays = [];
-    system = system;
-  };
-in
 {
   imports = [
     ./hardware-configuration.nix
@@ -211,7 +205,6 @@ in
         8080  # Open-WebUI
         8081  # Nextcloud
         8082  # Homepage Dashboard
-        8085  # Grocy Dashboard
         8096  # Jellyfin
         8920  # Jellyfin
         8097  # Prowlarr
@@ -602,10 +595,6 @@ in
       };
       "scripts/ninho-status.sh" = {
         source = ./scripts/ninho-status.sh;
-        mode = "0755";
-      };
-      "scripts/aio-gif-carousel.sh" = {
-        source = ./scripts/aio-gif-carousel.sh;
         mode = "0755";
       };
     };

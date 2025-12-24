@@ -1,11 +1,6 @@
-{ config, pkgs, inputs, ... }:
+{ config, pkgs, inputs, constants, ... }:
 let
-  # Import unstable packages for latest ollama
-  unstable = import inputs.nixpkgs-unstable {
-    inherit (pkgs) system;
-    overlays = [];
-    config.allowUnfree = true;
-  };
+  inherit (constants) ports storage;
 in
 {
 
@@ -22,31 +17,31 @@ in
 
     # Create organized media directories with proper ownership
     # These are where *Arr services will organize and hardlink media
-    "d /storage/media/movies 0775 radarr storage-users - -"
-    "d /storage/media/tv 0775 sonarr storage-users - -"
-    "d /storage/media/music 0775 lidarr storage-users - -"
-    "d /storage/media/books 0775 readarr storage-users - -"
+    "d ${storage.media}/movies 0775 radarr storage-users - -"
+    "d ${storage.media}/tv 0775 sonarr storage-users - -"
+    "d ${storage.media}/music 0775 lidarr storage-users - -"
+    "d ${storage.media}/books 0775 readarr storage-users - -"
 
     # Ensure torrents directory exists with proper permissions
-    "d /storage/torrents 0775 deluge storage-users - -"
+    "d ${storage.torrents} 0775 deluge storage-users - -"
   ];
 
   services = {
     prowlarr = {
       enable = true;
-      package = unstable.prowlarr;
+      package = pkgs.unstable.prowlarr;
       openFirewall = true;
       settings = {
-        server.port = 8097;
+        server.port = ports.prowlarr;
       };
     };
 
     radarr = {
       enable = true;
-      package = unstable.radarr;
+      package = pkgs.unstable.radarr;
       openFirewall = true;
       settings = {
-        server.port = 8098;
+        server.port = ports.radarr;
       };
     };
 
@@ -54,25 +49,25 @@ in
       enable = true;
       openFirewall = true;
       settings = {
-        server.port = 8099;
+        server.port = ports.sonarr;
       };
     };
 
     lidarr = {
       enable = true;
-      package = unstable.lidarr;
+      package = pkgs.unstable.lidarr;
       openFirewall = true;
       settings = {
-        server.port = 8100;
+        server.port = ports.lidarr;
       };
     };
 
     readarr = {
       enable = true;
-      package = unstable.readarr;
+      package = pkgs.unstable.readarr;
       openFirewall = true;
       settings = {
-        server.port = 8101;
+        server.port = ports.readarr;
       };
     };
 
@@ -94,14 +89,14 @@ in
       config = {
         allow_remote = true;
         listen_interface = "0.0.0.0";
-        download_location = "/storage/torrents";
+        download_location = storage.torrents;
         move_completed = true;
-        move_completed_path = "/storage/torrents";
+        move_completed_path = storage.torrents;
       };
       web = {
         enable = true;
         openFirewall = true;
-        port = 8103;
+        port = ports.deluge;
       };
     };
   };
