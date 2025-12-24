@@ -160,7 +160,7 @@
         steam-deck = home-manager.lib.homeManagerConfiguration {
           pkgs = nixpkgs.legacyPackages.x86_64-linux;
           modules = [ ./home-manager/users/steam-deck/home.nix ];
-          extraSpecialArgs = { inherit inputs; };
+          extraSpecialArgs = { inherit inputs; system = "x86_64-linux"; };
         };
       };
 
