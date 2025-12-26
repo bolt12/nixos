@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(systemctl status:*)",
+      "Bash(ss:*)",
+      "WebFetch(domain:gethomepage.dev)",
+      "WebFetch(domain:docs.coolercontrol.org)",
+      "Bash(curl:*)",
+      "Bash(lsof:*)",
+      "Bash(journalctl:*)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "Bash(python3:*)",
+      "Bash(nix search:*)",
+      "WebFetch(domain:bitmagnet.io)",
+      "Bash(cat:*)",
+      "Bash(xargs -I {} sh -c 'ls -li \"\"{}\"\" && echo')",
+      "Bash(systemctl --user start:*)",
+      "Bash(systemctl:*)",
+      "Bash(lspci:*)",
+      "Bash(lsmod:*)",
+      "Bash(nix-store -q:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

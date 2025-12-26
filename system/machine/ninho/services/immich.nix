@@ -1,12 +1,16 @@
-{ config, pkgs, ... }:
+{ config, pkgs, constants, ... }:
+let
+  inherit (constants) ports storage;
+  immichHome = "${storage.data}/immich";
+in
 {
   services.immich = {
     enable = true;
     host = "0.0.0.0";
-    port = 2283;
-    mediaLocation = "/storage/data/immich";
+    port = ports.immich;
+    mediaLocation = immichHome;
 
-    openFirewall = true; # Automatically opens port 2283 in firewall
+    openFirewall = true; # Automatically opens port in firewall
 
     database = {
       enable = true;
@@ -22,6 +26,6 @@
   };
 
   systemd.tmpfiles.rules = [
-    "d /storage/data/immich/ 0750 immich immich"
+    "d ${immichHome}/ 0750 immich immich"
   ];
 }

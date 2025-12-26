@@ -1,12 +1,4 @@
-{ config, pkgs, inputs, ... }:
-let
-  # Import unstable packages for latest ollama
-  unstable = import inputs.nixpkgs-unstable {
-    inherit (pkgs) system;
-    overlays = [];
-    config.allowUnfree = true;
-  };
-in
+{ config, pkgs, ... }:
 {
   services = {
     jellyfin = {
@@ -18,9 +10,7 @@ in
       enable = true;
       openFirewall = true;
       port = 8200;
-      package = unstable.jellyseerr;
+      package = pkgs.unstable.jellyseerr;
     };
   };
 }
-
-

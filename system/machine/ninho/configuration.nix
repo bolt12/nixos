@@ -7,12 +7,6 @@
 # Multi-user setup (bolt, pollard) with ZFS RAID storage
 # ============================================================================
 
-let
-  unstable = import inputs.nixpkgs-unstable {
-    overlays = [];
-    system = system;
-  };
-in
 {
   imports = [
     ./hardware-configuration.nix
@@ -46,7 +40,8 @@ in
 
     # Kernel modules - Load NVIDIA modules on boot (required for headless)
     # Also load rapl for energy consumption analysis
-    kernelModules = [ "kvm-amd" "intel_rapl_common" ];
+    # zstd for decompressing Bluetooth firmware
+    kernelModules = [ "kvm-amd" "intel_rapl_common" "zstd" ];
 
     # Force load NVIDIA modules early in boot (critical for headless servers)
     initrd.kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ];
@@ -61,6 +56,12 @@ in
       "nvidia-drm.modeset=1"
       "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
     ];
+
+    # Bluetooth module configuration - Disable autosuspend for MediaTek adapters
+    extraModprobeConfig = ''
+      options btusb enable_autosuspend=0
+      options btmtk enable_autosuspend=0
+    '';
 
     # ZFS configuration
     zfs = {
@@ -204,7 +205,6 @@ in
         8080  # Open-WebUI
         8081  # Nextcloud
         8082  # Homepage Dashboard
-        8085  # Grocy Dashboard
         8096  # Jellyfin
         8920  # Jellyfin
         8097  # Prowlarr
@@ -354,6 +354,12 @@ in
       ╔═══════════════════════════════════════════════════╗
       ║             Welcome to Ninho Server               ║
       ╚═══════════════════════════════════════════════════╝
+    '';
+
+    # Udev rules for Bluetooth - Disable USB autosuspend for MediaTek MT7922
+    udev.extraRules = ''
+      # Keep MediaTek MT7922 Bluetooth powered on (fixes EBUSY error)
+      ACTION=="add", SUBSYSTEM=="usb", ATTRS{idVendor}=="0489", ATTRS{idProduct}=="e13a", ATTR{power/control}="on"
     '';
   };
 
@@ -531,6 +537,22 @@ in
       if [[ $- == *i* ]] && [ -z "$TMUX" ]; then
         bash /etc/nixos/ninho-motd.sh | less
       fi
+
+      # Auto-start polkit text-mode authentication agent for terminal/SSH sessions
+      # This allows ALL polkit-requiring commands to prompt for passwords in the terminal
+      if [[ "$XDG_SESSION_TYPE" == "tty" ]] || [[ -n "$SSH_CONNECTION" ]]; then
+        # Only start if not already running for this session
+        if ! pgrep -u $USER -f "pkttyagent.*$$" > /dev/null; then
+          # Start pkttyagent in background for this shell session
+          pkttyagent --process $$ --fallback &
+
+          # Store the PID so we can clean it up on exit
+          _PKTTYAGENT_PID=$!
+
+          # Trap to kill the agent when shell exits
+          trap "kill $_PKTTYAGENT_PID 2>/dev/null" EXIT
+        fi
+      fi
     '';
 
     # Runs on port 11987
@@ -573,10 +595,6 @@ in
       };
       "scripts/ninho-status.sh" = {
         source = ./scripts/ninho-status.sh;
-        mode = "0755";
-      };
-      "scripts/aio-gif-carousel.sh" = {
-        source = ./scripts/aio-gif-carousel.sh;
         mode = "0755";
       };
     };

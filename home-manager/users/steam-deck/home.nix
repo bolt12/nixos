@@ -82,7 +82,76 @@ in
     ];
 
     # Minimal packages for Steam Deck
-    packages = [];
+    packages = with pkgs; [
+      wireguard-tools  # WireGuard VPN tools
+    ];
+
+    # WireGuard setup script
+    file.".local/bin/setup-wireguard.sh" = {
+      executable = true;
+      text = ''
+        #!/usr/bin/env bash
+        set -e
+
+        KEYS_DIR="$HOME/.config/wireguard"
+        WG_CONFIG="/etc/wireguard/wg0.conf"
+
+        echo "=== Steam Deck WireGuard Setup ==="
+        echo
+
+        # Create keys directory
+        mkdir -p "$KEYS_DIR"
+        chmod 700 "$KEYS_DIR"
+
+        # Generate keys
+        if [ ! -f "$KEYS_DIR/privatekey" ]; then
+          echo "Generating WireGuard keys..."
+          wg genkey > "$KEYS_DIR/privatekey"
+          chmod 600 "$KEYS_DIR/privatekey"
+          wg pubkey < "$KEYS_DIR/privatekey" > "$KEYS_DIR/publickey"
+          echo "Keys generated at $KEYS_DIR/"
+          echo
+        else
+          echo "Keys already exist at $KEYS_DIR/"
+          echo
+        fi
+
+        PRIVATE_KEY=$(cat "$KEYS_DIR/privatekey")
+        PUBLIC_KEY=$(cat "$KEYS_DIR/publickey")
+
+        echo "Your public key (add this to RPI server):"
+        echo "$PUBLIC_KEY"
+        echo
+
+        # Create WireGuard config
+        echo "Creating WireGuard configuration..."
+        cat > "$KEYS_DIR/wg0.conf" <<EOF
+        [Interface]
+        Address = 10.100.0.4/24
+        PrivateKey = $PRIVATE_KEY
+        ListenPort = 51820
+
+        [Peer]
+        # RPI5 WireGuard Server
+        PublicKey = 2OIP77a10/Fas+eCvYQNa3ixFNOq0JqZIuSk1tY/QTM=
+        Endpoint = rpi-nixos.ddns.net:51820
+        AllowedIPs = 10.100.0.0/24
+        PersistentKeepalive = 25
+        EOF
+
+        echo "Configuration created at $KEYS_DIR/wg0.conf"
+        echo
+        echo "Next steps:"
+        echo "1. Copy your public key above"
+        echo "2. On RPI server, update system/machine/rpi/rpi5.nix:"
+        echo "   Change Steam Deck peer publicKey to: $PUBLIC_KEY"
+        echo "3. Rebuild RPI server: sudo nixos-rebuild switch --flake .#"
+        echo "4. On Steam Deck, copy config: sudo cp $KEYS_DIR/wg0.conf $WG_CONFIG"
+        echo "5. Enable WireGuard: sudo systemctl enable wg-quick@wg0"
+        echo "6. Start WireGuard: sudo systemctl start wg-quick@wg0"
+        echo "7. Check status: sudo wg show"
+      '';
+    };
   };
 
   # Additional programs
