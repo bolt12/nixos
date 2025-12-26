@@ -223,7 +223,7 @@ in
             allowedIPs = [ "10.100.0.3/32" ];
           }
           { # Steam Deck
-            publicKey = "N1VIBzM8r1g0ItVXPrAopAGN8R+Dpqcmm8BbPKHOBx8=";
+            publicKey = "3w9nh1xsGDAZRF7QSEo9N8oEwpL5a+g6wGscNC+PbkQ=";
             allowedIPs = [ "10.100.0.4/32" ];
           }
           { # Supernote
