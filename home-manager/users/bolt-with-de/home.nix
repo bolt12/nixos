@@ -47,7 +47,6 @@
 
   # Desktop-specific programs
   programs = {
-    autorandr.enable = true;
     firefox.enable = true;
   };
 

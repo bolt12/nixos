@@ -15,8 +15,6 @@ let
     rev = "v2.0";
     sha256 = "sha256-TjGvY3eqpF+DDwatT7A78flyPcTkcLHQ1xcg+MKgCoE=";
   };
-
-  nixops = inputs.nixops.defaultPackage.${pkgs.system};
 in
 {
   imports = [

@@ -20,19 +20,13 @@ in
       systemd-boot.enable = true;
     };
 
-    # Emulate ARM on my system. Useful to deploy NixOS on ARM via nixops
+    # Emulate ARM on my system. Useful to deploy NixOS on ARM via Colmena
     binfmt.emulatedSystems = [ "aarch64-linux" ];
 
     kernelModules       = [ "acpi_call" ];
     extraModulePackages =
       with config.boot.kernelPackages; [ acpi_call ];
-    # extraModprobeConfig = ''
-    #   options snd-hda-intel model=generic
-    #   options snd slots=snd-hda-intel
-    #   options snd-intel-dspcfg dsp_driver=1
-    #   options snd_sof sof_debug=128
-    # '';
-    blacklistedKernelModules = [ ]; # "snd_soc_skl" ];
+    blacklistedKernelModules = [ ];
     plymouth.enable          = true;
     tmp = {
       useTmpfs    = true;

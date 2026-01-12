@@ -1,11 +1,10 @@
 { inputs
 , pkgs
-, system
 , ... }:
 
 let
   unstable = import inputs.nixpkgs-unstable {
-    inherit (pkgs) system;
+    system = pkgs.stdenv.hostPlatform.system;
     overlays = [
       inputs.neovim-nightly-overlay.overlays.default
     ];
@@ -22,6 +21,11 @@ let
   vim-silicon = pkgs.vimUtils.buildVimPlugin {
     name = "vim-silicon";
     src = inputs.vim-silicon;
+  };
+
+  llama-vim = pkgs.vimUtils.buildVimPlugin {
+    name = "llama-vim";
+    src = inputs.llama-vim;
   };
 
   neoscroll = pkgs.vimUtils.buildVimPlugin {
@@ -51,7 +55,7 @@ let
 
   cornelis = {
     # plugin packages in required Vim plugin dependencies
-    plugin = inputs.cornelis.packages.${system}.cornelis-vim;
+    plugin = inputs.cornelis.packages.${pkgs.stdenv.hostPlatform.system}.cornelis-vim;
     config = ''
       let g:cornelis_use_global_binary = 1
       let g:cornelis_split_location = 'bottom'
@@ -94,6 +98,7 @@ let
     highstr                  # highlight stuff
     lean-nvim                # Lean NVim plugin
     litee-nvim               # Litee library
+    llama-vim                # llama.cpp completion
     luasnip                  # snippets
     matchit-zip              # match parentheses
     neoscroll                # smooth scrollng
@@ -149,7 +154,7 @@ in
     withNodeJs   = true;
     withPython3  = true;
     withRuby     = true;
-    extraPackages = [ inputs.cornelis.packages.${system}.cornelis ];
+    extraPackages = [ inputs.cornelis.packages.${pkgs.stdenv.hostPlatform.system}.cornelis ];
   };
 
   xdg.configFile = {

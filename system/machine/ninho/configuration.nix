@@ -21,12 +21,6 @@
 
   system.stateVersion = "25.05";
 
-  networking = {
-    hostName = "nixos-ninho";
-    # Required for ZFS (generated with: head -c4 /dev/urandom | od -A none -t x4)
-    hostId = "d8e24c1d";
-  };
-
   time.timeZone = "Europe/Lisbon";
   i18n.defaultLocale = "en_US.UTF-8";
 
@@ -41,10 +35,11 @@
     # Kernel modules - Load NVIDIA modules on boot (required for headless)
     # Also load rapl for energy consumption analysis
     # zstd for decompressing Bluetooth firmware
-    kernelModules = [ "kvm-amd" "intel_rapl_common" "zstd" ];
+    # NVIDIA modules loaded here (NOT in initrd) to prevent boot hangs with dummy HDMI
+    kernelModules = [ "kvm-amd" "intel_rapl_common" "zstd" "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ];
 
-    # Force load NVIDIA modules early in boot (critical for headless servers)
-    initrd.kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ];
+    # Don't load NVIDIA in initrd - causes boot hang when dummy HDMI is connected
+    # initrd.kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ];
 
     # Kernel parameters
     kernelParams = [
@@ -177,6 +172,10 @@
   # ==========================================================================
 
   networking = {
+    hostName = "nixos-ninho";
+    # Required for ZFS (generated with: head -c4 /dev/urandom | od -A none -t x4)
+    hostId = "d8e24c1d";
+
     networkmanager = {
       enable = true;
       dns = "none";
@@ -202,7 +201,7 @@
         3000  # Grafana
         7000  # Emanote
         8000  # OnlyOffice
-        8080  # Open-WebUI
+        8080  # Llama swap
         8081  # Nextcloud
         8082  # Homepage Dashboard
         8096  # Jellyfin
@@ -216,9 +215,12 @@
         8103  # Deluge
         8200  # Jellyseer
         8384  # Syncthing web UI
-        11434 # Ollama
         11987 # CoolerControl
         22000 # Syncthing file transfers
+        10200 # Whisper
+        10201 # Whisper
+        10300 # Whisper
+        10301 # Whisper
       ];
       allowedUDPPorts = [
         51820 # WireGuard
@@ -244,6 +246,31 @@
         }
       ];
     };
+  };
+
+  # Network performance tuning for game streaming (Sunshine)
+  boot.kernel.sysctl = {
+    # UDP buffer optimization (Sunshine uses UDP for video streaming)
+    "net.core.rmem_max" = 134217728;      # 128MB read buffer
+    "net.core.wmem_max" = 134217728;      # 128MB write buffer
+    "net.core.rmem_default" = 1048576;    # 1MB default
+    "net.core.wmem_default" = 1048576;
+
+    # Reduce bufferbloat for lower latency
+    "net.core.netdev_max_backlog" = 5000;
+
+    # TCP optimization for control channel
+    "net.ipv4.tcp_fastopen" = 3;
+    "net.ipv4.tcp_notsent_lowat" = 16384;
+
+    # TCP buffer tuning
+    "net.ipv4.tcp_rmem" = "8192 1048576 134217728";
+    "net.ipv4.tcp_wmem" = "8192 1048576 134217728";
+
+    # Emergency kernel recovery - Magic SysRq key
+    # Usage: Alt+SysRq+<command> or echo <command> > /proc/sysrq-trigger
+    # REISUB sequence for safe emergency reboot: R E I S U B
+    "kernel.sysrq" = 1;
   };
 
   # ==========================================================================
@@ -291,38 +318,38 @@
     };
 
     templates = {
-      # System datasets (root)
+      # System datasets (root) - Reduced retention to prevent disk space issues
       system = {
         frequently = 0;
-        hourly = 24;      # 24 hours
-        daily = 7;        # 7 days
-        weekly = 4;       # 4 weeks
-        monthly = 3;      # 3 months
+        hourly = 6;       # 6 hours (reduced from 24)
+        daily = 3;        # 3 days (reduced from 7)
+        weekly = 2;       # 2 weeks (reduced from 4)
+        monthly = 2;      # 2 months (reduced from 3)
         yearly = 0;
         autosnap = true;
         autoprune = true;
       };
 
-      # User data (home)
+      # User data (home) - Reduced retention to prevent disk space issues
       production = {
-        frequently = 4;   # 4 x 15min = 1 hour
-        hourly = 48;      # 2 days
-        daily = 14;       # 2 weeks
-        weekly = 8;       # 2 months
-        monthly = 12;     # 1 year
-        yearly = 2;       # 2 years
+        frequently = 0;   # Disabled (reduced from 4)
+        hourly = 12;      # 12 hours (reduced from 48)
+        daily = 7;        # 1 week (reduced from 14)
+        weekly = 4;       # 1 month (reduced from 8)
+        monthly = 6;      # 6 months (reduced from 12)
+        yearly = 0;       # Disabled (reduced from 2)
         autosnap = true;
         autoprune = true;
       };
 
-      # Bulk storage
+      # Bulk storage - Reduced retention to prevent disk space issues
       storage = {
         frequently = 0;
         hourly = 0;
-        daily = 30;       # 1 month
-        weekly = 8;       # 2 months
-        monthly = 24;     # 2 years
-        yearly = 5;       # 5 years
+        daily = 14;       # 2 weeks (reduced from 30)
+        weekly = 4;       # 1 month (reduced from 8)
+        monthly = 6;      # 6 months (reduced from 24)
+        yearly = 1;       # 1 year (reduced from 5)
         autosnap = true;
         autoprune = true;
       };
@@ -462,6 +489,19 @@
       trusted-users = [ "root" "bolt" "pollard" ];
       experimental-features = [ "nix-command" "flakes" ];
 
+      # Binary caches - CUDA cache significantly reduces compilation times
+      substituters = [
+        "https://cache.nixos.org"
+        "https://cache.nixos-cuda.org"  # CUDA packages pre-built
+        "https://nix-community.cachix.org"
+      ];
+
+      trusted-public-keys = [
+        "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+        "cache.nixos-cuda.org-1:2Mm/sgz0GJsJ6Gr6j1B0aZfOj4HwfcgWO/PEHNS1/NY="
+        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      ];
+
       # Parallel builds
       max-jobs = "auto";
       cores = 0;
@@ -487,6 +527,7 @@
   };
 
   nixpkgs.config.allowUnfree = true;
+  nixpkgs.config.cudaSupport = true;
 
   # ==========================================================================
   # SYSTEM PACKAGES
@@ -515,6 +556,10 @@
     # NVIDIA tools
     nvtopPackages.nvidia     # GPU monitoring
     cudaPackages.cudatoolkit # CUDA toolkit
+
+    # LLM inference with CUDA acceleration (RTX 5090)
+    # Note: Full CUDA+CPU optimizations defined in system/common/overlays.nix
+    llama-cpp-cuda
   ];
 
   # ==========================================================================
@@ -532,31 +577,12 @@
   # ==========================================================================
 
   programs = {
-    bash.interactiveShellInit = ''
-      # Run MOTD for interactive shells (SSH or login)
-      if [[ $- == *i* ]] && [ -z "$TMUX" ]; then
-        bash /etc/nixos/ninho-motd.sh | less
-      fi
-
-      # Auto-start polkit text-mode authentication agent for terminal/SSH sessions
-      # This allows ALL polkit-requiring commands to prompt for passwords in the terminal
-      if [[ "$XDG_SESSION_TYPE" == "tty" ]] || [[ -n "$SSH_CONNECTION" ]]; then
-        # Only start if not already running for this session
-        if ! pgrep -u $USER -f "pkttyagent.*$$" > /dev/null; then
-          # Start pkttyagent in background for this shell session
-          pkttyagent --process $$ --fallback &
-
-          # Store the PID so we can clean it up on exit
-          _PKTTYAGENT_PID=$!
-
-          # Trap to kill the agent when shell exits
-          trap "kill $_PKTTYAGENT_PID 2>/dev/null" EXIT
-        fi
-      fi
-    '';
-
     # Runs on port 11987
     coolercontrol.enable = true;
+
+    # Enable nix-ld to run non-Nix packaged executables (AppImages, pre-built binaries)
+    # Useful for running upstream binaries that expect standard library paths
+    nix-ld.enable = true;
   };
 
   # Configure CoolerControl to listen on all interfaces

@@ -28,9 +28,10 @@ in
       NoNewPrivileges = true;
       PrivateTmp = true;
       ProtectSystem = "strict";
-      ProtectHome = "tmpfs";
-      ReadWritePaths = [ "/home/bolt/journal" ];
-      BindReadOnlyPaths = [ "/home/bolt/journal" ];
+      # Use BindPaths instead of ProtectHome + ReadWritePaths to avoid namespace conflicts
+      # This gives read-write access to the journal directory while protecting the rest of /home
+      BindPaths = [ "/home/bolt/journal" ];
+      ProtectHome = "read-only";
     };
   };
 }

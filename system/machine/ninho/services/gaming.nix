@@ -207,9 +207,5 @@
     # User lingering
     "f /var/lib/systemd/linger/bolt - - - -"
     "f /var/lib/systemd/linger/pollard - - - -"
-
-    # NVIDIA capabilities permissions (required for hardware encoding)
-    "z /dev/nvidia-caps/nvidia-cap1 0666 - - - -"
-    "z /dev/nvidia-caps/nvidia-cap2 0666 - - - -"
   ];
 }

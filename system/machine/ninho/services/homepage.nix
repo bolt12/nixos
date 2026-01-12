@@ -98,15 +98,15 @@ in
               };
             }
             {
-              Grocy = {
-                href = "http://${ninhoIp}:8085";
-                description = "Groceries";
-              };
-            }
-            {
               Emanote = {
                 href = "http://${ninhoIp}:${toString ports.emanote}";
                 description = "Journal";
+              };
+            }
+            {
+              Miniflux = {
+                href = "http://${ninhoIp}:${toString ports.miniflux}";
+                description = "RSS Reader";
               };
             }
             {
@@ -116,9 +116,9 @@ in
               };
             }
             {
-              Ollama = {
-                href = "http://${ninhoIp}:${toString ports.ollama}";
-                description = "LLM API";
+              "llama cpp / llama swap" = {
+                href = "http://${ninhoIp}:${toString ports.llamaswap}";
+                description = "LLM Inference (CUDA)";
               };
             }
             {

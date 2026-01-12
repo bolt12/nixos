@@ -26,20 +26,6 @@ let
       rev = "v2.0";
       sha256 = "sha256-TjGvY3eqpF+DDwatT7A78flyPcTkcLHQ1xcg+MKgCoE="; # Replace with the correct hash
     };
-
-  nixops = inputs.nixops.defaultPackage.${pkgs.system};
-
-  # Unstable branch packages
-  # Package lists moved to profiles for better organization
-
-  # Package lists removed - use profiles for organization
-
-  # Git packages moved to profiles
-
-  # Haskell packages moved to profiles
-
-  # Font packages moved to profiles
-
 in
 {
   nix = {

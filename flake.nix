@@ -9,10 +9,10 @@
   };
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     home-manager = {
-      url = "github:nix-community/home-manager/release-25.05";
+      url = "github:nix-community/home-manager/release-25.11";
       # The `follows` keyword in inputs is used for inheritance.
       # Here, `inputs.nixpkgs` of home-manager is kept consistent with
       # the `inputs.nixpkgs` of the current flake,
@@ -20,8 +20,9 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nixops = {
-      url = "github:NixOS/nixops";
+    colmena = {
+      url = "github:zhaofengli/colmena";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     raspberry-pi-nix.url = "github:nix-community/raspberry-pi-nix";
@@ -29,7 +30,6 @@
     # Pin emanote to version 1.4.0.0
     emanote = {
       url = "github:srid/emanote/1.4.0.0";
-      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
@@ -39,6 +39,12 @@
 
     nix-ai-tools = {
       url = "github:numtide/nix-ai-tools";
+    };
+
+    # llama-swap - latest release for model swapping
+    llama-swap = {
+      url = "github:mostlygeek/llama-swap/v182";
+      flake = false;
     };
 
     # Needed for steam-deck
@@ -61,6 +67,12 @@
       type = "github";
       owner = "segeljakt";
       repo = "vim-silicon";
+      flake = false;
+    };
+    llama-vim = {
+      type = "github";
+      owner = "ggml-org";
+      repo = "llama.vim";
       flake = false;
     };
     venn-nvim = {
@@ -96,6 +108,7 @@
   outputs = { self
             , nixpkgs
             , home-manager
+            , colmena
             , ... }@inputs:
     let
       system = "x86_64-linux";
@@ -164,44 +177,38 @@
         };
       };
 
-      nixopsConfigurations = {
-        default = {
-          inherit (inputs) nixpkgs;
-          network = {
-            description = "My remote machines";
-            storage.legacy = {};
-            enableRollback = true;
+      # Colmena deployment configuration
+      colmena = {
+        meta = {
+          nixpkgs = import nixpkgs {
+            system = "x86_64-linux";
+            config.allowUnfree = true;
+          };
+          specialArgs = { inherit inputs; };
+        };
+
+        # RPI 5 deployment target
+        rpi-5 = { name, nodes, pkgs, ... }: {
+          deployment = {
+            targetHost = "192.168.1.110";
+            targetUser = "bolt";
+            # Option 1: Build on target (slower but avoids cross-compilation issues)
+            # buildOnTarget = true;
+            # Option 2: Cross-compile locally (faster build machine, but may have compatibility issues)
+            buildOnTarget = false;
+            allowLocalDeployment = false;
           };
 
-          # Common configuration shared between all servers
-          defaults = { ... }: {
-            imports = [
-              inputs.raspberry-pi-nix.nixosModules.raspberry-pi
-              ./system/machine/rpi/hardware-configuration.nix
-              ./system/machine/rpi/rpi-basic.nix
-              ./system/machine/rpi/rpi5.nix
-            ];
-          };
+          imports = [
+            inputs.raspberry-pi-nix.nixosModules.raspberry-pi
+            ./system/machine/rpi/hardware-configuration.nix
+            ./system/machine/rpi/rpi-basic.nix
+            ./system/machine/rpi/rpi5.nix
+          ];
 
-          # Server definitions
-          rpi-5 = { ... }: {
-            # Augment standard NixOS module arguments.
-            _module.args = {
-              inherit inputs;
-            };
-
-            # Says we are going to deploy to an already existing NixOS machine
-            deployment.targetHost = "192.168.1.110";
-
-            imports = [
-              ./system/machine/rpi/rpi5.nix
-            ];
-
-            nixpkgs.localSystem = {
-              system = "aarch64-linux";
-              config = "aarch64-unknown-linux-gnu";
-              hostPlatform = "aarch64-linux";
-            };
+          # Cross-compile from x86_64 to aarch64
+          nixpkgs.crossSystem = {
+            system = "aarch64-linux";
           };
         };
       };

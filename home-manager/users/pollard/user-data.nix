@@ -53,27 +53,4 @@ in
     nix-info = "nix-shell -p nix-info --run nix-info";
     hm-help = "man home-configuration.nix";
   };
-
-  # Syncthing configuration for ninho server
-  # services.syncthing = {
-  #   overrideDevices = true;
-  #   overrideFolders = true;
-
-  #   guiAddress = "0.0.0.0:8384";
-
-  #   settings = {
-  #     devices = {
-  #       "pollard-laptop" = {
-  #         id = ""; # Need to fetch the ID from the GUI
-  #       };
-  #     };
-
-  #     folders = {
-  #       "folder-id" = {
-  #         path = "${config.userConfig.homeDirectory}/Documents";
-  #         devices = [ "pollard-laptop" ];
-  #       };
-  #     };
-  #   };
-  # };
 }

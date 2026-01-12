@@ -1,11 +1,11 @@
-{ config, lib, pkgs, inputs, system, ... }:
+{ config, lib, pkgs, inputs, ... }:
 
 # Pollard's headless configuration for the ninho server
 # Beginner-friendly setup with development tools and ZFS learning resources
 
 let
   unstable = import inputs.nixpkgs-unstable {
-    inherit system;
+    system = pkgs.stdenv.hostPlatform.system;
     overlays = [];
   };
 in
@@ -70,6 +70,20 @@ in
     man = {
       enable = true;
       generateCaches = true;  # Better man page search
+    };
+
+    ssh = {
+      enable = true;
+      # Disable deprecated default config - explicitly set what we need
+      enableDefaultConfig = false;
+
+      matchBlocks = {
+        # Default settings for all hosts (replaces deprecated defaults)
+        "*" = {
+          serverAliveInterval = 60;
+          serverAliveCountMax = 3;
+        };
+      };
     };
   };
 

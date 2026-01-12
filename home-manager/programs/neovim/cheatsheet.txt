@@ -317,6 +317,11 @@ Enter command prompt                   | `C-a :`
 List all keybindings                   | `C-a ?`
 Show large clock                       | `C-a t`
 
+## llama.vim @llm @completion @ai
+Toggle FIM suggestions                   | <C-f>
+Accept full suggestion                   | <Tab>
+Accept first line only                   | <S-Tab>
+
 ## Lean Files (<LocalLeader> prefix)
 
 Toggle the infoview open or closed     | <LocalLeader>i

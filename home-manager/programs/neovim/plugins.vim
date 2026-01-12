@@ -690,3 +690,14 @@ EOF
 " This will allow you to freely move the cursor in the buffer. (see help virtualedit)
 " Enter in Visual Block mode using <C-v>. Select the region where the box should be.
 " Invoke :VBox. This will draw a rectangle. In case, it has a width or a height of 1, it will draw a line.
+
+" llama.vim configuration
+let g:llama_config = {
+  \ 'endpoint': 'http://10.100.0.100:10003/infill',
+  \ 'auto_fim': 0,
+  \ 'show_info': 1
+  \ }
+
+" Note: llama-swap OpenAI-compatible endpoint
+" FIM may not work perfectly with non-FIM models like Nemotron
+" Consider adding a dedicated FIM model (e.g., Qwen2.5-Coder) to llama-swap

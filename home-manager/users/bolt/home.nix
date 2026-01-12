@@ -78,7 +78,17 @@ in
   # Additional programs (headless - no firefox, no autorandr)
   programs = {
     ssh = {
+      enable = true;
+      # Disable deprecated default config - explicitly set what we need
+      enableDefaultConfig = false;
+
       matchBlocks = {
+        # Default settings for all hosts (replaces deprecated defaults)
+        "*" = {
+          serverAliveInterval = 60;
+          serverAliveCountMax = 3;
+        };
+
         "rpi" = {
           hostname = "10.100.1.1";
           user = "bolt";

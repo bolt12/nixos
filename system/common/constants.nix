@@ -31,7 +31,8 @@
     onlyoffice = 8000;
     immich = 2283;
     grafana = 3000;
-    ollama = 8080;
+    llamaswap = 8080;
+    whisper = 10300;
     homepage = 8082;
     jellyfin = 8096;
     prowlarr = 8097;
@@ -45,5 +46,7 @@
     coolercontrol = 11987;
     emanote = 7000;
     bitmagnet = 3333;
+    miniflux = 8104;
+    anki-sync-server = 27701;
   };
 }

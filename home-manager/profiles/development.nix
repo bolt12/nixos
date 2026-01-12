@@ -3,8 +3,12 @@
 
 { inputs, pkgs, system, ... }:
 let
-  nixops = inputs.nixops.defaultPackage.${system};
   nix-ai-tools = inputs.nix-ai-tools.packages.${system};
+
+  unstable = import inputs.nixpkgs-unstable {
+    inherit (pkgs) system;
+    overlays = [];
+  };
 in {
 
   home.packages = with pkgs; [
@@ -41,7 +45,6 @@ in {
     # Build and packaging tools
     cachix                       # Nix binary cache
     home-manager                 # User environment management
-    nixops                       # NixOS deployment tool
 
     # Container and virtualization
     # Note: Docker is enabled at system level
@@ -68,6 +71,6 @@ in {
     lean4
   ] ++ [
     # Bleeding-edge development tools from unstable channel
-    pkgs.unstable.nixd                             # Nix language server for IDE integration
+    unstable.nixd                             # Nix language server for IDE integration
   ];
 }
