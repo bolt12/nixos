@@ -93,7 +93,7 @@ in
         "qwen3-coder" = {
           cmd = ''
             ${llama-cpp-cuda}/bin/llama-server \
-              -hf unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:Q6_K \
+              -hf unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:Q8_0 \
               --metrics \
               --host 0.0.0.0 \
               --port ''${PORT} \
@@ -102,11 +102,10 @@ in
               --top-p 0.8 \
               --top-k 20 \
               --repeat-penalty 1.05 \
-              -ngl 49 \
-              -c 180000 \
+              -ngl 99 \
+              -ot ".ffn_(up)_exps.=CPU" \
+              -c 200000 \
               -n 65536 \
-              --cache-type-k q4_0 \
-              --cache-type-v q4_0 \
               --flash-attn on \
               --batch-size 8192 \
               --ubatch-size 1024 \
@@ -119,7 +118,7 @@ in
         "nemotron-3-nano" = {
           cmd = ''
             ${llama-cpp-cuda}/bin/llama-server \
-              -hf unsloth/Nemotron-3-Nano-30B-A3B-GGUF:Q5_K_XL \
+              -hf unsloth/Nemotron-3-Nano-30B-A3B-GGUF:Q8_0 \
               --metrics \
               --host 0.0.0.0 \
               --port ''${PORT} \
@@ -127,9 +126,8 @@ in
               --temp 0.6 \
               --top-p 0.8 \
               -ngl 99 \
-              -c 180000 \
-              --cache-type-k q5_1 \
-              --cache-type-v q5_1 \
+              -ot ".ffn_(up)_exps.=CPU" \
+              -c 200000 \
               --flash-attn on \
               --batch-size 8192 \
               --ubatch-size 1024 \

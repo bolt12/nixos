@@ -50,12 +50,21 @@
       # NVIDIA configuration
       "nvidia-drm.modeset=1"
       "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
+
+      # PCI/PCIe power management - Disable ASPM to prevent network/SATA lockups
+      "pcie_aspm=off"
+
+      # Alternative: Allow fallback to BIOS ASPM settings if needed
+      # "pcie_aspm.policy=performance"
     ];
 
     # Bluetooth module configuration - Disable autosuspend for MediaTek adapters
     extraModprobeConfig = ''
       options btusb enable_autosuspend=0
       options btmtk enable_autosuspend=0
+
+      # AMD SATA controller fixes - Disable aggressive power management
+      options ahci ignore_sss=1
     '';
 
     # ZFS configuration

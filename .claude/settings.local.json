@@ -19,7 +19,9 @@
       "Bash(systemctl:*)",
       "Bash(lspci:*)",
       "Bash(lsmod:*)",
-      "Bash(nix-store -q:*)"
+      "Bash(nix-store -q:*)",
+      "WebFetch(domain:opencode.ai)",
+      "WebFetch(domain:search.nixos.org)"
     ],
     "deny": [],
     "ask": []

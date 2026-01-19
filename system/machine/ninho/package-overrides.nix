@@ -18,13 +18,13 @@ in
         rocmSupport = false;
         metalSupport = false;
       }).overrideAttrs (oldAttrs: {
-        version = "7658";
+        version = "7719";
 
         src = pkgs.fetchFromGitHub {
           owner = "ggml-org";
           repo = "llama.cpp";
-          tag = "b7658";
-          hash = "sha256-Ij8N5zsAx6GX89xOgPVZkMjE1N2tRJ+LerrJ02ckRsE=";
+          tag = "b7719";
+          hash = "sha256-OLS9tLeDaP7Ela9k36PUE3UNwlTUrabvrKaML3VBHG0=";
           leaveDotGit = true;
           postFetch = ''
             git -C "$out" rev-parse --short HEAD > $out/COMMIT
@@ -48,13 +48,13 @@ in
 
       # llama-swap v182 - Latest release with Anthropic API compatibility
       llama-swap = prev.llama-swap.overrideAttrs (oldAttrs: {
-        version = "182";
+        version = "183";
 
         src = pkgs.fetchFromGitHub {
           owner = "mostlygeek";
           repo = "llama-swap";
-          tag = "v182";
-          hash = "sha256-w/VQS8uCpgniwLiJsH/8IG/AGasRxjCv7fADTfpvWLw=";
+          tag = "v183";
+          hash = "sha256-5TIcDK6M/9jDkJDWafRGw+/TaW7Pbvn1yl9ijnzP/Mc=";
           leaveDotGit = true;
           postFetch = ''
             cd "$out"
@@ -67,7 +67,8 @@ in
         proxyVendor = true;
         vendorHash = "sha256-TPOKqgyf8vltRLbtNWXcK3jsWsVFaSrZAc+/AMkG/8A=";
         passthru.ui = oldAttrs.passthru.ui;
-        passthru.npmDepsHash = "sha256-RKPcMwJ0qVOgbTxoGryrLn7AW0Bfmv9WasoY+gw4B30=";
+        passthru.npmDepsHash = "sha256-fIDn3vfrqTZfzK8dc+Vpckw9M2iyJi5ggHFEV8PeXtU=";
+
       });
 
       # Fix scaphandre build error with riemann_client unstable feature
