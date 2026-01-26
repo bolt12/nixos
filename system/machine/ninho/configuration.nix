@@ -642,5 +642,23 @@
   security.sudo = {
     enable = true;
     wheelNeedsPassword = true;
+
+    # Allow llama-swap to control Wyoming services for VRAM management
+    # Full-power models stop Wyoming to free ~3GB VRAM, restart on exit
+    extraRules = [
+      {
+        users = [ "llama-swap" ];
+        commands = [
+          { command = "/run/current-system/sw/bin/systemctl stop wyoming-faster-whisper-en"; options = [ "NOPASSWD" ]; }
+          { command = "/run/current-system/sw/bin/systemctl stop wyoming-faster-whisper-pt"; options = [ "NOPASSWD" ]; }
+          { command = "/run/current-system/sw/bin/systemctl stop wyoming-piper-en"; options = [ "NOPASSWD" ]; }
+          { command = "/run/current-system/sw/bin/systemctl stop wyoming-piper-pt"; options = [ "NOPASSWD" ]; }
+          { command = "/run/current-system/sw/bin/systemctl start wyoming-faster-whisper-en"; options = [ "NOPASSWD" ]; }
+          { command = "/run/current-system/sw/bin/systemctl start wyoming-faster-whisper-pt"; options = [ "NOPASSWD" ]; }
+          { command = "/run/current-system/sw/bin/systemctl start wyoming-piper-en"; options = [ "NOPASSWD" ]; }
+          { command = "/run/current-system/sw/bin/systemctl start wyoming-piper-pt"; options = [ "NOPASSWD" ]; }
+        ];
+      }
+    ];
   };
 }

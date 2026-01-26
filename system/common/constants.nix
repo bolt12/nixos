@@ -48,5 +48,21 @@
     bitmagnet = 3333;
     miniflux = 8104;
     anki-sync-server = 27701;
+
+    # New services
+    navidrome = 8105;
+    ntfy = 8106;
+    filebrowser = 8107;
+    home-assistant = 8123;
+
+    # Additional services
+    uptime-kuma = 8109;
+    kavita = 8110;
+    memos = 8111;
+    bazarr = 8112;
+    comfy-ui = 8188;
+
+    # Monitoring
+    prometheus = 9090;
   };
 }

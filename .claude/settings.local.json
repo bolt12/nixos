@@ -1,4 +1,12 @@
 {
+  "env": {
+    "ANTHROPIC_AUTH_TOKEN": "37340e5d6c9044de9800b79aa8ebada7.6gocjlASMUDCC3VY",
+    "ANTHROPIC_BASE_URL": "https://api.z.ai/api/anthropic",
+    "API_TIMEOUT_MS": "3000000",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "glm-4.7-flash",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "glm-4.7",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "glm-4.7"
+  },
   "permissions": {
     "allow": [
       "Bash(systemctl status:*)",
@@ -21,7 +29,11 @@
       "Bash(lsmod:*)",
       "Bash(nix-store -q:*)",
       "WebFetch(domain:opencode.ai)",
-      "WebFetch(domain:search.nixos.org)"
+      "WebFetch(domain:search.nixos.org)",
+      "WebFetch(domain:mynixos.com)",
+      "WebFetch(domain:wiki.nixos.org)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:northflank.com)"
     ],
     "deny": [],
     "ask": []

@@ -18,13 +18,13 @@ in
         rocmSupport = false;
         metalSupport = false;
       }).overrideAttrs (oldAttrs: {
-        version = "7719";
+        version = "7836";
 
         src = pkgs.fetchFromGitHub {
           owner = "ggml-org";
           repo = "llama.cpp";
-          tag = "b7719";
-          hash = "sha256-OLS9tLeDaP7Ela9k36PUE3UNwlTUrabvrKaML3VBHG0=";
+          tag = "b7836";
+          hash = "sha256-uckbrQ7Fpf5re1oVvnjFUqN7ZtV7pPD0qEZHagRO5Po=";
           leaveDotGit = true;
           postFetch = ''
             git -C "$out" rev-parse --short HEAD > $out/COMMIT
@@ -48,13 +48,13 @@ in
 
       # llama-swap v182 - Latest release with Anthropic API compatibility
       llama-swap = prev.llama-swap.overrideAttrs (oldAttrs: {
-        version = "183";
+        version = "185";
 
         src = pkgs.fetchFromGitHub {
           owner = "mostlygeek";
           repo = "llama-swap";
-          tag = "v183";
-          hash = "sha256-5TIcDK6M/9jDkJDWafRGw+/TaW7Pbvn1yl9ijnzP/Mc=";
+          tag = "v185";
+          hash = "sha256-Yn7w3jqz+Lh0Ju4QtVTMYJfs6fL3kRke0esbj8q5Q1Y=";
           leaveDotGit = true;
           postFetch = ''
             cd "$out"

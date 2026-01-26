@@ -34,5 +34,14 @@
     # Cloud services - need access to share photos/files with other services
     nextcloud.extraGroups = [ "media" "storage-users" ];
     immich.extraGroups = [ "media" "storage-users" "render" "video" ];
+
+    # Music streaming
+    navidrome.extraGroups = [ "media" "storage-users" ];
+
+    # Book reader - needs media access for ebooks
+    kavita.extraGroups = [ "media" "storage-users" ];
+
+    # Subtitle manager - needs media access
+    bazarr.extraGroups = [ "media" "storage-users" ];
   };
 }
