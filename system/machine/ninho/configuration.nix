@@ -56,6 +56,11 @@
 
       # Alternative: Allow fallback to BIOS ASPM settings if needed
       # "pcie_aspm.policy=performance"
+
+      # Realtek RTL8126A network driver stability (r8169)
+      "r8169.use_dac=1"   # Enable DAC (Dual Address Cycle)
+      "r8169.aspm=0"      # Disable ASPM at driver level
+      "iommu=soft"        # Software IOMMU (may help with DMA issues)
     ];
 
     # Bluetooth module configuration - Disable autosuspend for MediaTek adapters
@@ -132,6 +137,11 @@
   # ==========================================================================
 
   hardware = {
+    # Hardware firmware
+    firmware = with pkgs; [
+      linux-firmware  # Include latest network driver firmware (RTL8126A)
+    ];
+
     # Bluetooth
     bluetooth = {
       enable = true;
@@ -203,6 +213,7 @@
       enable = true;
       trustedInterfaces = [ "wg0" ];
       allowedTCPPorts = [
+        22    # SSH - Remote access
         20    # FTP
         21    # FTP
         80    # HTTP
