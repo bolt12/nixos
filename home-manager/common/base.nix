@@ -66,6 +66,11 @@ in
     atuin = {
       enable = true;
       enableBashIntegration = true;
+      settings = {
+        sync_address = "http://10.100.0.100:8888";
+        auto_sync = true;
+        sync_frequency = "5m";
+      };
     };
   };
 

@@ -9,6 +9,9 @@
     # Import base bolt configuration (headless)
     ../bolt/home.nix
 
+    # Stylix theming (Gruvbox Dark)
+    inputs.stylix.homeModules.stylix
+
     # Add desktop-specific profiles
     ../../profiles/desktop.nix
     ../../profiles/wayland.nix
@@ -36,7 +39,7 @@
       fcitx5 = {
         addons = with pkgs; [
           fcitx5-gtk
-          fcitx5-configtool
+          qt6Packages.fcitx5-configtool
           fcitx5-mozc
           fcitx5-nord
           fcitx5-rime
@@ -57,13 +60,49 @@
     udiskie.enable = true;
     swayidle.enable = true;
     poweralertd.enable = true;
-    autorandr.enable = true;
     safeeyes.enable = true;
 
     wlsunset = {
       enable = true;
       latitude = "39";
       longitude = "-8";
+    };
+  };
+
+  # Stylix theming - purely additive, no existing configs modified
+  # Sway/waybar use raw config files; Stylix only manages GTK/cursor/fonts
+  # To remove: delete this block and the stylix import above
+  stylix = {
+    enable = true;
+    autoEnable = false;  # Don't auto-enable all targets
+
+    image = ../../background.png;
+    base16Scheme = "${pkgs.base16-schemes}/share/themes/gruvbox-dark-hard.yaml";
+    polarity = "dark";
+
+    fonts = {
+      monospace = {
+        package = pkgs.jetbrains-mono;
+        name = "JetBrains Mono";
+      };
+      sansSerif = {
+        package = pkgs.noto-fonts;
+        name = "Noto Sans";
+      };
+      serif = {
+        package = pkgs.noto-fonts;
+        name = "Noto Serif";
+      };
+    };
+
+    cursor = {
+      package = pkgs.numix-cursor-theme;
+      name = "Numix-Cursor";
+      size = 24;
+    };
+
+    targets = {
+      gtk.enable = true;
     };
   };
 }

@@ -6,9 +6,9 @@ local curl = require("plenary.curl")
 local json = vim.fn.json_encode
 local decode = vim.fn.json_decode
 
--- Constants for API interaction
-local API_URL = "https://api.openai.com/v1/chat/completions"
-local API_KEY = ""
+-- Constants for API interaction (local llama-swap, OpenAI-compatible)
+local API_URL = "http://10.100.0.100:8080/v1/chat/completions"
+local API_KEY = "not-needed"
 
 -- Setup highlight groups to indicate success and error messages
 -- Green for successful completion messages
@@ -43,11 +43,11 @@ function string:split(delimiter)
     return result
 end
 
--- Constructs the payload for the API request to OpenAI using the custom
--- prompt and journal content
+-- Constructs the payload for the API request using the custom
+-- prompt and selected content
 local function create_api_payload(custom_prompt, journal_content)
     return json({
-        model = "gpt-4.1-mini",
+        model = "qwen3-coder-next-full",
         messages = {
             {
                 role = "system",
@@ -69,7 +69,7 @@ local function create_api_payload(custom_prompt, journal_content)
     })
 end
 
--- Sends a POST request to the OpenAI API with the constructed payload
+-- Sends a POST request to the LLM API with the constructed payload
 local function send_post_request(custom_prompt, journal_content)
     local payload = create_api_payload(custom_prompt, journal_content)
 
@@ -181,7 +181,7 @@ end
 -- Handles the submission process: unmounts input popup, sends request, and
 -- displays result
 local function handle_submission(first_layout, second_layout, selected_text_popup, result_popup, prompt, selected_text)
-    vim.api.nvim_echo({{"Sending request to ChatGPT API...", "Normal"}}, false, {})
+    vim.api.nvim_echo({{"Sending request to LLM...", "Normal"}}, false, {})
     first_layout:unmount()
 
     local result, err = send_post_request(prompt, selected_text)

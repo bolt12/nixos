@@ -16,7 +16,6 @@
     mpv                          # Lightweight video player
     obs-studio                   # Streaming/recording
     obs-studio-plugins.wlrobs    # Wayland OBS plugin
-    simplescreenrecorder         # Screen recording
 
     # Office and productivity
     libreoffice                  # Office suite (also handles PDFs)
@@ -43,8 +42,6 @@
 
     # Desktop integration
     lxmenu-data                  # Desktop menu integration
-    greetd.gtkgreet              # Login greeter
-    xsettingsd                   # X11 settings daemon
 
     # GNOME applications and utilities
     gnome-calendar               # Calendar application
@@ -55,7 +52,7 @@
 
     # Font packages - system-wide typography configuration
     dejavu_fonts                 # Standard fonts
-    emojione                     # Emoji support
+    noto-fonts-color-emoji        # Emoji support
     font-awesome                 # Icon font
     hack-font                    # Monospace programming font
     inconsolata                  # Monospace font
@@ -65,12 +62,11 @@
     nerd-fonts.jetbrains-mono    # JetBrains programming font
     noto-fonts                   # Google Noto fonts
     noto-fonts-cjk-sans          # CJK language support
-    noto-fonts-extra             # Additional Noto fonts
     open-dyslexic                # Dyslexia-friendly font
     open-sans                    # Clean sans-serif font
     siji                         # Icon font for status bars
     terminus_font                # Bitmap terminal font
-    ubuntu_font_family           # Ubuntu font family
+    ubuntu-classic               # Ubuntu font family
     unifont                      # Unicode font
     xits-math                    # Mathematical typesetting
   ];

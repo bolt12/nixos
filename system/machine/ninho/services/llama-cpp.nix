@@ -9,25 +9,28 @@ let
 
   # Wrapper script for full-power models - stops Wyoming, restarts on exit
   # Uses a FIFO-based helper to avoid sudo (llama-swap drops all capabilities)
-  # Note: We don't use 'exec' because it replaces the shell and loses the trap handler
+  # Runs child in background with signal forwarding so llama-swap can unload models
   wyoming-wrapper = writeShellScript "wyoming-wrapper" ''
     set -euo pipefail
 
     WYOMING_CONTROL="/run/wyoming-control"
     MODEL_PID="$$"
 
-    echo "STOPPING WYOMING VOICE MODELS (PID: $MODEL_PID)"
     echo "stop $MODEL_PID" > "$WYOMING_CONTROL"
 
-    # Restart Wyoming when this script exits (normal, error, or signal)
     cleanup() {
-      echo "STARTING WYOMING VOICE MODELS (PID: $MODEL_PID)"
       echo "start $MODEL_PID" > "$WYOMING_CONTROL" || true
     }
-    trap cleanup EXIT
 
-    # Run llama-server as child process (not exec) so trap handler remains active
-    "$@"
+    # Run llama-server in background so we can trap signals
+    "$@" &
+    CHILD_PID=$!
+
+    # Forward termination signals to the child process
+    trap 'kill $CHILD_PID 2>/dev/null; wait $CHILD_PID 2>/dev/null; cleanup' EXIT TERM INT HUP
+
+    # Wait for child to complete
+    wait $CHILD_PID
   '';
 
 in
@@ -60,6 +63,17 @@ in
             "claude-opus-3-20240229"
           ];
         };
+
+        z-ai = {
+          proxy = "https://api.z.ai/api/anthropic";
+          apiKey = "";
+          models = [
+            "GLM-5"
+            "GLM-4.7"
+            "GLM-4.5"
+            "GLM-4.5-Air"
+          ];
+        };
       };
       models = {
         # ===========================================================================
@@ -71,150 +85,7 @@ in
         #             Moderate context (16k-32k) to fit in VRAM with Wyoming (~3GB)
         # Target: Fit entirely in 32GB VRAM for maximum speed
 
-        # Qwen 2.5 32B Q5_K_M - ~22GB base, tool calling optimized
-        "qwen2.5-instruct-hass" = {
-          cmd = ''
-            ${llama-cpp-cuda}/bin/llama-server \
-              -hf Qwen/Qwen2.5-32B-Instruct-GGUF:Q5_K_M \
-              --metrics \
-              --host 0.0.0.0 \
-              --port ''${PORT} \
-              --temp 0.1 \
-              --top-p 0.2 \
-              --top-k 40 \
-              -ngl 99 \
-              -c 32000 \
-              --cache-type-k q4_0 \
-              --cache-type-v q4_0 \
-              --flash-attn on \
-              --batch-size 4096 \
-              --ubatch-size 1024 \
-              --jinja
-          '';
-          aliases = [ "qwen2.5-hass" ];
-        };
-
-        # Devstral Small 24B Q5_K_M - ~16GB base, tool calling optimized
-        # Using Q5_K_M instead of Q6_K_XL to ensure full GPU fit
-        "devstral-small-hass" = {
-          cmd = ''
-            ${llama-cpp-cuda}/bin/llama-server \
-              -hf unsloth/Devstral-Small-2-24B-Instruct-2512-GGUF:Q5_K_M \
-              --metrics \
-              --host 0.0.0.0 \
-              --port ''${PORT} \
-              --temp 0.1 \
-              --top-p 0.2 \
-              --top-k 40 \
-              -ngl 99 \
-              -c 64000 \
-              --cache-type-k q8_0 \
-              --cache-type-v q8_0 \
-              --flash-attn on \
-              --batch-size 4096 \
-              --ubatch-size 1024 \
-              --jinja
-          '';
-          aliases = [ "devstral-hass" ];
-        };
-
-        # Nemotron 3 Nano 30B Q5_K_M - ~20GB base, MoE (3B active)
-        # Using Q5_K_M instead of Q8_0 to fit entirely in GPU
-        "nemotron-3-nano-hass" = {
-          cmd = ''
-            ${llama-cpp-cuda}/bin/llama-server \
-              -hf unsloth/Nemotron-3-Nano-30B-A3B-GGUF:Q5_K_M \
-              --metrics \
-              --host 0.0.0.0 \
-              --port ''${PORT} \
-              --temp 0.1 \
-              --top-p 0.2 \
-              --top-k 40 \
-              -ngl 99 \
-              -c 64000 \
-              --cache-type-k q8_0 \
-              --cache-type-v q8_0 \
-              --flash-attn on \
-              --batch-size 4096 \
-              --ubatch-size 1024 \
-              --jinja
-          '';
-          aliases = [ "nemotron-hass" ];
-        };
-
-        # Qwen3 VL 32B Q5_K_M - ~22GB base, vision/multimodal
-        "qwen3-vl-32b-hass" = {
-          cmd = ''
-            ${llama-cpp-cuda}/bin/llama-server \
-              -hf unsloth/Qwen3-VL-30B-A3B-Instruct-GGUF:Q5_K_M \
-              --metrics \
-              --host 0.0.0.0 \
-              --port ''${PORT} \
-              --temp 0.1 \
-              --top-p 0.2 \
-              --top-k 40 \
-              -ngl 99 \
-              -c 64000 \
-              --cache-type-k q8_0 \
-              --cache-type-v q8_0 \
-              --batch-size 1536 \
-              --ubatch-size 512 \
-              --flash-attn on \
-              --jinja
-          '';
-          aliases = [ "qwen-vl-hass" "vision-hass" ];
-        };
-
-        # GPT-OSS 20B F16 - ~15GB base, MoE (3.6B active)
-        # OpenAI recommends temp=1, top_p=1 for gpt-oss, but we use lower for tool calling
-        "gpt-oss-20b-hass" = {
-          cmd = ''
-            ${llama-cpp-cuda}/bin/llama-server \
-              -hf unsloth/gpt-oss-20b-GGUF:F16 \
-              --metrics \
-              --host 0.0.0.0 \
-              --port ''${PORT} \
-              --temp 0.1 \
-              --top-p 0.2 \
-              --top-k 40 \
-              -ngl 99 \
-              -c 64000 \
-              --cache-type-k q8_0 \
-              --cache-type-v q8_0 \
-              --flash-attn on \
-              --batch-size 4096 \
-              --ubatch-size 1024 \
-              --jinja
-          '';
-          aliases = [ "gpt-oss-hass" ];
-        };
-
-        # GPT-OSS 120B F16 - ~65GB base, MoE (5.1B active)
-        # Requires CPU offload, lower context for -hass
-        "gpt-oss-120b-hass" = {
-          cmd = ''
-            ${llama-cpp-cuda}/bin/llama-server \
-              -hf unsloth/gpt-oss-120b-GGUF:F16 \
-              --metrics \
-              --host 0.0.0.0 \
-              --port ''${PORT} \
-              --temp 0.1 \
-              --top-p 0.2 \
-              --top-k 40 \
-              -ngl 99 \
-              -ot ".ffn_(up|down)_exps.=CPU" \
-              -c 64000 \
-              --cache-type-k q8_0 \
-              --cache-type-v q8_0 \
-              --flash-attn on \
-              --batch-size 4096 \
-              --ubatch-size 1024 \
-              --jinja
-          '';
-          aliases = [ "gpt-oss-120b-hass" ];
-        };
-
-        # GLM 4.7 Flash Q5_K_M - ~15GB base
+        # GLM 4.7 Flash REAP Q8_0 - ~15GB base (ONLY hass model to keep)
         "glm-4.7-flash-hass" = {
           cmd = ''
             ${llama-cpp-cuda}/bin/llama-server \
@@ -234,7 +105,30 @@ in
               --ubatch-size 1024 \
               --jinja
           '';
-          aliases = [ "glm-hass" ];
+          aliases = [ "glm-4.7-flash-hass" ];
+        };
+
+        # ===========================================================================
+        # FIM MODEL - Fill-In-Middle for Code Completion (llama.vim)
+        # ===========================================================================
+        # Lightweight model that runs alongside Wyoming for code completion
+        # Uses /infill endpoint, no jinja needed
+
+        # Qwen2.5 Coder 14B Q8_0 - ~16GB VRAM, FIM-capable
+        "qwen2.5-coder-14b-fim" = {
+          cmd = ''
+            ${wyoming-wrapper} ${llama-cpp-cuda}/bin/llama-server \
+              -hf bartowski/Qwen2.5-Coder-14B-GGUF:Q8_0 \
+              --metrics \
+              --host 0.0.0.0 \
+              --port ''${PORT} \
+              -fit on \
+              -c 32768 \
+              --flash-attn on \
+              --batch-size 2048 \
+              --ubatch-size 2048
+          '';
+          aliases = [ "fim" "qwen-coder-fim" ];
         };
 
         # ===========================================================================
@@ -244,50 +138,7 @@ in
         # Parameters: temp 0.2, top-p 0.9, min-p 0.01 for precise yet creative code
         # GPT-OSS models use official OpenAI params: temp=1, top_p=1
 
-        "qwen2.5-instruct-full" = {
-          cmd = ''
-            ${wyoming-wrapper} ${llama-cpp-cuda}/bin/llama-server \
-              -hf Qwen/Qwen2.5-32B-Instruct-GGUF:Q5_K_M \
-              --metrics \
-              --host 0.0.0.0 \
-              --port ''${PORT} \
-              --temp 0.2 \
-              --top-p 0.9 \
-              --min-p 0.01 \
-              -ngl 99 \
-              -c 128000 \
-              --cache-type-k q8_0 \
-              --cache-type-v q8_0 \
-              --flash-attn on \
-              --batch-size 8192 \
-              --ubatch-size 2048 \
-              --jinja
-          '';
-          aliases = [ "qwen2.5-full" ];
-        };
-
-        "devstral-small-full" = {
-          cmd = ''
-            ${wyoming-wrapper} ${llama-cpp-cuda}/bin/llama-server \
-              -hf unsloth/Devstral-Small-2-24B-Instruct-2512-GGUF:Q6_K_XL \
-              --metrics \
-              --host 0.0.0.0 \
-              --port ''${PORT} \
-              --temp 0.2 \
-              --top-p 0.9 \
-              --min-p 0.01 \
-              -ngl 99 \
-              -c 131072 \
-              --cache-type-k q8_0 \
-              --cache-type-v q8_0 \
-              --flash-attn on \
-              --batch-size 8192 \
-              --ubatch-size 2048 \
-              --jinja
-          '';
-          aliases = [ "devstral-full" ];
-        };
-
+        # Nemotron 3 Nano 30B Q8_0 - ~20GB base, MoE (3B active)
         "nemotron-3-nano-full" = {
           cmd = ''
             ${wyoming-wrapper} ${llama-cpp-cuda}/bin/llama-server \
@@ -295,13 +146,13 @@ in
               --metrics \
               --host 0.0.0.0 \
               --port ''${PORT} \
-              --temp 0.2 \
-              --top-p 0.9 \
+              --temp 0.6 \
+              --top-p 0.95 \
               --min-p 0.01 \
-              -ngl 99 \
-              -c 220000 \
-              --cache-type-k q8_0 \
-              --cache-type-v q8_0 \
+              -fit on \
+              --fit-ctx 180000 \
+              --fit-target 256 \
+              --no-mmap \
               --flash-attn on \
               --batch-size 8192 \
               --ubatch-size 2048 \
@@ -310,29 +161,7 @@ in
           aliases = [ "nemotron-full" ];
         };
 
-        "qwen3-vl-32b-full" = {
-          cmd = ''
-            ${wyoming-wrapper} ${llama-cpp-cuda}/bin/llama-server \
-              -hf unsloth/Qwen3-VL-30B-A3B-Instruct-GGUF:Q5_K_M \
-              --metrics \
-              --host 0.0.0.0 \
-              --port ''${PORT} \
-              --temp 0.2 \
-              --top-p 0.9 \
-              --min-p 0.01 \
-              -ngl 99 \
-              -c 131072 \
-              --cache-type-k q8_0 \
-              --cache-type-v q8_0 \
-              --flash-attn on \
-              --batch-size 2048 \
-              --ubatch-size 1024 \
-              --jinja
-          '';
-          aliases = [ "vision-full" "vl-full" ];
-        };
-
-        # GPT-OSS models use OpenAI recommended params: temp=1.0, top_p=1.0
+        # GPT-OSS 20B F16 - ~15GB base, MoE (3.6B active)
         "gpt-oss-20b-full" = {
           cmd = ''
             ${wyoming-wrapper} ${llama-cpp-cuda}/bin/llama-server \
@@ -343,19 +172,21 @@ in
               --temp 1.0 \
               --top-p 1.0 \
               --top-k 0 \
-              -ngl 99 \
-              -c 131072 \
-              --cache-type-k q8_0 \
-              --cache-type-v q8_0 \
+              -fit on \
+              --fit-ctx 131072 \
+              --fit-target 256 \
               --flash-attn on \
               --batch-size 8192 \
               --ubatch-size 2048 \
+              --no-mmap \
               --chat-template-kwargs '{"reasoning_effort": "high"}' \
               --jinja
           '';
           aliases = [ "gpt-oss-full" "gpt-oss-20b-full" ];
         };
 
+        # GPT-OSS 120B F16 - ~65GB base, MoE (5.1B active)
+        # Requires CPU offload for full context
         "gpt-oss-120b-full" = {
           cmd = ''
             ${wyoming-wrapper} ${llama-cpp-cuda}/bin/llama-server \
@@ -366,20 +197,70 @@ in
               --temp 1.0 \
               --top-p 1.0 \
               --top-k 0 \
-              -ngl 99 \
-              -ot ".ffn_(up|down)_exps.=CPU" \
-              -c 131072 \
-              --cache-type-k q8_0 \
-              --cache-type-v q8_0 \
+              -fit on \
+              --fit-ctx 131072 \
+              --fit-target 256 \
               --flash-attn on \
               --batch-size 8192 \
               --ubatch-size 2048 \
+              --no-mmap \
               --chat-template-kwargs '{"reasoning_effort": "high"}' \
               --jinja
           '';
           aliases = [ "gpt-oss-120b-full" ];
         };
 
+        "step-3.5-flash-full" = {
+          cmd = ''
+            ${wyoming-wrapper} ${llama-cpp-cuda}/bin/llama-server \
+              -hf stepfun-ai/Step-3.5-Flash-Int4:Q4_K_S \
+              --metrics \
+              --host 0.0.0.0 \
+              --port ''${PORT} \
+              --temp 1.0 \
+              --top-p 0.95 \
+              --top-k 40 \
+              --min-p 0.01 \
+              -fit on \
+              --fit-ctx 120000 \
+              --fit-target 256 \
+              --cache-type-k q8_0 \
+              --cache-type-v q8_0 \
+              --no-mmap \
+              --flash-attn on \
+              --batch-size 4096 \
+              --ubatch-size 2048 \
+              --jinja
+          '';
+          aliases = [ "step-3.5-flash-full" ];
+        };
+
+        # Qwen3 Coder Next - ~1.6B? REAM - Best coding model
+        "qwen3-coder-next-full" = {
+          cmd = ''
+            ${wyoming-wrapper} ${llama-cpp-cuda}/bin/llama-server \
+              -hf mradermacher/Qwen3-Coder-Next-REAM-GGUF:Q4_K_M \
+              --metrics \
+              --host 0.0.0.0 \
+              --port ''${PORT} \
+              --temp 1.0 \
+              --top-p 0.95 \
+              --top-k 40 \
+              --min-p 0.01 \
+              --repeat-penalty 1.1 \
+              -fit on \
+              --fit-ctx 180000 \
+              --fit-target 128 \
+              --flash-attn on \
+              --batch-size 4096 \
+              --ubatch-size 2048 \
+              --no-mmap \
+              --jinja
+          '';
+          aliases = [ "qwen3-coder-next-full" ];
+        };
+
+        # GLM-4.7-Flash Q8_0 - ~15GB base
         "glm-4.7-flash-full" = {
           cmd = ''
             ${wyoming-wrapper} ${llama-cpp-cuda}/bin/llama-server \
@@ -388,18 +269,44 @@ in
               --host 0.0.0.0 \
               --port ''${PORT} \
               --temp 0.7 \
-              --top-p 0.95 \
+              --top-p 1.0 \
               --min-p 0.01 \
               --repeat-penalty 1.0 \
-              -ngl 99 \
-              -ot ".ffn_(up)_exps.=CPU" \
-              -c 150000 \
+              -fit on \
+              --fit-ctx 180000 \
+              --fit-target 256 \
               --flash-attn on \
               --batch-size 4096 \
               --ubatch-size 2048 \
+              --no-mmap \
+              --chat-template-kwargs '{"reasoning_effort": "high"}' \
               --jinja
           '';
           aliases = [ "glm-full" ];
+        };
+
+        # GLM-4.7-Flash Creative - ~15GB base, temp=1.0 for more creative output
+        "glm-4.7-flash-full-creative" = {
+          cmd = ''
+            ${wyoming-wrapper} ${llama-cpp-cuda}/bin/llama-server \
+              -hf unsloth/GLM-4.7-Flash-GGUF:Q8_0 \
+              --metrics \
+              --host 0.0.0.0 \
+              --port ''${PORT} \
+              --temp 1.0 \
+              --top-p 0.95 \
+              --min-p 0.01 \
+              --repeat-penalty 1.0 \
+              -fit on \
+              --fit-ctx 202752 \
+              --fit-target 256 \
+              --no-mmap \
+              --flash-attn on \
+              --batch-size 8192 \
+              --ubatch-size 2048 \
+              --jinja
+          '';
+          aliases = [ "glm-full-creative" ];
         };
       };
     };
@@ -444,33 +351,33 @@ in
           chown llama-swap:root "$FIFO"
         fi
 
-        echo "wyoming-control: Listening on $FIFO"
-
-        while read -r cmd pid < "$FIFO"; do
-          case "$cmd" in
-            stop)
-              echo "wyoming-control: Stopping Wyoming services (requested by PID $pid)"
-              /run/current-system/sw/bin/systemctl stop wyoming-faster-whisper-en || true
-              /run/current-system/sw/bin/systemctl stop wyoming-faster-whisper-pt || true
-              /run/current-system/sw/bin/systemctl stop wyoming-piper-en || true
-              /run/current-system/sw/bin/systemctl stop wyoming-piper-pt || true
-              echo "wyoming-control: Wyoming services stopped"
-              ;;
-            start)
-              echo "wyoming-control: Starting Wyoming services (requested by PID $pid)"
-              /run/current-system/sw/bin/systemctl start wyoming-faster-whisper-en || true
-              /run/current-system/sw/bin/systemctl start wyoming-faster-whisper-pt || true
-              /run/current-system/sw/bin/systemctl start wyoming-piper-en || true
-              /run/current-system/sw/bin/systemctl start wyoming-piper-pt || true
-              echo "wyoming-control: Wyoming services started"
-              ;;
-            *)
-              echo "wyoming-control: Unknown command: $cmd" >&2
-              ;;
-          esac
+        # Double-loop pattern: the inner loop reads until the writer closes
+        # (EOF), then the outer loop re-opens the FIFO for the next writer.
+        # Without this, a single writer closing causes the while-read to exit.
+        while true; do
+          while read -r cmd pid; do
+            case "$cmd" in
+              stop)
+                /run/current-system/sw/bin/systemctl stop wyoming-faster-whisper-en || true
+                /run/current-system/sw/bin/systemctl stop wyoming-faster-whisper-pt || true
+                /run/current-system/sw/bin/systemctl stop wyoming-piper-en || true
+                /run/current-system/sw/bin/systemctl stop wyoming-piper-pt || true
+                ;;
+              start)
+                /run/current-system/sw/bin/systemctl start wyoming-faster-whisper-en || true
+                /run/current-system/sw/bin/systemctl start wyoming-faster-whisper-pt || true
+                /run/current-system/sw/bin/systemctl start wyoming-piper-en || true
+                /run/current-system/sw/bin/systemctl start wyoming-piper-pt || true
+                ;;
+              *)
+                echo "wyoming-control: Unknown command: $cmd" >&2
+                ;;
+            esac
+          done < "$FIFO"
         done
       ''}'";
-      Restart = "on-failure";
+      Restart = "always";
+      RestartSec = 0;
       # This service runs as root to control system services
       User = "root";
     };

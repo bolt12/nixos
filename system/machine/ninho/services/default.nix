@@ -25,5 +25,6 @@
     ./kavita.nix         # Ebook/comic reader
     ./memos.nix          # Note-taking service
     ./bazarr.nix         # Automatic subtitles for Sonarr/Radarr
+    ./atuin.nix          # Shell history sync server
   ];
 }

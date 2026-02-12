@@ -30,7 +30,8 @@ in {
     # AI tools
     nix-ai-tools.ccstatusline # Claude code statusline
     nix-ai-tools.claude-code  # Claude code
-    nix-ai-tools.opencode    # Claude code router
+    nix-ai-tools.opencode     # Opencode
+    nix-ai-tools.codex        # OpenAI Codex
 
     # System development tools
     patchelf                     # ELF patcher for binaries

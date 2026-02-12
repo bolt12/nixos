@@ -88,7 +88,6 @@ let
     colorizer                # colors
     cornelis                 # agda-mode for neovim
     e-ink                    # e-ink colorscheme
-    fcitx-vim                # Keep and restore fcitx state when leaving/re-entering insert mode or search mode
     friendly-snippets        # snippets
     gitsigns-nvim            # git integration
     gruvbox-community        # color theme
@@ -106,7 +105,20 @@ let
     nvim-cmp                 # auto complete
     nvim-lspconfig           # LSP config support
     nvim-spectre             # a search panel for neovim
-    nvim-treesitter.withAllGrammars
+    (plugins-unstable.nvim-treesitter.withPlugins (p: [
+      # Primary languages
+      p.haskell p.nix p.lua p.bash p.python
+      p.c p.cpp p.rust
+      # Markup & data
+      p.markdown p.markdown_inline p.json p.yaml p.toml
+      p.html p.css p.xml
+      # Vim/editor
+      p.vim p.vimdoc p.query p.regex
+      # Version control
+      p.diff p.git_rebase p.gitcommit
+      # Infrastructure
+      p.dockerfile p.sql
+    ]))
     nvim-web-devicons        # file icons
     plenary-nvim             # lua dependency for other plugins
     popup-nvim               # popups

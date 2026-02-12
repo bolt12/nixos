@@ -4,15 +4,6 @@
 
 { config, lib, pkgs, inputs, system, ... }@attrs:
 
-let
-
-  unstable = import inputs.nixpkgs-unstable {
-    overlays = [
-    ];
-    system = system;
-  };
-
-in
 {
   imports =
     [
@@ -20,9 +11,6 @@ in
       ./machine/x1-g8/hardware-configuration.nix
       # Machine-specific configuration
       ./machine/x1-g8/default.nix
-      # Include IOHK related configs
-      ./iohk/caches.nix
-      ./iohk/ssh.nix
 
       # Import nixos home manager module
       inputs.home-manager.nixosModules.home-manager
@@ -52,8 +40,6 @@ in
       enable            = true;
       trustedInterfaces = [ "wg0" ];
       allowedTCPPorts   = [
-        20    # FTP
-        21    # FTP
         8000  # Development
         8384  # Syncthing web UI
         22000 # Syncthing file transfers
@@ -79,7 +65,7 @@ in
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     cage
-    greetd.gtkgreet
+    gtkgreet
     shared-mime-info
   ];
 
@@ -101,15 +87,10 @@ in
   hardware = {
     bluetooth = {
       enable         = true;
-      hsphfpd.enable = false;
       settings       = {
         General.Enable =
           lib.concatStringsSep "," [ "Source" "Sink" "Media" "Socket" ];
       };
-    };
-    graphics = {
-      enable      = true;
-      enable32Bit = true;
     };
     enableRedistributableFirmware = true;
     enableAllFirmware             = true;
@@ -119,7 +100,6 @@ in
   # Making fonts accessible to applications.
   fonts = {
     fontDir.enable         = true;
-    enableGhostscriptFonts = true;
     enableDefaultPackages  = true;
   };
 
@@ -181,6 +161,9 @@ in
     settings = {
       # Automate `nix-store --optimise`
       auto-optimise-store = true;
+
+      # Enable flakes and nix command for all users (including root)
+      experimental-features = [ "nix-command" "flakes" ];
 
       # Required by Cachix to be used as non-root user
       trusted-users = [ "root" "bolt" ];

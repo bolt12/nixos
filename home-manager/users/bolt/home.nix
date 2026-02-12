@@ -9,6 +9,47 @@ let
     inherit system;
     overlays = [];
   };
+
+  # Claude wrapper with GLM configuration
+  glaude = pkgs.writeShellApplication {
+    name = "glaude";
+    runtimeInputs = [ ];
+    text = ''
+      export ANTHROPIC_BASE_URL="http://10.100.0.100:8080"
+      export API_TIMEOUT_MS="3000000"
+      export ANTHROPIC_DEFAULT_OPUS_MODEL="GLM-5"
+      export ANTHROPIC_DEFAULT_SONNET_MODEL="GLM-5"
+      export ANTHROPIC_DEFAULT_HAIKU_MODEL="GLM-4.5-Air"
+      exec claude "$@"
+    '';
+  };
+
+  # Claude wrapper with only local llm setup
+  olaude-flash = pkgs.writeShellApplication {
+    name = "olaude-flash";
+    runtimeInputs = [ ];
+    text = ''
+      export ANTHROPIC_BASE_URL="http://10.100.0.100:8080"
+      export API_TIMEOUT_MS="3000000"
+      export ANTHROPIC_DEFAULT_OPUS_MODEL="glm-4.7-flash-full"
+      export ANTHROPIC_DEFAULT_SONNET_MODEL="glm-4.7-flash-full"
+      export ANTHROPIC_DEFAULT_HAIKU_MODEL="glm-4.7-flash-full"
+      exec claude "$@"
+    '';
+  };
+
+  olaude-qwen3 = pkgs.writeShellApplication {
+    name = "olaude-qwen3";
+    runtimeInputs = [ ];
+    text = ''
+      export ANTHROPIC_BASE_URL="http://10.100.0.100:8080"
+      export API_TIMEOUT_MS="3000000"
+      export ANTHROPIC_DEFAULT_OPUS_MODEL="qwen3-coder-next-full"
+      export ANTHROPIC_DEFAULT_SONNET_MODEL="qwen3-coder-next-full"
+      export ANTHROPIC_DEFAULT_HAIKU_MODEL="qwen3-coder-next-full"
+      exec claude "$@"
+    '';
+  };
 in
 {
   imports = [
@@ -26,7 +67,6 @@ in
     ../../programs/bash/default.nix
     ../../programs/emacs/default.nix
     ../../programs/git/default.nix
-    ../../programs/kimai-client/default.nix
     ../../programs/neovim/default.nix
     ../../programs/syncthing/default.nix
     ../../programs/tmux/default.nix
@@ -72,7 +112,11 @@ in
     ];
 
     # All packages managed through profiles
-    packages = [];
+    packages = [
+      glaude
+      olaude-flash
+      olaude-qwen3
+    ];
   };
 
   # Additional programs (headless - no firefox, no autorandr)

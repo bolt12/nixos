@@ -30,6 +30,16 @@ apply_ninho_nixos() {
     sudo nixos-rebuild switch --flake .#ninho-nixos --upgrade
 }
 
+apply_bolt_x200() {
+    echo -e "${GREEN}Applying bolt-x200 configuration (ThinkPad X200)...${NC}"
+    sudo nixos-rebuild switch --flake .#bolt-x200 --upgrade
+}
+
+test_bolt_x200() {
+    echo -e "${YELLOW}Testing bolt-x200 configuration (no switch)...${NC}"
+    sudo nixos-rebuild test --flake .#bolt-x200
+}
+
 test_bolt_nixos() {
     echo -e "${YELLOW}Testing bolt-nixos configuration (no switch)...${NC}"
     sudo nixos-rebuild test --flake .#bolt-nixos
@@ -120,26 +130,28 @@ echo ""
 echo -e "${YELLOW}NixOS System Configurations:${NC}"
 echo "  1) Apply: bolt-nixos (X1 Carbon Laptop)"
 echo "  2) Apply: ninho-nixos (Home Server)"
-echo "  3) Test: bolt-nixos (no activation)"
-echo "  4) Test: ninho-nixos (no activation)"
+echo "  3) Apply: bolt-x200 (ThinkPad X200)"
+echo "  4) Test: bolt-nixos (no activation)"
+echo "  5) Test: ninho-nixos (no activation)"
+echo "  6) Test: bolt-x200 (no activation)"
 echo ""
 echo -e "${YELLOW}SD Image Builds:${NC}"
-echo "  5) Build: Raspberry Pi 5 SD Image"
+echo "  7) Build: Raspberry Pi 5 SD Image"
 echo ""
 echo -e "${YELLOW}Home Manager Configurations:${NC}"
-echo "  6) Apply HM: bolt (headless)"
-echo "  7) Apply HM: bolt-with-de (desktop)"
-echo "  8) Apply HM: pollard"
-echo "  9) Apply HM: steam-deck"
+echo "  8) Apply HM: bolt (headless)"
+echo "  9) Apply HM: bolt-with-de (desktop)"
+echo " 10) Apply HM: pollard"
+echo " 11) Apply HM: steam-deck"
 echo ""
 echo -e "${YELLOW}Utilities:${NC}"
-echo " 10) Check flake validity"
-echo " 11) Update flake inputs"
+echo " 12) Check flake validity"
+echo " 13) Update flake inputs"
 echo ""
-echo " 12) Quit"
+echo " 14) Quit"
 echo ""
 
-read -p "Please select an option (1-12): " choice
+read -p "Please select an option (1-14): " choice
 
 case $choice in
     1)
@@ -149,33 +161,39 @@ case $choice in
         apply_ninho_nixos
         ;;
     3)
-        test_bolt_nixos
+        apply_bolt_x200
         ;;
     4)
-        test_ninho_nixos
+        test_bolt_nixos
         ;;
     5)
-        build_rpi5_sd_image
+        test_ninho_nixos
         ;;
     6)
-        apply_hm_bolt
+        test_bolt_x200
         ;;
     7)
-        apply_hm_bolt_with_de
+        build_rpi5_sd_image
         ;;
     8)
-        apply_hm_pollard
+        apply_hm_bolt
         ;;
     9)
-        apply_hm_steam_deck
+        apply_hm_bolt_with_de
         ;;
     10)
-        check_flake
+        apply_hm_pollard
         ;;
     11)
-        update_flake
+        apply_hm_steam_deck
         ;;
     12)
+        check_flake
+        ;;
+    13)
+        update_flake
+        ;;
+    14)
         echo -e "${GREEN}Exiting...${NC}"
         exit 0
         ;;

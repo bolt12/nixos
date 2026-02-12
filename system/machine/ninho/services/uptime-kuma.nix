@@ -11,6 +11,8 @@ in
       # Port configuration via environment variable
       UPTIME_KUMA_PORT = toString ports.uptime-kuma;
       UPTIME_KUMA_HOST = "0.0.0.0";
+      # Set HOME for Playwright (browser automation dependency)
+      HOME = "/var/lib/uptime-kuma";
     };
   };
 

@@ -1,14 +1,5 @@
 { config, pkgs, inputs, ... }:
 
-let
-
-  unstable = import nixpkgs-unstable {
-    overlays = [
-    ];
-    system = config.nixpkgs.system;
-  };
-
-in
 {
   # Use the GRUB 2 boot loader.
   boot = {
@@ -16,11 +7,10 @@ in
     loader = {
       grub = {
         enable  = true;
-        version = 2;
         device = "/dev/sda"; # or "nodev" for efi only
       };
     };
-    cleanTmpDir = true;
+    tmp.cleanOnBoot = true;
   };
 
   powerManagement = {
@@ -101,9 +91,8 @@ in
   };
 
   networking = {
-    hostName = "bolt-nixos";
-    interfaces.wls1.useDHCP = true;
-    interfaces.enp0s25.useDHCP = true;
+    hostName = "bolt-x200";
+    useDHCP = true;
   };
 
   security = {

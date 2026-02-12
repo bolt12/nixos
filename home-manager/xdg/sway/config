@@ -182,8 +182,8 @@ bindsym XF86AudioLowerVolume exec "amixer -q -c 0 sset Master,0 10- unmute"
 bindsym XF86AudioMute exec "amixer -q -c 0 sset Master,0 toggle"
 
 #brightness control
-bindsym XF86MonBrightnessDown exec light -U 10
-bindsym XF86MonBrightnessUp exec light -A 10
+bindsym XF86MonBrightnessDown exec brightnessctl set 10%-
+bindsym XF86MonBrightnessUp exec brightnessctl set +10%
 
 # capture all screens to clipboard
 bindsym $mod+alt+p exec grim - | wl-copy
@@ -259,7 +259,6 @@ bindswitch --reload --locked lid:off output $laptop enable
 exec_always ./laptop-lid.sh
 
 output "*" bg ~/Documents/background.png fill
-exec_always flashfocus
 
 set $gnome-schema org.gnome.desktop.interface
 

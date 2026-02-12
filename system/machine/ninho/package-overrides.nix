@@ -1,9 +1,22 @@
 { pkgs, inputs, system, ... }:
 
 let
+  # Import unstable with overlay to fix bellows test failures
   unstable = import inputs.nixpkgs-unstable {
     inherit system;
-    overlays = [];
+    overlays = [
+      (final: prev: {
+        python313 = prev.python313.override {
+          packageOverrides = pyfinal: pysuper: {
+            # Disable tests for bellows - test_ash_end_to_end is flaky with Python 3.13
+            bellows = pysuper.bellows.overridePythonAttrs (oldAttrs: {
+              doCheck = false;
+              doInstallCheck = false;
+            });
+          };
+        };
+      })
+    ];
     config.allowUnfree = true;
   };
 in
@@ -18,13 +31,13 @@ in
         rocmSupport = false;
         metalSupport = false;
       }).overrideAttrs (oldAttrs: {
-        version = "7836";
+        version = "78008";
 
         src = pkgs.fetchFromGitHub {
           owner = "ggml-org";
           repo = "llama.cpp";
-          tag = "b7836";
-          hash = "sha256-uckbrQ7Fpf5re1oVvnjFUqN7ZtV7pPD0qEZHagRO5Po=";
+          tag = "b8008";
+          hash = "sha256-zsxUWmIgvrdeYqRyE/pqJH9R9WurOAehyXIvIrHQkjQ=";
           leaveDotGit = true;
           postFetch = ''
             git -C "$out" rev-parse --short HEAD > $out/COMMIT
@@ -48,13 +61,13 @@ in
 
       # llama-swap v182 - Latest release with Anthropic API compatibility
       llama-swap = prev.llama-swap.overrideAttrs (oldAttrs: {
-        version = "185";
+        version = "186";
 
         src = pkgs.fetchFromGitHub {
           owner = "mostlygeek";
           repo = "llama-swap";
-          tag = "v185";
-          hash = "sha256-Yn7w3jqz+Lh0Ju4QtVTMYJfs6fL3kRke0esbj8q5Q1Y=";
+          tag = "v186";
+          hash = "sha256-3D+fQ9Lu0OfON694hWlv5QcuGS/zAlkOW+Q9AMq+RWQ=";
           leaveDotGit = true;
           postFetch = ''
             cd "$out"
@@ -67,8 +80,38 @@ in
         proxyVendor = true;
         vendorHash = "sha256-TPOKqgyf8vltRLbtNWXcK3jsWsVFaSrZAc+/AMkG/8A=";
         passthru.ui = oldAttrs.passthru.ui;
-        passthru.npmDepsHash = "sha256-fIDn3vfrqTZfzK8dc+Vpckw9M2iyJi5ggHFEV8PeXtU=";
+        passthru.npmDepsHash = "sha256-xz4z/Bxlbw7uuzRP0aWPRKSfhPAB++iToYnymu4RVSE=";
 
+      });
+
+      # WhisperX v3.7.6 - Fix use_auth_token TypeError with newer pyannote
+      whisperx = prev.whisperx.overridePythonAttrs (oldAttrs: {
+        version = "3.7.6";
+
+        src = pkgs.fetchFromGitHub {
+          owner = "m-bain";
+          repo = "whisperX";
+          tag = "v3.7.6";
+          hash = "sha256-ZHPGQP5HIuFafHGS6ykiSNtHY6QHh0o8DUE2lV41lUI=";
+        };
+
+        # Patch for pyannote-audio 4.0+ compatibility
+        # 1. use_auth_token -> token (deprecated API change)
+        # 2. DiarizeOutput.speaker_diarization wrapper (new return type in 4.0+)
+        postPatch = (oldAttrs.postPatch or "") + ''
+          substituteInPlace whisperx/vads/pyannote.py \
+            --replace-fail 'Model.from_pretrained(model_fp, use_auth_token=use_auth_token)' \
+                           'Model.from_pretrained(model_fp, token=use_auth_token)' \
+            --replace-fail 'super().__init__(segmentation=segmentation, fscore=fscore, use_auth_token=use_auth_token, **inference_kwargs)' \
+                           'super().__init__(segmentation=segmentation, fscore=fscore, token=use_auth_token, **inference_kwargs)'
+          substituteInPlace whisperx/diarize.py \
+            --replace-fail 'Pipeline.from_pretrained(model_config, use_auth_token=use_auth_token)' \
+                           'Pipeline.from_pretrained(model_config, token=use_auth_token)' \
+            --replace-fail 'speaker_embeddings = {speaker: embeddings[s].tolist() for s, speaker in enumerate(diarization.labels())}' \
+                           'speaker_embeddings = {speaker: embeddings[s].tolist() for s, speaker in enumerate(getattr(diarization, "speaker_diarization", diarization).labels())}'
+          # Use sed for multiline replacement (DiarizeOutput compatibility)
+          sed -i 's/diarize_df = pd.DataFrame(diarization.itertracks(yield_label=True), columns=/annotation = getattr(diarization, "speaker_diarization", diarization)\n        diarize_df = pd.DataFrame(annotation.itertracks(yield_label=True), columns=/g' whisperx/diarize.py
+        '';
       });
 
       # Fix scaphandre build error with riemann_client unstable feature

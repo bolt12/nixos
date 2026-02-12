@@ -38,10 +38,6 @@
     blueman                      # Bluetooth management
     alsa-utils                   # Audio utilities
 
-    # Clipboard and X11 utilities
-    xclip                        # Clipboard tool
-    xorg.xmodmap                 # Keyboard mapping
-
     # System libraries and frameworks
     glib                         # Core library
     zlib                         # Compression library

@@ -35,7 +35,10 @@
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
     emacs-overlay.url = "github:nix-community/emacs-overlay";
 
-    # kimai-client.url = "git+ssh://git@gitlab.well-typed.com/well-typed/kimai-client.git?ref=bolt12/patch";
+    stylix = {
+      url = "github:danth/stylix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     nix-ai-tools = {
       url = "github:numtide/nix-ai-tools";
@@ -142,6 +145,26 @@
           modules = [
             ./system/machine/ninho/configuration.nix
             ./system/common/overlays.nix
+          ];
+        };
+
+        bolt-x200 = nixpkgs.lib.nixosSystem {
+          inherit system;
+          specialArgs = { inherit inputs system constants; };
+          modules = [
+            ./system/machine/thinkpadx200/default.nix
+            ./system/common/overlays.nix
+            inputs.home-manager.nixosModules.home-manager
+            {
+              home-manager = {
+                useGlobalPkgs = false;
+                useUserPackages = true;
+                extraSpecialArgs = { inherit inputs system; };
+                users.bolt = { nixpkgs, ... }: {
+                  imports = [ ./home-manager/users/bolt-with-de/home.nix ];
+                };
+              };
+            }
           ];
         };
       };

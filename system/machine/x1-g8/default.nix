@@ -1,18 +1,9 @@
 { config, pkgs, inputs, ... }:
 
-let
-
-  unstable = import inputs.nixpkgs-unstable {
-    overlays = [
-    ];
-    system = config.nixpkgs.system;
-  };
-
-in
 {
   # Use the GRUB 2 boot loader.
   boot = {
-    kernelPackages = pkgs.linuxPackages_6_12;
+    kernelPackages = pkgs.linuxPackages_latest;
     loader         = {
       efi = {
         canTouchEfiVariables = true;
@@ -61,10 +52,10 @@ in
     enable = true;
     enable32Bit = true;
     extraPackages = with pkgs; [
-      vaapiIntel
-      vaapiVdpau
+      intel-vaapi-driver
+      libva-vdpau-driver
       libvdpau-va-gl
-      intel-media-driver # only available starting nixos-19.03 or the current nixos-unstable
+      intel-media-driver
     ];
   };
 
@@ -94,13 +85,13 @@ in
   };
 
   programs = {
-    light.enable = true;
+    sway.enable = true;
   };
 
   services = {
 
     # Systemd /run/user increase size
-    logind.extraConfig = "RuntimeDirectorySize=75%";
+    logind.settings.Login.RuntimeDirectorySize = "75%";
 
     dbus.enable = true;
 
@@ -140,13 +131,10 @@ in
     };
 
     xserver = {
-      enable     = true;
       xkb = {
         layout  = "us,pt";
         options = "caps:escape, grp:shifts_toggle";
       };
-
-      videoDrivers = [ "intel" ];
     };
 
     libinput = {
@@ -180,6 +168,10 @@ in
     blueman.enable = true;
 
     flatpak.enable = true;
+
+    fwupd.enable = true;
+
+    thermald.enable = true;
   };
 
   # Firefox NixOS wiki recommends
@@ -190,7 +182,6 @@ in
         pkgs.xdg-desktop-portal
         pkgs.xdg-desktop-portal-gtk
         pkgs.xdg-desktop-portal-wlr
-        pkgs.xdg-desktop-portal-gnome
       ];
       wlr.enable = true;
     };

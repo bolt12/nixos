@@ -110,13 +110,6 @@ nnoremap <leader>F :CtrlP<CR>
 " Highlighting for jsonc filetype
 autocmd FileType json syntax match Comment +\/\/.\+$+
 
-" Hoogle config
-" let g:hoogle_search_count = 20
-" au BufNewFile,BufRead *.hs map <silent> <F1> :Hoogle<CR>
-" au BufNewFile,BufRead *.hs map <silent> <C-c> :HoogleClose<CR>
-
-" nnoremap <leader>h :Hoogle <CR>
-
 " Floaterm
 hi Floaterm guibg=#282c34
 
@@ -247,35 +240,9 @@ require('telescope').setup{
         preview_height = 0.8,
       },
     },
-    -- Telescope layout setup
-    telescope_theme = {
-        function_name_1 = {
-            -- Theme options
-        },
-        function_name_2 = "dropdown",
-        -- e.g. realistic example
-        show_custom_functions = {
-            layout_config = { width = 0.4, height = 0.4 },
-        },
-    },
     ["ui-select"] = {
       require("telescope.themes").get_dropdown {
-        -- even more opts
       }
-
-      -- pseudo code / specification for writing custom displays, like the one
-      -- for "codeactions"
-      -- specific_opts = {
-      --   [kind] = {
-      --     make_indexed = function(items) -> indexed_items, width,
-      --     make_displayer = function(widths) -> displayer
-      --     make_display = function(displayer) -> function(e)
-      --     make_ordinal = function(e) -> string
-      --   },
-      --   -- for example to disable the custom builtin "codeactions" display
-      --      do the following
-      --   codeactions = false,
-      -- }
     }
   },
   defaults = {
@@ -388,19 +355,6 @@ cmp.setup ({
   }),
   mapping = cmp.mapping.preset.insert({
 
-   -- ... Your other mappings ...
-
-   -- ["<CR>"] = cmp.mapping({
-   --   i = function(fallback)
-   --     if cmp.visible() and cmp.get_active_entry() then
-   --       cmp.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = false })
-   --     else
-   --       fallback()
-   --     end
-   --   end,
-   --   s = cmp.mapping.confirm({ select = true }),
-   --   c = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = true }),
-   -- }),
    ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
 
    ["<Tab>"] = cmp.mapping(function(fallback)
@@ -432,37 +386,12 @@ cmp.setup.filetype('gitcommit', {
   })
 })
 require("cmp_git").setup()
-cmp.setup.cmdline(':', {
-  mapping = cmp.mapping.preset.cmdline(),
-  sources = cmp.config.sources({
-    { name = 'path' }
-  }, {
-    {
-      name = 'cmdline',
-      option = {
-        ignore_cmds = { 'Man', '!' }
-      }
-    }
-  })
-})
-
 -- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
 cmp.setup.cmdline({ '/', '?' }, {
   mapping = cmp.mapping.preset.cmdline(),
   sources = {
     { name = 'buffer' }
   }
-})
-
--- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
-cmp.setup.cmdline(':', {
-  mapping = cmp.mapping.preset.cmdline(),
-  sources = cmp.config.sources({
-    { name = 'path' }
-  }, {
-    { name = 'cmdline' }
-  }),
-  matching = { disallow_symbol_nonprefix_matching = false }
 })
 
 -- The nvim-cmp almost supports LSP's capabilities so You should advertise it to LSP servers..
@@ -525,43 +454,47 @@ vim.g.haskell_tools = {
 EOF
 
 lua << EOF
+vim.lsp.config('zk', {
+  cmd = {'zk', 'lsp'},
+  filetypes = {'markdown'},
+  root_dir = function()
+    return vim.loop.cwd()
+  end,
+  settings = {}
+})
+
 local lspconfig = require('lspconfig')
-local configs = require('lspconfig/configs')
 
-configs.zk = {
-  default_config = {
-    cmd = {'zk', 'lsp'},
-    filetypes = {'markdown'},
-    root_dir = function()
-      return vim.loop.cwd()
-    end,
-    settings = {}
-  };
-}
+vim.api.nvim_create_autocmd('LspAttach', {
+  callback = function(args)
+    local buffer = args.buf
+    local client = vim.lsp.get_client_by_id(args.data.client_id)
 
-lspconfig.zk.setup({ on_attach = function(client, buffer)
-  -- Add keybindings here, see https://github.com/neovim/nvim-lspconfig#keybindings-and-completion
-  local bufnr = vim.api.nvim_get_current_buf()
-  local opts = { noremap = true, silent = true, buffer = bufnr, }
+    if not client or client.config.name ~= 'zk' then
+      return
+    end
 
-  vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
-  vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
-  vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
-  vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
-  vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
-  vim.keymap.set('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, opts)
-  vim.keymap.set('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, opts)
-  vim.keymap.set('n', '<leader>wl', function()
-    print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-  end, opts)
-  vim.keymap.set('n', '<leader>D', vim.lsp.buf.type_definition, opts)
-  vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
-  vim.keymap.set({ 'n', 'v' }, '<leader>ca', vim.lsp.buf.code_action, opts)
-  vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
-  vim.keymap.set('n', '<leader>f', function()
-    vim.lsp.buf.format { async = true }
-  end, opts)
-end })
+    local opts = { noremap = true, silent = true, buffer = buffer }
+
+    vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
+    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
+    vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
+    vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
+    vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
+    vim.keymap.set('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, opts)
+    vim.keymap.set('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, opts)
+    vim.keymap.set('n', '<leader>wl', function()
+      print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+    end, opts)
+    vim.keymap.set('n', '<leader>D', vim.lsp.buf.type_definition, opts)
+    vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
+    vim.keymap.set({ 'n', 'v' }, '<leader>ca', vim.lsp.buf.code_action, opts)
+    vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
+    vim.keymap.set('n', '<leader>f', function()
+      vim.lsp.buf.format { async = true }
+    end, opts)
+  end
+})
 EOF
 
 lua << EOF
@@ -691,13 +624,16 @@ EOF
 " Enter in Visual Block mode using <C-v>. Select the region where the box should be.
 " Invoke :VBox. This will draw a rectangle. In case, it has a width or a height of 1, it will draw a line.
 
-" llama.vim configuration
+" llama.vim configuration - uses llama-swap with dedicated FIM model
 let g:llama_config = {
-  \ 'endpoint': 'http://10.100.0.100:10003/infill',
-  \ 'auto_fim': 0,
-  \ 'show_info': 1
+  \ 'endpoint_fim': 'http://10.100.0.100:8080/infill',
+  \ 'endpoint_inst': 'http://10.100.0.100:8080/v1/chat/completions',
+  \ 'enable_at_startup': v:false,
+  \ 'auto_fim': v:true,
+  \ 'show_info': 1,
+  \ 'model_fim': 'qwen2.5-coder-14b-fim',
+  \ 'model_inst': 'qwen3-coder-next-full',
+  \ 'n_prefix': 768,
+  \ 'n_suffix': 192,
+  \ 'n_predict': 128,
   \ }
-
-" Note: llama-swap OpenAI-compatible endpoint
-" FIM may not work perfectly with non-FIM models like Nemotron
-" Consider adding a dedicated FIM model (e.g., Qwen2.5-Coder) to llama-swap

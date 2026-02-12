@@ -5,7 +5,7 @@
 let
   # Import unstable packages for latest Wayland tools
   unstable = import inputs.nixpkgs-unstable {
-    inherit (pkgs) system;
+    inherit (pkgs.stdenv.hostPlatform) system;
     overlays = [];
   };
 in {
@@ -39,22 +39,12 @@ in {
     unstable.xdg-desktop-portal
     unstable.xdg-desktop-portal-gtk
     unstable.xdg-desktop-portal-wlr
-    unstable.xdg-desktop-portal-gnome
-    
-    # Wayland protocols
-    unstable.wayland-protocols
-    unstable.wlroots_0_18
-    
+
     # Media and image viewing
     pkgs.imv                     # Wayland-native image viewer
-    pkgs.mpv                     # Video player with Wayland support
-    
-    # Window management
-    pkgs.flashfocus              # Window focus effects
     
     # Terminal and session
     pkgs.kdePackages.konsole     # Terminal emulator
-    pkgs.cage                    # Kiosk compositor
     
     # Audio control
     pkgs.pamixer                 # PulseAudio/PipeWire mixer

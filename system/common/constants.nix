@@ -64,5 +64,8 @@
 
     # Monitoring
     prometheus = 9090;
+
+    # Sync
+    atuin = 8888;
   };
 }

@@ -33,33 +33,22 @@
     supportedFilesystems = [ "zfs" ];
 
     # Kernel modules - Load NVIDIA modules on boot (required for headless)
-    # Also load rapl for energy consumption analysis
+    # intel_rapl_common: Despite the name, supports AMD Zen via RAPL-compatible MSRs (used by Scaphandre)
     # zstd for decompressing Bluetooth firmware
     # NVIDIA modules loaded here (NOT in initrd) to prevent boot hangs with dummy HDMI
     kernelModules = [ "kvm-amd" "intel_rapl_common" "zstd" "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ];
 
-    # Don't load NVIDIA in initrd - causes boot hang when dummy HDMI is connected
-    # initrd.kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ];
-
     # Kernel parameters
     kernelParams = [
-      # ZFS ARC cache: With 128GB RAM, default (50%) = 64GB is fine
-      # Uncomment to limit for GPU workloads:
-      # "zfs.zfs_arc_max=34359738368"  # 32GB in bytes
-
       # NVIDIA configuration
       "nvidia-drm.modeset=1"
-      "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
 
       # PCI/PCIe power management - Disable ASPM to prevent network/SATA lockups
       "pcie_aspm=off"
 
-      # Alternative: Allow fallback to BIOS ASPM settings if needed
-      # "pcie_aspm.policy=performance"
-
       # Realtek RTL8126A network driver stability (r8169)
       "r8169.use_dac=1"   # Enable DAC (Dual Address Cycle)
-      "r8169.aspm=0"      # Disable ASPM at driver level
+      "r8169.aspm=0"      # Disable ASPM at driver level (prevents watchdog timeouts)
       "iommu=soft"        # Software IOMMU (may help with DMA issues)
     ];
 
@@ -76,7 +65,6 @@
     zfs = {
       forceImportRoot = false;
       forceImportAll = false;
-      # extraPools = [ "storage" ];  # Auto-import additional pools if needed
     };
 
     # LUKS encrypted devices
@@ -168,7 +156,6 @@
       # Power management
       powerManagement = {
         enable = true;
-        # finegrained = true;  # Experimental - uncomment for better Blackwell power control
       };
 
       # Use open-source kernel module (better for RTX 40/50 series)
@@ -261,7 +248,7 @@
         {
           publicKey = "2OIP77a10/Fas+eCvYQNa3ixFNOq0JqZIuSk1tY/QTM=";
           allowedIPs = [ "0.0.0.0/0" ];  # Full tunnel
-          endpoint = "rpi-nixos.ddns.net:51820";
+          endpoint = "192.168.1.110:51820";
           persistentKeepalive = 25;
         }
       ];
@@ -396,6 +383,13 @@
       '';
     };
 
+    # Ensure sshd auto-restarts if it crashes (prevents weekly reachability issues)
+    systemd.services.sshd = {
+      enable = true;
+      serviceConfig.Restart = "on-failure";
+      serviceConfig.RestartSec = "5s";
+    };
+
     # Getty (login banner)
     getty.helpLine = ''
       ╔═══════════════════════════════════════════════════╗
@@ -407,6 +401,23 @@
     udev.extraRules = ''
       # Keep MediaTek MT7922 Bluetooth powered on (fixes EBUSY error)
       ACTION=="add", SUBSYSTEM=="usb", ATTRS{idVendor}=="0489", ATTRS{idProduct}=="e13a", ATTR{power/control}="on"
+    '';
+
+    # Journald - prevent log exhaustion that can cause disk space issues
+    journald = {
+      extraConfig = ''
+        SystemMaxUse=2G
+        SystemMaxFileSize=100M
+        MaxFileSec=1week
+      '';
+    };
+
+    # logind - session management for long-running sessions
+    logind.extraConfig = ''
+      RuntimeDirectorySize=75%
+      KillUserProcesses=yes
+      HandleLidSwitch=poweroff
+      HandleLidSwitchDocked=poweroff
     '';
   };
 
@@ -486,6 +497,7 @@
   home-manager = {
     useGlobalPkgs = false;
     useUserPackages = true;
+    backupFileExtension = "hm-backup";
     extraSpecialArgs = { inherit inputs system; };
 
     users.bolt = { nixpkgs, ... }: {
@@ -580,6 +592,9 @@
     # LLM inference with CUDA acceleration (RTX 5090)
     # Note: Full CUDA+CPU optimizations defined in system/common/overlays.nix
     llama-cpp-cuda
+
+    # Speech recognition with word-level timestamps & diarization (CUDA via cudaSupport)
+    whisperx
   ];
 
   # ==========================================================================
@@ -653,23 +668,5 @@
   security.sudo = {
     enable = true;
     wheelNeedsPassword = true;
-
-    # Allow llama-swap to control Wyoming services for VRAM management
-    # Full-power models stop Wyoming to free ~3GB VRAM, restart on exit
-    extraRules = [
-      {
-        users = [ "llama-swap" ];
-        commands = [
-          { command = "/run/current-system/sw/bin/systemctl stop wyoming-faster-whisper-en"; options = [ "NOPASSWD" ]; }
-          { command = "/run/current-system/sw/bin/systemctl stop wyoming-faster-whisper-pt"; options = [ "NOPASSWD" ]; }
-          { command = "/run/current-system/sw/bin/systemctl stop wyoming-piper-en"; options = [ "NOPASSWD" ]; }
-          { command = "/run/current-system/sw/bin/systemctl stop wyoming-piper-pt"; options = [ "NOPASSWD" ]; }
-          { command = "/run/current-system/sw/bin/systemctl start wyoming-faster-whisper-en"; options = [ "NOPASSWD" ]; }
-          { command = "/run/current-system/sw/bin/systemctl start wyoming-faster-whisper-pt"; options = [ "NOPASSWD" ]; }
-          { command = "/run/current-system/sw/bin/systemctl start wyoming-piper-en"; options = [ "NOPASSWD" ]; }
-          { command = "/run/current-system/sw/bin/systemctl start wyoming-piper-pt"; options = [ "NOPASSWD" ]; }
-        ];
-      }
-    ];
   };
 }

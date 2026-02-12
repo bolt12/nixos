@@ -24,6 +24,16 @@
       wifi.powersave = false;
     };
 
+    # Static IP so ninho's WireGuard endpoint never goes stale
+    useDHCP = false;
+    interfaces.wlan0 = {
+      useDHCP = false;
+      ipv4.addresses = [{
+        address = "192.168.1.110";
+        prefixLength = 24;
+      }];
+    };
+    defaultGateway = "192.168.1.254";
   };
 
   # Set your time zone.
