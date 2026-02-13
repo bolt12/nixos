@@ -18,7 +18,6 @@ in {
     unstable.waybar              # Status bar
     unstable.wofi                # Application launcher
     unstable.mako                # Notification daemon
-    unstable.swayidle            # Idle management
     unstable.swaylock-fancy      # Screen locker
     unstable.wlogout             # Logout menu
     
