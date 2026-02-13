@@ -130,6 +130,7 @@
   home-manager = {
     useGlobalPkgs   = false;
     useUserPackages = true;
+    backupFileExtension = "hm-backup";
 
     extraSpecialArgs = {
       inherit inputs system;
