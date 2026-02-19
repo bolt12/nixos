@@ -1,0 +1,22 @@
+cabal-version: 3.0
+name:          ai-cmd
+version:       0.1.0
+synopsis:      Natural language shell command generator
+license:       MIT
+build-type:    Simple
+
+executable ai
+  default-language: GHC2024
+  main-is:         Main.hs
+  build-depends:
+    , aeson
+    , base              >=4.18 && <5
+    , bytestring
+    , directory
+    , haskeline
+    , http-client
+    , http-client-tls
+    , optparse-applicative
+    , process
+    , text
+    , vector

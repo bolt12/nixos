@@ -541,7 +541,7 @@ local plugins_dir = "/home/bolt/.config/nvim/custom-plugins"
 -- Add that directory to package.path.
 package.path = package.path .. ";" .. plugins_dir .. "/?.lua"
 
-require('chatgpt-ui')
+require('llm-assistant')
 require('journal-wrap-images')
 EOF
 

@@ -10,9 +10,9 @@
     extraConfig = ''
         set -g default-terminal "screen-256color"
 
-        # Copy and Paste into system clipboard
-
+        # Clipboard: OSC 52 escape sequences (works over SSH transparently)
         set -g set-clipboard on
+        set -g allow-passthrough on
 
         # Resize panes using Prefix + Ctrl + hjkl (repeatable)
         bind -r C-h resize-pane -L 5
@@ -21,7 +21,7 @@
         bind -r C-l resize-pane -R 5
 
         bind-key -T copy-mode-vi 'v' send -X begin-selection # start selecting text with "v"
-        bind-key -T copy-mode-vi 'y' send -X copy-selection-and-cancel # copy text with "y"
+        bind-key -T copy-mode-vi 'y' send -X copy-selection-and-cancel # copy text (triggers OSC 52)
         bind-key -T copy-mode-vi 'Y' send-keys -X copy-line
         bind-key -T copy-mode-vi Escape send-keys -X cancel
 

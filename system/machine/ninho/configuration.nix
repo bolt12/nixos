@@ -133,7 +133,6 @@
     # Bluetooth
     bluetooth = {
       enable = true;
-      hsphfpd.enable = false;
       settings = {
         General.Enable = lib.concatStringsSep "," [ "Source" "Sink" "Media" "Socket" ];
       };
@@ -383,13 +382,6 @@
       '';
     };
 
-    # Ensure sshd auto-restarts if it crashes (prevents weekly reachability issues)
-    systemd.services.sshd = {
-      enable = true;
-      serviceConfig.Restart = "on-failure";
-      serviceConfig.RestartSec = "5s";
-    };
-
     # Getty (login banner)
     getty.helpLine = ''
       ╔═══════════════════════════════════════════════════╗
@@ -413,12 +405,12 @@
     };
 
     # logind - session management for long-running sessions
-    logind.extraConfig = ''
-      RuntimeDirectorySize=75%
-      KillUserProcesses=yes
-      HandleLidSwitch=poweroff
-      HandleLidSwitchDocked=poweroff
-    '';
+    logind.settings.Login = {
+      RuntimeDirectorySize = "75%";
+      KillUserProcesses = true;
+      HandleLidSwitch = "poweroff";
+      HandleLidSwitchDocked = "poweroff";
+    };
   };
 
   # ==========================================================================
@@ -603,7 +595,6 @@
 
   fonts = {
     fontDir.enable = true;
-    enableGhostscriptFonts = true;
     enableDefaultPackages = true;
   };
 

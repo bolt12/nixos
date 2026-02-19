@@ -66,7 +66,7 @@ in
 
         z-ai = {
           proxy = "https://api.z.ai/api/anthropic";
-          apiKey = "";
+          apiKey = "37340e5d6c9044de9800b79aa8ebada7.6gocjlASMUDCC3VY";
           models = [
             "GLM-5"
             "GLM-4.7"
@@ -106,6 +106,31 @@ in
               --jinja
           '';
           aliases = [ "glm-4.7-flash-hass" ];
+        };
+
+        # Qwen3 Coder Next
+        "qwen3-coder-next-hass" = {
+          cmd = ''
+            ${wyoming-wrapper} ${llama-cpp-cuda}/bin/llama-server \
+              -hf unsloth/Qwen3-Coder-Next-GGUF:MXFP4_MOE\
+              --metrics \
+              --host 0.0.0.0 \
+              --port ''${PORT} \
+              --temp 1.0 \
+              --top-p 0.95 \
+              --top-k 40 \
+              --min-p 0.01 \
+              --repeat-penalty 1.1 \
+              -fit on \
+              --fit-ctx 64000 \
+              --fit-target 128 \
+              --flash-attn on \
+              --batch-size 4096 \
+              --ubatch-size 2048 \
+              --no-mmap \
+              --jinja
+          '';
+          aliases = [ "qwen3-coder-next-hass" ];
         };
 
         # ===========================================================================
@@ -239,7 +264,7 @@ in
         "qwen3-coder-next-full" = {
           cmd = ''
             ${wyoming-wrapper} ${llama-cpp-cuda}/bin/llama-server \
-              -hf mradermacher/Qwen3-Coder-Next-REAM-GGUF:Q4_K_M \
+              -hf unsloth/Qwen3-Coder-Next-GGUF:MXFP4_MOE\
               --metrics \
               --host 0.0.0.0 \
               --port ''${PORT} \

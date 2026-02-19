@@ -322,6 +322,18 @@ Toggle FIM suggestions                   | <C-f>
 Accept full suggestion                   | <Tab>
 Accept first line only                   | <S-Tab>
 
+## LLM Assistant @llm @ai @journal
+Open code assistant (visual)          | <leader>p
+Open journal summary (visual)         | <leader>j
+Open LLM menu (visual)               | <leader>l
+Submit prompt (in prompt popup)       | <leader>s
+Switch pane (in prompt popup)         | <Tab>
+Primary action (in result popup)      | <leader>s
+Append below selection                | <leader>a
+Replace selection                     | <leader>r
+Yank result to clipboard             | <leader>y
+Close popup / cancel request          | <Esc> or q
+
 ## Lean Files (<LocalLeader> prefix)
 
 Toggle the infoview open or closed     | <LocalLeader>i

@@ -17,6 +17,7 @@ let
     text = ''
       export ANTHROPIC_BASE_URL="http://10.100.0.100:8080"
       export API_TIMEOUT_MS="3000000"
+      export CLAUDE_CODE_MAX_OUTPUT_TOKENS=100000
       export ANTHROPIC_DEFAULT_OPUS_MODEL="GLM-5"
       export ANTHROPIC_DEFAULT_SONNET_MODEL="GLM-5"
       export ANTHROPIC_DEFAULT_HAIKU_MODEL="GLM-4.5-Air"
@@ -31,6 +32,7 @@ let
     text = ''
       export ANTHROPIC_BASE_URL="http://10.100.0.100:8080"
       export API_TIMEOUT_MS="3000000"
+      export CLAUDE_CODE_MAX_OUTPUT_TOKENS=100000
       export ANTHROPIC_DEFAULT_OPUS_MODEL="glm-4.7-flash-full"
       export ANTHROPIC_DEFAULT_SONNET_MODEL="glm-4.7-flash-full"
       export ANTHROPIC_DEFAULT_HAIKU_MODEL="glm-4.7-flash-full"
@@ -44,6 +46,7 @@ let
     text = ''
       export ANTHROPIC_BASE_URL="http://10.100.0.100:8080"
       export API_TIMEOUT_MS="3000000"
+      export CLAUDE_CODE_MAX_OUTPUT_TOKENS=100000
       export ANTHROPIC_DEFAULT_OPUS_MODEL="qwen3-coder-next-full"
       export ANTHROPIC_DEFAULT_SONNET_MODEL="qwen3-coder-next-full"
       export ANTHROPIC_DEFAULT_HAIKU_MODEL="qwen3-coder-next-full"
@@ -63,6 +66,7 @@ in
     ../../profiles/specialized.nix   # Agda, Lean, Arduino, etc.
 
     # Program configurations
+    ../../programs/ai-cmd/default.nix
     ../../programs/agda/default.nix
     ../../programs/bash/default.nix
     ../../programs/emacs/default.nix

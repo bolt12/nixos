@@ -31,13 +31,13 @@ in
         rocmSupport = false;
         metalSupport = false;
       }).overrideAttrs (oldAttrs: {
-        version = "78008";
+        version = "78083";
 
         src = pkgs.fetchFromGitHub {
           owner = "ggml-org";
           repo = "llama.cpp";
-          tag = "b8008";
-          hash = "sha256-zsxUWmIgvrdeYqRyE/pqJH9R9WurOAehyXIvIrHQkjQ=";
+          tag = "b8083";
+          hash = "sha256-VqtUTzSyF+kavv9S046Hf7q2fEJZr82h7Ab4yUHzalU=";
           leaveDotGit = true;
           postFetch = ''
             git -C "$out" rev-parse --short HEAD > $out/COMMIT
@@ -112,6 +112,8 @@ in
           # Use sed for multiline replacement (DiarizeOutput compatibility)
           sed -i 's/diarize_df = pd.DataFrame(diarization.itertracks(yield_label=True), columns=/annotation = getattr(diarization, "speaker_diarization", diarization)\n        diarize_df = pd.DataFrame(annotation.itertracks(yield_label=True), columns=/g' whisperx/diarize.py
         '';
+
+        meta = (oldAttrs.meta or {}) // { broken = false; };
       });
 
       # Fix scaphandre build error with riemann_client unstable feature
