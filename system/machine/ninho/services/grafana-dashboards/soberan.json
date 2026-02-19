@@ -5701,7 +5701,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "scaph_host_power_microwatts / 1e6 + nvidia_smi_power_draw_watts",
+          "expr": "scalar(scaph_host_power_microwatts) / 1e6 + scalar(nvidia_smi_power_draw_watts)",
           "legendFormat": ""
         }
       ],
@@ -5811,7 +5811,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "(scaph_host_power_microwatts / 1e6 + nvidia_smi_power_draw_watts) / 1000 * 0.15",
+          "expr": "(scalar(scaph_host_power_microwatts) / 1e6 + scalar(nvidia_smi_power_draw_watts)) / 1000 * 0.15",
           "legendFormat": ""
         }
       ],
@@ -5858,7 +5858,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "(scaph_host_power_microwatts / 1e6 + nvidia_smi_power_draw_watts) / 1000 * 0.15 * 24",
+          "expr": "(scalar(scaph_host_power_microwatts) / 1e6 + scalar(nvidia_smi_power_draw_watts)) / 1000 * 0.15 * 24",
           "legendFormat": ""
         }
       ],
@@ -5913,7 +5913,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "(scaph_host_power_microwatts / 1e6 + nvidia_smi_power_draw_watts) / 1000 * 0.15 * 730",
+          "expr": "(scalar(scaph_host_power_microwatts) / 1e6 + scalar(nvidia_smi_power_draw_watts)) / 1000 * 0.15 * 730",
           "legendFormat": ""
         }
       ],
@@ -5968,7 +5968,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "(scaph_host_power_microwatts / 1e6 + nvidia_smi_power_draw_watts) / 1000 * 0.15 * 8760",
+          "expr": "(scalar(scaph_host_power_microwatts) / 1e6 + scalar(nvidia_smi_power_draw_watts)) / 1000 * 0.15 * 8760",
           "legendFormat": ""
         }
       ],
@@ -6023,7 +6023,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "(scaph_host_power_microwatts / 1e6 + nvidia_smi_power_draw_watts) / 1000 * 0.15",
+          "expr": "(scalar(scaph_host_power_microwatts) / 1e6 + scalar(nvidia_smi_power_draw_watts)) / 1000 * 0.15",
           "legendFormat": "Total \u20ac/hr"
         },
         {
@@ -6081,7 +6081,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "scaph_host_power_microwatts / 1e6 + nvidia_smi_power_draw_watts",
+          "expr": "scalar(scaph_host_power_microwatts) / 1e6 + scalar(nvidia_smi_power_draw_watts)",
           "legendFormat": "Total"
         },
         {
@@ -6139,7 +6139,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "avg_over_time((scaph_host_power_microwatts / 1e6 + nvidia_smi_power_draw_watts)[24h:5m]) / 1000 * 0.15 * 24",
+          "expr": "(scalar(avg_over_time(scaph_host_power_microwatts[24h:5m])) / 1e6 + scalar(avg_over_time(nvidia_smi_power_draw_watts[24h:5m]))) / 1000 * 0.15 * 24",
           "legendFormat": "Est. daily cost"
         }
       ],
