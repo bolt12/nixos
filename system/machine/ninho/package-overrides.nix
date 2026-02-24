@@ -31,13 +31,13 @@ in
         rocmSupport = false;
         metalSupport = false;
       }).overrideAttrs (oldAttrs: {
-        version = "78083";
+        version = "78143";
 
         src = pkgs.fetchFromGitHub {
           owner = "ggml-org";
           repo = "llama.cpp";
-          tag = "b8083";
-          hash = "sha256-VqtUTzSyF+kavv9S046Hf7q2fEJZr82h7Ab4yUHzalU=";
+          tag = "b8143";
+          hash = "sha256-Qzsc58vO9LKWNWscVvir1JNNZNgQlGT+Ye4mXxHQE60=";
           leaveDotGit = true;
           postFetch = ''
             git -C "$out" rev-parse --short HEAD > $out/COMMIT
@@ -55,19 +55,21 @@ in
           ${oldAttrs.preConfigure or ""}
         '';
 
+        # Webui npm deps hash changed with this source version
+        npmDepsHash = "sha256-FKjoZTKm0ddoVdpxzYrRUmTiuafEfbKc4UD2fz2fb8A=";
+
         # Keep the original postInstall to handle installation correctly
         postInstall = oldAttrs.postInstall or "";
       });
 
-      # llama-swap v182 - Latest release with Anthropic API compatibility
-      llama-swap = prev.llama-swap.overrideAttrs (oldAttrs: {
-        version = "186";
-
-        src = pkgs.fetchFromGitHub {
+      # llama-swap v195 - Latest release with Anthropic API compatibility
+      # v195 renamed ui/ → ui-svelte/, so we rebuild the UI derivation from scratch
+      llama-swap = let
+        llama-swap-src = pkgs.fetchFromGitHub {
           owner = "mostlygeek";
           repo = "llama-swap";
-          tag = "v186";
-          hash = "sha256-3D+fQ9Lu0OfON694hWlv5QcuGS/zAlkOW+Q9AMq+RWQ=";
+          tag = "v195";
+          hash = "sha256-e9kRlL3YWJ00tD3OkUYy60+//90w3ZmfHfCcyMpRQhU=";
           leaveDotGit = true;
           postFetch = ''
             cd "$out"
@@ -76,12 +78,32 @@ in
             find "$out" -name .git -print0 | xargs -0 rm -rf
           '';
         };
-
+        llama-swap-ui = pkgs.buildNpmPackage {
+          pname = "llama-swap-ui";
+          version = "195";
+          src = llama-swap-src;
+          sourceRoot = "${llama-swap-src.name}/ui-svelte";
+          npmDepsHash = "sha256-4VH9jJ1Ae16p8kUubZBrIwwqw/X8I+wDg378G82WCtU=";
+          postPatch = ''
+            substituteInPlace vite.config.ts \
+              --replace-fail "../proxy/ui_dist" "${placeholder "out"}/ui_dist"
+          '';
+          postInstall = ''
+            rm -rf $out/lib
+          '';
+        };
+      in prev.llama-swap.overrideAttrs (oldAttrs: {
+        version = "195";
+        src = llama-swap-src;
         proxyVendor = true;
         vendorHash = "sha256-TPOKqgyf8vltRLbtNWXcK3jsWsVFaSrZAc+/AMkG/8A=";
-        passthru.ui = oldAttrs.passthru.ui;
-        passthru.npmDepsHash = "sha256-xz4z/Bxlbw7uuzRP0aWPRKSfhPAB++iToYnymu4RVSE=";
+        passthru.ui = llama-swap-ui;
 
+        preBuild = ''
+          ldflags+=" -X main.commit=$(cat COMMIT)"
+          ldflags+=" -X main.date=$(cat SOURCE_DATE_EPOCH)"
+          cp -r ${llama-swap-ui}/ui_dist proxy/
+        '';
       });
 
       # WhisperX v3.7.6 - Fix use_auth_token TypeError with newer pyannote

@@ -30,7 +30,13 @@
       "WebFetch(domain:deepwiki.com)",
       "WebFetch(domain:www.home-assistant.io)",
       "WebFetch(domain:ntfy.sh)",
-      "WebFetch(domain:docs.ntfy.sh)"
+      "WebFetch(domain:docs.ntfy.sh)",
+      "WebFetch(domain:pchalasani.github.io)",
+      "WebFetch(domain:download.pytorch.org)",
+      "WebFetch(domain:forum.proxmox.com)",
+      "WebFetch(domain:discourse.nixos.org)",
+      "WebFetch(domain:farcaller.net)",
+      "WebFetch(domain:oddlama.org)"
     ],
     "deny": [],
     "ask": []

@@ -88,32 +88,12 @@ in
   };
 
   services = {
-    # PostgreSQL configuration for RPI 5 (16KB page size compatibility)
-    postgresql = {
+    # Tang server for Clevis/LUKS auto-unlock on ninho
+    # Serves key advertisement on port 7654 for initrd Clevis clients
+    tang = {
       enable = true;
-      enableJIT = false; # Disable JIT on ARM for stability
-    };
-
-    # Immich - Self-hosted photo and video backup solution
-    # Access at http://<rpi-ip>:2283
-    immich = {
-      enable = true;
-      host = "0.0.0.0"; # Listen on all interfaces
-      port = 2283; # Default Immich port
-      openFirewall = true; # Automatically opens port 2283 in firewall
-
-      # Database settings (uses PostgreSQL configured above)
-      database = {
-        enable = true;
-        createDB = true;
-        # Disable Vectors to avoid jemalloc 16KB page size issues on RPI 5
-        enableVectors = false;
-      };
-
-      machine-learning.enable = false;
-
-      # Redis for job queuing and caching
-      redis.enable = true;
+      listenStream = [ "7654" ];
+      ipAddressAllow = [ "127.0.0.0/8" "192.168.1.0/24" "10.100.0.0/24" ];
     };
 
     pipewire = {
@@ -184,7 +164,7 @@ in
     # Open ports in the firewall.
     firewall = {
       enable = true;
-      allowedTCPPorts = [ 22 25 53 465 587 7000 ];
+      allowedTCPPorts = [ 22 25 53 465 587 7000 7654 ];
       allowedUDPPorts = [ 53 51820 ];
     };
 

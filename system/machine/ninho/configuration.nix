@@ -32,11 +32,17 @@
     # Supported filesystems
     supportedFilesystems = [ "zfs" ];
 
+    # Override hardware-configuration.nix to add r8169 (needed for initrd networking → Clevis)
+    initrd.availableKernelModules = [ "nvme" "xhci_pci" "ahci" "thunderbolt" "usbhid" "usb_storage" "sd_mod" "r8169" ];
+
     # Kernel modules - Load NVIDIA modules on boot (required for headless)
     # intel_rapl_common: Despite the name, supports AMD Zen via RAPL-compatible MSRs (used by Scaphandre)
     # zstd for decompressing Bluetooth firmware
     # NVIDIA modules loaded here (NOT in initrd) to prevent boot hangs with dummy HDMI
-    kernelModules = [ "kvm-amd" "intel_rapl_common" "zstd" "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ];
+    kernelModules = [ "kvm-amd" "intel_rapl_common" "zstd" "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" "sp5100_tco" ];
+
+    # Emulate aarch64 for building RPi packages via Colmena (like x1-g8)
+    binfmt.emulatedSystems = [ "aarch64-linux" ];
 
     # Kernel parameters
     kernelParams = [
@@ -50,6 +56,9 @@
       "r8169.use_dac=1"   # Enable DAC (Dual Address Cycle)
       "r8169.aspm=0"      # Disable ASPM at driver level (prevents watchdog timeouts)
       "iommu=soft"        # Software IOMMU (may help with DMA issues)
+
+      # Initrd networking for Clevis/Tang LUKS auto-unlock
+      "ip=:::::enp11s0:dhcp"
     ];
 
     # Bluetooth module configuration - Disable autosuspend for MediaTek adapters
@@ -92,6 +101,50 @@
         device = "/dev/disk/by-uuid/4396e7a6-bfba-413a-8370-f892f9129521";
         preLVM = true;
       };
+    };
+
+    # Initrd networking for Clevis/Tang auto-unlock
+    initrd.network = {
+      enable = true;
+      flushBeforeStage2 = true;  # Clean slate for NetworkManager in stage 2
+
+      # SSH fallback — if Tang is unreachable, SSH in to type the passphrase
+      # Port 2222 (not 22) because the initrd uses a different host key
+      # Usage: ssh -p 2222 root@<ninho-lan-ip>
+      ssh = {
+        enable = true;
+        port = 2222;
+        authorizedKeys = [
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHKTf4Bb2BBymwZvxPtxEefspOPTACPn3HqrRiWAMJEJ armandoifsantos@gmail.com"
+        ];
+        hostKeys = [ "/etc/secrets/initrd/ssh_host_ed25519_key" ];
+      };
+
+      postCommands = ''
+        echo 'cryptsetup-askpass' >> /root/.profile
+      '';
+    };
+
+    # Clevis/Tang auto-unlock for all LUKS devices
+    initrd.clevis = {
+      enable = true;
+      devices = {
+        "luks-rpool-nvme0n1-part2".secretFile = "/etc/secrets/initrd/luks-rpool-nvme0n1-part2.jwe";
+        "luks-rpool-nvme1n1-part2".secretFile = "/etc/secrets/initrd/luks-rpool-nvme1n1-part2.jwe";
+        "luks-storage-sda-part2".secretFile = "/etc/secrets/initrd/luks-storage-sda-part2.jwe";
+        "luks-storage-sdb-part2".secretFile = "/etc/secrets/initrd/luks-storage-sdb-part2.jwe";
+        "luks-storage-sdc-part2".secretFile = "/etc/secrets/initrd/luks-storage-sdc-part2.jwe";
+      };
+    };
+
+    # Inject secrets into initrd (avoids world-readable Nix store paths)
+    initrd.secrets = {
+      "/etc/secrets/initrd/luks-rpool-nvme0n1-part2.jwe" = "/etc/secrets/initrd/luks-rpool-nvme0n1-part2.jwe";
+      "/etc/secrets/initrd/luks-rpool-nvme1n1-part2.jwe" = "/etc/secrets/initrd/luks-rpool-nvme1n1-part2.jwe";
+      "/etc/secrets/initrd/luks-storage-sda-part2.jwe" = "/etc/secrets/initrd/luks-storage-sda-part2.jwe";
+      "/etc/secrets/initrd/luks-storage-sdb-part2.jwe" = "/etc/secrets/initrd/luks-storage-sdb-part2.jwe";
+      "/etc/secrets/initrd/luks-storage-sdc-part2.jwe" = "/etc/secrets/initrd/luks-storage-sdc-part2.jwe";
+      "/etc/secrets/initrd/ssh_host_ed25519_key" = "/etc/secrets/initrd/ssh_host_ed25519_key";
     };
 
     # GRUB bootloader with mirrored boot support
@@ -512,6 +565,7 @@
       auto-optimise-store = true;
       trusted-users = [ "root" "bolt" "pollard" ];
       experimental-features = [ "nix-command" "flakes" ];
+      extra-platforms = [ "aarch64-linux" ];  # Allow building/evaluating aarch64 derivations (binfmt)
 
       # Binary caches - CUDA cache significantly reduces compilation times
       substituters = [
@@ -587,6 +641,12 @@
 
     # Speech recognition with word-level timestamps & diarization (CUDA via cudaSupport)
     whisperx
+
+    # Network diagnostics
+    ethtool
+
+    # Clevis — needed for JWE enrollment and key rotation (Tang/LUKS auto-unlock)
+    clevis
   ];
 
   # ==========================================================================

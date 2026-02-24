@@ -214,10 +214,8 @@
         rpi-5 = { name, nodes, pkgs, ... }: {
           deployment = {
             targetHost = "192.168.1.110";
-            targetUser = "bolt";
-            # Option 1: Build on target (slower but avoids cross-compilation issues)
-            # buildOnTarget = true;
-            # Option 2: Cross-compile locally (faster build machine, but may have compatibility issues)
+            targetUser = "root";
+            # Build locally via QEMU binfmt emulation (not cross-compilation)
             buildOnTarget = false;
             allowLocalDeployment = false;
           };
@@ -229,10 +227,7 @@
             ./system/machine/rpi/rpi5.nix
           ];
 
-          # Cross-compile from x86_64 to aarch64
-          nixpkgs.crossSystem = {
-            system = "aarch64-linux";
-          };
+          nixpkgs.system = "aarch64-linux";
         };
       };
     };
