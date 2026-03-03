@@ -43,25 +43,6 @@
         bind l select-pane -R
       '';
     plugins = [
-      { plugin = pkgs.tmuxPlugins.resurrect;
-        extraConfig = ''
-          # allow tmux-ressurect to capture pane contents
-          set -g @resurrect-capture-pane-contents 'on'
-          # for vim
-          set -g @resurrect-strategy-vim 'session'
-          # for neovim
-          set -g @resurrect-strategy-nvim 'session'
-          set -g @resurrect-processes  '~nvim'
-
-          '';
-      }
-      { plugin = pkgs.tmuxPlugins.continuum;
-      extraConfig = ''
-          # enable tmux-continuum functionality
-          set -g @continuum-boot 'on'
-          set -g @continuum-restore 'on'
-          '';
-      }
       { plugin = pkgs.tmuxPlugins.catppuccin;
         extraConfig = ''
           set -g @catppuccin_window_status_style "rounded"
@@ -79,6 +60,24 @@
           set -g @catppuccin-tmux_pane_id_style hide
           set -g @catppuccin-tmux_zoom_id_style hide
           set -g @catppuccin-tmux_show_path 1
+          '';
+      }
+      { plugin = pkgs.tmuxPlugins.resurrect;
+        extraConfig = ''
+          # allow tmux-ressurect to capture pane contents
+          set -g @resurrect-capture-pane-contents 'on'
+          # for vim
+          set -g @resurrect-strategy-vim 'session'
+          # for neovim
+          set -g @resurrect-strategy-nvim 'session'
+          set -g @resurrect-processes  '~nvim'
+
+          '';
+      }
+      { plugin = pkgs.tmuxPlugins.continuum;
+      extraConfig = ''
+          # enable tmux-continuum functionality
+          set -g @continuum-restore 'on'
           '';
       }
     ];

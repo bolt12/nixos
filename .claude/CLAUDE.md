@@ -71,3 +71,9 @@ ssh -p 2222 root@<ninho-lan-ip>
 - Tang is stateless — rotating keys requires re-enrolling all Clevis clients
 - `boot.initrd.secrets` files must exist on disk before `nixos-rebuild switch` — create placeholders if enrolling later
 - Colmena RPi deploy requires: ssh-agent with key loaded, `--impure` flag, `targetUser = "root"` (no interactive sudo support)
+
+### llama-swap / stable-diffusion.cpp
+
+**Key details for future edits:**
+- SD3.5 GGUF quantizations (e.g. from second-state) strip the VAE (`first_stage_model` tensors) — a separate `--vae` safetensors file is required when using `--diffusion-model` with split GGUF components in stable-diffusion.cpp
+- Wyoming faster-whisper uses CTranslate2 format; whisper.cpp (whisper-server) uses GGML format — model files are not interchangeable between the two

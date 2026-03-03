@@ -67,7 +67,7 @@ optsParser =
               vsep
                 [ "Environment variables:",
                   "  AI_CMD_URL      OpenAI-compatible API base URL (default: http://10.100.0.100:8080)",
-                  "  AI_CMD_MODEL    Model name for llama backend (default: qwen3-coder-next-hass)",
+                  "  AI_CMD_MODEL    Model name for llama backend (default: qwen3.5-27B-full)",
                   "  AI_CMD_BACKEND  Default backend: llama or claude (default: llama)",
                   "",
                   "After generating a command you are prompted:",
@@ -92,7 +92,7 @@ loadConfig opts = do
      | Just "claude" <- envBackend -> pure ClaudeBackend
      | otherwise -> do
         url <- fromMaybe "http://10.100.0.100:8080" <$> lookupEnv "AI_CMD_URL"
-        model <- fromMaybe "qwen3-coder-next-hass" <$> lookupEnv "AI_CMD_MODEL"
+        model <- fromMaybe "qwen3.5-27B-full" <$> lookupEnv "AI_CMD_MODEL"
         req <- parseRequest (url <> "/v1/chat/completions")
         pure $ LlamaBackend req (T.pack model)
 
@@ -155,7 +155,8 @@ llamaGenerate baseReq model context request = do
             [ "model" .= model,
               "temperature" .= (0.1 :: Double),
               "max_tokens" .= (512 :: Int),
-              "messages" .= messages
+              "messages" .= messages,
+              "chat_template_kwargs" .= object ["enable_thinking" .= False]
             ]
 
   result <- try $ do
@@ -197,6 +198,15 @@ claudeGenerate context request = do
   T.pack <$> readProcess "claude" ["--print", "-p", prompt] ""
 
 -- ------------------------------------------------------------------ Text Processing
+
+stripThinking :: Text -> Text
+stripThinking t
+  | "<think>" `T.isPrefixOf` T.stripStart t =
+      case T.breakOn "</think>" t of
+        (_, rest)
+          | T.null rest -> t -- no closing tag, return as-is
+          | otherwise -> T.strip $ T.drop (T.length "</think>") rest
+  | otherwise = t
 
 stripCodeFences :: Text -> Text
 stripCodeFences =
@@ -251,7 +261,7 @@ main = do
 
   raw <- generate backend context input
 
-  let cmd = stripCodeFences raw
+  let cmd = stripCodeFences . stripThinking $ raw
 
   when (T.null cmd) $ do
     hPutStrLn stderr "Error: empty response from backend"

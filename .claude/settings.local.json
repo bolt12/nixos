@@ -36,7 +36,18 @@
       "WebFetch(domain:forum.proxmox.com)",
       "WebFetch(domain:discourse.nixos.org)",
       "WebFetch(domain:farcaller.net)",
-      "WebFetch(domain:oddlama.org)"
+      "WebFetch(domain:oddlama.org)",
+      "WebFetch(domain:www.nijho.lt)",
+      "WebFetch(domain:api.github.com)",
+      "WebFetch(domain:eqbench.com)",
+      "WebFetch(domain:www.club386.com)",
+      "WebFetch(domain:blog.neevcloud.com)",
+      "WebFetch(domain:unsloth.ai)",
+      "WebFetch(domain:forum.level1techs.com)",
+      "WebFetch(domain:ollama.com)",
+      "WebFetch(domain:news.ycombinator.com)",
+      "WebFetch(domain:openbenchmarking.org)",
+      "WebFetch(domain:developer.nvidia.com)"
     ],
     "deny": [],
     "ask": []

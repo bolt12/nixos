@@ -11,9 +11,16 @@ local curl = require("plenary.curl")
 local Config = {
   api_url = "http://10.100.0.100:8080/v1/chat/completions",
   models_url = "http://10.100.0.100:8080/v1/models",
-  comfyui_url = "http://10.100.0.100:8188",
+  images_url = "http://10.100.0.100:8080/v1/images/generations",
   api_key = "not-needed",
   request_timeout = 120000,
+  image_timeout = 600000, -- 10 min (accounts for first-time model download)
+
+  image_models = {
+    { id = "flux1-schnell", label = "FLUX.1 Schnell", default_size = "1024x1024" },
+    { id = "sd3.5-medium", label = "SD 3.5 Medium", default_size = "1024x1024" },
+  },
+  default_image_model = "flux1-schnell",
 
   profiles = {
     code_assistant = {
@@ -31,7 +38,7 @@ local Config = {
       needs_prompt = true,
     },
     journal_summary = {
-      model = "glm-4.7-flash-full-creative",
+      model = "qwen3.5-27B-creative",
       temperature = 1.0,
       system_prompt = [[You are a personal journal assistant that creates weekly summaries.
 
@@ -128,6 +135,48 @@ writer created it themselves.
       result_action = "append_below",
       needs_prompt = false,
     },
+    visual_journal = {
+      model = "qwen3.5-27B-creative",
+      temperature = 0.9,
+      system_prompt = [=[You are a visual storytelling assistant that distills journal entries into a single abstract image prompt for Stable Diffusion / FLUX image generators.
+
+## Your Task
+
+Read the provided journal entries and produce ONE image prompt that abstractly captures the week's essence — its emotional arc, recurring themes, and defining energy.
+
+## Process (internal — do NOT include in output)
+
+1. **Analyze** the journal entries for:
+   - Dominant emotions and emotional trajectory (rising, falling, turbulent, calm)
+   - Recurring themes, motifs, or preoccupations
+   - Key events that defined the week's character
+   - Sensory details that could translate into symbolic imagery
+
+2. **Synthesize** a single composite image concept that:
+   - Uses symbolic and metaphorical imagery rather than literal scene recreation
+   - Blends multiple themes into one cohesive visual
+   - Captures the *feeling* of the week, not specific moments
+   - Works as an abstract or semi-abstract composition
+
+## Prompt Writing Guidelines
+
+Write the prompt optimized for Stable Diffusion / FLUX models:
+- **Keyword-heavy**: comma-separated descriptive phrases work better than prose
+- **2-4 sentences max**: front-load the most important visual elements
+- **No people or character descriptions**: use objects, landscapes, textures, colors as metaphors
+- **Include style direction**: lighting, color palette, artistic style, composition
+- **Include atmosphere**: mood, energy, symbolic elements
+
+## Output Format
+
+Output ONLY the prompt block, no titles, explanations, or commentary:
+
+[PROMPT]
+[Your detailed abstract image prompt here — comma-separated keywords and short phrases, 2-4 sentences, symbolic/metaphorical imagery, include style/lighting/mood direction]
+[/PROMPT]]=],
+      result_action = "append_below",
+      needs_prompt = false,
+    },
   },
 
   -- Fallback model list when API is unreachable
@@ -140,6 +189,7 @@ writer created it themselves.
       "gpt-oss-20b-full",
       "nemotron-3-nano-full",
       "qwen3-coder-next-full",
+      "qwen3.5-27B-creative",
       "qwen2.5-coder-14b-fim",
       "step-3.5-flash-full",
     },
@@ -222,6 +272,28 @@ local function save_selection()
     end_col = ec,
     text_lines = lines,
   }
+  return true
+end
+
+local function parse_image_prompts(text)
+  local prompts = {}
+  for prompt in text:gmatch("%[PROMPT%](.-)%[/PROMPT%]") do
+    local trimmed = prompt:match("^%s*(.-)%s*$")
+    if trimmed and trimmed ~= "" then
+      table.insert(prompts, trimmed)
+    end
+  end
+  return prompts
+end
+
+local function save_base64_png(b64_data, filepath)
+  local decoded = vim.base64.decode(b64_data)
+  local f, err = io.open(filepath, "wb")
+  if not f then
+    return false, "Cannot write to " .. filepath .. ": " .. (err or "unknown error")
+  end
+  f:write(decoded)
+  f:close()
   return true
 end
 
@@ -310,6 +382,45 @@ function Api.stop_timer()
     State.elapsed_timer:close()
     State.elapsed_timer = nil
   end
+end
+
+function Api.generate_image(opts, on_result, on_error)
+  local payload = vim.fn.json_encode({
+    model = opts.model,
+    prompt = opts.prompt,
+    size = opts.size or "1024x1024",
+    response_format = "b64_json",
+  })
+
+  local job = curl.post(Config.images_url, {
+    body = payload,
+    headers = {
+      content_type = "application/json",
+      authorization = "Bearer " .. Config.api_key,
+    },
+    timeout = Config.image_timeout,
+    callback = function(response)
+      vim.schedule(function()
+        if response.status ~= 200 then
+          on_error("HTTP " .. (response.status or "?") .. ": " .. (response.body or "no body"))
+          return
+        end
+        local ok, parsed = pcall(vim.fn.json_decode, response.body)
+        if not ok or not parsed.data or not parsed.data[1] then
+          on_error("Failed to parse image response")
+          return
+        end
+        on_result(parsed.data[1].b64_json)
+      end)
+    end,
+    on_error = function(err)
+      vim.schedule(function()
+        on_error("Image request failed: " .. (err.message or vim.inspect(err)))
+      end)
+    end,
+  })
+
+  return job
 end
 
 function Api.fetch_models(callback)
@@ -628,6 +739,42 @@ function UI.show_model_picker(on_select)
   end)
 end
 
+function UI.show_image_model_picker(on_select)
+  local items = {}
+  for _, m in ipairs(Config.image_models) do
+    local suffix = m.id == Config.default_image_model and " (default)" or ""
+    table.insert(items, Menu.item(m.label .. suffix, { id = m.id, size = m.default_size }))
+  end
+
+  local menu = Menu({
+    relative = "editor",
+    position = "50%",
+    size = { width = 35, height = #Config.image_models + 4 },
+    border = {
+      style = "rounded",
+      text = {
+        top = " Image Model ",
+        top_align = "center",
+        bottom = " <CR> select | <Esc> cancel ",
+        bottom_align = "center",
+      },
+    },
+  }, {
+    lines = items,
+    keymap = {
+      focus_next = { "j", "<Down>" },
+      focus_prev = { "k", "<Up>" },
+      close = { "<Esc>", "q" },
+      submit = { "<CR>" },
+    },
+    on_submit = function(item)
+      on_select({ model = item.id, size = item.size })
+    end,
+  })
+
+  menu:mount()
+end
+
 function UI.show_mode_menu()
   local items = {
     Menu.item("Code Assistant", { id = "code_assistant" }),
@@ -759,37 +906,127 @@ function Modes.journal_summary()
   end)
 end
 
-function Modes.image_generation()
-  -- Check ComfyUI availability
-  curl.get(Config.comfyui_url .. "/system_stats", {
-    timeout = 3000,
-    callback = function(response)
-      vim.schedule(function()
-        if response.status ~= 200 then
-          vim.notify("ComfyUI is not available (HTTP " .. (response.status or "?") .. ")", vim.log.levels.WARN)
+function Modes.image_generation(opts)
+  opts = opts or {}
+  if not save_selection() then return end
+  local profile = Config.profiles.visual_journal
+  local selected_text_str = table.concat(State.sel.text_lines, "\n")
+  local buf_dir = vim.fn.expand("%:p:h")
+
+  local function proceed(save_dir)
+    save_dir = vim.fn.fnamemodify(save_dir, ":p"):gsub("/$", "")
+
+  -- Phase 1: Pick image model
+  UI.show_image_model_picker(function(image_model)
+    -- Phase 2: LLM generates single abstract prompt
+    local cancel_map = vim.api.nvim_set_keymap
+    cancel_map("n", "<Esc>", "", {
+      noremap = true,
+      silent = true,
+      callback = function()
+        Api.cancel()
+        vim.notify("Request cancelled", vim.log.levels.WARN)
+        pcall(vim.api.nvim_del_keymap, "n", "<Esc>")
+      end,
+    })
+
+    Api.chat({
+      profile = profile,
+      user_content = selected_text_str,
+    }, function(result)
+      pcall(vim.api.nvim_del_keymap, "n", "<Esc>")
+
+      local prompts = parse_image_prompts(result)
+      if #prompts == 0 then
+        UI.show_result(result, profile)
+        return
+      end
+
+      -- Phase 3: Generate image, save PNG, insert markdown link
+      local prompt = prompts[1]
+
+      -- Status bar timer for image generation
+      State.elapsed_seconds = 0
+      State.elapsed_timer = vim.loop.new_timer()
+      State.elapsed_timer:start(1000, 1000, vim.schedule_wrap(function()
+        State.elapsed_seconds = State.elapsed_seconds + 1
+        vim.api.nvim_echo(
+          { { string.format("Generating image with %s... %ds (Esc to cancel)", image_model.model, State.elapsed_seconds), "LLMStatus" } },
+          false, {}
+        )
+      end))
+      vim.api.nvim_echo(
+        { { string.format("Generating image with %s... (Esc to cancel)", image_model.model), "LLMStatus" } },
+        false, {}
+      )
+
+      local image_job = Api.generate_image({
+        model = image_model.model,
+        prompt = prompt,
+        size = image_model.size,
+      }, function(b64_data)
+        Api.stop_timer()
+
+        vim.fn.mkdir(save_dir, "p")
+        local filename = "journal-" .. os.date("%Y%m%d-%H%M%S") .. ".png"
+        local filepath = save_dir .. "/" .. filename
+        local ok, err = save_base64_png(b64_data, filepath)
+        if not ok then
+          vim.notify("Failed to save image: " .. (err or "unknown error"), vim.log.levels.ERROR)
           return
         end
-        vim.notify(
-          "ComfyUI is running. Image generation workflow not yet configured -- "
-            .. "install a checkpoint model via ComfyUI Manager first.",
-          vim.log.levels.INFO
-        )
-        -- TODO: Implement full image generation workflow
-        -- 1. Stop Wyoming via FIFO
-        -- 2. POST /prompt with workflow JSON
-        -- 3. Poll /history/{prompt_id}
-        -- 4. Download result, save to disk
-        -- 5. POST /free to release VRAM
-        -- 6. Restart Wyoming
-        -- 7. Insert markdown image link
+
+        -- Build path relative to buffer directory for markdown link
+        local rel_path
+        local buf_prefix = buf_dir .. "/"
+        if filepath:sub(1, #buf_prefix) == buf_prefix then
+          rel_path = filepath:sub(#buf_prefix + 1)
+        else
+          rel_path = filepath
+        end
+        Actions.append_below({ "", string.format("![Visual Journal](%s)", rel_path) })
+        vim.notify("Image saved: " .. rel_path, vim.log.levels.INFO)
+      end, function(err)
+        Api.stop_timer()
+        vim.notify("Image generation failed: " .. err, vim.log.levels.ERROR)
       end)
-    end,
-    on_error = function()
-      vim.schedule(function()
-        vim.notify("ComfyUI is not reachable at " .. Config.comfyui_url, vim.log.levels.WARN)
-      end)
-    end,
-  })
+
+      -- Allow cancelling image generation with Esc
+      cancel_map("n", "<Esc>", "", {
+        noremap = true,
+        silent = true,
+        callback = function()
+          Api.stop_timer()
+          if image_job then
+            pcall(function() image_job:shutdown() end)
+          end
+          vim.notify("Image generation cancelled", vim.log.levels.WARN)
+          vim.api.nvim_echo({ { "" } }, false, {})
+          pcall(vim.api.nvim_del_keymap, "n", "<Esc>")
+        end,
+      })
+    end, function(err)
+      pcall(vim.api.nvim_del_keymap, "n", "<Esc>")
+      vim.notify(err, vim.log.levels.ERROR)
+    end)
+  end)
+  end -- proceed
+
+  if opts.save_dir then
+    proceed(opts.save_dir)
+  else
+    vim.ui.input({
+      prompt = "Save image to: ",
+      default = buf_dir .. "/images/",
+      completion = "dir",
+    }, function(input)
+      if not input or input == "" then
+        vim.notify("Image generation cancelled", vim.log.levels.WARN)
+        return
+      end
+      proceed(input)
+    end)
+  end
 end
 
 function Modes.menu()
@@ -814,10 +1051,16 @@ vim.api.nvim_create_user_command("LLMMenu", function()
   Modes.menu()
 end, { range = true })
 
+vim.api.nvim_create_user_command("LLMImage", function(cmd)
+  local dir = cmd.args ~= "" and cmd.args or nil
+  Modes.image_generation({ save_dir = dir })
+end, { range = true, nargs = "?", complete = "dir" })
+
 -- Keymaps (visual mode)
 vim.api.nvim_set_keymap("x", "<leader>p", ":LLMAssistant<CR>", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("x", "<leader>j", ":LLMJournal<CR>", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("x", "<leader>l", ":LLMMenu<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("x", "<leader>i", ":LLMImage<CR>", { noremap = true, silent = true })
 
 -- Module return (for require and mode menu self-reference)
 return {

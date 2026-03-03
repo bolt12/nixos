@@ -31,13 +31,13 @@ in
         rocmSupport = false;
         metalSupport = false;
       }).overrideAttrs (oldAttrs: {
-        version = "78143";
+        version = "78187";
 
         src = pkgs.fetchFromGitHub {
           owner = "ggml-org";
           repo = "llama.cpp";
-          tag = "b8143";
-          hash = "sha256-Qzsc58vO9LKWNWscVvir1JNNZNgQlGT+Ye4mXxHQE60=";
+          tag = "b8187";
+          hash = "sha256-LgWvx8vKp0Jc4qaoRdMnREv15KsD82byIb+I3IGVlp8=";
           leaveDotGit = true;
           postFetch = ''
             git -C "$out" rev-parse --short HEAD > $out/COMMIT
@@ -68,8 +68,8 @@ in
         llama-swap-src = pkgs.fetchFromGitHub {
           owner = "mostlygeek";
           repo = "llama-swap";
-          tag = "v195";
-          hash = "sha256-e9kRlL3YWJ00tD3OkUYy60+//90w3ZmfHfCcyMpRQhU=";
+          tag = "v197";
+          hash = "sha256-EXgyYmpbN/zzr6KeSpvFEB+FS7gDIZFinNMv70v5boY=";
           leaveDotGit = true;
           postFetch = ''
             cd "$out"
@@ -83,7 +83,7 @@ in
           version = "195";
           src = llama-swap-src;
           sourceRoot = "${llama-swap-src.name}/ui-svelte";
-          npmDepsHash = "sha256-4VH9jJ1Ae16p8kUubZBrIwwqw/X8I+wDg378G82WCtU=";
+          npmDepsHash = "sha256-Fs7+JKE8YBp2Xj8bVBlwmT+UwuD642VeUHiPx+fv94c=";
           postPatch = ''
             substituteInPlace vite.config.ts \
               --replace-fail "../proxy/ui_dist" "${placeholder "out"}/ui_dist"
@@ -156,6 +156,74 @@ in
           fi
         '';
       });
+
+      # whisper-cpp-cuda - whisper.cpp with CUDA support for RTX 5090
+      whisper-cpp-cuda = (unstable.whisper-cpp.override {
+        cudaSupport = true;
+        cudaPackages = unstable.cudaPackages;
+      }).overrideAttrs (oldAttrs: {
+        cmakeFlags = (oldAttrs.cmakeFlags or [ ]) ++ [
+          "-DGGML_NATIVE=ON"
+          "-DCMAKE_CUDA_ARCHITECTURES=89" # RTX 5090
+        ];
+        preConfigure = ''
+          export NIX_ENFORCE_NO_NATIVE=0
+          ${oldAttrs.preConfigure or ""}
+        '';
+      });
+
+      # stable-diffusion-cpp-cuda - stable-diffusion.cpp with CUDA for image generation
+      stable-diffusion-cpp-cuda = unstable.cudaPackages.backendStdenv.mkDerivation {
+        pname = "stable-diffusion-cpp";
+        version = "unstable-2026-02-19";
+
+        src = pkgs.fetchFromGitHub {
+          owner = "leejet";
+          repo = "stable-diffusion.cpp";
+          rev = "c5eb1e4137f22bcc6bf7b866d059b4e0638fb109";
+          hash = "sha256-l69KArY0fGgQCp6YwK0Az9GAxW2rGOJdcJJ634HXQIs=";
+          fetchSubmodules = true;
+        };
+
+        nativeBuildInputs = [
+          unstable.cmake
+          unstable.git
+          unstable.cudaPackages.cuda_nvcc
+          unstable.autoAddDriverRunpath
+        ];
+
+        buildInputs = with unstable.cudaPackages; [
+          cuda_cccl
+          cuda_cudart
+          libcublas
+        ];
+
+        cmakeFlags = [
+          "-DSD_CUDA=ON"
+          "-DSD_BUILD_SERVER=ON"
+          "-DCMAKE_CUDA_ARCHITECTURES=89" # RTX 5090
+          "-DGGML_NATIVE=ON"
+        ];
+
+        preConfigure = ''
+          export NIX_ENFORCE_NO_NATIVE=0
+        '';
+
+        installPhase = ''
+          runHook preInstall
+          mkdir -p $out/bin
+          install -Dm755 bin/sd-cli $out/bin/sd-cli
+          install -Dm755 bin/sd-server $out/bin/sd-server
+          runHook postInstall
+        '';
+
+        meta = {
+          description = "Stable Diffusion and Flux in pure C/C++ with CUDA support";
+          homepage = "https://github.com/leejet/stable-diffusion.cpp";
+          license = unstable.lib.licenses.mit;
+          platforms = [ "x86_64-linux" ];
+        };
+      };
     })
   ];
 }

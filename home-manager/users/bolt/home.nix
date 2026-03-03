@@ -26,33 +26,35 @@ let
   };
 
   # Claude wrapper with only local llm setup
-  olaude-flash = pkgs.writeShellApplication {
-    name = "olaude-flash";
+
+  olaude-qwen3-5-27B = pkgs.writeShellApplication {
+    name = "olaude-qwen3-5-27B";
     runtimeInputs = [ ];
     text = ''
       export ANTHROPIC_BASE_URL="http://10.100.0.100:8080"
       export API_TIMEOUT_MS="3000000"
       export CLAUDE_CODE_MAX_OUTPUT_TOKENS=100000
-      export ANTHROPIC_DEFAULT_OPUS_MODEL="glm-4.7-flash-full"
-      export ANTHROPIC_DEFAULT_SONNET_MODEL="glm-4.7-flash-full"
-      export ANTHROPIC_DEFAULT_HAIKU_MODEL="glm-4.7-flash-full"
+      export ANTHROPIC_DEFAULT_OPUS_MODEL="qwen3.5-27B-full"
+      export ANTHROPIC_DEFAULT_SONNET_MODEL="qwen3.5-27B-full"
+      export ANTHROPIC_DEFAULT_HAIKU_MODEL="''${OLAUDE_HAIKU:-qwen3.5-27B-full}"
       exec claude "$@"
     '';
   };
 
-  olaude-qwen3 = pkgs.writeShellApplication {
-    name = "olaude-qwen3";
+  olaude-qwen3-5-35B-A3B = pkgs.writeShellApplication {
+    name = "olaude-qwen3-5-35B-A3B";
     runtimeInputs = [ ];
     text = ''
       export ANTHROPIC_BASE_URL="http://10.100.0.100:8080"
       export API_TIMEOUT_MS="3000000"
       export CLAUDE_CODE_MAX_OUTPUT_TOKENS=100000
-      export ANTHROPIC_DEFAULT_OPUS_MODEL="qwen3-coder-next-full"
-      export ANTHROPIC_DEFAULT_SONNET_MODEL="qwen3-coder-next-full"
-      export ANTHROPIC_DEFAULT_HAIKU_MODEL="qwen3-coder-next-full"
+      export ANTHROPIC_DEFAULT_OPUS_MODEL="qwen3.5-35B-A3B-full"
+      export ANTHROPIC_DEFAULT_SONNET_MODEL="qwen3.5-35B-A3B-full"
+      export ANTHROPIC_DEFAULT_HAIKU_MODEL="''${OLAUDE_HAIKU:-qwen3.5-35B-A3B-full}"
       exec claude "$@"
     '';
   };
+
 in
 {
   imports = [
@@ -118,8 +120,8 @@ in
     # All packages managed through profiles
     packages = [
       glaude
-      olaude-flash
-      olaude-qwen3
+      olaude-qwen3-5-27B
+      olaude-qwen3-5-35B-A3B
     ];
   };
 

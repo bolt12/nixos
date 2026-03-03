@@ -326,6 +326,7 @@ Accept first line only                   | <S-Tab>
 Open code assistant (visual)          | <leader>p
 Open journal summary (visual)         | <leader>j
 Open LLM menu (visual)               | <leader>l
+Open image generation (visual)       | <leader>i
 Submit prompt (in prompt popup)       | <leader>s
 Switch pane (in prompt popup)         | <Tab>
 Primary action (in result popup)      | <leader>s

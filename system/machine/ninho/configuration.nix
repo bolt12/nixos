@@ -55,7 +55,7 @@
       # Realtek RTL8126A network driver stability (r8169)
       "r8169.use_dac=1"   # Enable DAC (Dual Address Cycle)
       "r8169.aspm=0"      # Disable ASPM at driver level (prevents watchdog timeouts)
-      "iommu=soft"        # Software IOMMU (may help with DMA issues)
+      "iommu=pt"          # IOMMU passthrough (avoids swiotlb bounce buffer faults on AHCI)
 
       # Initrd networking for Clevis/Tang LUKS auto-unlock
       "ip=:::::enp11s0:dhcp"
@@ -669,6 +669,23 @@
     # Enable nix-ld to run non-Nix packaged executables (AppImages, pre-built binaries)
     # Useful for running upstream binaries that expect standard library paths
     nix-ld.enable = true;
+  };
+
+  # Cap RTX 5090 power to 450W (the efficiency knee: -22% power, ~0% LLM decode loss)
+  # Token generation is GDDR7 bandwidth-bound; -pl only throttles core clocks.
+  systemd.services.nvidia-power-limit = {
+    description = "Set NVIDIA GPU power limit to 450W";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "nvidia-persistenced.service" ];
+    requires = [ "nvidia-persistenced.service" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = let
+        nvidia-smi = "${config.hardware.nvidia.package.bin}/bin/nvidia-smi";
+      in
+        "${nvidia-smi} -pl 450";
+    };
   };
 
   # Configure CoolerControl to listen on all interfaces

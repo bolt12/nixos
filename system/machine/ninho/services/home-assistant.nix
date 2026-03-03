@@ -118,6 +118,22 @@ in
             }
           ];
         }
+        {
+          binary_sensor = [
+            {
+              name = "Outdoor Requires Heating";
+              unique_id = "outdoor_requires_heating";
+              state = "{{ state_attr('weather.forecast_home', 'temperature') | float(15) < 15 }}";
+              icon = "mdi:thermometer-low";
+            }
+            {
+              name = "Outdoor Requires Cooling";
+              unique_id = "outdoor_requires_cooling";
+              state = "{{ state_attr('weather.forecast_home', 'temperature') | float(15) > 25 }}";
+              icon = "mdi:thermometer-high";
+            }
+          ];
+        }
       ];
 
       # ─────────────────────────────────────────────────────────────────
@@ -250,95 +266,131 @@ in
           ];
         }
 
-        # 5. Return Home - Smart Pre-Heat
+        # 5a. Return from Lunch Gym - Office Reheat
         {
-          id = "return_home_smart_preheat";
+          id = "return_lunch_gym_office_reheat";
           alias = "Return Home - Smart Pre-Heat";
-          description = "Turn on appropriate AC when arriving home based on time of day";
+          description = "Reheat office after lunch gym if temperature dropped";
           trigger = [{
             platform = "state";
             entity_id = "person.armando";
             from = "not_home";
             to = "home";
           }];
-          condition = [{
-            condition = "time";
-            after = "08:00:00";
-            before = "23:30:00";
+          condition = [
+            {
+              condition = "time";
+              after = "12:00:00";
+              before = "16:00:00";
+              weekday = ["mon" "tue" "wed" "thu" "fri"];
+            }
+            {
+              condition = "or";
+              conditions = [
+                {
+                  condition = "state";
+                  entity_id = "binary_sensor.outdoor_requires_heating";
+                  state = "on";
+                }
+                {
+                  condition = "state";
+                  entity_id = "binary_sensor.outdoor_requires_cooling";
+                  state = "on";
+                }
+              ];
+            }
+            {
+              condition = "template";
+              value_template = ''
+                {% set outdoor = state_attr('weather.forecast_home', 'temperature') | float(15) %}
+                {% set indoor = state_attr('climate.ac_escritorio', 'current_temperature') | float(20) %}
+                {{ (outdoor < 15 and indoor < 20) or (outdoor > 25 and indoor > 23) }}
+              '';
+            }
+          ];
+          action = [
+            {
+              action = "climate.set_hvac_mode";
+              target.entity_id = "climate.ac_escritorio";
+              data.hvac_mode = "{{ states('sensor.smart_hvac_mode') }}";
+            }
+            { delay.seconds = 2; }
+            {
+              action = "climate.set_temperature";
+              target.entity_id = "climate.ac_escritorio";
+              data.temperature = 22;
+            }
+            {
+              action = "rest_command.ntfy_notify";
+              data = {
+                title = "Welcome Back";
+                message = "Back from gym - office AC on to 22°C (was {{ state_attr('climate.ac_escritorio', 'current_temperature') }}°C)";
+              };
+            }
+          ];
+        }
+
+        # 5b. Return from Evening - Sala Comfort
+        {
+          id = "return_evening_sala_comfort";
+          alias = "Return Home - Smart Pre-Heat";
+          description = "Condition living room after evening return (track & field)";
+          trigger = [{
+            platform = "state";
+            entity_id = "person.armando";
+            from = "not_home";
+            to = "home";
           }];
-          action = [{
-            choose = [
-              # Weekday work hours (8AM-6PM): Office
-              {
-                conditions = [
-                  {
-                    condition = "time";
-                    after = "08:00:00";
-                    before = "18:00:00";
-                  }
-                  {
-                    condition = "time";
-                    weekday = ["mon" "tue" "wed" "thu" "fri"];
-                  }
-                  {
-                    condition = "numeric_state";
-                    entity_id = "climate.ac_escritorio";
-                    attribute = "current_temperature";
-                    below = 23;
-                  }
-                ];
-                sequence = [
-                  {
-                    action = "climate.set_hvac_mode";
-                    target.entity_id = "climate.ac_escritorio";
-                    data.hvac_mode = "{{ states('sensor.smart_hvac_mode') }}";
-                  }
-                  { delay.seconds = 2; }
-                  {
-                    action = "climate.set_temperature";
-                    target.entity_id = "climate.ac_escritorio";
-                    data.temperature = 24;
-                  }
-                  {
-                    action = "rest_command.ntfy_notify";
-                    data = {
-                      title = "Welcome Home";
-                      message = "Arrived home (work hours) - heating office to 24°C";
-                    };
-                  }
-                ];
-              }
-              # Everything else (weekday evenings + all weekend): Living room
-              {
-                conditions = [{
-                  condition = "numeric_state";
-                  entity_id = "climate.ac_sala";
-                  attribute = "current_temperature";
-                  below = 23;
-                }];
-                sequence = [
-                  {
-                    action = "climate.set_hvac_mode";
-                    target.entity_id = "climate.ac_sala";
-                    data.hvac_mode = "{{ states('sensor.smart_hvac_mode') }}";
-                  }
-                  { delay.seconds = 2; }
-                  {
-                    action = "climate.set_temperature";
-                    target.entity_id = "climate.ac_sala";
-                    data.temperature = 24;
-                  }
-                  {
-                    action = "rest_command.ntfy_notify";
-                    data = {
-                      title = "Welcome Home";
-                      message = "Arrived home - heating living room to 24°C";
-                    };
-                  }
-                ];
-              }
-            ];
-          }];
+          condition = [
+            {
+              condition = "time";
+              after = "18:00:00";
+              before = "23:00:00";
+            }
+            {
+              condition = "or";
+              conditions = [
+                {
+                  condition = "state";
+                  entity_id = "binary_sensor.outdoor_requires_heating";
+                  state = "on";
+                }
+                {
+                  condition = "state";
+                  entity_id = "binary_sensor.outdoor_requires_cooling";
+                  state = "on";
+                }
+              ];
+            }
+            {
+              condition = "template";
+              value_template = ''
+                {% set outdoor = state_attr('weather.forecast_home', 'temperature') | float(15) %}
+                {% set indoor = state_attr('climate.ac_sala', 'current_temperature') | float(20) %}
+                {{ (outdoor < 15 and indoor < 20) or (outdoor > 25 and indoor > 23) }}
+              '';
+            }
+          ];
+          action = [
+            {
+              action = "climate.set_hvac_mode";
+              target.entity_id = "climate.ac_sala";
+              data.hvac_mode = "{{ states('sensor.smart_hvac_mode') }}";
+            }
+            { delay.seconds = 2; }
+            {
+              action = "climate.set_temperature";
+              target.entity_id = "climate.ac_sala";
+              data.temperature = 22;
+            }
+            {
+              action = "rest_command.ntfy_notify";
+              data = {
+                title = "Welcome Home";
+                message = "Evening return - sala AC on to 22°C (was {{ state_attr('climate.ac_sala', 'current_temperature') }}°C)";
+              };
+            }
+          ];
         }
 
         # 7. Seasonal Mode - Heat/Cool Auto Switch
@@ -477,10 +529,10 @@ in
         {
           id = "workday_start_comfort";
           alias = "Workday Start Comfort";
-          description = "Turn on office AC at 8:30 on weekdays if room is cold";
+          description = "Turn on office AC at 8:45 on weekdays if room needs conditioning and weather warrants it";
           trigger = [{
             platform = "time";
-            at = "08:30:00";
+            at = "08:45:00";
           }];
           condition = [
             {
@@ -493,10 +545,27 @@ in
               weekday = ["mon" "tue" "wed" "thu" "fri"];
             }
             {
-              condition = "numeric_state";
-              entity_id = "climate.ac_escritorio";
-              attribute = "current_temperature";
-              below = 23;
+              condition = "or";
+              conditions = [
+                {
+                  condition = "state";
+                  entity_id = "binary_sensor.outdoor_requires_heating";
+                  state = "on";
+                }
+                {
+                  condition = "state";
+                  entity_id = "binary_sensor.outdoor_requires_cooling";
+                  state = "on";
+                }
+              ];
+            }
+            {
+              condition = "template";
+              value_template = ''
+                {% set outdoor = state_attr('weather.forecast_home', 'temperature') | float(15) %}
+                {% set indoor = state_attr('climate.ac_escritorio', 'current_temperature') | float(20) %}
+                {{ (outdoor < 15 and indoor < 20) or (outdoor > 25 and indoor > 23) }}
+              '';
             }
           ];
           action = [
@@ -509,13 +578,13 @@ in
             {
               action = "climate.set_temperature";
               target.entity_id = "climate.ac_escritorio";
-              data.temperature = 24;
+              data.temperature = 22;
             }
             {
               action = "rest_command.ntfy_notify";
               data = {
                 title = "Workday Start";
-                message = "Office AC on - heating to 24°C for the workday";
+                message = "Office AC on to 22°C (indoor {{ state_attr('climate.ac_escritorio', 'current_temperature') }}°C, outdoor {{ state_attr('weather.forecast_home', 'temperature') }}°C)";
               };
             }
           ];
@@ -525,7 +594,7 @@ in
         {
           id = "weekend_morning_comfort";
           alias = "Weekend Morning Comfort";
-          description = "Turn on living room AC at 10:00 on weekends";
+          description = "Turn on living room AC at 10:00 on weekends if weather warrants it";
           trigger = [{
             platform = "time";
             at = "10:00:00";
@@ -541,10 +610,27 @@ in
               weekday = ["sat" "sun"];
             }
             {
-              condition = "numeric_state";
-              entity_id = "climate.ac_sala";
-              attribute = "current_temperature";
-              below = 23;
+              condition = "or";
+              conditions = [
+                {
+                  condition = "state";
+                  entity_id = "binary_sensor.outdoor_requires_heating";
+                  state = "on";
+                }
+                {
+                  condition = "state";
+                  entity_id = "binary_sensor.outdoor_requires_cooling";
+                  state = "on";
+                }
+              ];
+            }
+            {
+              condition = "template";
+              value_template = ''
+                {% set outdoor = state_attr('weather.forecast_home', 'temperature') | float(15) %}
+                {% set indoor = state_attr('climate.ac_sala', 'current_temperature') | float(20) %}
+                {{ (outdoor < 15 and indoor < 20) or (outdoor > 25 and indoor > 23) }}
+              '';
             }
           ];
           action = [
@@ -557,13 +643,13 @@ in
             {
               action = "climate.set_temperature";
               target.entity_id = "climate.ac_sala";
-              data.temperature = 23;
+              data.temperature = 22;
             }
             {
               action = "rest_command.ntfy_notify";
               data = {
                 title = "Weekend Morning";
-                message = "Weekend - living room AC on to 23°C";
+                message = "Weekend - sala AC on to 22°C (indoor {{ state_attr('climate.ac_sala', 'current_temperature') }}°C, outdoor {{ state_attr('weather.forecast_home', 'temperature') }}°C)";
               };
             }
           ];
@@ -573,7 +659,7 @@ in
         {
           id = "night_bedroom_prep";
           alias = "Night Bedroom Prep";
-          description = "Pre-heat bedroom 30 minutes before bedtime (23:30)";
+          description = "Pre-heat bedroom 30 minutes before bedtime if cold outside and room is chilly";
           trigger = [{
             platform = "time";
             at = "23:00:00";
@@ -585,29 +671,34 @@ in
               state = "home";
             }
             {
+              condition = "state";
+              entity_id = "binary_sensor.outdoor_requires_heating";
+              state = "on";
+            }
+            {
               condition = "numeric_state";
               entity_id = "climate.ac_quarto";
               attribute = "current_temperature";
-              below = 20;
+              below = 19;
             }
           ];
           action = [
             {
               action = "climate.set_hvac_mode";
               target.entity_id = "climate.ac_quarto";
-              data.hvac_mode = "{{ states('sensor.smart_hvac_mode') }}";
+              data.hvac_mode = "heat";
             }
             { delay.seconds = 2; }
             {
               action = "climate.set_temperature";
               target.entity_id = "climate.ac_quarto";
-              data.temperature = 21;
+              data.temperature = 20;
             }
             {
               action = "rest_command.ntfy_notify";
               data = {
                 title = "Bedroom Prep";
-                message = "Pre-conditioning bedroom for 30 minutes";
+                message = "Pre-heating bedroom to 20°C for 30 minutes (was {{ state_attr('climate.ac_quarto', 'current_temperature') }}°C)";
               };
             }
             { delay.minutes = 30; }
@@ -656,11 +747,11 @@ in
         # Climate-Aware Automations
         # ─────────────────────────────────────────────────────────────
 
-        # 16. TV On - Heat Living Room
+        # 16. TV On - Condition Living Room
         {
           id = "tv_on_heat_sala";
           alias = "TV On - Heat Living Room";
-          description = "Heat/cool living room when LG TV turns on in the evening";
+          description = "Condition living room when LG TV turns on if weather warrants it";
           trigger = [{
             platform = "state";
             entity_id = "media_player.lg_webos_tv_75nano826qb";
@@ -678,10 +769,27 @@ in
               state = "off";
             }
             {
-              condition = "numeric_state";
-              entity_id = "climate.ac_sala";
-              attribute = "current_temperature";
-              below = 22;
+              condition = "or";
+              conditions = [
+                {
+                  condition = "state";
+                  entity_id = "binary_sensor.outdoor_requires_heating";
+                  state = "on";
+                }
+                {
+                  condition = "state";
+                  entity_id = "binary_sensor.outdoor_requires_cooling";
+                  state = "on";
+                }
+              ];
+            }
+            {
+              condition = "template";
+              value_template = ''
+                {% set outdoor = state_attr('weather.forecast_home', 'temperature') | float(15) %}
+                {% set indoor = state_attr('climate.ac_sala', 'current_temperature') | float(20) %}
+                {{ (outdoor < 15 and indoor < 20) or (outdoor > 25 and indoor > 23) }}
+              '';
             }
           ];
           action = [
@@ -694,13 +802,13 @@ in
             {
               action = "climate.set_temperature";
               target.entity_id = "climate.ac_sala";
-              data.temperature = 23;
+              data.temperature = 22;
             }
             {
               action = "rest_command.ntfy_notify";
               data = {
                 title = "TV On - Climate";
-                message = "TV on - climate control living room to 23°C";
+                message = "TV on - sala AC on to 22°C (indoor {{ state_attr('climate.ac_sala', 'current_temperature') }}°C, outdoor {{ state_attr('weather.forecast_home', 'temperature') }}°C)";
               };
             }
           ];
@@ -729,29 +837,36 @@ in
             }
             {
               choose = [{
-                conditions = [{
-                  condition = "numeric_state";
-                  entity_id = "climate.ac_quarto";
-                  attribute = "current_temperature";
-                  below = 21;
-                }];
+                conditions = [
+                  {
+                    condition = "state";
+                    entity_id = "binary_sensor.outdoor_requires_heating";
+                    state = "on";
+                  }
+                  {
+                    condition = "numeric_state";
+                    entity_id = "climate.ac_quarto";
+                    attribute = "current_temperature";
+                    below = 19;
+                  }
+                ];
                 sequence = [
                   {
                     action = "climate.set_hvac_mode";
                     target.entity_id = "climate.ac_quarto";
-                    data.hvac_mode = "{{ states('sensor.smart_hvac_mode') }}";
+                    data.hvac_mode = "heat";
                   }
                   { delay.seconds = 2; }
                   {
                     action = "climate.set_temperature";
                     target.entity_id = "climate.ac_quarto";
-                    data.temperature = 21;
+                    data.temperature = 20;
                   }
                   {
                     action = "rest_command.ntfy_notify";
                     data = {
                       title = "TV Off - Bedtime";
-                      message = "TV off - sala AC off, pre-heating bedroom for 25 min";
+                      message = "TV off - sala AC off, pre-heating bedroom to 20°C for 25 min";
                     };
                   }
                   { delay.minutes = 25; }
@@ -765,7 +880,7 @@ in
                 action = "rest_command.ntfy_notify";
                 data = {
                   title = "TV Off - Bedtime";
-                  message = "TV off - sala AC off, bedroom already warm";
+                  message = "TV off - sala AC off, bedroom warm enough ({{ state_attr('climate.ac_quarto', 'current_temperature') }}°C)";
                 };
               }];
             }
@@ -862,7 +977,7 @@ in
         {
           id = "calendar_meeting_preheat";
           alias = "Calendar Meeting Pre-Heat";
-          description = "Pre-heat office 15 minutes before calendar events on weekday mornings";
+          description = "Pre-heat office 15 minutes before calendar events if weather warrants it";
           trigger = [{
             platform = "calendar";
             event = "start";
@@ -887,10 +1002,27 @@ in
               state = "off";
             }
             {
-              condition = "numeric_state";
-              entity_id = "climate.ac_escritorio";
-              attribute = "current_temperature";
-              below = 23;
+              condition = "or";
+              conditions = [
+                {
+                  condition = "state";
+                  entity_id = "binary_sensor.outdoor_requires_heating";
+                  state = "on";
+                }
+                {
+                  condition = "state";
+                  entity_id = "binary_sensor.outdoor_requires_cooling";
+                  state = "on";
+                }
+              ];
+            }
+            {
+              condition = "template";
+              value_template = ''
+                {% set outdoor = state_attr('weather.forecast_home', 'temperature') | float(15) %}
+                {% set indoor = state_attr('climate.ac_escritorio', 'current_temperature') | float(20) %}
+                {{ (outdoor < 15 and indoor < 20) or (outdoor > 25 and indoor > 23) }}
+              '';
             }
           ];
           action = [
@@ -903,13 +1035,13 @@ in
             {
               action = "climate.set_temperature";
               target.entity_id = "climate.ac_escritorio";
-              data.temperature = 24;
+              data.temperature = 22;
             }
             {
               action = "rest_command.ntfy_notify";
               data = {
                 title = "Meeting Prep";
-                message = "Pre-heating office - meeting in 15 minutes";
+                message = "Meeting in 15 min - office AC on to 22°C (was {{ state_attr('climate.ac_escritorio', 'current_temperature') }}°C)";
               };
             }
           ];
