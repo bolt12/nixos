@@ -30,11 +30,6 @@
       "8.8.4.4"
     ];
 
-    # The global useDHCP flag is deprecated, therefore explicitly set to false here.
-    # Per-interface useDHCP will be mandatory in the future, so this generated config
-    # replicates the default behaviour.
-    useDHCP = false;
-
     # Enable WireGuard
     firewall = {
       enable            = true;
@@ -94,7 +89,6 @@
     };
     enableRedistributableFirmware = true;
     enableAllFirmware             = true;
-    cpu.intel.updateMicrocode     = true;
   };
 
   # Making fonts accessible to applications.

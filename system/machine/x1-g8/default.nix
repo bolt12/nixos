@@ -86,6 +86,7 @@
 
   programs = {
     sway.enable = true;
+    nix-ld.enable = true;
   };
 
   services = {
@@ -130,13 +131,6 @@
       };
     };
 
-    xserver = {
-      xkb = {
-        layout  = "us,pt";
-        options = "caps:escape, grp:shifts_toggle";
-      };
-    };
-
     libinput = {
       enable = true;
       touchpad.clickMethod = "clickfinger";
@@ -170,8 +164,6 @@
     flatpak.enable = true;
 
     fwupd.enable = true;
-
-    thermald.enable = true;
   };
 
   # Firefox NixOS wiki recommends
@@ -188,10 +180,6 @@
   };
 
   networking = {
-    interfaces.wlp0s20f3.useDHCP = true;
-    interfaces.enp0s31f6.useDHCP = true;
-    interfaces.enp45s0u2.useDHCP = true;
-
     wireguard.interfaces = {
       # "wg0" is the network interface name. You can name the interface arbitrarily.
       wg0 = {
@@ -230,11 +218,7 @@
   };
 
   security = {
-    pam.services.swaylock.text = ''
-      # PAM configuration file for the swaylock screen locker. By default, it includes
-      # the 'login' configuration file (see /etc/pam.d/login)
-      auth include login
-    '';
+    pam.services.swaylock = {};
 
     polkit.enable = true;
 

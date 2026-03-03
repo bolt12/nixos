@@ -11,6 +11,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     home-manager = {
       url = "github:nix-community/home-manager/release-25.11";
       # The `follows` keyword in inputs is used for inheritance.
@@ -126,6 +127,7 @@
           modules = [
             ./system/configuration.nix
             ./system/common/overlays.nix
+            inputs.nixos-hardware.nixosModules.lenovo-thinkpad-x1-7th-gen
           ];
         };
 
