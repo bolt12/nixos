@@ -31,13 +31,13 @@ in
         rocmSupport = false;
         metalSupport = false;
       }).overrideAttrs (oldAttrs: {
-        version = "78187";
+        version = "8227";
 
         src = pkgs.fetchFromGitHub {
           owner = "ggml-org";
           repo = "llama.cpp";
-          tag = "b8187";
-          hash = "sha256-LgWvx8vKp0Jc4qaoRdMnREv15KsD82byIb+I3IGVlp8=";
+          tag = "b8227";
+          hash = "sha256-MlNsWnev4IMvQT7Zrz1YPJJ4KCxLZop6wGaoVSLz8lw=";
           leaveDotGit = true;
           postFetch = ''
             git -C "$out" rev-parse --short HEAD > $out/COMMIT
@@ -56,7 +56,7 @@ in
         '';
 
         # Webui npm deps hash changed with this source version
-        npmDepsHash = "sha256-FKjoZTKm0ddoVdpxzYrRUmTiuafEfbKc4UD2fz2fb8A=";
+        npmDepsHash = "sha256-5ZswgZFLeI32/xQZqCTTFbCzleDqr5AotjFg/5rNn1M=";
 
         # Keep the original postInstall to handle installation correctly
         postInstall = oldAttrs.postInstall or "";

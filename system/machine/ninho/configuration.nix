@@ -460,7 +460,7 @@
     # logind - session management for long-running sessions
     logind.settings.Login = {
       RuntimeDirectorySize = "75%";
-      KillUserProcesses = true;
+      KillUserProcesses = false;
       HandleLidSwitch = "poweroff";
       HandleLidSwitchDocked = "poweroff";
     };

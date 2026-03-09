@@ -116,10 +116,12 @@
   # Use PipeWire (modern audio server)
   services.pipewire = {
     enable = true;
+    audio.enable = true;
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
     jack.enable = true;
+    wireplumber.enable = true;
   };
 
   # ==========================================================================
@@ -200,12 +202,8 @@
   # USER LINGERING & NVIDIA PERMISSIONS
   # ==========================================================================
   # Enable lingering so user services (like Sunshine) start at boot
-  # without requiring an active login session
-  # Also ensure NVIDIA capabilities devices have correct permissions (for NVENC/NVDEC)
-
-  systemd.tmpfiles.rules = [
-    # User lingering
-    "f /var/lib/systemd/linger/bolt - - - -"
-    "f /var/lib/systemd/linger/pollard - - - -"
-  ];
+  # without requiring an active login session, and so tmux/other processes
+  # survive SSH logout (works with KillUserProcesses = true in logind)
+  users.users.bolt.linger = true;
+  users.users.pollard.linger = true;
 }

@@ -2,13 +2,21 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running 'nixos-help').
 
-{ config, lib, pkgs, raspberry-pi-nix, inputs, ... }@attrs:
+{
+  config,
+  lib,
+  pkgs,
+  raspberry-pi-nix,
+  inputs,
+  ...
+}@attrs:
 
 let
   # Get emanote from the flake input
   emanotePackage = inputs.emanote.packages.${pkgs.system}.default;
 in
 {
+  imports = [ ./services/dns-blocklist.nix ];
   nixpkgs = {
     config.allowUnfree = true;
   };
@@ -25,8 +33,16 @@ in
       # Add more channels as needed
     ];
     # Required by Cachix to be used as non-root user
-    settings.trusted-users = [ "bolt" "deck" "root" "@wheel" ];
-    settings.experimental-features = [ "nix-command" "flakes" ];
+    settings.trusted-users = [
+      "bolt"
+      "deck"
+      "root"
+      "@wheel"
+    ];
+    settings.experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
   };
 
   systemd = {
@@ -67,24 +83,22 @@ in
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment = {
-    systemPackages =
-      with pkgs; [
-        bluez
-        bluez-tools
-        git
-        git-annex
-        iptables
-        libraspberrypi
-        neovim
-        unbound-full
-        unzip
-        wget
-        wireguard-tools
-        # Add emanote to system packages as well for manual use
-        emanotePackage
-      ];
+    systemPackages = with pkgs; [
+      bluez
+      bluez-tools
+      git
+      git-annex
+      iptables
+      libraspberrypi
+      neovim
+      unbound-full
+      unzip
+      wget
+      wireguard-tools
+      # Add emanote to system packages as well for manual use
+      emanotePackage
+    ];
 
-    etc."unbound/unbound-ads".text = builtins.readFile ./unbound-ads/unbound_ad_servers;
   };
 
   services = {
@@ -93,7 +107,11 @@ in
     tang = {
       enable = true;
       listenStream = [ "7654" ];
-      ipAddressAllow = [ "127.0.0.0/8" "192.168.1.0/24" "10.100.0.0/24" ];
+      ipAddressAllow = [
+        "127.0.0.0/8"
+        "192.168.1.0/24"
+        "10.100.0.0/24"
+      ];
     };
 
     pipewire = {
@@ -109,63 +127,119 @@ in
       enable = true;
       user = "bolt";
       settings = {
-        include = "/etc/unbound/unbound-ads";
         server = {
-          verbosity = 2;
-          log-queries = "yes";
+          module-config = ''"respip validator iterator"'';
+          # Logging — production settings (use unbound-control to enable debug temporarily)
+          verbosity = 0;
+          log-queries = "no";
+          log-servfail = "yes";
 
+          # Stale/expired record serving (RFC 8767)
           serve-expired = "yes";
           serve-expired-ttl = 86400;
+          serve-expired-client-timeout = 1800;
 
+          # Network
           interface = [ "0.0.0.0" ];
           do-ip4 = "yes";
           do-udp = "yes";
           do-tcp = "yes";
+          so-reuseport = "yes";
+          so-rcvbuf = "1m";
+          so-sndbuf = "1m";
+          edns-buffer-size = "1232";
 
+          # Security hardening
           harden-glue = "yes";
           harden-dnssec-stripped = "yes";
-          use-caps-for-id = "no";
-          edns-buffer-size = "1232";
-          prefetch = "yes";
+          harden-below-nxdomain = "yes";
+          harden-algo-downgrade = "yes";
+          harden-large-queries = "yes";
+          use-caps-for-id = "yes";
+          aggressive-nsec = "yes";
+          val-clean-additional = "yes";
+          deny-any = "yes";
+          unwanted-reply-threshold = 10000;
 
+          # Privacy
+          hide-identity = "yes";
+          hide-version = "yes";
+          qname-minimisation = "yes";
+
+          # Performance
           num-threads = 1;
-          so-rcvbuf = "1m";
+          prefetch = "yes";
+          prefetch-key = "yes";
+          minimal-responses = "yes";
+          rrset-roundrobin = "yes";
 
+          # Cache sizing
+          msg-cache-size = "8m";
+          rrset-cache-size = "16m";
+          key-cache-size = "8m";
+          neg-cache-size = "4m";
+          cache-min-ttl = 300;
+          cache-max-ttl = 86400;
+
+          # DNS rebinding protection
           private-address = [
             "192.168.0.0/16"
             "169.254.0.0/16"
             "172.16.0.0/12"
             "10.0.0.0/8"
+            "fd00::/8"
+            "fe80::/10"
           ];
 
           access-control = [
             "192.168.0.0/16 allow"
             "10.100.0.0/16 allow"
           ];
-          qname-minimisation = "yes";
         };
         remote-control = {
           control-enable = true;
+        };
+        rpz = {
+          name = "hagezi-pro";
+          zonefile = "/var/lib/unbound/hagezi-pro.rpz";
+          rpz-action-override = "nxdomain";
+          rpz-log = "yes";
+          rpz-log-name = "hagezi-pro";
         };
       };
     };
   };
 
   networking = {
-    nameservers = [ "127.0.0.1" "1.1.1.1" "192.168.1.254" ];
+    nameservers = [
+      "127.0.0.1"
+      "1.1.1.1"
+      "192.168.1.254"
+    ];
 
     # enable NAT
     nat = {
       enable = true;
-      externalInterface = "wlan0";
+      externalInterface = "end0";
       internalInterfaces = [ "wg0" ];
     };
 
     # Open ports in the firewall.
     firewall = {
       enable = true;
-      allowedTCPPorts = [ 22 25 53 465 587 7000 7654 ];
-      allowedUDPPorts = [ 53 51820 ];
+      allowedTCPPorts = [
+        22
+        25
+        53
+        465
+        587
+        7000
+        7654
+      ];
+      allowedUDPPorts = [
+        53
+        51820
+      ];
     };
 
     wireguard.interfaces = {
@@ -181,12 +255,12 @@ in
         # This allows the wireguard server to route your traffic to the internet and hence be like a VPN
         # For this to work you have to set the dnsserver IP of your router (or dnsserver of choice) in your clients
         postSetup = ''
-          ${pkgs.iptables}/bin/iptables -t nat -A POSTROUTING -s 10.100.0.0/24 -o wlan0 -j MASQUERADE
+          ${pkgs.iptables}/bin/iptables -t nat -A POSTROUTING -s 10.100.0.0/24 -o end0 -j MASQUERADE
         '';
 
         # This undoes the above command
         postShutdown = ''
-          ${pkgs.iptables}/bin/iptables -t nat -D POSTROUTING -s 10.100.0.0/24 -o wlan0 -j MASQUERADE
+          ${pkgs.iptables}/bin/iptables -t nat -D POSTROUTING -s 10.100.0.0/24 -o end0 -j MASQUERADE
         '';
 
         # Path to the private key file.
@@ -194,27 +268,33 @@ in
 
         peers = [
           # List of allowed peers.
-          { # X1 G8 Carbon
+          {
+            # X1 G8 Carbon
             publicKey = "hUUAT7Dny5aFJHvwUE9poaaAcEheyEDMhff5AwQPiRk=";
             allowedIPs = [ "10.100.0.2/32" ];
           }
-          { # Bolt Android phone
+          {
+            # Bolt Android phone
             publicKey = "KP3wpBB2zEsJnSHzVISjJ1gmUAAWS/rOa1rgBJ5uBkM=";
             allowedIPs = [ "10.100.0.3/32" ];
           }
-          { # Steam Deck
+          {
+            # Steam Deck
             publicKey = "3w9nh1xsGDAZRF7QSEo9N8oEwpL5a+g6wGscNC+PbkQ=";
             allowedIPs = [ "10.100.0.4/32" ];
           }
-          { # Supernote
+          {
+            # Supernote
             publicKey = "OcLbbW78TqTqFSdn24oCAfRt1U+VlSilAfeEspiqUR4=";
             allowedIPs = [ "10.100.0.5/32" ];
           }
-          { # Pollard Android phone
+          {
+            # Pollard Android phone
             publicKey = "QFbI4k1IANbEVUpPEE71QF71aSQRgdr4OqJnwtxUkn0=";
             allowedIPs = [ "10.100.0.6/32" ];
           }
-          { # Ninho Home Server
+          {
+            # Ninho Home Server
             publicKey = "xSZiLvopp4Q/eMMxYyzQrdmvt/dyejc2CR4/dzsm5gw=";
             allowedIPs = [ "10.100.0.100/32" ];
           }
@@ -224,5 +304,10 @@ in
   };
 
   # Swap
-  swapDevices = [{ device = "/swapfile"; size = 8192; }];
+  swapDevices = [
+    {
+      device = "/swapfile";
+      size = 8192;
+    }
+  ];
 }

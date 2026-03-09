@@ -349,14 +349,13 @@ in
               --min-p 0.0 \
               --presence-penalty 0.0 \
               --repeat-penalty 1.0 \
-              -n 81920 \
+              -n 32768 \
               -c 196000 \
               -fit on \
               --flash-attn on \
               --cache-type-k q8_0 \
               --cache-type-v q8_0 \
               --no-mmap \
-              --chat-template-kwargs '{"reasoning_effort": "high"}' \
               --jinja
           '';
           aliases = [ "qwen3.5-27B-full" ];
@@ -383,13 +382,13 @@ in
               --chat-template-kwargs '{"enable_thinking": false}' \
               --jinja
           '';
-          aliases = [ "qwen3.5-creative" ];
+          aliases = [ "qwen3.5-27B-creative" ];
         };
 
         "qwen3.5-35B-A3B-full" = {
           cmd = ''
             ${wyoming-wrapper} ${llama-cpp-cuda}/bin/llama-server \
-              -hf unsloth/Qwen3.5-35B-A3B-GGUF:UD-MXFP4_MOE \
+              -hf unsloth/Qwen3.5-35B-A3B-GGUF:MXFP4_MOE \
               --metrics \
               --host 0.0.0.0 \
               --port ''${PORT} \
@@ -399,12 +398,12 @@ in
               --min-p 0.0 \
               --presence-penalty 0.0 \
               --repeat-penalty 1.0 \
-              -n 81920 \
+              -n 32768 \
+              -c 196000 \
               --flash-attn on \
               --cache-type-k q8_0 \
               --cache-type-v q8_0 \
               --no-mmap \
-              --chat-template-kwargs '{"reasoning_effort": "high"}' \
               --jinja
           '';
           aliases = [ "qwen3.5-35B-A3B-full" ];
@@ -427,8 +426,8 @@ in
               -fit on \
               --flash-attn on \
               --no-mmap \
-              -n 81920 \
-              --chat-template-kwargs '{"enable_thinking": true, "reasoning_effort": "high"}' \
+              -n 32768 \
+              --chat-template-kwargs '{"enable_thinking": true}' \
               --jinja
           '';
           aliases = [ "qwen3.5-9B-full" ];
@@ -493,8 +492,8 @@ in
 
         "qwen3.5-4B-haiku" = {
           cmd = ''
-            ${llama-cpp-cuda}/bin/llama-server \
-              -hf unsloth/Qwen3.5-4B-GGUF:Q4_K_M \
+            ${wyoming-wrapper} ${llama-cpp-cuda}/bin/llama-server \
+              -hf unsloth/Qwen3.5-4B-GGUF:UD-Q4_K_XL \
               --metrics \
               --host 0.0.0.0 \
               --port ''${PORT} \
@@ -514,7 +513,7 @@ in
 
         "qwen3.5-9B-haiku" = {
           cmd = ''
-            ${llama-cpp-cuda}/bin/llama-server \
+            ${wyoming-wrapper} ${llama-cpp-cuda}/bin/llama-server \
               -hf unsloth/Qwen3.5-9B-GGUF:Q4_K_M \
               --metrics \
               --host 0.0.0.0 \
@@ -525,9 +524,9 @@ in
               --min-p 0.0 \
               --presence-penalty 1.5 \
               --repeat-penalty 1.0 \
-              -ngl 32 \
               -c 32768 \
               --jinja
+
           '';
           aliases = [ "qwen3.5-9B-haiku" ];
         };

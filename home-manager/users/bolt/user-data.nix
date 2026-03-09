@@ -6,38 +6,73 @@
 let
   # Define the ignore patterns in a "heredoc" string
   docsIgnorePatterns = pkgs.writeText "documents-stignore" ''
-    // --- Ignore the dedicated directories ---
-    Bolt/Playground
-    Bolt/UMinho/Profissional/Well-Typed/Projects
+    // --- Version control ---
+    // Sync working trees only; use git push/pull for repo state
+    .git
 
     // --- General ---
     .DS_Store
     Thumbs.db
     *~
     *.lock
-
-    // --- Claude ---
-    // Only ignore the .git folder at the root of a repo, not the files inside
     .claude
 
     // --- Haskell (Cabal / Stack) ---
-    dist/
-    dist-newstyle/
-    .stack-work/
+    dist-newstyle
+    .stack-work
     cabal.sandbox.config
-    .cabal-sandbox/
+    .cabal-sandbox
     *.o
     *.hi
     *.chi
+    *.chs.h
     *.dyn_o
     *.dyn_hi
 
+    // --- Agda ---
+    *.agdai
+    MAlonzo
+
+    // --- Lean ---
+    .lake
+    lake-packages
+    build/bin
+    build/ir
+    build/lib
+
+    // --- Java ---
+    *.class
+    .gradle
+    .settings
+    .classpath
+    .project
+    target
+
+    // --- JS / Node ---
+    node_modules
+    .next
+    .nuxt
+    .parcel-cache
+    .turbo
+    .angular
+    bower_components
+
     // --- Nix ---
-    // 'result' symlinks created by nix build
     result
     result-*
-    // Environment variables managed by direnv
-    .direnv/
+    .direnv
+
+    // --- Chrome extensions ---
+    .chrome-profile
+
+    // --- IDE / editor ---
+    .idea
+    .vscode
+    *.swp
+    *.swo
+
+    // --- Generated output ---
+    Bolt/Playground/Haskell/generative-art/showcases
   '';
 in
 {
