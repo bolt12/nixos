@@ -12,8 +12,8 @@ let
   agdaStdlibSrc = pkgs.fetchFromGitHub {
     owner = "agda";
     repo = "agda-stdlib";
-    rev = "v2.0";
-    sha256 = "sha256-TjGvY3eqpF+DDwatT7A78flyPcTkcLHQ1xcg+MKgCoE=";
+    rev = "v2.3";
+    sha256 = "sha256-JOeoek6OfyIk9vwTj5QUJU6LnRzwfiG0e0ysW6zbhZ8=";
   };
 in
 {

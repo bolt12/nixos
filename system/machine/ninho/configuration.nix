@@ -116,6 +116,7 @@
         port = 2222;
         authorizedKeys = [
           "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHKTf4Bb2BBymwZvxPtxEefspOPTACPn3HqrRiWAMJEJ armandoifsantos@gmail.com"
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICBqERTS3WbTIgNxGLVMNMNoI5qN277fDAkGeAboztJU claudiacorreiaa7@gmail.com"
         ];
         hostKeys = [ "/etc/secrets/initrd/ssh_host_ed25519_key" ];
       };
@@ -520,9 +521,9 @@
         ];
         initialPassword = "ninho";  # CHANGE AFTER FIRST LOGIN
 
-        # openssh.authorizedKeys.keys = [
-        #   "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... pollard@computer"
-        # ];
+        openssh.authorizedKeys.keys = [
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICBqERTS3WbTIgNxGLVMNMNoI5qN277fDAkGeAboztJU claudiacorreiaa7@gmail.com"
+        ];
       };
     };
   };

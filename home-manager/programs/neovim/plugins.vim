@@ -537,7 +537,7 @@ EOF
 
 lua << EOF
 -- Define the directory containing your custom plugins.
-local plugins_dir = "/home/bolt/.config/nvim/custom-plugins"
+local plugins_dir = vim.fn.stdpath("config") .. "/custom-plugins"
 -- Add that directory to package.path.
 package.path = package.path .. ";" .. plugins_dir .. "/?.lua"
 

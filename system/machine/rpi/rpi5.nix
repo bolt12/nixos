@@ -298,6 +298,11 @@ in
             publicKey = "xSZiLvopp4Q/eMMxYyzQrdmvt/dyejc2CR4/dzsm5gw=";
             allowedIPs = [ "10.100.0.100/32" ];
           }
+          {
+            # Pollard MacOs
+            publicKey = "mk0JLBqa8b16kH/Kh87/ceaf+iQpUfxRHoHb+I/zqHY=";
+            allowedIPs = [ "10.100.0.7/32" ];
+          }
         ];
       };
     };

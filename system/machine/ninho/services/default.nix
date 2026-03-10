@@ -27,6 +27,6 @@
     ./bazarr.nix         # Automatic subtitles for Sonarr/Radarr
     ./atuin.nix          # Shell history sync server
     ./network-watchdog.nix # RTL8126A NIC failure recovery
-    ./recyclarr.nix      # TRaSH Guide profile sync for Sonarr/Radarr
+
   ];
 }
