@@ -47,7 +47,10 @@
       "WebFetch(domain:ollama.com)",
       "WebFetch(domain:news.ycombinator.com)",
       "WebFetch(domain:openbenchmarking.org)",
-      "WebFetch(domain:developer.nvidia.com)"
+      "WebFetch(domain:developer.nvidia.com)",
+      "WebFetch(domain:cdn.jsdelivr.net)",
+      "WebFetch(domain:nixos.wiki)",
+      "WebFetch(domain:jellyfin.org)"
     ],
     "deny": [],
     "ask": []

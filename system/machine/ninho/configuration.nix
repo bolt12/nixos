@@ -488,6 +488,7 @@
 
       pollard = {
         isNormalUser = true;
+        linger = true;      # Keep user services running after logout
         description = "Claudia";
         extraGroups = [
           "wheel"           # sudo access
