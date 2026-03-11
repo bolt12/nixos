@@ -122,7 +122,7 @@
 
   # Home Manager Configuration:
   home-manager = {
-    useGlobalPkgs   = false;
+    useGlobalPkgs   = true;
     useUserPackages = true;
     backupFileExtension = "hm-backup";
 

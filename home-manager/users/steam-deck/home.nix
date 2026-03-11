@@ -4,11 +4,6 @@
 # This runs on SteamOS (non-NixOS) using home-manager standalone mode
 
 let
-  unstable = import inputs.nixpkgs-unstable {
-    inherit (pkgs) system;
-    overlays = [];
-  };
-
   agdaStdlibSrc = pkgs.fetchFromGitHub {
     owner = "agda";
     repo = "agda-stdlib";

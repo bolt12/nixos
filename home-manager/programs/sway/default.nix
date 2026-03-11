@@ -1,13 +1,4 @@
-{ pkgs, inputs, ... }:
-let
-
-  unstable = import inputs.nixpkgs-unstable {
-    inherit (pkgs) system;
-    overlays = [
-    ];
-  };
-
-in
+{ pkgs, ... }:
   {
 
     services.gnome-keyring.enable = true;

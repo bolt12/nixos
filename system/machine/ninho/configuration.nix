@@ -1,4 +1,4 @@
-{ config, lib, pkgs, inputs, system, ... }@attrs:
+{ config, lib, pkgs, inputs, system, constants, ... }@attrs:
 
 # ============================================================================
 # Ninho Server Configuration

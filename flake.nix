@@ -159,7 +159,7 @@
             inputs.home-manager.nixosModules.home-manager
             {
               home-manager = {
-                useGlobalPkgs = false;
+                useGlobalPkgs = true;
                 useUserPackages = true;
                 extraSpecialArgs = { inherit inputs system; };
                 users.bolt = { nixpkgs, ... }: {
@@ -171,32 +171,46 @@
         };
       };
 
-      # Home Manager activation script
-      homeConfigurations = {
+      # Home Manager activation script (standalone)
+      # pkgsFor includes the unstable overlay so HM modules can use pkgs.unstable.*
+      homeConfigurations = let
+        pkgsFor = sys: import nixpkgs {
+          system = sys;
+          config.allowUnfree = true;
+          overlays = [
+            (final: prev: {
+              unstable = import inputs.nixpkgs-unstable {
+                system = sys;
+                config.allowUnfree = true;
+              };
+            })
+          ];
+        };
+      in {
         # Bolt headless configuration for ninho server
         bolt = home-manager.lib.homeManagerConfiguration {
-          pkgs = nixpkgs.legacyPackages.${system};
+          pkgs = pkgsFor system;
           modules = [ ./home-manager/users/bolt/home.nix ];
           extraSpecialArgs = { inherit inputs system; };
         };
 
         # Bolt desktop configuration for bolt-nixos
         bolt-with-de = home-manager.lib.homeManagerConfiguration {
-          pkgs = nixpkgs.legacyPackages.${system};
+          pkgs = pkgsFor system;
           modules = [ ./home-manager/users/bolt-with-de/home.nix ];
           extraSpecialArgs = { inherit inputs system; };
         };
 
         # Pollard configuration for ninho server
         pollard = home-manager.lib.homeManagerConfiguration {
-          pkgs = nixpkgs.legacyPackages.${system};
+          pkgs = pkgsFor system;
           modules = [ ./home-manager/users/pollard/home.nix ];
           extraSpecialArgs = { inherit inputs system; };
         };
 
         # SteamDeck home-manager configuration
         steam-deck = home-manager.lib.homeManagerConfiguration {
-          pkgs = nixpkgs.legacyPackages.x86_64-linux;
+          pkgs = pkgsFor "x86_64-linux";
           modules = [ ./home-manager/users/steam-deck/home.nix ];
           extraSpecialArgs = { inherit inputs; system = "x86_64-linux"; };
         };
@@ -209,7 +223,7 @@
             system = "x86_64-linux";
             config.allowUnfree = true;
           };
-          specialArgs = { inherit inputs; };
+          specialArgs = { inherit inputs constants; };
         };
 
         # RPI 5 deployment target
@@ -231,6 +245,15 @@
 
           nixpkgs.system = "aarch64-linux";
         };
+      };
+
+      # Formatter for `nix fmt`
+      formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixfmt-rfc-style;
+
+      # Build checks for `nix flake check`
+      checks.x86_64-linux = {
+        ninho = self.nixosConfigurations.ninho-nixos.config.system.build.toplevel;
+        bolt-nixos = self.nixosConfigurations.bolt-nixos.config.system.build.toplevel;
       };
     };
   }

@@ -3,12 +3,6 @@
 # Pollard's headless configuration for the ninho server
 # Beginner-friendly setup with development tools and ZFS learning resources
 
-let
-  unstable = import inputs.nixpkgs-unstable {
-    system = pkgs.stdenv.hostPlatform.system;
-    overlays = [];
-  };
-in
 {
   imports = [
     # Common base configuration

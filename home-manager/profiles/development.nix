@@ -4,11 +4,6 @@
 { inputs, pkgs, system, ... }:
 let
   nix-ai-tools = inputs.nix-ai-tools.packages.${system};
-
-  unstable = import inputs.nixpkgs-unstable {
-    inherit (pkgs) system;
-    overlays = [];
-  };
 in {
 
   home.packages = with pkgs; [
@@ -70,8 +65,8 @@ in {
 
     # Lean development
     lean4
-  ] ++ [
+
     # Bleeding-edge development tools from unstable channel
-    unstable.nixd                             # Nix language server for IDE integration
+    pkgs.unstable.nixd                         # Nix language server for IDE integration
   ];
 }
