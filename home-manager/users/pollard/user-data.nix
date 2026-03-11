@@ -52,5 +52,8 @@ in
     nix-search = "nix search nixpkgs";
     nix-info = "nix-shell -p nix-info --run nix-info";
     hm-help = "man home-configuration.nix";
+
+    # NixOS rebuild
+    nrs = "nixos-rebuild-safe";
   };
 }

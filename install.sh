@@ -9,6 +9,62 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
+# ============================================================================
+# Pre-flight Safety Checks
+# ============================================================================
+
+preflight_checks() {
+    local errors=0
+
+    # 1. Verify we're in a git repo with a flake.nix
+    if ! git rev-parse --is-inside-work-tree &>/dev/null; then
+        echo -e "${RED}ERROR: Not inside a git repository.${NC}"
+        echo "       Run this script from your nixos config checkout."
+        exit 1
+    fi
+    if [[ ! -f flake.nix ]]; then
+        echo -e "${RED}ERROR: No flake.nix in current directory ($(pwd)).${NC}"
+        echo "       cd into the root of your nixos config repo first."
+        exit 1
+    fi
+
+    # 2. Fetch latest remote state
+    echo -e "${BLUE}Fetching origin...${NC}"
+    if ! git fetch origin 2>/dev/null; then
+        echo -e "${YELLOW}WARNING: Could not fetch from origin (offline?). Skipping sync check.${NC}"
+        return 0
+    fi
+
+    # 3. Check if local branch is behind origin/main
+    local local_rev remote_rev base_rev
+    local_rev=$(git rev-parse HEAD)
+    remote_rev=$(git rev-parse origin/main 2>/dev/null) || true
+
+    if [[ -n "$remote_rev" ]]; then
+        base_rev=$(git merge-base HEAD origin/main 2>/dev/null) || true
+        if [[ "$local_rev" != "$remote_rev" && "$base_rev" == "$local_rev" ]]; then
+            echo -e "${RED}ERROR: Your branch is behind origin/main.${NC}"
+            echo "       Run 'git pull' before rebuilding to avoid deploying stale config."
+            exit 1
+        fi
+        if [[ "$local_rev" != "$remote_rev" && "$base_rev" != "$local_rev" && "$base_rev" != "$remote_rev" ]]; then
+            echo -e "${RED}ERROR: Your branch has diverged from origin/main.${NC}"
+            echo "       Reconcile with 'git pull --rebase' or 'git merge origin/main' first."
+            exit 1
+        fi
+    fi
+
+    # 4. Warn about uncommitted changes (don't abort — user may be testing)
+    if ! git diff --quiet HEAD 2>/dev/null || ! git diff --cached --quiet 2>/dev/null; then
+        echo -e "${YELLOW}WARNING: You have uncommitted changes. The rebuild will use your working tree.${NC}"
+    fi
+
+    echo -e "${GREEN}Pre-flight checks passed.${NC}"
+    echo ""
+}
+
+preflight_checks
+
 echo -e "${BLUE}╔════════════════════════════════════════════════════════════╗${NC}"
 echo -e "${BLUE}║          NixOS Configuration Manager                       ║${NC}"
 echo -e "${BLUE}╚════════════════════════════════════════════════════════════╝${NC}"

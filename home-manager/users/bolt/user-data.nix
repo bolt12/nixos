@@ -98,6 +98,9 @@ in
 
     # Tool shortcuts
     doom = "${config.userConfig.homeDirectory}/.emacs.d/bin/doom";
+
+    # NixOS rebuild
+    nrs = "nixos-rebuild-safe";
   };
 
   # Syncthing configuration for ninho server
