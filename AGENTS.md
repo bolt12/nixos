@@ -1,4 +1,6 @@
-# NixOS Configuration
+# AGENTS.md — NixOS Configuration Repository
+
+Instructions for AI agents working on this codebase. Read fully before making changes.
 
 ## Repository Layout
 
@@ -27,15 +29,49 @@ home-manager/
 install.sh                             # Interactive rebuild menu with pre-flight safety checks
 ```
 
-## Multi-User Rules (ninho)
+## Rules
 
-Ninho is shared by **bolt** and **pollard**, each with their own clone at `$HOME/nixos/`.
+1. **Home-manager first**: user-specific services and data belong in `home-manager/users/<user>/`, not in `system/`. System config (`system/`) is for system-level concerns only: user declarations, groups, lingering, hardware, system-wide services.
 
-- **Home-manager first**: user-specific services and data belong in `home-manager/users/<user>/`, not in `system/`. System config is for system-level concerns only (user declarations, groups, system services).
-- **No hardcoded home paths in system services**: use `%h` (systemd user specifier) or `config.userConfig.homeDirectory` in HM modules. If a system service genuinely needs a user path, use a NixOS option or `constants.nix`.
-- **Dual-checkout model**: both users have independent git clones. Always `git pull` before rebuilding. The `install.sh` pre-flight checks enforce this (aborts if behind `origin/main`).
-- **Port allocation**: all service ports go in `system/common/constants.nix` — never hardcode port numbers in service modules.
-- **Format with nixfmt**: `nix fmt` uses `nixfmt-rfc-style`.
+2. **No hardcoded home paths in system services**: use `%h` (systemd user specifier) or `config.userConfig.homeDirectory` in HM modules. If a system service genuinely needs a user path, use a NixOS option or `constants.nix`.
+
+3. **Dual-checkout model**: ninho is shared by **bolt** and **pollard**, each with their own clone at `$HOME/nixos/`. Never assume a single source of truth. Always verify the repo is up-to-date before rebuilding (`install.sh` enforces this with pre-flight checks).
+
+4. **Port allocation**: all service ports go in `system/common/constants.nix`. Never hardcode port numbers in service modules — import `constants` and use `constants.ports.<name>`.
+
+5. **Format with nixfmt**: run `nix fmt` (uses `nixfmt-rfc-style`). Check before committing.
+
+6. **Never commit directly to main without review**. Use feature branches for non-trivial changes.
+
+7. **Never apply a NixOS rebuild** without verifying the repo is in sync with `origin/main`. Use `nixos-rebuild-safe` or run `git fetch && git status` first.
+
+8. **Never post comments, replies, or reviews on GitHub PRs/issues** unless explicitly asked.
+
+## Multi-User Architecture (ninho)
+
+| User | Home-Manager Config | Role |
+|------|-------------------|------|
+| bolt | `home-manager/users/bolt/home.nix` | Primary admin, Haskell dev |
+| pollard | `home-manager/users/pollard/home.nix` | Software engineer, learning NixOS |
+
+Both users are declared in `system/machine/ninho/configuration.nix` (groups, SSH keys, lingering). Their packages, services, and dotfiles are entirely in HM.
+
+### File Ownership
+
+| Path | Owner | Managed by |
+|------|-------|-----------|
+| `system/machine/ninho/configuration.nix` | root (system) | `nixos-rebuild switch` |
+| `system/machine/ninho/services/*.nix` | root (system) | `nixos-rebuild switch` |
+| `home-manager/users/bolt/*` | bolt | HM via `nixos-rebuild` or standalone `home-manager switch` |
+| `home-manager/users/pollard/*` | pollard | HM via `nixos-rebuild` or standalone `home-manager switch` |
+| `system/common/constants.nix` | shared | Both system and HM modules import this |
+
+## Module Structure
+
+- **User options** (`home-manager/common/user-options.nix`): defines `userConfig.{username, homeDirectory, git.userName, git.userEmail, git.signingKey, bash.extraAliases}`. Every user's `home.nix` sets these.
+- **Profiles** (`home-manager/profiles/`): package bundles imported by user configs. `development.nix` = compilers, tools; `system-tools.nix` = monitoring, networking; `specialized.nix` = Agda, Lean, Arduino.
+- **Programs** (`home-manager/programs/`): per-program configuration (neovim, git, bash, etc.), imported by user configs.
+- **Services** (`system/machine/ninho/services/`): each service is a separate `.nix` file, imported via `services/default.nix`. All use `constants.ports` for port numbers.
 
 ## Rebuild Commands
 
@@ -44,8 +80,11 @@ Ninho is shared by **bolt** and **pollard**, each with their own clone at `$HOME
 | `nixos-rebuild-safe` (or `nrs`) | cd to `$HOME/nixos`, run pre-flight checks, show interactive menu |
 | `sudo nixos-rebuild switch --flake .#ninho-nixos` | Direct ninho rebuild (no safety checks) |
 | `sudo nixos-rebuild switch --flake .#bolt-nixos` | Direct laptop rebuild |
+| `sudo nixos-rebuild dry-activate --flake .#ninho-nixos` | Dry-run (evaluate + build, no activation) |
 | `home-manager switch --flake .#bolt` | Standalone HM activation for bolt |
 | `home-manager switch --flake .#pollard` | Standalone HM activation for pollard |
+| `nix flake check` | Validate flake (runs checks defined in `flake.nix`) |
+| `nix fmt` | Format all `.nix` files with `nixfmt-rfc-style` |
 
 ## Known Issues
 
@@ -89,39 +128,11 @@ Automatic LUKS decryption at boot via Tang (on RPi) and Clevis (in ninho's initr
 - **Initrd networking**: DHCP on `enp11s0` via `ip=:::::enp11s0:dhcp` kernel param, `r8169` in initrd modules
 - **SSH fallback**: port 2222 (not 22 — separate host key avoids known_hosts conflicts)
 
-**Secrets** (stored in `/etc/secrets/initrd/`, injected via `boot.initrd.secrets`):
-- `luks-rpool-nvme0n1-part2.jwe`, `luks-rpool-nvme1n1-part2.jwe` — root pool NVMe
-- `luks-storage-sd{a,b,c}-part2.jwe` — storage pool HDDs
-- `ssh_host_ed25519_key` — initrd SSH host key
-
-**Manual enrollment steps** (required after initial deploy or key rotation):
-1. Deploy Tang to RPi: `eval $(ssh-agent) && ssh-add ~/.ssh/id_ed25519 && colmena apply --on rpi-5 --impure`
-2. Verify Tang: `ssh root@192.168.1.110 "curl -sf http://127.0.0.1:7654/adv" | jq .`
-3. Generate initrd SSH key: `sudo ssh-keygen -t ed25519 -N "" -f /etc/secrets/initrd/ssh_host_ed25519_key`
-4. Create JWE files:
-   ```
-   echo -n "PASSPHRASE" | sudo clevis encrypt tang '{"url":"http://192.168.1.110:7654"}' | sudo tee /etc/secrets/initrd/luks-rpool-nvme0n1-part2.jwe > /dev/null
-   for dev in luks-rpool-nvme1n1-part2 luks-storage-sda-part2 luks-storage-sdb-part2 luks-storage-sdc-part2; do
-     sudo cp /etc/secrets/initrd/luks-rpool-nvme0n1-part2.jwe /etc/secrets/initrd/${dev}.jwe
-   done
-   sudo chmod 600 /etc/secrets/initrd/*.jwe
-   ```
-5. Rebuild ninho (bakes JWE into initrd): `sudo nixos-rebuild switch --flake .#ninho-nixos`
-6. Reboot and verify: `journalctl -b | grep -i clevis`
-
-**SSH fallback** (if Tang unreachable during boot):
-```
-ssh -p 2222 root@<ninho-lan-ip>
-# cryptsetup-askpass runs automatically
-```
-
 **Key details for future edits:**
 - `boot.initrd.availableKernelModules` is overridden in `configuration.nix` (not `hardware-configuration.nix`) to add `r8169`
 - `flushBeforeStage2 = true` tears down initrd networking so NetworkManager starts clean
 - Each LUKS device has its own JWE file (allows per-device passphrase changes later)
 - Tang is stateless — rotating keys requires re-enrolling all Clevis clients
-- `boot.initrd.secrets` files must exist on disk before `nixos-rebuild switch` — create placeholders if enrolling later
-- Colmena RPi deploy requires: ssh-agent with key loaded, `--impure` flag, `targetUser = "root"` (no interactive sudo support)
 
 ### llama-swap / stable-diffusion.cpp
 
