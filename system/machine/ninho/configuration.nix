@@ -253,41 +253,24 @@
       enable = true;
       trustedInterfaces = [ "wg0" ];
       allowedTCPPorts = [
-        22    # SSH - Remote access
-        20    # FTP
-        21    # FTP
-        80    # HTTP
-        2283  # Immich
-        3000  # Grafana
-        7000  # Emanote
-        8000  # OnlyOffice
-        8080  # Llama swap
-        8081  # Nextcloud
-        8082  # Homepage Dashboard
-        8096  # Jellyfin
-        8920  # Jellyfin
-        8097  # Prowlarr
-        8098  # Radarr
-        8199  # Sonarr
-        8100  # Lidarr
-        8101  # Readarr
-        3333  # Bitmagnet
-        8103  # Deluge
-        8200  # Jellyseer
-        8384  # Syncthing web UI
-        11987 # CoolerControl
-        22000 # Syncthing file transfers
-        10200 # Whisper
-        10201 # Whisper
-        10300 # Whisper
-        10301 # Whisper
-      ];
+        22     # SSH
+        80     # HTTP
+        8920   # Jellyfin HTTPS
+        22000  # Syncthing file transfers
+        10200  # Whisper (alt)
+        10201  # Whisper (alt)
+        10301  # Whisper (alt)
+      ] ++ (with constants.ports; [
+        immich grafana emanote onlyoffice llamaswap nextcloud
+        homepage jellyfin prowlarr radarr sonarr lidarr readarr
+        bitmagnet deluge jellyseerr syncthing coolercontrol whisper
+      ]);
       allowedUDPPorts = [
-        51820 # WireGuard
-        22000 # Syncthing discovery
-        21027 # Syncthing discovery
-        1900  # Jellyfin
-        7359  # Jellyfin
+        51820  # WireGuard
+        22000  # Syncthing discovery
+        21027  # Syncthing discovery
+        1900   # Jellyfin SSDP
+        7359   # Jellyfin discovery
       ];
     };
 
@@ -295,7 +278,7 @@
     wireguard.interfaces.wg0 = {
       ips = [ "10.100.0.100/24" ];
       listenPort = 51820;
-      privateKeyFile = "/home/wireguard-keys/private";
+      privateKeyFile = "/etc/wireguard/private";
 
       peers = [
         {
@@ -428,7 +411,7 @@
       enable = true;
       settings = {
         PermitRootLogin = "no";
-        X11Forwarding = true;
+        X11Forwarding = false;
       };
       extraConfig = ''
         ClientAliveInterval 60
@@ -462,8 +445,8 @@
     logind.settings.Login = {
       RuntimeDirectorySize = "75%";
       KillUserProcesses = false;
-      HandleLidSwitch = "poweroff";
-      HandleLidSwitchDocked = "poweroff";
+      HandleLidSwitch = "ignore";
+      HandleLidSwitchDocked = "ignore";
     };
   };
 
@@ -496,7 +479,6 @@
           "plugdev"
           "storage-users"
           "media"
-          "root"
         ];
         initialPassword = "ninho";  # CHANGE AFTER FIRST LOGIN
         openssh.authorizedKeys.keys = [
@@ -517,7 +499,6 @@
           "plugdev"
           "storage-users"
           "media"
-          "root"
         ];
         initialPassword = "ninho";  # CHANGE AFTER FIRST LOGIN
 
@@ -541,7 +522,7 @@
   # ==========================================================================
 
   home-manager = {
-    useGlobalPkgs = false;
+    useGlobalPkgs = true;
     useUserPackages = true;
     backupFileExtension = "hm-backup";
     extraSpecialArgs = { inherit inputs system; };
@@ -598,11 +579,7 @@
       persistent = true;
     };
 
-    # Store optimization
-    optimise = {
-      automatic = true;
-      dates = [ "weekly" ];
-    };
+    # Store optimization — auto-optimise-store (above) handles this on every build
   };
 
   nixpkgs.config.allowUnfree = true;
@@ -613,13 +590,20 @@
   # ==========================================================================
 
   environment.systemPackages = with pkgs; [
-    # Essential utilities
+    # Safe rebuild wrapper — delegates to install.sh from the user's checkout
+    (pkgs.writeShellApplication {
+      name = "nixos-rebuild-safe";
+      runtimeInputs = [ pkgs.git ];
+      text = ''
+        cd "$HOME/nixos"
+        exec ./install.sh "$@"
+      '';
+    })
+
+    # Emergency/root tools only — user tools are in home-manager profiles
     vim
-    wget
-    git
-    htop
-    tmux
-    tree
+
+    # System administration
     nss
     nssTools
     liquidctl
@@ -627,10 +611,6 @@
     # ZFS tools
     zfs
     zfstools
-
-    # System monitoring
-    iotop
-    ncdu
 
     # NVIDIA tools
     nvtopPackages.nvidia     # GPU monitoring

@@ -5,11 +5,6 @@
 # but excludes desktop environment components
 
 let
-  unstable = import inputs.nixpkgs-unstable {
-    inherit system;
-    overlays = [];
-  };
-
   # Claude wrapper with GLM configuration
   glaude = pkgs.writeShellApplication {
     name = "glaude";
@@ -164,6 +159,21 @@ in
         };
       };
     };
+  };
+
+  # Emanote journal server (user-level — bolt's personal data)
+  systemd.user.services.emanote = {
+    Unit = {
+      Description = "Emanote journal server";
+      After = [ "network.target" ];
+    };
+    Service = {
+      Type = "simple";
+      ExecStart = "${inputs.emanote.packages.${system}.default}/bin/emanote --layers \"%h/journal\" run --no-ws --host=0.0.0.0 --port=7000";
+      Restart = "always";
+      RestartSec = "10";
+    };
+    Install.WantedBy = [ "default.target" ];
   };
 
   # No desktop services for headless configuration
