@@ -190,7 +190,7 @@ Output ONLY the prompt block, no titles, explanations, or commentary:
       "nemotron-3-nano-full",
       "qwen3-coder-next-full",
       "qwen3.5-27B-creative",
-      "qwen2.5-coder-14b-fim",
+      "qwen3.5-27B-full",
       "step-3.5-flash-full",
     },
     cloud_models = {

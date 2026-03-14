@@ -631,7 +631,7 @@ let g:llama_config = {
   \ 'enable_at_startup': v:false,
   \ 'auto_fim': v:true,
   \ 'show_info': 1,
-  \ 'model_fim': 'qwen2.5-coder-14b-fim',
+  \ 'model_fim': 'qwen3.5-27B-full',
   \ 'model_inst': 'qwen3-coder-next-full',
   \ 'n_prefix': 768,
   \ 'n_suffix': 192,

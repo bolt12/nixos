@@ -31,13 +31,13 @@ in
         rocmSupport = false;
         metalSupport = false;
       }).overrideAttrs (oldAttrs: {
-        version = "8227";
+        version = "8334";
 
         src = pkgs.fetchFromGitHub {
           owner = "ggml-org";
           repo = "llama.cpp";
-          tag = "b8227";
-          hash = "sha256-MlNsWnev4IMvQT7Zrz1YPJJ4KCxLZop6wGaoVSLz8lw=";
+          tag = "b8334";
+          hash = "sha256-1WBivYmZQgujl73IS4J5/jUiwOh/d2ZfKRA93P9ADiM=";
           leaveDotGit = true;
           postFetch = ''
             git -C "$out" rev-parse --short HEAD > $out/COMMIT
@@ -68,8 +68,8 @@ in
         llama-swap-src = pkgs.fetchFromGitHub {
           owner = "mostlygeek";
           repo = "llama-swap";
-          tag = "v197";
-          hash = "sha256-EXgyYmpbN/zzr6KeSpvFEB+FS7gDIZFinNMv70v5boY=";
+          tag = "v198";
+          hash = "sha256-7fZUKDCtj8RGca53CkLwVpvNWX6ryTbS02Uz/+uZpTs=";
           leaveDotGit = true;
           postFetch = ''
             cd "$out"
@@ -80,10 +80,10 @@ in
         };
         llama-swap-ui = pkgs.buildNpmPackage {
           pname = "llama-swap-ui";
-          version = "195";
+          version = "198";
           src = llama-swap-src;
           sourceRoot = "${llama-swap-src.name}/ui-svelte";
-          npmDepsHash = "sha256-Fs7+JKE8YBp2Xj8bVBlwmT+UwuD642VeUHiPx+fv94c=";
+          npmDepsHash = "sha256-gTDsuWPLCWsPltioziygFmSQFdLqjkZpmmVWIWoZwoc=";
           postPatch = ''
             substituteInPlace vite.config.ts \
               --replace-fail "../proxy/ui_dist" "${placeholder "out"}/ui_dist"
@@ -93,7 +93,7 @@ in
           '';
         };
       in prev.llama-swap.overrideAttrs (oldAttrs: {
-        version = "195";
+        version = "198";
         src = llama-swap-src;
         proxyVendor = true;
         vendorHash = "sha256-TPOKqgyf8vltRLbtNWXcK3jsWsVFaSrZAc+/AMkG/8A=";
