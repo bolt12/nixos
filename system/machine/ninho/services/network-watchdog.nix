@@ -78,40 +78,5 @@ in
       rebootTime = "10min";
     };
 
-    # ------------------------------------------------------------------------
-    # Preventive reboot — every 6 days at 4 AM, skip if ZFS scrub running
-    # ------------------------------------------------------------------------
-    timers.preventive-reboot = {
-      description = "Preventive reboot to mitigate RTL8126A driver degradation";
-      wantedBy = [ "timers.target" ];
-      timerConfig = {
-        # ~every 6 days: 1st, 7th, 13th, 19th, 25th of each month at 04:00
-        OnCalendar = "*-*-01,07,13,19,25 04:00:00";
-        RandomizedDelaySec = "10min";
-        Persistent = true;
-      };
-    };
-
-    services.preventive-reboot = {
-      description = "Preventive reboot (skip if ZFS scrub in progress)";
-      serviceConfig = {
-        Type = "oneshot";
-        Environment = "PATH=${lib.makeBinPath [ pkgs.zfs pkgs.systemd pkgs.coreutils pkgs.gnugrep pkgs.curl ]}";
-      };
-      script = ''
-        ntfy_url="http://127.0.0.1:8106/network-watchdog"
-        if zpool status 2>/dev/null | grep -q "scrub in progress"; then
-          echo "ZFS scrub in progress — skipping preventive reboot"
-          curl -sf -o /dev/null -H "Title: Preventive Reboot" -H "Priority: default" \
-            -d "Preventive reboot skipped — ZFS scrub in progress" "$ntfy_url" 2>/dev/null || true
-          exit 0
-        fi
-        echo "No ZFS scrub running — initiating preventive reboot"
-        curl -sf -o /dev/null -H "Title: Preventive Reboot" -H "Priority: high" \
-          -d "Preventive reboot starting now (RTL8126A driver hygiene)" "$ntfy_url" 2>/dev/null || true
-        sleep 2
-        systemctl reboot
-      '';
-    };
   };
 }

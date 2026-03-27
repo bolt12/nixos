@@ -32,7 +32,14 @@
   };
 
   # Set display resolution early (runs when X server starts, before session)
+  # Register ultrawide mode (HDMI dummy plug EDID doesn't advertise it) so Sunshine
+  # can switch to it when an ultrawide Moonlight client connects.
+  # Default to 1440p; fall back to 1080p if dummy plug doesn't support it.
   services.xserver.displayManager.setupCommands = ''
+    ${pkgs.xorg.xrandr}/bin/xrandr --newmode "2560x1080_60" 230.00 2560 2720 2992 3424 1080 1081 1084 1118 -HSync +VSync 2>/dev/null || true
+    ${pkgs.xorg.xrandr}/bin/xrandr --addmode HDMI-0 "2560x1080_60" 2>/dev/null || true
+
+    ${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-0 --mode 2560x1440 --rate 60 --scale 1x1 --panning 2560x1440 || \
     ${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-0 --mode 1920x1080 --rate 60 --scale 1x1 --panning 1920x1080 || \
     ${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-0 --mode 1920x1080 --rate 60 || \
     true
@@ -54,7 +61,11 @@
     # Disable XFCE compositor to fix game streaming black screen issues
     ${pkgs.xfce.xfconf}/bin/xfconf-query -c xfwm4 -p /general/use_compositing -s false || true
 
-    # Ensure resolution is properly set (fixes black screen after game intros)
+    # Ensure ultrawide mode is registered and resolution is set
+    ${pkgs.xorg.xrandr}/bin/xrandr --newmode "2560x1080_60" 230.00 2560 2720 2992 3424 1080 1081 1084 1118 -HSync +VSync 2>/dev/null || true
+    ${pkgs.xorg.xrandr}/bin/xrandr --addmode HDMI-0 "2560x1080_60" 2>/dev/null || true
+
+    ${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-0 --mode 2560x1440 --rate 60 --scale 1x1 --panning 2560x1440 || \
     ${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-0 --mode 1920x1080 --rate 60 --scale 1x1 --panning 1920x1080 || true
   '';
 
@@ -106,6 +117,18 @@
 
     # Enable hardware capabilities for best performance
     capSysAdmin = true;
+
+    # Streaming settings
+    settings = {
+      # Capture method — NvFBC is lowest latency for NVIDIA GPUs
+      capture = "nvfbc";
+      # Hardware encoding via NVENC
+      encoder = "nvenc";
+      # Prefer AV1 (RTX 5090 has excellent AV1 NVENC — ~30-40% better quality/bitrate than H.264)
+      # Falls back to HEVC/H.264 if the client doesn't support it
+      av1_mode = 2;   # 0=off, 1=allow, 2=prefer
+      hevc_mode = 2;  # 0=off, 1=allow, 2=prefer
+    };
   };
 
   # ==========================================================================
@@ -124,36 +147,10 @@
     wireplumber.enable = true;
   };
 
-  # ==========================================================================
-  # FIREWALL CONFIGURATION
-  # ==========================================================================
-
-  networking.firewall = {
-    allowedTCPPorts = [
-      # Sunshine Web UI and streaming
-      47984  # HTTPS Web UI
-      47989  # HTTP Web UI
-      47990  # RTSP/Configuration
-      48010  # Video stream
-
-      # Steam Remote Play (backup option)
-      27036
-      27037
-    ];
-
-    allowedUDPPorts = [
-      # Sunshine streaming (video/audio/control)
-      47998
-      47999
-      48000
-      48002
-      48010
-
-      # Steam Remote Play (backup option)
-      27031
-      27036
-    ];
-  };
+  # Firewall ports are handled by:
+  #   services.sunshine.openFirewall = true
+  #   programs.steam.remotePlay.openFirewall = true
+  #   programs.steam.dedicatedServer.openFirewall = true
 
   # ==========================================================================
   # SYSTEM PACKAGES
@@ -174,6 +171,11 @@
     # Performance monitoring
     iftop  # Network bandwidth monitor
   ];
+
+  # ==========================================================================
+  # GAMEMODE (CPU/scheduler optimization during gaming)
+  # ==========================================================================
+  programs.gamemode.enable = true;
 
   # ==========================================================================
   # INPUT DEVICES (uinput for virtual controllers/keyboard/mouse)

@@ -1,4 +1,11 @@
-{ config, lib, pkgs, inputs, system, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  inputs,
+  system,
+  ...
+}:
 
 # Bolt's desktop configuration for bolt-nixos
 # This imports the base bolt configuration and adds desktop environment components
@@ -9,7 +16,7 @@
     # Import base bolt configuration (headless)
     ../bolt/home.nix
 
-    # Stylix theming (Gruvbox Dark)
+    # Stylix theming
     inputs.stylix.homeModules.stylix
 
     # Add desktop-specific profiles
@@ -22,10 +29,7 @@
     # Add desktop program configurations
     ../../programs/sway/default.nix
     ../../programs/waybar/default.nix
-    ../../programs/wofi/default.nix
-
-    # Add XDG desktop configurations
-    ../../xdg/sway/default.nix
+    ../../programs/fuzzel/default.nix
 
     # Desktop-specific user data (Syncthing configuration)
     ./user-data.nix
@@ -58,26 +62,111 @@
     lorri.enable = true;
     blueman-applet.enable = true;
     udiskie.enable = true;
-    swayidle.enable = true;
     poweralertd.enable = true;
     safeeyes.enable = true;
+
+    # Idle management — lock after 5min, DPMS off after 10min
+    swayidle = {
+      enable = true;
+      timeouts = [
+        {
+          timeout = 300;
+          command = "swaylock -f --clock --indicator --effect-blur 7x5 --effect-vignette 0.5:0.5";
+        }
+        {
+          timeout = 600;
+          command = ''swaymsg "output * dpms off"'';
+          resumeCommand = ''swaymsg "output * dpms on"'';
+        }
+      ];
+      events = [
+        {
+          event = "before-sleep";
+          command = "swaylock -f --clock --indicator --effect-blur 7x5 --effect-vignette 0.5:0.5";
+        }
+      ];
+    };
 
     wlsunset = {
       enable = true;
       latitude = "39";
       longitude = "-8";
     };
+
+    # Automatic display profile switching
+    kanshi = {
+      enable = true;
+      settings = [
+        {
+          profile.name = "docked-ultrawide";
+          profile.outputs = [
+            {
+              criteria = "eDP-1";
+              status = "disable";
+            }
+            {
+              criteria = "OOO BW-GM3 0000000000001";
+              mode = "2560x1080@60Hz";
+              position = "0,0";
+            }
+          ];
+        }
+        {
+          profile.name = "docked-hdmi";
+          profile.outputs = [
+            {
+              criteria = "eDP-1";
+              position = "0,1326";
+            }
+            {
+              criteria = "HDMI-A-1";
+              mode = "3840x2160@30Hz";
+              scale = 1.75;
+              transform = "90";
+            }
+          ];
+        }
+        {
+          profile.name = "triple";
+          profile.outputs = [
+            {
+              criteria = "eDP-1";
+              position = "0,1326";
+            }
+            {
+              criteria = "OOO BW-GM3 0000000000001";
+              mode = "2560x1080@60Hz";
+              position = "1920,1326";
+            }
+            {
+              criteria = "LG Electronics LG HDR 4K 0x000694F9";
+              mode = "2560x1440@60Hz";
+              scale = 1.5;
+              position = "4480,880";
+              transform = "270";
+            }
+          ];
+        }
+        {
+          profile.name = "undocked";
+          profile.outputs = [
+            {
+              criteria = "eDP-1";
+              status = "enable";
+            }
+          ];
+        }
+      ];
+    };
   };
 
-  # Stylix theming - purely additive, no existing configs modified
-  # Sway/waybar use raw config files; Stylix only manages GTK/cursor/fonts
-  # To remove: delete this block and the stylix import above
+  # Stylix theming — Catppuccin Mocha (unified with sway/waybar)
   stylix = {
     enable = true;
-    autoEnable = false;  # Don't auto-enable all targets
+    autoEnable = false;
 
     image = ../../background.png;
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/gruvbox-dark-hard.yaml";
+    base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
     polarity = "dark";
 
     fonts = {
@@ -103,6 +192,8 @@
 
     targets = {
       gtk.enable = true;
+      bat.enable = true;
+      fzf.enable = true;
     };
   };
 }

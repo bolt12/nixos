@@ -1,142 +1,286 @@
+/* === Catppuccin Mocha palette === */
+@define-color base    #1e1e2e;
+@define-color mantle  #181825;
+@define-color crust   #11111b;
+@define-color surface0 #313244;
+@define-color surface1 #45475a;
+@define-color surface2 #585b70;
+@define-color overlay0 #6c7086;
+@define-color text    #cdd6f4;
+@define-color subtext0 #a6adc8;
+@define-color subtext1 #bac2de;
+@define-color blue    #89b4fa;
+@define-color lavender #b4befe;
+@define-color sapphire #74c7ec;
+@define-color sky     #89dceb;
+@define-color teal    #94e2d5;
+@define-color green   #a6e3a1;
+@define-color yellow  #f9e2af;
+@define-color peach   #fab387;
+@define-color maroon  #eba0ac;
+@define-color red     #f38ba8;
+@define-color mauve   #cba6f7;
+@define-color pink    #f5c2e7;
+@define-color flamingo #f2cdcd;
+@define-color rosewater #f5e0dc;
+
+/* === Bar === */
 window#waybar {
-    border:        none;
-    border-radius: 0;
-    font-family:   "Noto Sans Bold";
-    font-size:     12px;
-    box-shadow:    none;
-    text-shadow:   none;
-    transition-duration: 0s;
-    color:      #CDD6F4; /* cat-text */
-    background: rgba(30, 30, 46, 0.7); /* cat-base with transparency */
+    background: alpha(@base, 0.75);
+    border-radius: 12px;
+    border: 1px solid alpha(@surface0, 0.5);
+    font-family: "JetBrainsMono Nerd Font", "Noto Sans", sans-serif;
+    font-size: 13px;
+    color: @text;
+    transition-duration: 0.3s;
 }
 
-window#waybar.solo {
-    background: #181825; /* cat-mantle */
+tooltip {
+    background: @base;
+    border: 1px solid @surface0;
+    border-radius: 8px;
+    color: @text;
 }
 
+tooltip label {
+    color: @text;
+}
+
+/* === Workspaces === */
 #workspaces {
-    margin: 0 5px;
+    margin: 4px 4px;
+    background: alpha(@surface0, 0.4);
+    border-radius: 10px;
+    padding: 0 2px;
 }
 
 #workspaces button {
-    padding:    0 5px;
-    color:      #A6ADC8; /* cat-subtext0 */
+    padding: 2px 8px;
+    margin: 2px 1px;
+    color: @overlay0;
+    border-radius: 8px;
+    background: transparent;
+    border: none;
+    transition: all 0.2s ease;
+    min-width: 20px;
+}
+
+#workspaces button:hover {
+    background: alpha(@surface1, 0.5);
+    color: @text;
 }
 
 #workspaces button.visible {
-    color:      #CDD6F4; /* cat-text */
+    color: @text;
 }
 
 #workspaces button.focused {
-    border-top: 3px solid #89B4FA; /* cat-blue for focused indicator */
-    border-bottom: 3px solid rgba(0, 0, 0, 0); /* fully transparent */
+    background: alpha(@blue, 0.25);
+    color: @blue;
 }
 
 #workspaces button.urgent {
-    color:      #F38BA8; /* cat-red for urgent */
+    background: alpha(@red, 0.3);
+    color: @red;
 }
 
-/* Common styling for most modules */
-#tray,
-#mode,
-#battery,
-#cpu,
-#network,
-#pulseaudio,
-#idle_inhibitor,
-#backlight,
-#custom-cpu_speed,
-#custom-powermenu,
-#custom-spotify,
-#custom-weather,
-#custom-mail,
-#custom-media,
-#temperature,
-#memory,
-#clock,
-#custom-storage,
-#custom-network_speed { /* Added custom-network_speed */
-    margin:     0px 0px 0px 10px;
-    padding: 0 5px;
-    border-top: 3px solid rgba(0, 0, 0, 0); /* Start with no top border for most */
-    border-bottom: 3px solid rgba(0, 0, 0, 0); /* Start with no bottom border for most */
+/* === Sway mode === */
+#mode {
+    background: alpha(@red, 0.25);
+    color: @red;
+    border-radius: 10px;
+    padding: 2px 12px;
+    margin: 4px 4px;
+    font-weight: bold;
 }
 
-/* Specific module adjustments for consistency if needed */
-#battery.warning {
-   color:       #F9E2AF; /* cat-yellow */
+/* === Window title === */
+#window {
+    color: @subtext0;
+    margin: 4px 8px;
+    font-size: 12px;
 }
 
-#battery.critical {
-    color:      #F38BA8; /* cat-red */
+/* === Center modules === */
+#clock {
+    background: alpha(@surface0, 0.4);
+    color: @text;
+    border-radius: 10px;
+    padding: 2px 14px;
+    margin: 4px 4px;
+    font-weight: bold;
 }
 
-#battery.charging {
-    color:      #A6E3AF; /* cat-green for charging */
+#mpris {
+    background: alpha(@surface0, 0.4);
+    color: @lavender;
+    border-radius: 10px;
+    padding: 2px 14px;
+    margin: 4px 4px;
 }
 
+#mpris.paused {
+    color: @overlay0;
+    font-style: italic;
+}
+
+/* === System group (pill) === */
+#group-system {
+    background: alpha(@surface0, 0.4);
+    border-radius: 10px;
+    margin: 4px 2px;
+    padding: 0 4px;
+}
+
+#group-system > * {
+    padding: 2px 6px;
+    margin: 0;
+}
+
+#cpu {
+    color: @sapphire;
+}
+#cpu.warning {
+    color: @yellow;
+}
+#cpu.critical {
+    color: @red;
+}
+
+#memory {
+    color: @mauve;
+}
+#memory.warning {
+    color: @yellow;
+}
+#memory.critical {
+    color: @red;
+}
+
+#temperature {
+    color: @teal;
+}
+#temperature.critical {
+    color: @red;
+}
+
+#custom-storage {
+    color: @peach;
+}
 #custom-storage.warning {
-    color:      #F9E2AF; /* cat-yellow */
+    color: @yellow;
+}
+#custom-storage.critical {
+    color: @red;
 }
 
-#custom-storage.critical {
-    color:      #F38BA8; /* cat-red */
+/* === Right-side modules === */
+#privacy {
+    color: @red;
+    padding: 2px 8px;
+    margin: 4px 2px;
+}
+
+#idle_inhibitor {
+    color: @overlay0;
+    padding: 2px 8px;
+    margin: 4px 2px;
+    border-radius: 10px;
+}
+#idle_inhibitor.activated {
+    color: @yellow;
+    background: alpha(@yellow, 0.15);
+}
+
+#systemd-failed-units {
+    color: @red;
+    padding: 2px 8px;
+    margin: 4px 2px;
+}
+
+#custom-notification {
+    background: alpha(@surface0, 0.4);
+    color: @lavender;
+    border-radius: 10px;
+    padding: 2px 10px;
+    margin: 4px 2px;
+}
+
+#bluetooth {
+    color: @blue;
+    padding: 2px 8px;
+    margin: 4px 2px;
+}
+#bluetooth.disabled {
+    color: @overlay0;
+}
+
+#wireplumber {
+    background: alpha(@surface0, 0.4);
+    color: @green;
+    border-radius: 10px;
+    padding: 2px 10px;
+    margin: 4px 2px;
+}
+#wireplumber.muted {
+    color: @overlay0;
+}
+
+#custom-weather {
+    color: @sky;
+    padding: 2px 8px;
+    margin: 4px 2px;
+}
+
+#battery {
+    background: alpha(@surface0, 0.4);
+    color: @green;
+    border-radius: 10px;
+    padding: 2px 10px;
+    margin: 4px 2px;
+}
+#battery.warning {
+    color: @yellow;
+    background: alpha(@yellow, 0.1);
+}
+#battery.critical {
+    color: @red;
+    background: alpha(@red, 0.15);
+    animation: blink 1s ease infinite alternate;
+}
+#battery.charging {
+    color: @green;
 }
 
 @keyframes blink {
     to {
-        background-color: #CDD6F4; /* cat-text */
-        color: #1E1E2E; /* cat-base */
+        background: alpha(@red, 0.3);
+        color: @text;
     }
 }
 
-#workspaces button:hover {
-    box-shadow: inherit;
-    border-bottom: 3px solid #89B4FA; /* cat-blue on hover */
+#tray {
+    padding: 2px 8px;
+    margin: 4px 2px;
 }
 
-#workspaces button.focused {
-    border-bottom: 3px solid #89B4FA; /* cat-blue for focused */
-    color: #CDD6F4; /* Ensure text is visible for focused */
+#tray > .passive {
+    -gtk-icon-effect: dim;
 }
 
-#workspaces button.urgent {
-    background-color: #F38BA8; /* cat-red background for urgent */
-    color: #1E1E2E; /* Dark text on red background */
+#tray > .needs-attention {
+    -gtk-icon-effect: highlight;
+    background: alpha(@red, 0.15);
+    border-radius: 8px;
 }
 
-/* Optional: Add a subtle border to all modules for a 'slick' look */
-#tray,
-#mode,
-#battery,
-#cpu,
-#network,
-#pulseaudio,
-#idle_inhibitor,
-#backlight,
-#custom-cpu_speed,
-#custom-powermenu,
-#custom-spotify,
-#custom-weather,
-#custom-mail,
-#custom-media,
-#temperature,
-#memory,
-#clock,
-#custom-storage,
-#custom-network_speed {
-    border-bottom: 1px solid #313244; /* cat-surface0 for a subtle separator */
+#custom-powermenu {
+    color: @red;
+    background: alpha(@surface0, 0.4);
+    border-radius: 10px;
+    padding: 2px 12px;
+    margin: 4px 4px 4px 2px;
 }
-
-/* Let's refine the focused workspace to make it stand out subtly */
-#workspaces button.focused {
-    background-color: #313244; /* cat-surface0 */
-    border-bottom: 3px solid #89B4FA; /* cat-blue */
-    color: #CDD6F4;
-}
-
-#workspaces button.active { /* Use 'active' for current workspace if available, or focused */
-    background-color: #313244; /* cat-surface0 */
-    border-bottom: 3px solid #89B4FA; /* cat-blue */
-    color: #CDD6F4;
+#custom-powermenu:hover {
+    background: alpha(@red, 0.2);
 }

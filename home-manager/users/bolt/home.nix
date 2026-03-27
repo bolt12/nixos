@@ -13,6 +13,7 @@ let
       export ANTHROPIC_BASE_URL="http://10.100.0.100:8080"
       export API_TIMEOUT_MS="3000000"
       export CLAUDE_CODE_MAX_OUTPUT_TOKENS=100000
+      export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
       export ANTHROPIC_DEFAULT_OPUS_MODEL="GLM-5"
       export ANTHROPIC_DEFAULT_SONNET_MODEL="GLM-5"
       export ANTHROPIC_DEFAULT_HAIKU_MODEL="GLM-4.5-Air"
@@ -29,6 +30,7 @@ let
       export ANTHROPIC_BASE_URL="http://10.100.0.100:8080"
       export API_TIMEOUT_MS="3000000"
       export CLAUDE_CODE_MAX_OUTPUT_TOKENS=100000
+      export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
       export ANTHROPIC_DEFAULT_OPUS_MODEL="qwen3.5-9B-full"
       export ANTHROPIC_DEFAULT_SONNET_MODEL="qwen3.5-9B-full"
       export ANTHROPIC_DEFAULT_HAIKU_MODEL="''${OLAUDE_HAIKU:-qwen3.5-9B-full}"
@@ -43,6 +45,7 @@ let
       export ANTHROPIC_BASE_URL="http://10.100.0.100:8080"
       export API_TIMEOUT_MS="3000000"
       export CLAUDE_CODE_MAX_OUTPUT_TOKENS=100000
+      export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
       export ANTHROPIC_DEFAULT_OPUS_MODEL="qwen3.5-27B-full"
       export ANTHROPIC_DEFAULT_SONNET_MODEL="qwen3.5-27B-full"
       export ANTHROPIC_DEFAULT_HAIKU_MODEL="''${OLAUDE_HAIKU:-qwen3.5-27B-full}"
@@ -57,10 +60,29 @@ let
       export ANTHROPIC_BASE_URL="http://10.100.0.100:8080"
       export API_TIMEOUT_MS="3000000"
       export CLAUDE_CODE_MAX_OUTPUT_TOKENS=100000
+      export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
       export ANTHROPIC_DEFAULT_OPUS_MODEL="qwen3.5-35B-A3B-full"
       export ANTHROPIC_DEFAULT_SONNET_MODEL="qwen3.5-35B-A3B-full"
       export ANTHROPIC_DEFAULT_HAIKU_MODEL="''${OLAUDE_HAIKU:-qwen3.5-35B-A3B-full}"
       exec claude "$@"
+    '';
+  };
+
+  # Pi coding agent wrapper for Ninho local models (Qwen via OpenAI-compatible API)
+  pi-local = pkgs.writeShellApplication {
+    name = "pi-local";
+    runtimeInputs = [ ];
+    text = ''
+      exec pi --provider ninho --model qwen3.5-27B-full "$@"
+    '';
+  };
+
+  # Pi coding agent wrapper for GLM via Ninho (Anthropic-compatible API via z.ai)
+  pi-glm = pkgs.writeShellApplication {
+    name = "pi-glm";
+    runtimeInputs = [ ];
+    text = ''
+      exec pi --provider ninho-glm --model "''${PI_GLM_MODEL:-GLM-4.7}" "$@"
     '';
   };
 
@@ -132,6 +154,8 @@ in
       olaude-qwen3-5-9B
       olaude-qwen3-5-27B
       olaude-qwen3-5-35B-A3B
+      pi-local
+      pi-glm
     ];
   };
 

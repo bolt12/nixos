@@ -30,6 +30,10 @@
         # Reduce escape time for faster responsiveness (esp. with Vim)
         set -sg escape-time 10 # Or 0
 
+        # Extended keys for modified key sequences (needed by Pi, Claude Code, etc.)
+        set -g extended-keys on
+        set -g extended-keys-format csi-u
+
         # Split panes using | and - (Vim-like) in current path
         bind | split-window -h -c "#{pane_current_path}"
         bind - split-window -v -c "#{pane_current_path}"

@@ -29,6 +29,10 @@
   # ==========================================================================
 
   boot = {
+    # Use 6.18 kernel for native r8126 driver (fixes RTL8126A NETDEV WATCHDOG timeouts)
+    # 6.19 breaks NVIDIA 580.x (vm_area_struct.__vm_flags removed)
+    kernelPackages = pkgs.linuxPackages_6_18;
+
     # Supported filesystems
     supportedFilesystems = [ "zfs" ];
 
@@ -48,13 +52,11 @@
     kernelParams = [
       # NVIDIA configuration
       "nvidia-drm.modeset=1"
+      "nvidia-drm.fbdev=1"       # Enable NVIDIA framebuffer device (improves KMS capture, driver 560+)
 
       # PCI/PCIe power management - Disable ASPM to prevent network/SATA lockups
       "pcie_aspm=off"
 
-      # Realtek RTL8126A network driver stability (r8169)
-      "r8169.use_dac=1"   # Enable DAC (Dual Address Cycle)
-      "r8169.aspm=0"      # Disable ASPM at driver level (prevents watchdog timeouts)
       "iommu=pt"          # IOMMU passthrough (avoids swiotlb bounce buffer faults on AHCI)
 
       # Initrd networking for Clevis/Tang LUKS auto-unlock

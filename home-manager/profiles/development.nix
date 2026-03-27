@@ -27,6 +27,7 @@ in {
     nix-ai-tools.claude-code  # Claude code
     nix-ai-tools.opencode     # Opencode
     nix-ai-tools.codex        # OpenAI Codex
+    nix-ai-tools.pi           # Pi coding agent
 
     # System development tools
     patchelf                     # ELF patcher for binaries

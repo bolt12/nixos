@@ -166,7 +166,7 @@ in
 
         z-ai = {
           proxy = "https://api.z.ai/api/anthropic";
-          apiKey = "37340e5d6c9044de9800b79aa8ebada7.6gocjlASMUDCC3VY";
+          apiKey = "a4fa0ae51579418d8a4fe5d547c0f0e5.8tEPzRTbIBYKmfpI";
           models = [
             "GLM-5"
             "GLM-4.7"
