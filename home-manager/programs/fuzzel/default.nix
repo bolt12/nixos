@@ -5,12 +5,13 @@
     enable = true;
     settings = {
       main = {
-        font = "JetBrainsMono Nerd Font:size=11";
+        font = "JetBrainsMono Nerd Font:size=13";
         terminal = "konsole";
-        width = 35;
-        lines = 10;
+        width = 50;
+        lines = 15;
         layer = "overlay";
         prompt = "  ";
+        inner-pad = 12;
       };
       colors = {
         # Catppuccin Mocha

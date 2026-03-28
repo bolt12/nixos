@@ -55,14 +55,14 @@ tooltip label {
 }
 
 #workspaces button {
-    padding: 2px 8px;
+    padding: 2px 10px;
     margin: 2px 1px;
     color: @overlay0;
     border-radius: 8px;
     background: transparent;
     border: none;
     transition: all 0.2s ease;
-    min-width: 20px;
+    min-width: 28px;
 }
 
 #workspaces button:hover {

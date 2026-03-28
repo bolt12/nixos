@@ -98,7 +98,9 @@
       enable = true;
       settings = [
         {
-          profile.name = "docked-ultrawide";
+          # Both external monitors — disable laptop, use 2560x1080 ultrawide
+          # to free extender bandwidth for LG at 60Hz
+          profile.name = "docked-dual";
           profile.outputs = [
             {
               criteria = "eDP-1";
@@ -109,45 +111,47 @@
               mode = "2560x1080@60Hz";
               position = "0,0";
             }
+            {
+              criteria = "LG Electronics LG HDR 4K 0x000694F9";
+              mode = "1920x1080@60Hz";
+              transform = "90";
+              position = "2560,0";
+            }
           ];
         }
         {
-          profile.name = "docked-hdmi";
+          # Ultrawide only
+          profile.name = "docked-ultrawide";
           profile.outputs = [
             {
               criteria = "eDP-1";
-              position = "0,1326";
+              status = "disable";
             }
             {
-              criteria = "HDMI-A-1";
+              criteria = "OOO BW-GM3 0000000000001";
+              mode = "3440x1440@60Hz";
+              position = "0,0";
+            }
+          ];
+        }
+        {
+          # LG 4K only — full 4K possible when ultrawide is off
+          profile.name = "docked-lg";
+          profile.outputs = [
+            {
+              criteria = "eDP-1";
+              status = "disable";
+            }
+            {
+              criteria = "LG Electronics LG HDR 4K 0x000694F9";
               mode = "3840x2160@30Hz";
-              scale = 1.75;
+              scale = 2.0;
               transform = "90";
             }
           ];
         }
         {
-          profile.name = "triple";
-          profile.outputs = [
-            {
-              criteria = "eDP-1";
-              position = "0,1326";
-            }
-            {
-              criteria = "OOO BW-GM3 0000000000001";
-              mode = "2560x1080@60Hz";
-              position = "1920,1326";
-            }
-            {
-              criteria = "LG Electronics LG HDR 4K 0x000694F9";
-              mode = "2560x1440@60Hz";
-              scale = 1.5;
-              position = "4480,880";
-              transform = "270";
-            }
-          ];
-        }
-        {
+          # Laptop only
           profile.name = "undocked";
           profile.outputs = [
             {

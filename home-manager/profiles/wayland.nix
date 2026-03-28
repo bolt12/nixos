@@ -10,7 +10,7 @@
 
     # Wayland compositor tools
     waybar # Status bar
-    fuzzel # Application launcher (replaces wofi)
+    # fuzzel is configured via programs.fuzzel (programs/fuzzel/default.nix)
     swaynotificationcenter # Notification center (replaces mako)
     swaylock-effects # Screen locker with blur/clock (replaces swaylock-fancy)
     wlogout # Logout menu
@@ -27,7 +27,7 @@
 
     # Display management
     wdisplays # Display configuration
-    kanshi # Automatic display profile switching
+    # kanshi is configured via services.kanshi (users/bolt-with-de/home.nix)
     brightnessctl # Brightness control
     wlsunset # Blue light filter
     wl-gammactl # Gamma correction

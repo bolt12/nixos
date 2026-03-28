@@ -3,6 +3,7 @@
 let
   mod = "Mod1";
   lockCmd = "swaylock --clock --indicator --effect-blur 7x5 --effect-vignette 0.5:0.5 --grace 5 --fade-in 0.2";
+  wallpaper = ../../background.png;
 in
 {
   services.gnome-keyring.enable = true;
@@ -125,7 +126,7 @@ in
         inner = 8;
         outer = 4;
         smartBorders = "on";
-        smartGaps = true;
+        smartGaps = false;
       };
 
       colors = {
@@ -185,7 +186,7 @@ in
       # Only wallpaper is set here
       output = {
         "*" = {
-          bg = "~/Documents/background.png fill";
+          bg = "${wallpaper} fill";
         };
       };
 
@@ -402,11 +403,11 @@ in
       output * max_render_time 6
 
       # Workspace output assignments (with fallback monitors)
-      workspace 1 output "OOO BW-GM3 0000000000001" HDMI-A-1
-      workspace 2 output "OOO BW-GM3 0000000000001" HDMI-A-1
-      workspace 3 output eDP-1 "LG Electronics LG HDR 4K 0x000694F9"
+      workspace 1 output "OOO BW-GM3 0000000000001" eDP-1
+      workspace 2 output "OOO BW-GM3 0000000000001" eDP-1
+      workspace 3 output "LG Electronics LG HDR 4K 0x000694F9" eDP-1
 
-      # Default focus
+      # Default focus on ultrawide
       focus output "OOO BW-GM3 0000000000001"
 
       # Laptop lid switch
@@ -421,4 +422,5 @@ in
     source = ../../xdg/sway/laptop-lid.sh;
     executable = true;
   };
+
 }

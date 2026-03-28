@@ -11,18 +11,18 @@
     "modules-right": ["group/system", "privacy", "idle_inhibitor", "systemd-failed-units", "custom/notification", "bluetooth", "wireplumber", "custom/weather", "battery", "tray", "custom/powermenu"],
 
     "sway/workspaces": {
-        "format": "{icon}",
+        "format": "{name} {icon}",
         "format-icons": {
             "1": "",
             "2": "",
             "3": "",
             "4": "󰙯",
             "5": "",
-            "6": "6",
-            "7": "7",
-            "8": "8",
+            "6": "",
+            "7": "",
+            "8": "",
             "9": "",
-            "10": "10",
+            "10": "",
             "urgent": "",
             "default": ""
         },
