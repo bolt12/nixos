@@ -50,7 +50,18 @@
       "WebFetch(domain:developer.nvidia.com)",
       "WebFetch(domain:cdn.jsdelivr.net)",
       "WebFetch(domain:nixos.wiki)",
-      "WebFetch(domain:jellyfin.org)"
+      "WebFetch(domain:jellyfin.org)",
+      "Bash(ls:*)",
+      "Bash(swaymsg:*)",
+      "Read(//home/bolt/.config/**)",
+      "Bash(sudo dmesg:*)",
+      "Read(//sys/class/drm/card1-DP-3/**)",
+      "Read(//sys/class/drm/card1-DP-4/**)",
+      "Bash(for d:*)",
+      "Bash(do echo:*)",
+      "Read(//sys/class/drm/$d/**)",
+      "Read(//sys/class/drm/**)",
+      "Bash(done)"
     ],
     "deny": [],
     "ask": []

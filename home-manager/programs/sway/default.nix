@@ -313,6 +313,10 @@ in
         "${mod}+y" = "border none";
         "${mod}+u" = "border pixel 1";
         "${mod}+i" = "border normal";
+
+        # Toggle LG monitor (for when it's cabled but powered off —
+        # kanshi can't tell, so manually disable to trigger BlitzWolf-only profile)
+        "${mod}+Shift+m" = ''exec swaymsg -t get_outputs | jq -r '.[] | select(.name | test("DP-[0-9]+")) | select(.make == "LG Electronics") | .name' | xargs -I{} swaymsg output "{}" toggle'';
       };
 
       modes = {

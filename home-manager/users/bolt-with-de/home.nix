@@ -94,12 +94,16 @@
     };
 
     # Automatic display profile switching
+    # Note: kanshi detects based on connected outputs, not powered-on state.
+    # If the LG is cabled but powered off, kanshi still sees it as connected
+    # and matches the dual profile. Use Mod+Shift+m to manually toggle the
+    # LG output, or physically disconnect it for BlitzWolf-only mode.
     kanshi = {
       enable = true;
       settings = [
         {
-          # Both external monitors — disable laptop, use 2560x1080 ultrawide
-          # to free extender bandwidth for LG at 60Hz
+          # Both external monitors — BlitzWolf at full res with scaling,
+          # LG portrait at 1080p@30Hz (USB-C dock bandwidth constraint)
           profile.name = "docked-dual";
           profile.outputs = [
             {
@@ -108,20 +112,21 @@
             }
             {
               criteria = "OOO BW-GM3 0000000000001";
-              mode = "2560x1080@60Hz";
+              mode = "3440x1440@60Hz";
+              scale = 1.3;
               position = "0,0";
             }
             {
               criteria = "LG Electronics LG HDR 4K 0x000694F9";
-              mode = "1920x1080@60Hz";
+              mode = "1920x1080@30Hz";
               transform = "90";
-              position = "2560,0";
+              position = "2646,0";
             }
           ];
         }
         {
-          # Ultrawide only
-          profile.name = "docked-ultrawide";
+          # BlitzWolf only — full resolution with comfortable scaling
+          profile.name = "docked-blitzwolf";
           profile.outputs = [
             {
               criteria = "eDP-1";
@@ -130,12 +135,13 @@
             {
               criteria = "OOO BW-GM3 0000000000001";
               mode = "3440x1440@60Hz";
+              scale = 1.3;
               position = "0,0";
             }
           ];
         }
         {
-          # LG 4K only — full 4K possible when ultrawide is off
+          # LG 4K only — full 4K possible when BlitzWolf is off
           profile.name = "docked-lg";
           profile.outputs = [
             {

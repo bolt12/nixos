@@ -5,73 +5,87 @@
 let
   # Define the ignore patterns in a "heredoc" string
   docsIgnorePatterns = pkgs.writeText "documents-stignore" ''
+    // (?d) = allow Syncthing to delete ignored files when their parent
+    // directory is removed on the remote side. Without this, directories
+    // containing only ignored build artifacts can never be cleaned up,
+    // causing perpetual "Failed to sync" warnings and a red tray icon.
+
     // --- Version control ---
     // Sync working trees only; use git push/pull for repo state
-    .git
+    (?d).git
 
     // --- General ---
-    .DS_Store
-    Thumbs.db
-    *~
-    *.lock
-    .claude
+    (?d).DS_Store
+    (?d)Thumbs.db
+    (?d)*~
+    (?d)*.lock
+    (?d).claude
+
+    // --- C / C++ / CMake ---
+    (?d)CMakeFiles
+    (?d)CMakeCache.txt
+    (?d)cmake_install.cmake
+    (?d)Makefile
+    (?d)*.a
+    (?d)*.so
+    (?d)*.dylib
 
     // --- Haskell (Cabal / Stack) ---
-    dist-newstyle
-    .stack-work
-    cabal.sandbox.config
-    .cabal-sandbox
-    *.o
-    *.hi
-    *.chi
-    *.chs.h
-    *.dyn_o
-    *.dyn_hi
+    (?d)dist-newstyle
+    (?d).stack-work
+    (?d)cabal.sandbox.config
+    (?d).cabal-sandbox
+    (?d)*.o
+    (?d)*.hi
+    (?d)*.chi
+    (?d)*.chs.h
+    (?d)*.dyn_o
+    (?d)*.dyn_hi
 
     // --- Agda ---
-    *.agdai
-    MAlonzo
+    (?d)*.agdai
+    (?d)MAlonzo
 
     // --- Lean ---
-    .lake
-    lake-packages
-    build/bin
-    build/ir
-    build/lib
+    (?d).lake
+    (?d)lake-packages
+    (?d)build/bin
+    (?d)build/ir
+    (?d)build/lib
 
     // --- Java ---
-    *.class
-    .gradle
-    .settings
-    .classpath
-    .project
-    target
+    (?d)*.class
+    (?d).gradle
+    (?d).settings
+    (?d).classpath
+    (?d).project
+    (?d)target
 
     // --- JS / Node ---
-    node_modules
-    .next
-    .nuxt
-    .parcel-cache
-    .turbo
-    .angular
-    bower_components
+    (?d)node_modules
+    (?d).next
+    (?d).nuxt
+    (?d).parcel-cache
+    (?d).turbo
+    (?d).angular
+    (?d)bower_components
 
     // --- Nix ---
-    result
-    result-*
-    .direnv
+    (?d)result
+    (?d)result-*
+    (?d).direnv
 
     // --- Chrome extensions ---
-    .chrome-profile
+    (?d).chrome-profile
 
     // --- IDE / editor ---
-    .idea
-    .vscode
-    *.swp
-    *.swo
+    (?d).idea
+    (?d).vscode
+    (?d)*.swp
+    (?d)*.swo
 
     // --- Generated output ---
-    Bolt/Playground/Haskell/generative-art/showcases
+    (?d)Bolt/Playground/Haskell/generative-art/showcases
   '';
 in
 {
