@@ -265,7 +265,7 @@ in
         "${mod}+Shift+equal" = "scratchpad show";
 
         # Session
-        "${mod}+Shift+c" = "reload";
+        "${mod}+Shift+c" = "reload; exec kanshictl reload";
         "${mod}+Shift+r" = "restart";
         "${mod}+Shift+e" = "exec wlogout";
 
@@ -346,9 +346,10 @@ in
           command = "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway";
         }
 
-        # PipeWire audio stack
+        # Restart portal services so they pick up the Wayland environment
+        # PipeWire is started via socket activation by systemd — no restart needed
         {
-          command = "systemctl --user restart pipewire pipewire-pulse.service pipewire-pulse.socket pipewire.socket wireplumber.service";
+          command = "systemctl --user restart xdg-desktop-portal.service xdg-desktop-portal-gtk.service xdg-desktop-portal-wlr.service";
         }
 
         # System tray applets
@@ -363,9 +364,6 @@ in
 
         # Input method
         { command = "fcitx5"; }
-
-        # PipeWire session manager
-        { command = "wireplumber"; }
 
         # Autotiling — auto-alternate horizontal/vertical splits
         {

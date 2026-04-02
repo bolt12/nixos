@@ -67,5 +67,8 @@
 
     # Sync
     atuin = 8888;
+
+    # Nix cache
+    attic = 8090;
   };
 }

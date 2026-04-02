@@ -201,10 +201,9 @@
             # Public key of the server (not a file path).
             publicKey = "2OIP77a10/Fas+eCvYQNa3ixFNOq0JqZIuSk1tY/QTM=";
 
-            # Forward all the traffic via VPN.
-            allowedIPs = [ "0.0.0.0/0" ];
-            # Or forward only particular subnets
-            #allowedIPs = [ "10.100.0.1" "91.108.12.0/22" ];
+            # Route only VPN subnet — avoids default route conflict at boot
+            # (0.0.0.0/0 caused a routing loop before the WiFi route was established)
+            allowedIPs = [ "10.100.0.0/24" ];
 
             # Set this to the server IP and port.
             endpoint = "rpi-nixos.ddns.net:51820";

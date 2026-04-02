@@ -162,6 +162,19 @@
 
       # Required by Cachix to be used as non-root user
       trusted-users = [ "root" "bolt" ];
+
+      # Ninho Attic binary cache (accessible via WireGuard VPN)
+      # Low connect-timeout so nix doesn't stall when VPN is down
+      connect-timeout = 2;
+      # TODO: after first deploy, get the public key with:
+      #   attic cache info <cache-name>
+      # and add it to extra-trusted-public-keys below
+      extra-substituters = [
+        "http://10.100.0.100:8090/main"
+      ];
+      extra-trusted-public-keys = [
+        # "<cache-name>:<public-key>" — fill in after creating the cache on ninho
+      ];
     };
   };
 
