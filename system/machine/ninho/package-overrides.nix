@@ -31,13 +31,13 @@ in
         rocmSupport = false;
         metalSupport = false;
       }).overrideAttrs (oldAttrs: {
-        version = "8334";
+        version = "8635";
 
         src = pkgs.fetchFromGitHub {
           owner = "ggml-org";
           repo = "llama.cpp";
-          tag = "b8334";
-          hash = "sha256-1WBivYmZQgujl73IS4J5/jUiwOh/d2ZfKRA93P9ADiM=";
+          tag = "b8635";
+          hash = "sha256-KdSiGELpa8WxSC8wjZ8pi3Anv+Y3ZlqN+5qTdwNjuJI=";
           leaveDotGit = true;
           postFetch = ''
             git -C "$out" rev-parse --short HEAD > $out/COMMIT
@@ -56,7 +56,14 @@ in
         '';
 
         # Webui npm deps hash changed with this source version
-        npmDepsHash = "sha256-5ZswgZFLeI32/xQZqCTTFbCzleDqr5AotjFg/5rNn1M=";
+        npmDepsHash = "sha256-DxgUDVr+kwtW55C4b89Pl+j3u2ILmACcQOvOBjKWAKQ=";
+
+        # b8635 removed tools/server/public/index.html.gz from the source tree,
+        # but upstream nixpkgs postPatch still tries to rm it — use -f to tolerate
+        postPatch = builtins.replaceStrings
+          [ "rm tools/server/public/index.html.gz" ]
+          [ "rm -f tools/server/public/index.html.gz" ]
+          (oldAttrs.postPatch or "");
 
         # Keep the original postInstall to handle installation correctly
         postInstall = oldAttrs.postInstall or "";
@@ -68,8 +75,8 @@ in
         llama-swap-src = pkgs.fetchFromGitHub {
           owner = "mostlygeek";
           repo = "llama-swap";
-          tag = "v198";
-          hash = "sha256-7fZUKDCtj8RGca53CkLwVpvNWX6ryTbS02Uz/+uZpTs=";
+          tag = "v199";
+          hash = "sha256-tAWXhfOWPLBuEgd+32CbuIkn1hN+4VI4xkyx7E2a81I=";
           leaveDotGit = true;
           postFetch = ''
             cd "$out"
@@ -80,7 +87,7 @@ in
         };
         llama-swap-ui = pkgs.buildNpmPackage {
           pname = "llama-swap-ui";
-          version = "198";
+          version = "199";
           src = llama-swap-src;
           sourceRoot = "${llama-swap-src.name}/ui-svelte";
           npmDepsHash = "sha256-gTDsuWPLCWsPltioziygFmSQFdLqjkZpmmVWIWoZwoc=";
@@ -92,8 +99,8 @@ in
             rm -rf $out/lib
           '';
         };
-      in prev.llama-swap.overrideAttrs (oldAttrs: {
-        version = "198";
+      in unstable.llama-swap.overrideAttrs (oldAttrs: {
+        version = "199";
         src = llama-swap-src;
         proxyVendor = true;
         vendorHash = "sha256-TPOKqgyf8vltRLbtNWXcK3jsWsVFaSrZAc+/AMkG/8A=";

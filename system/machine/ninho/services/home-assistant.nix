@@ -1542,199 +1542,234 @@ in
       # Main Dashboard Views
       views = [
         # ═══════════════════════════════════════════════════════════════
-        # VIEW 1: HOME - Overview with bubble-card navigation
+        # VIEW 1: HOME
         # ═══════════════════════════════════════════════════════════════
         {
+          type = "sections";
           title = "Home";
           icon = "mdi:home";
           path = "home";
+          max_columns = 4;
           badges = [
             { entity = "person.armando"; }
             { entity = "sun.sun"; }
           ];
-          cards = [
-            # ── Bubble-Card Bottom Navigation (persistent across views) ──
+          sections = [
+            # ── Navigation Overlay (position: fixed) ──
             {
-              type = "custom:bubble-card";
-              card_type = "horizontal-buttons-stack";
-              auto_order = false;
-              "1_link" = "/lovelace/home";
-              "1_icon" = "mdi:home";
-              "1_name" = "Home";
-              "2_link" = "/lovelace/climate";
-              "2_icon" = "mdi:thermostat";
-              "2_name" = "Climate";
-              "3_link" = "/lovelace/health";
-              "3_icon" = "mdi:heart-pulse";
-              "3_name" = "Health";
-              "4_link" = "/lovelace/media";
-              "4_icon" = "mdi:play-circle";
-              "4_name" = "Media";
-              "5_link" = "/lovelace/services";
-              "5_icon" = "mdi:apps";
-              "5_name" = "Services";
-              "6_link" = "/lovelace/system";
-              "6_icon" = "mdi:server";
-              "6_name" = "System";
-              styles = ''
-                .horizontal-buttons-stack-container {
-                  background: rgba(var(--rgb-card-background-color), 0.9) !important;
-                  backdrop-filter: blur(10px);
-                  border-radius: 24px 24px 0 0;
+              type = "grid";
+              cards = [
+                {
+                  type = "custom:bubble-card";
+                  card_type = "horizontal-buttons-stack";
+                  auto_order = false;
+                  "1_link" = "/lovelace/home";
+                  "1_icon" = "mdi:home";
+                  "1_name" = "Home";
+                  "2_link" = "/lovelace/climate";
+                  "2_icon" = "mdi:thermostat";
+                  "2_name" = "Climate";
+                  "3_link" = "/lovelace/health";
+                  "3_icon" = "mdi:heart-pulse";
+                  "3_name" = "Health";
+                  "4_link" = "/lovelace/media";
+                  "4_icon" = "mdi:play-circle";
+                  "4_name" = "Media";
+                  "5_link" = "/lovelace/services";
+                  "5_icon" = "mdi:apps";
+                  "5_name" = "Services";
+                  "6_link" = "/lovelace/system";
+                  "6_icon" = "mdi:server";
+                  "6_name" = "System";
+                  "7_link" = "/lovelace/settings";
+                  "7_icon" = "mdi:cog";
+                  "7_name" = "Settings";
+                  styles = ''
+                    .horizontal-buttons-stack-container {
+                      background: rgba(var(--rgb-card-background-color), 0.9) !important;
+                      backdrop-filter: blur(10px);
+                      border-radius: 24px 24px 0 0;
+                    }
+                  '';
                 }
-              '';
+              ];
             }
-            # ── Dynamic Greeting ──
+            # ── Welcome ──
             {
-              type = "custom:button-card";
-              entity = "sensor.time_of_day";
-              name = "[[[ return 'Good ' + entity.state + ', Armando' ]]]";
-              styles = {
-                card = [
-                  { "background" = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"; }
-                  { "color" = "white"; }
-                  { "font-size" = "24px"; }
-                  { "font-weight" = "bold"; }
-                  { "padding" = "20px"; }
-                  { "border-radius" = "16px"; }
-                ];
-              };
+              type = "grid";
+              title = "Welcome";
+              cards = [
+                {
+                  type = "custom:button-card";
+                  entity = "sensor.time_of_day";
+                  name = "[[[ return 'Good ' + entity.state + ', Armando' ]]]";
+                  layout_options = { grid_columns = 4; grid_rows = 1; };
+                  styles = {
+                    card = [
+                      { "background" = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"; }
+                      { "color" = "white"; }
+                      { "font-size" = "24px"; }
+                      { "font-weight" = "bold"; }
+                      { "padding" = "20px"; }
+                      { "border-radius" = "16px"; }
+                    ];
+                  };
+                }
+                {
+                  type = "custom:mushroom-chips-card";
+                  alignment = "center";
+                  layout_options = { grid_columns = 4; grid_rows = 1; };
+                  chips = [
+                    {
+                      type = "entity";
+                      entity = "person.armando";
+                      content_info = "state";
+                    }
+                    {
+                      type = "template";
+                      icon = "mdi:air-conditioner";
+                      content = "{{ states('sensor.active_ac_units') }} AC";
+                      icon_color = "{% if states('sensor.active_ac_units')|int > 0 %}blue{% else %}grey{% endif %}";
+                    }
+                    {
+                      type = "template";
+                      icon = "mdi:thermostat-auto";
+                      content = "{{ states('sensor.smart_hvac_mode') | title }}";
+                      icon_color = "{% if states('sensor.smart_hvac_mode') == 'cool' %}blue{% else %}orange{% endif %}";
+                    }
+                    {
+                      type = "weather";
+                      entity = "weather.forecast_home";
+                      show_conditions = true;
+                      show_temperature = true;
+                    }
+                    {
+                      type = "template";
+                      icon = "mdi:heart-pulse";
+                      content = "{{ states('sensor.recovery_score') }}%";
+                      icon_color = "{% set s = states('sensor.recovery_score')|int(0) %}{% if s >= 70 %}green{% elif s >= 50 %}amber{% else %}red{% endif %}";
+                    }
+                    {
+                      type = "entity";
+                      entity = "sensor.prado_travel_distance_from_braga";
+                      icon = "mdi:car";
+                    }
+                  ];
+                }
+              ];
             }
-            # ── Status Chips Row ──
+            # ── At a Glance ──
             {
-              type = "custom:mushroom-chips-card";
-              alignment = "center";
-              chips = [
+              type = "grid";
+              title = "At a Glance";
+              cards = [
                 {
-                  type = "entity";
-                  entity = "person.armando";
-                  content_info = "state";
-                }
-                {
-                  type = "template";
-                  icon = "mdi:air-conditioner";
-                  content = "{{ states('sensor.active_ac_units') }} AC";
-                  icon_color = "{% if states('sensor.active_ac_units')|int > 0 %}blue{% else %}grey{% endif %}";
-                }
-                {
-                  type = "template";
-                  icon = "mdi:thermostat-auto";
-                  content = "{{ states('sensor.smart_hvac_mode') | title }}";
-                  icon_color = "{% if states('sensor.smart_hvac_mode') == 'cool' %}blue{% else %}orange{% endif %}";
-                }
-                {
-                  type = "weather";
+                  type = "weather-forecast";
                   entity = "weather.forecast_home";
-                  show_conditions = true;
-                  show_temperature = true;
+                  show_forecast = true;
+                  forecast_type = "daily";
+                  layout_options = { grid_columns = 2; grid_rows = 2; };
                 }
                 {
-                  type = "template";
-                  icon = "mdi:heart-pulse";
-                  content = "{{ states('sensor.recovery_score') }}%";
-                  icon_color = "{% set s = states('sensor.recovery_score')|int(0) %}{% if s >= 70 %}green{% elif s >= 50 %}amber{% else %}red{% endif %}";
-                }
-                {
-                  type = "entity";
-                  entity = "sensor.prado_travel_distance_from_braga";
-                  icon = "mdi:car";
-                }
-              ];
-            }
-            # ── Weather Card ──
-            {
-              type = "weather-forecast";
-              entity = "weather.forecast_home";
-              show_forecast = true;
-              forecast_type = "daily";
-              card_mod.style = "ha-card { border-radius: 12px; }";
-            }
-            # ── Contextual Room Temperature ──
-            {
-              type = "custom:button-card";
-              entity = "sensor.time_of_day";
-              name = "[[[ const h = new Date().getHours(); const d = new Date().getDay(); if (h >= 8 && h < 18 && d >= 1 && d <= 5) return 'Office'; if (h >= 23 || h < 8) return 'Bedroom'; return 'Living Room'; ]]]";
-              label = "[[[ const h = new Date().getHours(); const d = new Date().getDay(); if (h >= 8 && h < 18 && d >= 1 && d <= 5) return states['climate.ac_escritorio'].attributes.current_temperature + '°C'; if (h >= 23 || h < 8) return states['climate.ac_quarto'].attributes.current_temperature + '°C'; return states['climate.ac_sala'].attributes.current_temperature + '°C'; ]]]";
-              show_label = true;
-              icon = "[[[ const h = new Date().getHours(); const d = new Date().getDay(); if (h >= 8 && h < 18 && d >= 1 && d <= 5) return 'mdi:desk'; if (h >= 23 || h < 8) return 'mdi:bed'; return 'mdi:sofa'; ]]]";
-              styles = {
-                card = [
-                  { "background" = "rgba(var(--rgb-primary-color), 0.1)"; }
-                  { "border-radius" = "12px"; }
-                  { "padding" = "16px"; }
-                ];
-                label = [
-                  { "font-size" = "28px"; }
-                  { "font-weight" = "bold"; }
-                ];
-              };
-            }
-            # ── Quick Action Chips ──
-            {
-              type = "custom:mushroom-chips-card";
-              alignment = "center";
-              chips = [
-                {
-                  type = "template";
-                  icon = "mdi:power-off";
-                  icon_color = "red";
-                  content = "All AC Off";
-                  tap_action = {
-                    action = "call-service";
-                    service = "script.all_ac_off";
-                  };
-                }
-                {
-                  type = "template";
-                  icon = "mdi:weather-night";
-                  icon_color = "indigo";
-                  content = "Night Mode";
-                  tap_action = {
-                    action = "call-service";
-                    service = "script.all_ac_off";
-                  };
-                }
-                {
-                  type = "template";
-                  icon = "mdi:home-export-outline";
-                  icon_color = "green";
-                  content = "Away Mode";
-                  tap_action = {
-                    action = "call-service";
-                    service = "automation.trigger";
-                    service_data = { entity_id = "automation.away_mode_all_ac_off"; };
+                  type = "custom:button-card";
+                  entity = "sensor.time_of_day";
+                  name = "[[[ const h = new Date().getHours(); const d = new Date().getDay(); if (h >= 8 && h < 18 && d >= 1 && d <= 5) return 'Office'; if (h >= 23 || h < 8) return 'Bedroom'; return 'Living Room'; ]]]";
+                  label = "[[[ const h = new Date().getHours(); const d = new Date().getDay(); if (h >= 8 && h < 18 && d >= 1 && d <= 5) return states['climate.ac_escritorio'].attributes.current_temperature + '°C'; if (h >= 23 || h < 8) return states['climate.ac_quarto'].attributes.current_temperature + '°C'; return states['climate.ac_sala'].attributes.current_temperature + '°C'; ]]]";
+                  show_label = true;
+                  icon = "[[[ const h = new Date().getHours(); const d = new Date().getDay(); if (h >= 8 && h < 18 && d >= 1 && d <= 5) return 'mdi:desk'; if (h >= 23 || h < 8) return 'mdi:bed'; return 'mdi:sofa'; ]]]";
+                  layout_options = { grid_columns = 2; grid_rows = 2; };
+                  styles = {
+                    card = [
+                      { "background" = "rgba(var(--rgb-primary-color), 0.1)"; }
+                      { "border-radius" = "12px"; }
+                      { "padding" = "16px"; }
+                    ];
+                    label = [
+                      { "font-size" = "28px"; }
+                      { "font-weight" = "bold"; }
+                    ];
                   };
                 }
               ];
             }
-            # ── Today's Calendar ──
+            # ── Quick Actions ──
             {
-              type = "calendar";
-              entities = [
-                "calendar.armando_well_typed_com"
-                "calendar.armandoifsantos_gmail_com"
+              type = "grid";
+              title = "Quick Actions";
+              cards = [
+                {
+                  type = "custom:mushroom-chips-card";
+                  alignment = "center";
+                  layout_options = { grid_columns = 4; grid_rows = 1; };
+                  chips = [
+                    {
+                      type = "template";
+                      icon = "mdi:power-off";
+                      icon_color = "red";
+                      content = "All AC Off";
+                      tap_action = {
+                        action = "call-service";
+                        service = "script.all_ac_off";
+                      };
+                    }
+                    {
+                      type = "template";
+                      icon = "mdi:home-export-outline";
+                      icon_color = "green";
+                      content = "Away Mode";
+                      tap_action = {
+                        action = "call-service";
+                        service = "automation.trigger";
+                        service_data = { entity_id = "automation.away_mode_all_ac_off"; };
+                      };
+                    }
+                  ];
+                }
               ];
-              card_mod.style = "ha-card { border-radius: 12px; }";
+            }
+            # ── Schedule ──
+            {
+              type = "grid";
+              title = "Schedule";
+              cards = [
+                {
+                  type = "calendar";
+                  entities = [
+                    "calendar.armando_well_typed_com"
+                    "calendar.armandoifsantos_gmail_com"
+                    "calendar.birthdays"
+                    "calendar.holidays_in_portugal"
+                  ];
+                  layout_options = { grid_columns = 4; grid_rows = 3; };
+                }
+              ];
             }
             # ── Now Playing ──
             {
-              type = "custom:auto-entities";
-              card = {
-                type = "entities";
-                title = "Now Playing";
-              };
-              filter = {
-                include = [
-                  { domain = "media_player"; state = "playing"; }
-                  { domain = "media_player"; state = "paused"; }
-                ];
-              };
-              sort.method = "state";
-              show_empty = false;
+              type = "grid";
+              title = "Now Playing";
+              cards = [
+                {
+                  type = "custom:auto-entities";
+                  card = {
+                    type = "entities";
+                  };
+                  filter = {
+                    include = [
+                      { domain = "media_player"; state = "playing"; }
+                      { domain = "media_player"; state = "paused"; }
+                    ];
+                  };
+                  sort.method = "state";
+                  show_empty = false;
+                  layout_options = { grid_columns = 4; grid_rows = 2; };
+                }
+              ];
             }
-            # ── Recovery At-a-Glance ──
+            # ── Health Summary ──
             {
-              type = "horizontal-stack";
+              type = "grid";
+              title = "Health Summary";
               cards = [
                 {
                   type = "gauge";
@@ -1743,24 +1778,21 @@ in
                   min = 0;
                   max = 100;
                   severity = { green = 70; yellow = 50; red = 0; };
-                  card_mod.style = "ha-card { border-radius: 12px; }";
+                  layout_options = { grid_columns = 2; grid_rows = 2; };
                 }
                 {
-                  type = "vertical-stack";
-                  cards = [
-                    {
-                      type = "custom:mushroom-entity-card";
-                      entity = "sensor.training_readiness";
-                      name = "Training";
-                      icon = "mdi:dumbbell";
-                    }
-                    {
-                      type = "custom:mushroom-entity-card";
-                      entity = "sensor.garmin_connect_body_battery_most_recent";
-                      name = "Body Battery";
-                      icon = "mdi:battery-heart-variant";
-                    }
-                  ];
+                  type = "custom:mushroom-entity-card";
+                  entity = "sensor.training_readiness";
+                  name = "Training";
+                  icon = "mdi:dumbbell";
+                  layout_options = { grid_columns = 2; grid_rows = 1; };
+                }
+                {
+                  type = "custom:mushroom-entity-card";
+                  entity = "sensor.garmin_connect_body_battery_most_recent";
+                  name = "Body Battery";
+                  icon = "mdi:battery-heart-variant";
+                  layout_options = { grid_columns = 2; grid_rows = 1; };
                 }
               ];
             }
@@ -1768,306 +1800,471 @@ in
         }
 
         # ═══════════════════════════════════════════════════════════════
-        # VIEW 2: CLIMATE - AC controls with apexcharts
+        # VIEW 2: CLIMATE (includes merged Energy analytics)
         # ═══════════════════════════════════════════════════════════════
         {
+          type = "sections";
           title = "Climate";
           icon = "mdi:thermostat";
           path = "climate";
-          cards = [
-            # ── Header ──
+          max_columns = 4;
+          sections = [
+            # ── Status ──
             {
-              type = "custom:mushroom-title-card";
-              title = "Climate Control";
-              subtitle = "Gree AC units";
-              card_mod.style = "ha-card { color: #2196F3; }";
-            }
-            # ── Status Chips ──
-            {
-              type = "custom:mushroom-chips-card";
-              alignment = "center";
-              chips = [
-                {
-                  type = "template";
-                  icon = "mdi:air-conditioner";
-                  content = "{{ states('sensor.active_ac_units') }} Active";
-                  icon_color = "{% if states('sensor.active_ac_units')|int > 0 %}blue{% else %}grey{% endif %}";
-                }
-                {
-                  type = "template";
-                  icon = "mdi:thermostat-auto";
-                  content = "{{ states('sensor.smart_hvac_mode') | title }} Mode";
-                  icon_color = "{% if states('sensor.smart_hvac_mode') == 'cool' %}blue{% else %}orange{% endif %}";
-                }
-                {
-                  type = "weather";
-                  entity = "weather.forecast_home";
-                  show_conditions = true;
-                  show_temperature = true;
-                }
-              ];
-            }
-            # ── Outdoor Temperature (Gree sensors) ──
-            {
-              type = "custom:mushroom-chips-card";
-              alignment = "center";
-              chips = [
-                {
-                  type = "entity";
-                  entity = "sensor.ac_sala_outside_temperature";
-                  icon = "mdi:thermometer";
-                  name = "Sala Out";
-                }
-                {
-                  type = "entity";
-                  entity = "sensor.ac_escritorio_outside_temperature";
-                  icon = "mdi:thermometer";
-                  name = "Office Out";
-                }
-                {
-                  type = "entity";
-                  entity = "sensor.ac_quarto_outside_temperature";
-                  icon = "mdi:thermometer";
-                  name = "Bedroom Out";
-                }
-                {
-                  type = "entity";
-                  entity = "sensor.ac_quarto_hospedes_outside_temperature";
-                  icon = "mdi:thermometer";
-                  name = "Guest Out";
-                }
-              ];
-            }
-            # ── Quick Actions ──
-            {
-              type = "custom:mushroom-chips-card";
-              alignment = "center";
-              chips = [
-                {
-                  type = "template";
-                  icon = "mdi:power-off";
-                  content = "All Off";
-                  icon_color = "red";
-                  tap_action = {
-                    action = "call-service";
-                    service = "script.all_ac_off";
-                  };
-                }
-                {
-                  type = "template";
-                  icon = "mdi:snowflake";
-                  content = "Cool All 22°C";
-                  icon_color = "blue";
-                  tap_action = {
-                    action = "call-service";
-                    service = "climate.set_temperature";
-                    service_data = {
-                      entity_id = [ "climate.ac_sala" "climate.ac_escritorio" "climate.ac_quarto" "climate.ac_quarto_hospedes" ];
-                      temperature = 22;
-                      hvac_mode = "cool";
-                    };
-                  };
-                }
-                {
-                  type = "template";
-                  icon = "mdi:fire";
-                  content = "Heat All 24°C";
-                  icon_color = "orange";
-                  tap_action = {
-                    action = "call-service";
-                    service = "climate.set_temperature";
-                    service_data = {
-                      entity_id = [ "climate.ac_sala" "climate.ac_escritorio" "climate.ac_quarto" "climate.ac_quarto_hospedes" ];
-                      temperature = 24;
-                      hvac_mode = "heat";
-                    };
-                  };
-                }
-              ];
-            }
-            # ── Thermostat Cards ──
-            {
-              type = "thermostat";
-              entity = "climate.ac_sala";
-              name = "Sala (Living Room)";
-              features = [
-                { type = "climate-hvac-modes"; hvac_modes = [ "off" "cool" "heat" "fan_only" "auto" ]; }
-                { type = "climate-fan-modes"; }
-              ];
-            }
-            {
-              type = "thermostat";
-              entity = "climate.ac_escritorio";
-              name = "Escritório (Office)";
-              features = [
-                { type = "climate-hvac-modes"; hvac_modes = [ "off" "cool" "heat" "fan_only" "auto" ]; }
-                { type = "climate-fan-modes"; }
-              ];
-            }
-            {
-              type = "vertical-stack";
+              type = "grid";
+              title = "Status";
               cards = [
                 {
-                  type = "thermostat";
-                  entity = "climate.ac_quarto";
-                  name = "Quarto (Bedroom)";
-                  features = [
-                    { type = "climate-hvac-modes"; hvac_modes = [ "off" "cool" "heat" "fan_only" "auto" ]; }
+                  type = "custom:mushroom-chips-card";
+                  alignment = "center";
+                  layout_options = { grid_columns = 4; grid_rows = 1; };
+                  chips = [
+                    {
+                      type = "template";
+                      icon = "mdi:air-conditioner";
+                      content = "{{ states('sensor.active_ac_units') }} Active";
+                      icon_color = "{% if states('sensor.active_ac_units')|int > 0 %}blue{% else %}grey{% endif %}";
+                    }
+                    {
+                      type = "template";
+                      icon = "mdi:thermostat-auto";
+                      content = "{{ states('sensor.smart_hvac_mode') | title }} Mode";
+                      icon_color = "{% if states('sensor.smart_hvac_mode') == 'cool' %}blue{% else %}orange{% endif %}";
+                    }
+                    {
+                      type = "weather";
+                      entity = "weather.forecast_home";
+                      show_conditions = true;
+                      show_temperature = true;
+                    }
                   ];
                 }
                 {
-                  type = "custom:mushroom-entity-card";
-                  entity = "script.bedroom_quick_heat";
-                  name = "Quick Heat (30 min)";
-                  icon = "mdi:clock-fast";
-                  tap_action = {
-                    action = "call-service";
-                    service = "script.bedroom_quick_heat";
-                  };
-                }
-              ];
-            }
-            {
-              type = "vertical-stack";
-              cards = [
-                {
-                  type = "thermostat";
-                  entity = "climate.ac_quarto_hospedes";
-                  name = "Quarto de Hóspedes (Guest)";
-                  features = [
-                    { type = "climate-hvac-modes"; hvac_modes = [ "off" "cool" "heat" "fan_only" "auto" ]; }
+                  type = "custom:mushroom-chips-card";
+                  alignment = "center";
+                  layout_options = { grid_columns = 4; grid_rows = 1; };
+                  chips = [
+                    {
+                      type = "entity";
+                      entity = "sensor.ac_sala_outside_temperature";
+                      icon = "mdi:thermometer";
+                      name = "Sala Out";
+                    }
+                    {
+                      type = "entity";
+                      entity = "sensor.ac_escritorio_outside_temperature";
+                      icon = "mdi:thermometer";
+                      name = "Office Out";
+                    }
+                    {
+                      type = "entity";
+                      entity = "sensor.ac_quarto_outside_temperature";
+                      icon = "mdi:thermometer";
+                      name = "Bedroom Out";
+                    }
+                    {
+                      type = "entity";
+                      entity = "sensor.ac_quarto_hospedes_outside_temperature";
+                      icon = "mdi:thermometer";
+                      name = "Guest Out";
+                    }
                   ];
                 }
                 {
-                  type = "custom:mushroom-entity-card";
-                  entity = "script.guest_room_on";
-                  name = "Guest Room Heat";
-                  icon = "mdi:fire";
-                  tap_action = {
-                    action = "call-service";
-                    service = "script.guest_room_on";
-                  };
+                  type = "custom:mushroom-chips-card";
+                  alignment = "center";
+                  layout_options = { grid_columns = 4; grid_rows = 1; };
+                  chips = [
+                    {
+                      type = "template";
+                      icon = "mdi:power-off";
+                      content = "All Off";
+                      icon_color = "red";
+                      tap_action = {
+                        action = "call-service";
+                        service = "script.all_ac_off";
+                      };
+                    }
+                    {
+                      type = "template";
+                      icon = "mdi:snowflake";
+                      content = "Cool All 22°C";
+                      icon_color = "blue";
+                      tap_action = {
+                        action = "call-service";
+                        service = "climate.set_temperature";
+                        service_data = {
+                          entity_id = [ "climate.ac_sala" "climate.ac_escritorio" "climate.ac_quarto" "climate.ac_quarto_hospedes" ];
+                          temperature = 22;
+                          hvac_mode = "cool";
+                        };
+                      };
+                    }
+                    {
+                      type = "template";
+                      icon = "mdi:fire";
+                      content = "Heat All 24°C";
+                      icon_color = "orange";
+                      tap_action = {
+                        action = "call-service";
+                        service = "climate.set_temperature";
+                        service_data = {
+                          entity_id = [ "climate.ac_sala" "climate.ac_escritorio" "climate.ac_quarto" "climate.ac_quarto_hospedes" ];
+                          temperature = 24;
+                          hvac_mode = "heat";
+                        };
+                      };
+                    }
+                  ];
                 }
               ];
             }
-            # ── Temperature History (apexcharts) ──
+            # ── Thermostats ──
             {
-              type = "custom:apexcharts-card";
-              header = { title = "Temperature History (24h)"; show = true; };
-              graph_span = "24h";
-              span.end = "now";
-              yaxis = [{ min = 14; max = 32; }];
-              series = [
+              type = "grid";
+              title = "Thermostats";
+              cards = [
                 {
+                  type = "thermostat";
                   entity = "climate.ac_sala";
-                  attribute = "current_temperature";
-                  name = "Sala";
-                  color = "#FF9800";
-                  stroke_width = 2;
-                  curve = "smooth";
+                  name = "Sala (Living Room)";
+                  layout_options = { grid_columns = 2; grid_rows = 3; };
+                  features = [
+                    { type = "climate-hvac-modes"; hvac_modes = [ "off" "cool" "heat" "fan_only" "auto" ]; }
+                    { type = "climate-fan-modes"; }
+                  ];
                 }
                 {
+                  type = "thermostat";
                   entity = "climate.ac_escritorio";
-                  attribute = "current_temperature";
-                  name = "Escritório";
-                  color = "#2196F3";
-                  stroke_width = 2;
-                  curve = "smooth";
+                  name = "Escritório (Office)";
+                  layout_options = { grid_columns = 2; grid_rows = 3; };
+                  features = [
+                    { type = "climate-hvac-modes"; hvac_modes = [ "off" "cool" "heat" "fan_only" "auto" ]; }
+                    { type = "climate-fan-modes"; }
+                  ];
                 }
                 {
-                  entity = "climate.ac_quarto";
-                  attribute = "current_temperature";
-                  name = "Quarto";
-                  color = "#9C27B0";
-                  stroke_width = 2;
-                  curve = "smooth";
+                  type = "vertical-stack";
+                  layout_options = { grid_columns = 2; grid_rows = 3; };
+                  cards = [
+                    {
+                      type = "thermostat";
+                      entity = "climate.ac_quarto";
+                      name = "Quarto (Bedroom)";
+                      features = [
+                        { type = "climate-hvac-modes"; hvac_modes = [ "off" "cool" "heat" "fan_only" "auto" ]; }
+                      ];
+                    }
+                    {
+                      type = "custom:mushroom-entity-card";
+                      entity = "script.bedroom_quick_heat";
+                      name = "Quick Heat (30 min)";
+                      icon = "mdi:clock-fast";
+                      tap_action = {
+                        action = "call-service";
+                        service = "script.bedroom_quick_heat";
+                      };
+                    }
+                  ];
                 }
                 {
-                  entity = "climate.ac_quarto_hospedes";
-                  attribute = "current_temperature";
-                  name = "Hóspedes";
-                  color = "#4CAF50";
-                  stroke_width = 2;
-                  curve = "smooth";
-                }
-                {
-                  entity = "weather.forecast_home";
-                  attribute = "temperature";
-                  name = "Outdoor";
-                  color = "#78909C";
-                  stroke_width = 1;
-                  curve = "smooth";
-                  opacity = 0.5;
+                  type = "vertical-stack";
+                  layout_options = { grid_columns = 2; grid_rows = 3; };
+                  cards = [
+                    {
+                      type = "thermostat";
+                      entity = "climate.ac_quarto_hospedes";
+                      name = "Quarto de Hóspedes (Guest)";
+                      features = [
+                        { type = "climate-hvac-modes"; hvac_modes = [ "off" "cool" "heat" "fan_only" "auto" ]; }
+                      ];
+                    }
+                    {
+                      type = "custom:mushroom-entity-card";
+                      entity = "script.guest_room_on";
+                      name = "Guest Room Heat";
+                      icon = "mdi:fire";
+                      tap_action = {
+                        action = "call-service";
+                        service = "script.guest_room_on";
+                      };
+                    }
+                  ];
                 }
               ];
-              card_mod.style = "ha-card { border-radius: 12px; }";
             }
-            # ── AC Runtime Today (bar chart) ──
+            # ── Room Conditions ──
             {
-              type = "custom:apexcharts-card";
-              header = { title = "AC Runtime Today"; show = true; };
-              chart_type = "bar";
-              layout = "horizontal";
-              series = [
-                { entity = "sensor.ac_sala_runtime_today"; name = "Sala"; color = "#FF9800"; }
-                { entity = "sensor.ac_escritorio_runtime_today"; name = "Escritório"; color = "#2196F3"; }
-                { entity = "sensor.ac_quarto_runtime_today"; name = "Quarto"; color = "#9C27B0"; }
-                { entity = "sensor.ac_quarto_hospedes_runtime_today"; name = "Hóspedes"; color = "#4CAF50"; }
+              type = "grid";
+              title = "Room Conditions";
+              cards = [
+                {
+                  type = "conditional";
+                  conditions = [{
+                    condition = "numeric_state";
+                    entity = "sensor.active_ac_units";
+                    above = 0;
+                  }];
+                  card = {
+                    type = "glance";
+                    title = "Room Humidity";
+                    entities = [
+                      { entity = "sensor.ac_sala_room_humidity"; name = "Sala"; }
+                      { entity = "sensor.ac_escritorio_room_humidity"; name = "Escritório"; }
+                      { entity = "sensor.ac_quarto_room_humidity"; name = "Quarto"; }
+                      { entity = "sensor.ac_quarto_hospedes_room_humidity"; name = "Hóspedes"; }
+                    ];
+                  };
+                }
+                {
+                  type = "glance";
+                  title = "Current AC Modes";
+                  layout_options = { grid_columns = 4; grid_rows = 1; };
+                  entities = [
+                    { entity = "climate.ac_sala"; name = "Sala"; }
+                    { entity = "climate.ac_escritorio"; name = "Escritório"; }
+                    { entity = "climate.ac_quarto"; name = "Quarto"; }
+                    { entity = "climate.ac_quarto_hospedes"; name = "Hóspedes"; }
+                  ];
+                }
               ];
-              card_mod.style = "ha-card { border-radius: 12px; }";
             }
-            # ── Humidity Row (only when AC active) ──
+            # ── Temperature History ──
             {
-              type = "conditional";
-              conditions = [{
-                condition = "numeric_state";
-                entity = "sensor.active_ac_units";
-                above = 0;
-              }];
-              card = {
-                type = "glance";
-                title = "Room Humidity";
-                entities = [
-                  { entity = "sensor.ac_sala_room_humidity"; name = "Sala"; }
-                  { entity = "sensor.ac_escritorio_room_humidity"; name = "Escritório"; }
-                  { entity = "sensor.ac_quarto_room_humidity"; name = "Quarto"; }
-                  { entity = "sensor.ac_quarto_hospedes_room_humidity"; name = "Hóspedes"; }
-                ];
-                card_mod.style = "ha-card { border-radius: 12px; }";
-              };
+              type = "grid";
+              title = "Temperature History";
+              cards = [
+                {
+                  type = "custom:apexcharts-card";
+                  header = { title = "Temperature History (24h)"; show = true; };
+                  graph_span = "24h";
+                  span.end = "now";
+                  layout_options = { grid_columns = 4; grid_rows = 3; };
+                  yaxis = [{ min = 14; max = 32; }];
+                  series = [
+                    {
+                      entity = "climate.ac_sala";
+                      attribute = "current_temperature";
+                      name = "Sala";
+                      color = "#FF9800";
+                      stroke_width = 2;
+                      curve = "smooth";
+                    }
+                    {
+                      entity = "climate.ac_escritorio";
+                      attribute = "current_temperature";
+                      name = "Escritório";
+                      color = "#2196F3";
+                      stroke_width = 2;
+                      curve = "smooth";
+                    }
+                    {
+                      entity = "climate.ac_quarto";
+                      attribute = "current_temperature";
+                      name = "Quarto";
+                      color = "#9C27B0";
+                      stroke_width = 2;
+                      curve = "smooth";
+                    }
+                    {
+                      entity = "climate.ac_quarto_hospedes";
+                      attribute = "current_temperature";
+                      name = "Hóspedes";
+                      color = "#4CAF50";
+                      stroke_width = 2;
+                      curve = "smooth";
+                    }
+                    {
+                      entity = "weather.forecast_home";
+                      attribute = "temperature";
+                      name = "Outdoor";
+                      color = "#78909C";
+                      stroke_width = 1;
+                      curve = "smooth";
+                      opacity = 0.5;
+                    }
+                  ];
+                }
+                {
+                  type = "custom:apexcharts-card";
+                  header = { title = "Temperature Comparison (48h)"; show = true; };
+                  graph_span = "48h";
+                  span.end = "now";
+                  layout_options = { grid_columns = 4; grid_rows = 3; };
+                  yaxis = [{ min = 14; max = 32; }];
+                  series = [
+                    {
+                      entity = "climate.ac_sala";
+                      attribute = "current_temperature";
+                      name = "Sala";
+                      color = "#FF9800";
+                      stroke_width = 2;
+                      curve = "smooth";
+                    }
+                    {
+                      entity = "climate.ac_escritorio";
+                      attribute = "current_temperature";
+                      name = "Escritório";
+                      color = "#2196F3";
+                      stroke_width = 2;
+                      curve = "smooth";
+                    }
+                    {
+                      entity = "climate.ac_quarto";
+                      attribute = "current_temperature";
+                      name = "Quarto";
+                      color = "#9C27B0";
+                      stroke_width = 2;
+                      curve = "smooth";
+                    }
+                    {
+                      entity = "climate.ac_quarto_hospedes";
+                      attribute = "current_temperature";
+                      name = "Hóspedes";
+                      color = "#4CAF50";
+                      stroke_width = 2;
+                      curve = "smooth";
+                    }
+                    {
+                      entity = "weather.forecast_home";
+                      attribute = "temperature";
+                      name = "Outdoor";
+                      color = "#78909C";
+                      stroke_width = 1;
+                      curve = "smooth";
+                      opacity = 0.5;
+                    }
+                  ];
+                }
+              ];
             }
-            # ── Climate Automations (compact chips) ──
+            # ── AC Runtime & Efficiency ──
             {
-              type = "custom:mushroom-chips-card";
-              alignment = "center";
-              chips = [
+              type = "grid";
+              title = "AC Runtime & Efficiency";
+              cards = [
                 {
-                  type = "entity";
-                  entity = "automation.workday_start_comfort";
-                  icon = "mdi:weather-sunset-up";
-                  name = "Workday";
-                  tap_action = { action = "toggle"; };
+                  type = "custom:apexcharts-card";
+                  header = { title = "AC Runtime Today"; show = true; };
+                  chart_type = "bar";
+                  layout = "horizontal";
+                  layout_options = { grid_columns = 2; grid_rows = 2; };
+                  series = [
+                    { entity = "sensor.ac_sala_runtime_today"; name = "Sala"; color = "#FF9800"; }
+                    { entity = "sensor.ac_escritorio_runtime_today"; name = "Escritório"; color = "#2196F3"; }
+                    { entity = "sensor.ac_quarto_runtime_today"; name = "Quarto"; color = "#9C27B0"; }
+                    { entity = "sensor.ac_quarto_hospedes_runtime_today"; name = "Hóspedes"; color = "#4CAF50"; }
+                  ];
                 }
                 {
-                  type = "entity";
-                  entity = "automation.night_shutdown_all_ac";
-                  icon = "mdi:weather-night";
-                  name = "Night Off";
-                  tap_action = { action = "toggle"; };
+                  type = "custom:apexcharts-card";
+                  header = { title = "AC Runtime (7 days)"; show = true; };
+                  graph_span = "7d";
+                  span.end = "now";
+                  chart_type = "area";
+                  stacked = true;
+                  layout_options = { grid_columns = 2; grid_rows = 2; };
+                  series = [
+                    {
+                      entity = "sensor.ac_sala_runtime_today";
+                      name = "Sala";
+                      color = "#FF9800";
+                      stroke_width = 1;
+                      curve = "smooth";
+                      opacity = 0.5;
+                      group_by = { func = "max"; duration = "1d"; };
+                    }
+                    {
+                      entity = "sensor.ac_escritorio_runtime_today";
+                      name = "Escritório";
+                      color = "#2196F3";
+                      stroke_width = 1;
+                      curve = "smooth";
+                      opacity = 0.5;
+                      group_by = { func = "max"; duration = "1d"; };
+                    }
+                    {
+                      entity = "sensor.ac_quarto_runtime_today";
+                      name = "Quarto";
+                      color = "#9C27B0";
+                      stroke_width = 1;
+                      curve = "smooth";
+                      opacity = 0.5;
+                      group_by = { func = "max"; duration = "1d"; };
+                    }
+                    {
+                      entity = "sensor.ac_quarto_hospedes_runtime_today";
+                      name = "Hóspedes";
+                      color = "#4CAF50";
+                      stroke_width = 1;
+                      curve = "smooth";
+                      opacity = 0.5;
+                      group_by = { func = "max"; duration = "1d"; };
+                    }
+                  ];
                 }
                 {
-                  type = "entity";
-                  entity = "automation.away_mode_all_ac_off";
-                  icon = "mdi:home-export-outline";
-                  name = "Away";
-                  tap_action = { action = "toggle"; };
+                  type = "conditional";
+                  conditions = [{
+                    condition = "numeric_state";
+                    entity = "sensor.active_ac_units";
+                    above = 0;
+                  }];
+                  card = {
+                    type = "custom:apexcharts-card";
+                    header = { title = "Humidity Comparison (24h)"; show = true; };
+                    graph_span = "24h";
+                    span.end = "now";
+                    series = [
+                      { entity = "sensor.ac_sala_room_humidity"; name = "Sala"; color = "#FF9800"; stroke_width = 2; curve = "smooth"; }
+                      { entity = "sensor.ac_escritorio_room_humidity"; name = "Escritório"; color = "#2196F3"; stroke_width = 2; curve = "smooth"; }
+                      { entity = "sensor.ac_quarto_room_humidity"; name = "Quarto"; color = "#9C27B0"; stroke_width = 2; curve = "smooth"; }
+                      { entity = "sensor.ac_quarto_hospedes_room_humidity"; name = "Hóspedes"; color = "#4CAF50"; stroke_width = 2; curve = "smooth"; }
+                    ];
+                  };
                 }
+              ];
+            }
+            # ── Automations ──
+            {
+              type = "grid";
+              title = "Automations";
+              cards = [
                 {
-                  type = "entity";
-                  entity = "automation.seasonal_mode_heat_cool_auto_switch";
-                  icon = "mdi:sun-snowflake-variant";
-                  name = "Seasonal";
-                  tap_action = { action = "toggle"; };
+                  type = "custom:mushroom-chips-card";
+                  alignment = "center";
+                  layout_options = { grid_columns = 4; grid_rows = 1; };
+                  chips = [
+                    {
+                      type = "entity";
+                      entity = "automation.workday_start_comfort";
+                      icon = "mdi:weather-sunset-up";
+                      name = "Workday";
+                      tap_action = { action = "toggle"; };
+                    }
+                    {
+                      type = "entity";
+                      entity = "automation.night_shutdown_all_ac";
+                      icon = "mdi:weather-night";
+                      name = "Night Off";
+                      tap_action = { action = "toggle"; };
+                    }
+                    {
+                      type = "entity";
+                      entity = "automation.away_mode_all_ac_off";
+                      icon = "mdi:home-export-outline";
+                      name = "Away";
+                      tap_action = { action = "toggle"; };
+                    }
+                    {
+                      type = "entity";
+                      entity = "automation.seasonal_mode_heat_cool_auto_switch";
+                      icon = "mdi:sun-snowflake-variant";
+                      name = "Seasonal";
+                      tap_action = { action = "toggle"; };
+                    }
+                  ];
                 }
               ];
             }
@@ -2075,191 +2272,210 @@ in
         }
 
         # ═══════════════════════════════════════════════════════════════
-        # VIEW 3: HEALTH & TRAINING (NEW)
+        # VIEW 3: HEALTH & TRAINING
         # ═══════════════════════════════════════════════════════════════
         {
+          type = "sections";
           title = "Health";
           icon = "mdi:heart-pulse";
           path = "health";
-          cards = [
-            # ── Header ──
+          max_columns = 4;
+          sections = [
+            # ── Overview ──
             {
-              type = "custom:mushroom-title-card";
-              title = "Health & Training";
-              subtitle = "Garmin Connect data";
-              card_mod.style = "ha-card { color: #E53935; }";
-            }
-            # ── Top Chips ──
-            {
-              type = "custom:mushroom-chips-card";
-              alignment = "center";
-              chips = [
+              type = "grid";
+              title = "Overview";
+              cards = [
                 {
-                  type = "template";
-                  icon = "mdi:dumbbell";
-                  content = "{{ states('sensor.training_readiness') }}";
-                  icon_color = "{% set s = states('sensor.training_readiness') %}{% if s == 'Ready' %}green{% elif s == 'Moderate' %}amber{% else %}red{% endif %}";
+                  type = "custom:mushroom-chips-card";
+                  alignment = "center";
+                  layout_options = { grid_columns = 4; grid_rows = 1; };
+                  chips = [
+                    {
+                      type = "template";
+                      icon = "mdi:dumbbell";
+                      content = "{{ states('sensor.training_readiness') }}";
+                      icon_color = "{% set s = states('sensor.training_readiness') %}{% if s == 'Ready' %}green{% elif s == 'Moderate' %}amber{% else %}red{% endif %}";
+                    }
+                    {
+                      type = "entity";
+                      entity = "sensor.garmin_connect_hrv_status";
+                      icon = "mdi:heart-flash";
+                    }
+                    {
+                      type = "entity";
+                      entity = "sensor.garmin_connect_fitness_age";
+                      icon = "mdi:human";
+                    }
+                  ];
                 }
                 {
-                  type = "entity";
-                  entity = "sensor.garmin_connect_hrv_status";
-                  icon = "mdi:heart-flash";
+                  type = "gauge";
+                  entity = "sensor.recovery_score";
+                  name = "Recovery Score";
+                  min = 0;
+                  max = 100;
+                  severity = { green = 70; yellow = 50; red = 0; };
+                  layout_options = { grid_columns = 2; grid_rows = 2; };
                 }
                 {
-                  type = "entity";
-                  entity = "sensor.garmin_connect_fitness_age";
-                  icon = "mdi:human";
+                  type = "custom:mushroom-entity-card";
+                  entity = "sensor.garmin_connect_last_activity";
+                  name = "Last Activity";
+                  icon = "mdi:run";
+                  layout_options = { grid_columns = 2; grid_rows = 2; };
                 }
               ];
             }
-            # ── Recovery Gauge ──
-            {
-              type = "gauge";
-              entity = "sensor.recovery_score";
-              name = "Recovery Score";
-              min = 0;
-              max = 100;
-              severity = { green = 70; yellow = 50; red = 0; };
-              card_mod.style = "ha-card { border-radius: 12px; }";
-            }
-            # ── Today's Metrics Grid ──
+            # ── Today's Metrics ──
             {
               type = "grid";
-              columns = 2;
-              square = false;
+              title = "Today's Metrics";
               cards = [
                 {
                   type = "custom:mushroom-entity-card";
                   entity = "sensor.garmin_connect_body_battery_most_recent";
                   name = "Body Battery";
                   icon = "mdi:battery-heart-variant";
+                  layout_options = { grid_columns = 2; grid_rows = 1; };
                 }
                 {
                   type = "custom:mushroom-entity-card";
                   entity = "sensor.garmin_connect_resting_heart_rate";
                   name = "Resting HR";
                   icon = "mdi:heart-pulse";
+                  layout_options = { grid_columns = 2; grid_rows = 1; };
                 }
                 {
                   type = "custom:mushroom-entity-card";
                   entity = "sensor.garmin_connect_sleep_score";
                   name = "Sleep Score";
                   icon = "mdi:sleep";
+                  layout_options = { grid_columns = 2; grid_rows = 1; };
                 }
                 {
                   type = "custom:mushroom-entity-card";
                   entity = "sensor.garmin_connect_avg_stress_level";
                   name = "Avg Stress";
                   icon = "mdi:head-snowflake";
+                  layout_options = { grid_columns = 2; grid_rows = 1; };
                 }
                 {
                   type = "custom:mushroom-entity-card";
                   entity = "sensor.garmin_connect_total_steps";
                   name = "Steps";
                   icon = "mdi:shoe-print";
+                  layout_options = { grid_columns = 2; grid_rows = 1; };
                 }
                 {
                   type = "custom:mushroom-entity-card";
                   entity = "sensor.garmin_connect_active_kilocalories";
                   name = "Active Cal";
                   icon = "mdi:fire";
+                  layout_options = { grid_columns = 2; grid_rows = 1; };
                 }
                 {
                   type = "custom:mushroom-entity-card";
                   entity = "sensor.garmin_connect_total_distance_mtr";
                   name = "Distance";
                   icon = "mdi:map-marker-distance";
+                  layout_options = { grid_columns = 2; grid_rows = 1; };
                 }
                 {
                   type = "custom:mushroom-entity-card";
                   entity = "sensor.garmin_connect_floors_ascended";
                   name = "Floors";
                   icon = "mdi:stairs-up";
+                  layout_options = { grid_columns = 2; grid_rows = 1; };
                 }
               ];
             }
-            # ── Body Battery 24h Graph ──
+            # ── Trends ──
             {
-              type = "custom:apexcharts-card";
-              header = { title = "Body Battery (24h)"; show = true; };
-              graph_span = "24h";
-              span.end = "now";
-              series = [{
-                entity = "sensor.garmin_connect_body_battery_most_recent";
-                name = "Body Battery";
-                color = "#4CAF50";
-                stroke_width = 2;
-                curve = "smooth";
-                type = "area";
-                opacity = 0.2;
-              }];
-              yaxis = [{ min = 0; max = 100; }];
-              card_mod.style = "ha-card { border-radius: 12px; }";
-            }
-            # ── Resting HR 7-Day Trend ──
-            {
-              type = "custom:apexcharts-card";
-              header = { title = "Resting Heart Rate (7 days)"; show = true; };
-              graph_span = "7d";
-              span.end = "now";
-              series = [{
-                entity = "sensor.garmin_connect_resting_heart_rate";
-                name = "Resting HR";
-                color = "#E53935";
-                stroke_width = 2;
-                curve = "smooth";
-              }];
-              card_mod.style = "ha-card { border-radius: 12px; }";
-            }
-            # ── Sleep Score 7-Day Trend ──
-            {
-              type = "custom:apexcharts-card";
-              header = { title = "Sleep Score (7 days)"; show = true; };
-              graph_span = "7d";
-              span.end = "now";
-              series = [{
-                entity = "sensor.garmin_connect_sleep_score";
-                name = "Sleep Score";
-                color = "#7E57C2";
-                stroke_width = 2;
-                curve = "smooth";
-                type = "area";
-                opacity = 0.15;
-              }];
-              yaxis = [{ min = 0; max = 100; }];
-              card_mod.style = "ha-card { border-radius: 12px; }";
-            }
-            # ── Last Activity ──
-            {
-              type = "custom:mushroom-entity-card";
-              entity = "sensor.garmin_connect_last_activity";
-              name = "Last Activity";
-              icon = "mdi:run";
-            }
-            # ── Stress Breakdown Chips ──
-            {
-              type = "custom:mushroom-chips-card";
-              alignment = "center";
-              chips = [
+              type = "grid";
+              title = "Trends";
+              cards = [
                 {
-                  type = "entity";
-                  entity = "sensor.garmin_connect_high_stress_duration";
-                  icon = "mdi:alert-circle";
+                  type = "custom:apexcharts-card";
+                  header = { title = "Body Battery (24h)"; show = true; };
+                  graph_span = "24h";
+                  span.end = "now";
+                  layout_options = { grid_columns = 4; grid_rows = 3; };
+                  series = [{
+                    entity = "sensor.garmin_connect_body_battery_most_recent";
+                    name = "Body Battery";
+                    color = "#4CAF50";
+                    stroke_width = 2;
+                    curve = "smooth";
+                    type = "area";
+                    opacity = 0.2;
+                  }];
+                  yaxis = [{ min = 0; max = 100; }];
                 }
                 {
-                  type = "entity";
-                  entity = "sensor.garmin_connect_medium_stress_duration";
-                  icon = "mdi:alert";
+                  type = "custom:apexcharts-card";
+                  header = { title = "Resting Heart Rate (7 days)"; show = true; };
+                  graph_span = "7d";
+                  span.end = "now";
+                  layout_options = { grid_columns = 2; grid_rows = 3; };
+                  series = [{
+                    entity = "sensor.garmin_connect_resting_heart_rate";
+                    name = "Resting HR";
+                    color = "#E53935";
+                    stroke_width = 2;
+                    curve = "smooth";
+                  }];
                 }
                 {
-                  type = "entity";
-                  entity = "sensor.garmin_connect_low_stress_duration";
-                  icon = "mdi:check-circle";
+                  type = "custom:apexcharts-card";
+                  header = { title = "Sleep Score (7 days)"; show = true; };
+                  graph_span = "7d";
+                  span.end = "now";
+                  layout_options = { grid_columns = 2; grid_rows = 3; };
+                  series = [{
+                    entity = "sensor.garmin_connect_sleep_score";
+                    name = "Sleep Score";
+                    color = "#7E57C2";
+                    stroke_width = 2;
+                    curve = "smooth";
+                    type = "area";
+                    opacity = 0.15;
+                  }];
+                  yaxis = [{ min = 0; max = 100; }];
                 }
+              ];
+            }
+            # ── Stress ──
+            {
+              type = "grid";
+              title = "Stress";
+              cards = [
                 {
-                  type = "entity";
-                  entity = "sensor.garmin_connect_rest_stress_duration";
-                  icon = "mdi:sleep";
+                  type = "custom:mushroom-chips-card";
+                  alignment = "center";
+                  layout_options = { grid_columns = 4; grid_rows = 1; };
+                  chips = [
+                    {
+                      type = "entity";
+                      entity = "sensor.garmin_connect_high_stress_duration";
+                      icon = "mdi:alert-circle";
+                    }
+                    {
+                      type = "entity";
+                      entity = "sensor.garmin_connect_medium_stress_duration";
+                      icon = "mdi:alert";
+                    }
+                    {
+                      type = "entity";
+                      entity = "sensor.garmin_connect_low_stress_duration";
+                      icon = "mdi:check-circle";
+                    }
+                    {
+                      type = "entity";
+                      entity = "sensor.garmin_connect_rest_stress_duration";
+                      icon = "mdi:sleep";
+                    }
+                  ];
                 }
               ];
             }
@@ -2267,152 +2483,161 @@ in
         }
 
         # ═══════════════════════════════════════════════════════════════
-        # VIEW 4: MEDIA - Entertainment controls (fixed entities)
+        # VIEW 4: MEDIA
         # ═══════════════════════════════════════════════════════════════
         {
+          type = "sections";
           title = "Media";
           icon = "mdi:play-circle";
           path = "media";
-          cards = [
+          max_columns = 4;
+          sections = [
+            # ── Living Room TV ──
             {
-              type = "custom:mushroom-title-card";
-              title = "Media & Entertainment";
-              subtitle = "TV, Music, and Streaming";
-              card_mod.style = "ha-card { color: #7E57C2; }";
-            }
-            # ── LG TV ──
-            {
-              type = "custom:mushroom-title-card";
+              type = "grid";
               title = "Living Room TV";
-            }
-            {
-              type = "custom:mushroom-media-player-card";
-              entity = "media_player.lg_webos_tv_75nano826qb";
-              name = "LG TV";
-              icon = "mdi:television";
-              use_media_info = true;
-              show_volume_level = true;
-              media_controls = [ "on_off" "play_pause_stop" ];
-              volume_controls = [ "volume_buttons" "volume_mute" ];
-            }
-            {
-              type = "custom:lg-webos-remote-control";
-              entity = "media_player.lg_webos_tv_75nano826qb";
-            }
-            # ── Active Jellyfin Sessions ──
-            {
-              type = "custom:auto-entities";
-              card = {
-                type = "entities";
-                title = "Jellyfin Sessions";
-              };
-              filter = {
-                include = [
-                  { domain = "media_player"; integration = "jellyfin"; }
-                ];
-                exclude = [
-                  { state = "unavailable"; }
-                ];
-              };
-              sort.method = "state";
-              show_empty = false;
+              cards = [
+                {
+                  type = "custom:mushroom-media-player-card";
+                  entity = "media_player.lg_webos_tv_75nano826qb";
+                  name = "LG TV";
+                  icon = "mdi:television";
+                  use_media_info = true;
+                  show_volume_level = true;
+                  media_controls = [ "on_off" "play_pause_stop" ];
+                  volume_controls = [ "volume_buttons" "volume_mute" ];
+                  layout_options = { grid_columns = 2; grid_rows = 2; };
+                }
+                {
+                  type = "custom:lg-webos-remote-control";
+                  entity = "media_player.lg_webos_tv_75nano826qb";
+                  layout_options = { grid_columns = 2; grid_rows = 4; };
+                }
+              ];
             }
             # ── Now Playing ──
             {
-              type = "custom:auto-entities";
-              card = {
-                type = "entities";
-                title = "Now Playing";
-              };
-              filter = {
-                include = [
-                  { domain = "media_player"; state = "playing"; }
-                  { domain = "media_player"; state = "paused"; }
-                ];
-              };
-              sort.method = "state";
-              show_empty = false;
+              type = "grid";
+              title = "Now Playing";
+              cards = [
+                {
+                  type = "custom:auto-entities";
+                  card = {
+                    type = "entities";
+                    title = "Jellyfin Sessions";
+                  };
+                  filter = {
+                    include = [
+                      { domain = "media_player"; integration = "jellyfin"; }
+                    ];
+                    exclude = [
+                      { state = "unavailable"; }
+                    ];
+                  };
+                  sort.method = "state";
+                  show_empty = false;
+                  layout_options = { grid_columns = 2; grid_rows = 2; };
+                }
+                {
+                  type = "custom:auto-entities";
+                  card = {
+                    type = "entities";
+                    title = "Now Playing";
+                  };
+                  filter = {
+                    include = [
+                      { domain = "media_player"; state = "playing"; }
+                      { domain = "media_player"; state = "paused"; }
+                    ];
+                  };
+                  sort.method = "state";
+                  show_empty = false;
+                  layout_options = { grid_columns = 2; grid_rows = 2; };
+                }
+              ];
             }
-            # ── Media Library Stats ──
+            # ── Library ──
             {
-              type = "horizontal-stack";
+              type = "grid";
+              title = "Library";
               cards = [
                 {
                   type = "custom:mushroom-entity-card";
                   entity = "sensor.radarr_films";
                   name = "Films";
                   icon = "mdi:movie";
+                  layout_options = { grid_columns = 1; grid_rows = 1; };
                 }
                 {
                   type = "custom:mushroom-entity-card";
                   entity = "sensor.sonarr_shows";
                   name = "Shows";
                   icon = "mdi:television-classic";
+                  layout_options = { grid_columns = 1; grid_rows = 1; };
                 }
                 {
                   type = "custom:mushroom-entity-card";
                   entity = "sensor.nixos_ninho_active_clients";
                   name = "Active";
                   icon = "mdi:account-group";
+                  layout_options = { grid_columns = 1; grid_rows = 1; };
+                }
+                {
+                  type = "custom:mushroom-chips-card";
+                  alignment = "center";
+                  layout_options = { grid_columns = 1; grid_rows = 1; };
+                  chips = [
+                    {
+                      type = "entity";
+                      entity = "sensor.sonarr_queue";
+                      icon = "mdi:television-classic";
+                    }
+                    {
+                      type = "entity";
+                      entity = "sensor.radarr_queue";
+                      icon = "mdi:movie";
+                    }
+                  ];
                 }
               ];
             }
-            # ── Meater Cooking (conditional) ──
+            # ── Cooking ──
             {
-              type = "conditional";
-              conditions = [
+              type = "grid";
+              title = "Cooking";
+              cards = [
                 {
-                  condition = "state";
-                  entity = "sensor.meater_probe_3415f6c7_cook_state";
-                  state_not = "idle";
-                }
-                {
-                  condition = "state";
-                  entity = "sensor.meater_probe_3415f6c7_cook_state";
-                  state_not = "unavailable";
-                }
-              ];
-              card = {
-                type = "vertical-stack";
-                cards = [
-                  {
-                    type = "custom:mushroom-title-card";
-                    title = "Cooking in Progress";
-                    subtitle = "Meater Probe";
-                  }
-                  {
+                  type = "conditional";
+                  conditions = [
+                    {
+                      condition = "state";
+                      entity = "sensor.meater_probe_3415f6c7_cook_state";
+                      state_not = "idle";
+                    }
+                    {
+                      condition = "state";
+                      entity = "sensor.meater_probe_3415f6c7_cook_state";
+                      state_not = "unavailable";
+                    }
+                  ];
+                  card = {
                     type = "glance";
+                    title = "Meater Probe";
                     entities = [
                       { entity = "sensor.meater_probe_3415f6c7_internal_temperature"; name = "Internal"; }
                       { entity = "sensor.meater_probe_3415f6c7_target_temperature"; name = "Target"; }
                       { entity = "sensor.meater_probe_3415f6c7_ambient_temperature"; name = "Ambient"; }
                       { entity = "sensor.meater_probe_3415f6c7_time_remaining"; name = "Time Left"; }
                     ];
-                    card_mod.style = "ha-card { border-radius: 12px; border: 2px solid #FF5722; }";
-                  }
-                ];
-              };
-            }
-            # ── Media Management Chips ──
-            {
-              type = "custom:mushroom-chips-card";
-              alignment = "center";
-              chips = [
-                {
-                  type = "entity";
-                  entity = "sensor.sonarr_queue";
-                  icon = "mdi:television-classic";
-                }
-                {
-                  type = "entity";
-                  entity = "sensor.radarr_queue";
-                  icon = "mdi:movie";
+                    card_mod.style = "ha-card { border: 2px solid #FF5722; }";
+                  };
                 }
               ];
             }
-            # ── Service Quick Links ──
+            # ── Quick Links ──
             {
-              type = "horizontal-stack";
+              type = "grid";
+              title = "Quick Links";
               cards = [
                 {
                   type = "custom:mushroom-template-card";
@@ -2420,6 +2645,7 @@ in
                   secondary = "Media Server";
                   icon = "mdi:play-box-multiple";
                   icon_color = "purple";
+                  layout_options = { grid_columns = 1; grid_rows = 1; };
                   tap_action = { action = "url"; url_path = "http://10.100.0.100:8096"; };
                 }
                 {
@@ -2428,6 +2654,7 @@ in
                   secondary = "Music";
                   icon = "mdi:music";
                   icon_color = "green";
+                  layout_options = { grid_columns = 1; grid_rows = 1; };
                   tap_action = { action = "url"; url_path = "http://10.100.0.100:8105"; };
                 }
                 {
@@ -2436,6 +2663,7 @@ in
                   secondary = "Requests";
                   icon = "mdi:movie-search";
                   icon_color = "amber";
+                  layout_options = { grid_columns = 1; grid_rows = 1; };
                   tap_action = { action = "url"; url_path = "http://10.100.0.100:8200"; };
                 }
               ];
@@ -2444,28 +2672,19 @@ in
         }
 
         # ═══════════════════════════════════════════════════════════════
-        # VIEW 5: SERVICES - Categorized with status indicators
+        # VIEW 5: SERVICES
         # ═══════════════════════════════════════════════════════════════
         {
+          type = "sections";
           title = "Services";
           icon = "mdi:apps";
           path = "services";
-          cards = [
-            {
-              type = "custom:mushroom-title-card";
-              title = "Self-Hosted Services";
-              subtitle = "All services on Ninho";
-            }
+          max_columns = 4;
+          sections = [
             # ── Media ──
             {
-              type = "custom:mushroom-title-card";
-              title = "Media";
-              card_mod.style = "ha-card { color: #7E57C2; }";
-            }
-            {
               type = "grid";
-              columns = 3;
-              square = false;
+              title = "Media";
               cards = [
                 {
                   type = "custom:mushroom-template-card";
@@ -2473,6 +2692,7 @@ in
                   secondary = "Media Server";
                   icon = "mdi:play-box-multiple";
                   icon_color = "purple";
+                  layout_options = { grid_columns = 1; grid_rows = 1; };
                   tap_action = { action = "url"; url_path = "http://10.100.0.100:8096"; };
                 }
                 {
@@ -2481,6 +2701,7 @@ in
                   secondary = "Music";
                   icon = "mdi:music";
                   icon_color = "green";
+                  layout_options = { grid_columns = 1; grid_rows = 1; };
                   tap_action = { action = "url"; url_path = "http://10.100.0.100:8105"; };
                 }
                 {
@@ -2489,6 +2710,7 @@ in
                   secondary = "Requests";
                   icon = "mdi:movie-search";
                   icon_color = "amber";
+                  layout_options = { grid_columns = 1; grid_rows = 1; };
                   tap_action = { action = "url"; url_path = "http://10.100.0.100:8200"; };
                 }
                 {
@@ -2497,20 +2719,15 @@ in
                   secondary = "Books";
                   icon = "mdi:book-open-page-variant";
                   icon_color = "teal";
+                  layout_options = { grid_columns = 1; grid_rows = 1; };
                   tap_action = { action = "url"; url_path = "http://10.100.0.100:8110"; };
                 }
               ];
             }
             # ── Downloads ──
             {
-              type = "custom:mushroom-title-card";
-              title = "Downloads";
-              card_mod.style = "ha-card { color: #FF9800; }";
-            }
-            {
               type = "grid";
-              columns = 3;
-              square = false;
+              title = "Downloads";
               cards = [
                 {
                   type = "custom:mushroom-template-card";
@@ -2518,6 +2735,7 @@ in
                   secondary = "TV Shows";
                   icon = "mdi:television-classic";
                   icon_color = "blue";
+                  layout_options = { grid_columns = 1; grid_rows = 1; };
                   tap_action = { action = "url"; url_path = "http://10.100.0.100:8099"; };
                 }
                 {
@@ -2526,6 +2744,7 @@ in
                   secondary = "Movies";
                   icon = "mdi:movie";
                   icon_color = "amber";
+                  layout_options = { grid_columns = 1; grid_rows = 1; };
                   tap_action = { action = "url"; url_path = "http://10.100.0.100:8098"; };
                 }
                 {
@@ -2534,6 +2753,7 @@ in
                   secondary = "Music";
                   icon = "mdi:music-note";
                   icon_color = "green";
+                  layout_options = { grid_columns = 1; grid_rows = 1; };
                   tap_action = { action = "url"; url_path = "http://10.100.0.100:8100"; };
                 }
                 {
@@ -2542,6 +2762,7 @@ in
                   secondary = "Books";
                   icon = "mdi:book";
                   icon_color = "brown";
+                  layout_options = { grid_columns = 1; grid_rows = 1; };
                   tap_action = { action = "url"; url_path = "http://10.100.0.100:8101"; };
                 }
                 {
@@ -2550,6 +2771,7 @@ in
                   secondary = "Indexers";
                   icon = "mdi:magnify";
                   icon_color = "orange";
+                  layout_options = { grid_columns = 1; grid_rows = 1; };
                   tap_action = { action = "url"; url_path = "http://10.100.0.100:8097"; };
                 }
                 {
@@ -2558,6 +2780,7 @@ in
                   secondary = "Subtitles";
                   icon = "mdi:subtitles";
                   icon_color = "grey";
+                  layout_options = { grid_columns = 1; grid_rows = 1; };
                   tap_action = { action = "url"; url_path = "http://10.100.0.100:8112"; };
                 }
                 {
@@ -2566,6 +2789,7 @@ in
                   secondary = "Torrents";
                   icon = "mdi:download";
                   icon_color = "blue";
+                  layout_options = { grid_columns = 1; grid_rows = 1; };
                   tap_action = { action = "url"; url_path = "http://10.100.0.100:8103"; };
                 }
                 {
@@ -2574,20 +2798,15 @@ in
                   secondary = "DHT Indexer";
                   icon = "mdi:magnet";
                   icon_color = "red";
+                  layout_options = { grid_columns = 1; grid_rows = 1; };
                   tap_action = { action = "url"; url_path = "http://10.100.0.100:3333"; };
                 }
               ];
             }
             # ── Cloud & Files ──
             {
-              type = "custom:mushroom-title-card";
-              title = "Cloud & Files";
-              card_mod.style = "ha-card { color: #2196F3; }";
-            }
-            {
               type = "grid";
-              columns = 3;
-              square = false;
+              title = "Cloud & Files";
               cards = [
                 {
                   type = "custom:mushroom-template-card";
@@ -2595,6 +2814,7 @@ in
                   secondary = "Files";
                   icon = "mdi:cloud";
                   icon_color = "blue";
+                  layout_options = { grid_columns = 1; grid_rows = 1; };
                   tap_action = { action = "url"; url_path = "http://10.100.0.100:8081"; };
                 }
                 {
@@ -2603,6 +2823,7 @@ in
                   secondary = "Sync";
                   icon = "mdi:sync";
                   icon_color = "cyan";
+                  layout_options = { grid_columns = 1; grid_rows = 1; };
                   tap_action = { action = "url"; url_path = "http://10.100.0.100:8384"; };
                 }
                 {
@@ -2611,6 +2832,7 @@ in
                   secondary = "Web Files";
                   icon = "mdi:folder";
                   icon_color = "orange";
+                  layout_options = { grid_columns = 1; grid_rows = 1; };
                   tap_action = { action = "url"; url_path = "http://10.100.0.100:8107"; };
                 }
                 {
@@ -2619,20 +2841,15 @@ in
                   secondary = "Photos";
                   icon = "mdi:image-multiple";
                   icon_color = "indigo";
+                  layout_options = { grid_columns = 1; grid_rows = 1; };
                   tap_action = { action = "url"; url_path = "http://10.100.0.100:2283"; };
                 }
               ];
             }
             # ── AI & Tools ──
             {
-              type = "custom:mushroom-title-card";
-              title = "AI & Tools";
-              card_mod.style = "ha-card { color: #FFC107; }";
-            }
-            {
               type = "grid";
-              columns = 3;
-              square = false;
+              title = "AI & Tools";
               cards = [
                 {
                   type = "custom:mushroom-template-card";
@@ -2640,6 +2857,7 @@ in
                   secondary = "LLM API";
                   icon = "mdi:brain";
                   icon_color = "yellow";
+                  layout_options = { grid_columns = 1; grid_rows = 1; };
                   tap_action = { action = "url"; url_path = "http://10.100.0.100:8080"; };
                 }
                 {
@@ -2648,6 +2866,7 @@ in
                   secondary = "Image Gen";
                   icon = "mdi:image-auto-adjust";
                   icon_color = "pink";
+                  layout_options = { grid_columns = 1; grid_rows = 1; };
                   tap_action = { action = "url"; url_path = "http://10.100.0.100:8188"; };
                 }
                 {
@@ -2656,6 +2875,7 @@ in
                   secondary = "Notes";
                   icon = "mdi:note-text";
                   icon_color = "teal";
+                  layout_options = { grid_columns = 1; grid_rows = 1; };
                   tap_action = { action = "url"; url_path = "http://10.100.0.100:8111"; };
                 }
                 {
@@ -2664,6 +2884,7 @@ in
                   secondary = "RSS Reader";
                   icon = "mdi:rss";
                   icon_color = "orange";
+                  layout_options = { grid_columns = 1; grid_rows = 1; };
                   tap_action = { action = "url"; url_path = "http://10.100.0.100:8104"; };
                 }
                 {
@@ -2672,20 +2893,15 @@ in
                   secondary = "Zettelkasten";
                   icon = "mdi:notebook";
                   icon_color = "green";
+                  layout_options = { grid_columns = 1; grid_rows = 1; };
                   tap_action = { action = "url"; url_path = "http://10.100.0.100:7000"; };
                 }
               ];
             }
             # ── Monitoring ──
             {
-              type = "custom:mushroom-title-card";
-              title = "Monitoring";
-              card_mod.style = "ha-card { color: #4CAF50; }";
-            }
-            {
               type = "grid";
-              columns = 3;
-              square = false;
+              title = "Monitoring";
               cards = [
                 {
                   type = "custom:mushroom-template-card";
@@ -2693,6 +2909,7 @@ in
                   secondary = "Metrics";
                   icon = "mdi:chart-areaspline";
                   icon_color = "orange";
+                  layout_options = { grid_columns = 1; grid_rows = 1; };
                   tap_action = { action = "url"; url_path = "http://10.100.0.100:3000"; };
                 }
                 {
@@ -2701,6 +2918,7 @@ in
                   secondary = "Status";
                   icon = "mdi:heart-pulse";
                   icon_color = "green";
+                  layout_options = { grid_columns = 1; grid_rows = 1; };
                   tap_action = { action = "url"; url_path = "http://10.100.0.100:8109"; };
                 }
                 {
@@ -2709,6 +2927,7 @@ in
                   secondary = "Notifications";
                   icon = "mdi:bell";
                   icon_color = "red";
+                  layout_options = { grid_columns = 1; grid_rows = 1; };
                   tap_action = { action = "url"; url_path = "http://10.100.0.100:8106"; };
                 }
                 {
@@ -2717,6 +2936,7 @@ in
                   secondary = "Dashboard";
                   icon = "mdi:view-dashboard";
                   icon_color = "grey";
+                  layout_options = { grid_columns = 1; grid_rows = 1; };
                   tap_action = { action = "url"; url_path = "http://10.100.0.100:8082"; };
                 }
               ];
@@ -2725,37 +2945,30 @@ in
         }
 
         # ═══════════════════════════════════════════════════════════════
-        # VIEW 6: SYSTEM - Fixed entities, apexcharts, vacuum, light
+        # VIEW 6: SYSTEM
         # ═══════════════════════════════════════════════════════════════
         {
+          type = "sections";
           title = "System";
           icon = "mdi:server";
           path = "system";
-          cards = [
-            # ── Header ──
+          max_columns = 4;
+          sections = [
+            # ── Server Status ──
             {
-              type = "custom:mushroom-title-card";
-              title = "System Status";
-              subtitle = "Ninho server monitoring";
-            }
-            # ── Uptime Chip ──
-            {
-              type = "custom:mushroom-chips-card";
-              alignment = "center";
-              chips = [{
-                type = "entity";
-                entity = "sensor.uptime";
-                icon = "mdi:clock-check";
-              }];
-            }
-            # ── Resource Gauges (using template sensors) ──
-            {
-              type = "custom:mushroom-title-card";
-              title = "System Resources";
-            }
-            {
-              type = "horizontal-stack";
+              type = "grid";
+              title = "Server Status";
               cards = [
+                {
+                  type = "custom:mushroom-chips-card";
+                  alignment = "center";
+                  layout_options = { grid_columns = 4; grid_rows = 1; };
+                  chips = [{
+                    type = "entity";
+                    entity = "sensor.uptime";
+                    icon = "mdi:clock-check";
+                  }];
+                }
                 {
                   type = "gauge";
                   entity = "sensor.cpu_usage";
@@ -2763,6 +2976,7 @@ in
                   min = 0;
                   max = 100;
                   severity = { green = 0; yellow = 70; red = 90; };
+                  layout_options = { grid_columns = 1; grid_rows = 2; };
                 }
                 {
                   type = "gauge";
@@ -2771,6 +2985,7 @@ in
                   min = 0;
                   max = 100;
                   severity = { green = 0; yellow = 70; red = 90; };
+                  layout_options = { grid_columns = 1; grid_rows = 2; };
                 }
                 {
                   type = "gauge";
@@ -2779,12 +2994,8 @@ in
                   min = 20;
                   max = 100;
                   severity = { green = 20; yellow = 70; red = 85; };
+                  layout_options = { grid_columns = 1; grid_rows = 2; };
                 }
-              ];
-            }
-            {
-              type = "horizontal-stack";
-              cards = [
                 {
                   type = "gauge";
                   entity = "sensor.disk_usage";
@@ -2792,6 +3003,7 @@ in
                   min = 0;
                   max = 100;
                   severity = { green = 0; yellow = 70; red = 90; };
+                  layout_options = { grid_columns = 1; grid_rows = 2; };
                 }
                 {
                   type = "gauge";
@@ -2800,128 +3012,136 @@ in
                   min = 0;
                   max = 100;
                   severity = { green = 0; yellow = 70; red = 90; };
+                  layout_options = { grid_columns = 4; grid_rows = 2; };
                 }
               ];
             }
-            # ── System Load (apexcharts) ──
+            # ── Performance ──
             {
-              type = "custom:apexcharts-card";
-              header = { title = "System Load (24h)"; show = true; };
-              graph_span = "24h";
-              span.end = "now";
-              series = [
-                {
-                  entity = "sensor.system_monitor_load_1_min";
-                  name = "1 min";
-                  color = "#4CAF50";
-                  stroke_width = 2;
-                  curve = "smooth";
-                }
-                {
-                  entity = "sensor.system_monitor_load_5_min";
-                  name = "5 min";
-                  color = "#FF9800";
-                  stroke_width = 2;
-                  curve = "smooth";
-                }
-                {
-                  entity = "sensor.system_monitor_load_15_min";
-                  name = "15 min";
-                  color = "#F44336";
-                  stroke_width = 2;
-                  curve = "smooth";
-                }
-              ];
-              card_mod.style = "ha-card { border-radius: 12px; }";
-            }
-            # ── CPU Usage 24h (apexcharts) ──
-            {
-              type = "custom:apexcharts-card";
-              header = { title = "CPU Usage (24h)"; show = true; };
-              graph_span = "24h";
-              span.end = "now";
-              series = [{
-                entity = "sensor.system_monitor_processor_use";
-                name = "CPU";
-                color = "#2196F3";
-                stroke_width = 2;
-                curve = "smooth";
-                type = "area";
-                opacity = 0.2;
-              }];
-              yaxis = [{ min = 0; max = 100; }];
-              card_mod.style = "ha-card { border-radius: 12px; }";
-            }
-            # ── Network Speed ──
-            {
-              type = "glance";
-              title = "Network Speed";
-              entities = [
-                { entity = "sensor.speedtest_download"; name = "Download"; icon = "mdi:download"; }
-                { entity = "sensor.speedtest_upload"; name = "Upload"; icon = "mdi:upload"; }
-                { entity = "sensor.speedtest_ping"; name = "Ping"; icon = "mdi:timer-outline"; }
-              ];
-              card_mod.style = "ha-card { border-radius: 12px; }";
-            }
-            # ── Network Interfaces ──
-            {
-              type = "horizontal-stack";
+              type = "grid";
+              title = "Performance";
               cards = [
+                {
+                  type = "custom:apexcharts-card";
+                  header = { title = "System Load (24h)"; show = true; };
+                  graph_span = "24h";
+                  span.end = "now";
+                  layout_options = { grid_columns = 2; grid_rows = 3; };
+                  series = [
+                    {
+                      entity = "sensor.system_monitor_load_1_min";
+                      name = "1 min";
+                      color = "#4CAF50";
+                      stroke_width = 2;
+                      curve = "smooth";
+                    }
+                    {
+                      entity = "sensor.system_monitor_load_5_min";
+                      name = "5 min";
+                      color = "#FF9800";
+                      stroke_width = 2;
+                      curve = "smooth";
+                    }
+                    {
+                      entity = "sensor.system_monitor_load_15_min";
+                      name = "15 min";
+                      color = "#F44336";
+                      stroke_width = 2;
+                      curve = "smooth";
+                    }
+                  ];
+                }
+                {
+                  type = "custom:apexcharts-card";
+                  header = { title = "CPU Usage (24h)"; show = true; };
+                  graph_span = "24h";
+                  span.end = "now";
+                  layout_options = { grid_columns = 2; grid_rows = 3; };
+                  series = [{
+                    entity = "sensor.system_monitor_processor_use";
+                    name = "CPU";
+                    color = "#2196F3";
+                    stroke_width = 2;
+                    curve = "smooth";
+                    type = "area";
+                    opacity = 0.2;
+                  }];
+                  yaxis = [{ min = 0; max = 100; }];
+                }
+              ];
+            }
+            # ── Network ──
+            {
+              type = "grid";
+              title = "Network";
+              cards = [
+                {
+                  type = "glance";
+                  title = "Network Speed";
+                  layout_options = { grid_columns = 4; grid_rows = 1; };
+                  entities = [
+                    { entity = "sensor.speedtest_download"; name = "Download"; icon = "mdi:download"; }
+                    { entity = "sensor.speedtest_upload"; name = "Upload"; icon = "mdi:upload"; }
+                    { entity = "sensor.speedtest_ping"; name = "Ping"; icon = "mdi:timer-outline"; }
+                  ];
+                }
                 {
                   type = "custom:mushroom-entity-card";
                   entity = "sensor.system_monitor_network_throughput_in_enp11s0";
                   name = "enp11s0 In";
                   icon = "mdi:arrow-down";
+                  layout_options = { grid_columns = 1; grid_rows = 1; };
                 }
                 {
                   type = "custom:mushroom-entity-card";
                   entity = "sensor.system_monitor_network_throughput_out_enp11s0";
                   name = "enp11s0 Out";
                   icon = "mdi:arrow-up";
+                  layout_options = { grid_columns = 1; grid_rows = 1; };
                 }
                 {
                   type = "custom:mushroom-entity-card";
                   entity = "sensor.system_monitor_network_throughput_in_wg0";
                   name = "WG In";
                   icon = "mdi:arrow-down";
+                  layout_options = { grid_columns = 1; grid_rows = 1; };
                 }
                 {
                   type = "custom:mushroom-entity-card";
                   entity = "sensor.system_monitor_network_throughput_out_wg0";
                   name = "WG Out";
                   icon = "mdi:arrow-up";
+                  layout_options = { grid_columns = 1; grid_rows = 1; };
                 }
               ];
             }
-            # ── Robot Vacuum ──
-            {
-              type = "custom:mushroom-title-card";
-              title = "Devices";
-            }
-            {
-              type = "custom:mushroom-entity-card";
-              entity = "vacuum.dreame_de_521213416_p2028";
-              name = "Robot Vacuum";
-              icon = "mdi:robot-vacuum";
-              tap_action = { action = "more-info"; };
-            }
-            # ── Smart Light ──
-            {
-              type = "custom:mushroom-entity-card";
-              entity = "light.yeelink_de_77086772_color1_s_2_light";
-              name = "Smart Light";
-              icon = "mdi:lightbulb";
-              tap_action = { action = "toggle"; };
-            }
-            # ── Automations Status ──
-            {
-              type = "custom:mushroom-title-card";
-              title = "Automations";
-            }
+            # ── Devices ──
             {
               type = "grid";
-              columns = 2;
-              square = false;
+              title = "Devices";
+              cards = [
+                {
+                  type = "custom:mushroom-entity-card";
+                  entity = "vacuum.dreame_de_521213416_p2028";
+                  name = "Robot Vacuum";
+                  icon = "mdi:robot-vacuum";
+                  tap_action = { action = "more-info"; };
+                  layout_options = { grid_columns = 2; grid_rows = 1; };
+                }
+                {
+                  type = "custom:mushroom-entity-card";
+                  entity = "light.yeelink_de_77086772_color1_s_2_light";
+                  name = "Smart Light";
+                  icon = "mdi:lightbulb";
+                  tap_action = { action = "toggle"; };
+                  layout_options = { grid_columns = 2; grid_rows = 1; };
+                }
+              ];
+            }
+            # ── Automations ──
+            {
+              type = "grid";
+              title = "Automations";
               cards = [
                 {
                   type = "custom:mushroom-entity-card";
@@ -2929,6 +3149,7 @@ in
                   name = "Workday Start";
                   icon = "mdi:weather-sunset-up";
                   tap_action = { action = "toggle"; };
+                  layout_options = { grid_columns = 2; grid_rows = 1; };
                 }
                 {
                   type = "custom:mushroom-entity-card";
@@ -2936,6 +3157,7 @@ in
                   name = "Night Shutdown";
                   icon = "mdi:weather-night";
                   tap_action = { action = "toggle"; };
+                  layout_options = { grid_columns = 2; grid_rows = 1; };
                 }
                 {
                   type = "custom:mushroom-entity-card";
@@ -2943,6 +3165,7 @@ in
                   name = "Away Mode";
                   icon = "mdi:home-export-outline";
                   tap_action = { action = "toggle"; };
+                  layout_options = { grid_columns = 2; grid_rows = 1; };
                 }
                 {
                   type = "custom:mushroom-entity-card";
@@ -2950,6 +3173,7 @@ in
                   name = "Return Home";
                   icon = "mdi:home-import-outline";
                   tap_action = { action = "toggle"; };
+                  layout_options = { grid_columns = 2; grid_rows = 1; };
                 }
                 {
                   type = "custom:mushroom-entity-card";
@@ -2957,6 +3181,7 @@ in
                   name = "Seasonal Mode";
                   icon = "mdi:sun-snowflake-variant";
                   tap_action = { action = "toggle"; };
+                  layout_options = { grid_columns = 2; grid_rows = 1; };
                 }
                 {
                   type = "custom:mushroom-entity-card";
@@ -2964,6 +3189,7 @@ in
                   name = "TV On Heat";
                   icon = "mdi:television";
                   tap_action = { action = "toggle"; };
+                  layout_options = { grid_columns = 2; grid_rows = 1; };
                 }
                 {
                   type = "custom:mushroom-entity-card";
@@ -2971,6 +3197,7 @@ in
                   name = "Cooking Alert";
                   icon = "mdi:grill";
                   tap_action = { action = "toggle"; };
+                  layout_options = { grid_columns = 2; grid_rows = 1; };
                 }
                 {
                   type = "custom:mushroom-entity-card";
@@ -2978,6 +3205,7 @@ in
                   name = "Daily Health";
                   icon = "mdi:heart-pulse";
                   tap_action = { action = "toggle"; };
+                  layout_options = { grid_columns = 2; grid_rows = 1; };
                 }
                 {
                   type = "custom:mushroom-entity-card";
@@ -2985,6 +3213,7 @@ in
                   name = "Weekly Summary";
                   icon = "mdi:calendar-week";
                   tap_action = { action = "toggle"; };
+                  layout_options = { grid_columns = 2; grid_rows = 1; };
                 }
                 {
                   type = "custom:mushroom-entity-card";
@@ -2992,6 +3221,7 @@ in
                   name = "Bedroom Prep";
                   icon = "mdi:bed-clock";
                   tap_action = { action = "toggle"; };
+                  layout_options = { grid_columns = 2; grid_rows = 1; };
                 }
                 {
                   type = "custom:mushroom-entity-card";
@@ -2999,6 +3229,7 @@ in
                   name = "TV Off Late";
                   icon = "mdi:television-off";
                   tap_action = { action = "toggle"; };
+                  layout_options = { grid_columns = 2; grid_rows = 1; };
                 }
                 {
                   type = "custom:mushroom-entity-card";
@@ -3006,6 +3237,7 @@ in
                   name = "Meeting Pre-Heat";
                   icon = "mdi:calendar-clock";
                   tap_action = { action = "toggle"; };
+                  layout_options = { grid_columns = 2; grid_rows = 1; };
                 }
                 {
                   type = "custom:mushroom-entity-card";
@@ -3013,6 +3245,7 @@ in
                   name = "Cold Boost";
                   icon = "mdi:snowflake-alert";
                   tap_action = { action = "toggle"; };
+                  layout_options = { grid_columns = 2; grid_rows = 1; };
                 }
                 {
                   type = "custom:mushroom-entity-card";
@@ -3020,244 +3253,41 @@ in
                   name = "Weekend Morning";
                   icon = "mdi:coffee";
                   tap_action = { action = "toggle"; };
+                  layout_options = { grid_columns = 2; grid_rows = 1; };
                 }
               ];
             }
-            # ── GitHub Repos ──
+            # ── GitHub ──
             {
-              type = "custom:mushroom-chips-card";
-              alignment = "center";
-              chips = [
+              type = "grid";
+              title = "GitHub";
+              cards = [
                 {
-                  type = "entity";
-                  entity = "sensor.bolt12_nixos_stars";
-                  icon = "mdi:github";
-                }
-                {
-                  type = "entity";
-                  entity = "sensor.bolt12_nixos_issues";
-                  icon = "mdi:alert-circle-outline";
-                }
-                {
-                  type = "entity";
-                  entity = "sensor.well_typed_hs_bindgen_stars";
-                  icon = "mdi:github";
-                }
-                {
-                  type = "entity";
-                  entity = "sensor.well_typed_hs_bindgen_issues";
-                  icon = "mdi:alert-circle-outline";
-                }
-              ];
-            }
-          ];
-        }
-
-        # ═══════════════════════════════════════════════════════════════
-        # VIEW 7: ENERGY / AC ANALYTICS
-        # ═══════════════════════════════════════════════════════════════
-        {
-          title = "Energy";
-          icon = "mdi:lightning-bolt";
-          path = "energy";
-          cards = [
-            {
-              type = "custom:mushroom-title-card";
-              title = "AC Analytics";
-              subtitle = "Runtime, temperature, and humidity trends";
-            }
-            # ── AC Runtime Today ──
-            {
-              type = "custom:apexcharts-card";
-              header = { title = "AC Runtime Today (hours)"; show = true; };
-              chart_type = "bar";
-              layout = "horizontal";
-              series = [
-                { entity = "sensor.ac_sala_runtime_today"; name = "Sala"; color = "#FF9800"; }
-                { entity = "sensor.ac_escritorio_runtime_today"; name = "Escritório"; color = "#2196F3"; }
-                { entity = "sensor.ac_quarto_runtime_today"; name = "Quarto"; color = "#9C27B0"; }
-                { entity = "sensor.ac_quarto_hospedes_runtime_today"; name = "Hóspedes"; color = "#4CAF50"; }
-              ];
-              card_mod.style = "ha-card { border-radius: 12px; }";
-            }
-            # ── AC Runtime 7-Day Trend ──
-            {
-              type = "custom:apexcharts-card";
-              header = { title = "AC Runtime (7 days)"; show = true; };
-              graph_span = "7d";
-              span.end = "now";
-              chart_type = "area";
-              stacked = true;
-              series = [
-                {
-                  entity = "sensor.ac_sala_runtime_today";
-                  name = "Sala";
-                  color = "#FF9800";
-                  stroke_width = 1;
-                  curve = "smooth";
-                  opacity = 0.5;
-                  group_by = { func = "max"; duration = "1d"; };
-                }
-                {
-                  entity = "sensor.ac_escritorio_runtime_today";
-                  name = "Escritório";
-                  color = "#2196F3";
-                  stroke_width = 1;
-                  curve = "smooth";
-                  opacity = 0.5;
-                  group_by = { func = "max"; duration = "1d"; };
-                }
-                {
-                  entity = "sensor.ac_quarto_runtime_today";
-                  name = "Quarto";
-                  color = "#9C27B0";
-                  stroke_width = 1;
-                  curve = "smooth";
-                  opacity = 0.5;
-                  group_by = { func = "max"; duration = "1d"; };
-                }
-                {
-                  entity = "sensor.ac_quarto_hospedes_runtime_today";
-                  name = "Hóspedes";
-                  color = "#4CAF50";
-                  stroke_width = 1;
-                  curve = "smooth";
-                  opacity = 0.5;
-                  group_by = { func = "max"; duration = "1d"; };
-                }
-              ];
-              card_mod.style = "ha-card { border-radius: 12px; }";
-            }
-            # ── Room Temperature Comparison (48h) ──
-            {
-              type = "custom:apexcharts-card";
-              header = { title = "Temperature Comparison (48h)"; show = true; };
-              graph_span = "48h";
-              span.end = "now";
-              yaxis = [{ min = 14; max = 32; }];
-              series = [
-                {
-                  entity = "climate.ac_sala";
-                  attribute = "current_temperature";
-                  name = "Sala";
-                  color = "#FF9800";
-                  stroke_width = 2;
-                  curve = "smooth";
-                }
-                {
-                  entity = "climate.ac_escritorio";
-                  attribute = "current_temperature";
-                  name = "Escritório";
-                  color = "#2196F3";
-                  stroke_width = 2;
-                  curve = "smooth";
-                }
-                {
-                  entity = "climate.ac_quarto";
-                  attribute = "current_temperature";
-                  name = "Quarto";
-                  color = "#9C27B0";
-                  stroke_width = 2;
-                  curve = "smooth";
-                }
-                {
-                  entity = "climate.ac_quarto_hospedes";
-                  attribute = "current_temperature";
-                  name = "Hóspedes";
-                  color = "#4CAF50";
-                  stroke_width = 2;
-                  curve = "smooth";
-                }
-                {
-                  entity = "weather.forecast_home";
-                  attribute = "temperature";
-                  name = "Outdoor";
-                  color = "#78909C";
-                  stroke_width = 1;
-                  curve = "smooth";
-                  opacity = 0.5;
-                }
-              ];
-              card_mod.style = "ha-card { border-radius: 12px; }";
-            }
-            # ── Humidity Comparison (24h, only when AC active) ──
-            {
-              type = "conditional";
-              conditions = [{
-                condition = "numeric_state";
-                entity = "sensor.active_ac_units";
-                above = 0;
-              }];
-              card = {
-                type = "custom:apexcharts-card";
-                header = { title = "Humidity Comparison (24h)"; show = true; };
-                graph_span = "24h";
-                span.end = "now";
-                series = [
-                  { entity = "sensor.ac_sala_room_humidity"; name = "Sala"; color = "#FF9800"; stroke_width = 2; curve = "smooth"; }
-                  { entity = "sensor.ac_escritorio_room_humidity"; name = "Escritório"; color = "#2196F3"; stroke_width = 2; curve = "smooth"; }
-                  { entity = "sensor.ac_quarto_room_humidity"; name = "Quarto"; color = "#9C27B0"; stroke_width = 2; curve = "smooth"; }
-                  { entity = "sensor.ac_quarto_hospedes_room_humidity"; name = "Hóspedes"; color = "#4CAF50"; stroke_width = 2; curve = "smooth"; }
-                ];
-                card_mod.style = "ha-card { border-radius: 12px; }";
-              };
-            }
-            # ── AC Mode Distribution ──
-            {
-              type = "glance";
-              title = "Current AC Modes";
-              entities = [
-                { entity = "climate.ac_sala"; name = "Sala"; }
-                { entity = "climate.ac_escritorio"; name = "Escritório"; }
-                { entity = "climate.ac_quarto"; name = "Quarto"; }
-                { entity = "climate.ac_quarto_hospedes"; name = "Hóspedes"; }
-              ];
-              card_mod.style = "ha-card { border-radius: 12px; }";
-            }
-            # ── Quick Action Chips ──
-            {
-              type = "custom:mushroom-chips-card";
-              alignment = "center";
-              chips = [
-                {
-                  type = "template";
-                  icon = "mdi:power-off";
-                  content = "All Off";
-                  icon_color = "red";
-                  tap_action = {
-                    action = "call-service";
-                    service = "script.all_ac_off";
-                  };
-                }
-                {
-                  type = "template";
-                  icon = "mdi:snowflake";
-                  content = "Cool All 22°C";
-                  icon_color = "blue";
-                  tap_action = {
-                    action = "call-service";
-                    service = "climate.set_temperature";
-                    service_data = {
-                      entity_id = [ "climate.ac_sala" "climate.ac_escritorio" "climate.ac_quarto" "climate.ac_quarto_hospedes" ];
-                      temperature = 22;
-                      hvac_mode = "cool";
-                    };
-                  };
-                }
-                {
-                  type = "template";
-                  icon = "mdi:fire";
-                  content = "Heat All 24°C";
-                  icon_color = "orange";
-                  tap_action = {
-                    action = "call-service";
-                    service = "climate.set_temperature";
-                    service_data = {
-                      entity_id = [ "climate.ac_sala" "climate.ac_escritorio" "climate.ac_quarto" "climate.ac_quarto_hospedes" ];
-                      temperature = 24;
-                      hvac_mode = "heat";
-                    };
-                  };
+                  type = "custom:mushroom-chips-card";
+                  alignment = "center";
+                  layout_options = { grid_columns = 4; grid_rows = 1; };
+                  chips = [
+                    {
+                      type = "entity";
+                      entity = "sensor.bolt12_nixos_stars";
+                      icon = "mdi:github";
+                    }
+                    {
+                      type = "entity";
+                      entity = "sensor.bolt12_nixos_issues";
+                      icon = "mdi:alert-circle-outline";
+                    }
+                    {
+                      type = "entity";
+                      entity = "sensor.well_typed_hs_bindgen_stars";
+                      icon = "mdi:github";
+                    }
+                    {
+                      type = "entity";
+                      entity = "sensor.well_typed_hs_bindgen_issues";
+                      icon = "mdi:alert-circle-outline";
+                    }
+                  ];
                 }
               ];
             }
@@ -3265,131 +3295,99 @@ in
         }
 
         # ═══════════════════════════════════════════════════════════════
-        # VIEW 8: CALENDAR - Specific entities + commute
+        # VIEW 7: SETTINGS
         # ═══════════════════════════════════════════════════════════════
         {
-          title = "Calendar";
-          icon = "mdi:calendar";
-          path = "calendar";
-          cards = [
-            {
-              type = "custom:mushroom-title-card";
-              title = "Schedule & Lists";
-              subtitle = "Calendars, events, and shopping";
-            }
-            # ── Calendar (specific entities) ──
-            {
-              type = "calendar";
-              entities = [
-                "calendar.armando_well_typed_com"
-                "calendar.armandoifsantos_gmail_com"
-                "calendar.birthdays"
-                "calendar.holidays_in_portugal"
-              ];
-              card_mod.style = "ha-card { border-radius: 12px; }";
-            }
-            # ── Upcoming Events (list view) ──
-            {
-              type = "calendar";
-              initial_view = "listWeek";
-              entities = [
-                "calendar.armando_well_typed_com"
-                "calendar.armandoifsantos_gmail_com"
-                "calendar.birthdays"
-                "calendar.holidays_in_portugal"
-              ];
-              card_mod.style = "ha-card { border-radius: 12px; }";
-            }
-            # ── Commute Info ──
-            {
-              type = "custom:mushroom-entity-card";
-              entity = "sensor.prado_travel_distance_from_braga";
-              name = "Commute Distance";
-              icon = "mdi:car";
-            }
-            # ── Shopping List ──
-            {
-              type = "shopping-list";
-            }
-          ];
-        }
-
-        # ═══════════════════════════════════════════════════════════════
-        # VIEW 9: SETTINGS - Automation management + HACS updates
-        # ═══════════════════════════════════════════════════════════════
-        {
+          type = "sections";
           title = "Settings";
           icon = "mdi:cog";
           path = "settings";
-          cards = [
+          max_columns = 4;
+          sections = [
+            # ── Controls ──
             {
-              type = "custom:mushroom-title-card";
-              title = "Dashboard Settings";
-            }
-            {
-              type = "custom:button-card";
-              name = "Reload Dashboard";
-              icon = "mdi:refresh";
-              tap_action = {
-                action = "call-service";
-                service = "homeassistant.reload_core_config";
-              };
-              styles.card = [
-                { "border-radius" = "12px"; }
+              type = "grid";
+              title = "Controls";
+              cards = [
+                {
+                  type = "custom:button-card";
+                  name = "Reload Dashboard";
+                  icon = "mdi:refresh";
+                  layout_options = { grid_columns = 2; grid_rows = 1; };
+                  tap_action = {
+                    action = "call-service";
+                    service = "homeassistant.reload_core_config";
+                  };
+                }
+                {
+                  type = "custom:button-card";
+                  name = "Restart Home Assistant";
+                  icon = "mdi:restart";
+                  layout_options = { grid_columns = 2; grid_rows = 1; };
+                  tap_action = {
+                    action = "call-service";
+                    service = "homeassistant.restart";
+                    confirmation = {
+                      text = "Are you sure you want to restart Home Assistant?";
+                    };
+                  };
+                }
               ];
             }
+            # ── Shopping List ──
             {
-              type = "custom:button-card";
-              name = "Restart Home Assistant";
-              icon = "mdi:restart";
-              tap_action = {
-                action = "call-service";
-                service = "homeassistant.restart";
-                confirmation = {
-                  text = "Are you sure you want to restart Home Assistant?";
-                };
-              };
-              styles.card = [
-                { "border-radius" = "12px"; }
+              type = "grid";
+              title = "Shopping List";
+              cards = [
+                {
+                  type = "shopping-list";
+                  layout_options = { grid_columns = 4; grid_rows = 3; };
+                }
               ];
             }
-            # ── All Automations ──
+            # ── Automation Management ──
             {
-              type = "custom:mushroom-title-card";
+              type = "grid";
               title = "Automation Management";
+              cards = [
+                {
+                  type = "custom:auto-entities";
+                  card = {
+                    type = "entities";
+                    title = "All Automations";
+                  };
+                  filter = {
+                    include = [
+                      { domain = "automation"; }
+                    ];
+                  };
+                  sort = {
+                    method = "friendly_name";
+                  };
+                  layout_options = { grid_columns = 4; grid_rows = 4; };
+                }
+              ];
             }
+            # ── Updates ──
             {
-              type = "custom:auto-entities";
-              card = {
-                type = "entities";
-                title = "All Automations";
-              };
-              filter = {
-                include = [
-                  { domain = "automation"; }
-                ];
-              };
-              sort = {
-                method = "friendly_name";
-              };
-            }
-            # ── HACS Updates ──
-            {
-              type = "custom:mushroom-title-card";
+              type = "grid";
               title = "Updates";
-            }
-            {
-              type = "custom:auto-entities";
-              card = {
-                type = "entities";
-                title = "Available Updates";
-              };
-              filter = {
-                include = [
-                  { domain = "update"; }
-                ];
-              };
-              show_empty = false;
+              cards = [
+                {
+                  type = "custom:auto-entities";
+                  card = {
+                    type = "entities";
+                    title = "Available Updates";
+                  };
+                  filter = {
+                    include = [
+                      { domain = "update"; }
+                    ];
+                  };
+                  show_empty = false;
+                  layout_options = { grid_columns = 4; grid_rows = 2; };
+                }
+              ];
             }
           ];
         }

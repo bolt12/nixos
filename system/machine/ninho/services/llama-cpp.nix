@@ -339,7 +339,7 @@ in
         "qwen3.5-27B-full" = {
           cmd = ''
             ${wyoming-wrapper} ${llama-cpp-cuda}/bin/llama-server \
-              -hf unsloth/Qwen3.5-27B-GGUF:UD-Q4_K_XL \
+              -hf unsloth/Qwen3.5-27B-GGUF:Q6_K \
               --metrics \
               --host 0.0.0.0 \
               --port ''${PORT} \
@@ -365,7 +365,7 @@ in
         "qwen3.5-27B-creative" = {
           cmd = ''
             ${wyoming-wrapper} ${llama-cpp-cuda}/bin/llama-server \
-              -hf unsloth/Qwen3.5-27B-GGUF:UD-Q4_K_XL \
+              -hf unsloth/Qwen3.5-27B-GGUF:Q6_K \
               --metrics \
               --host 0.0.0.0 \
               --port ''${PORT} \
