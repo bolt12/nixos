@@ -60,17 +60,17 @@ let
     '';
   };
 
-  olaude-qwen3-5-35B-A3B = pkgs.writeShellApplication {
-    name = "olaude-qwen3-5-35B-A3B";
+  olaude-qwen3-6-35B-A3B = pkgs.writeShellApplication {
+    name = "olaude-qwen3-6-35B-A3B";
     runtimeInputs = [ ];
     text = ''
       export ANTHROPIC_BASE_URL="http://10.100.0.100:8080"
       export API_TIMEOUT_MS="3000000"
       export CLAUDE_CODE_MAX_OUTPUT_TOKENS=100000
       export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
-      export ANTHROPIC_DEFAULT_OPUS_MODEL="qwen3.5-35B-A3B-full"
-      export ANTHROPIC_DEFAULT_SONNET_MODEL="qwen3.5-35B-A3B-full"
-      export ANTHROPIC_DEFAULT_HAIKU_MODEL="''${OLAUDE_HAIKU:-qwen3.5-35B-A3B-full}"
+      export ANTHROPIC_DEFAULT_OPUS_MODEL="qwen3.6-35B-A3B-full"
+      export ANTHROPIC_DEFAULT_SONNET_MODEL="qwen3.5-36B-A3B-full"
+      export ANTHROPIC_DEFAULT_HAIKU_MODEL="''${OLAUDE_HAIKU:-qwen3.6-35B-A3B-full}"
       exec claude "$@"
     '';
   };
@@ -173,9 +173,8 @@ in
     # All packages managed through profiles
     packages = [
       glaude
-      olaude-qwen3-5-9B
       olaude-qwen3-5-27B
-      olaude-qwen3-5-35B-A3B
+      olaude-qwen3-6-35B-A3B
       olaude-gemma-4-26B-A4B
       pi-local
       pi-glm

@@ -329,6 +329,7 @@ in
               --cache-type-k q8_0 \
               --cache-type-v q8_0 \
               --no-mmap \
+              --chat-template-kwargs '{"preserve_thinking": true}' \
               --jinja
           '';
           aliases = [ "qwen3.6-35B-A3B-full" ];
