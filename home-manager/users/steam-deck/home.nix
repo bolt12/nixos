@@ -1,4 +1,4 @@
-{ config, pkgs, lib, inputs, ... }:
+{ config, pkgs, lib, inputs, constants, ... }:
 
 # Steam Deck home-manager configuration (standalone)
 # This runs on SteamOS (non-NixOS) using home-manager standalone mode
@@ -122,13 +122,13 @@ in
         [Interface]
         Address = 10.100.0.4/24
         PrivateKey = $PRIVATE_KEY
-        ListenPort = 51820
+        ListenPort = ${toString constants.network.wireguard.port}
 
         [Peer]
         # RPI5 WireGuard Server
-        PublicKey = 2OIP77a10/Fas+eCvYQNa3ixFNOq0JqZIuSk1tY/QTM=
-        Endpoint = rpi-nixos.ddns.net:51820
-        AllowedIPs = 10.100.0.0/24
+        PublicKey = ${constants.network.wireguard.rpiServerPubKey}
+        Endpoint = ${constants.network.rpi.hostname}:${toString constants.network.wireguard.port}
+        AllowedIPs = ${constants.network.wireguard.subnet}
         PersistentKeepalive = 25
         EOF
 

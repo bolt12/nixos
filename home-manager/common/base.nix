@@ -1,4 +1,4 @@
-{ lib, pkgs, ... }:
+{ lib, pkgs, constants, ... }:
 
 # Base configuration shared across all home-manager users
 # This file contains minimal common settings that every user needs
@@ -34,7 +34,7 @@
       enable = true;
       enableBashIntegration = true;
       settings = {
-        sync_address = "http://10.100.0.100:8888";
+        sync_address = "http://${constants.network.ninho.vpnIp}:${toString constants.ports.atuin}";
         auto_sync = true;
         sync_frequency = "5m";
       };

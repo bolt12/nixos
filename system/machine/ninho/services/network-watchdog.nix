@@ -70,13 +70,11 @@ in
       };
     };
 
-    # ------------------------------------------------------------------------
-    # Hardware watchdog — sp5100_tco (AMD)
-    # ------------------------------------------------------------------------
-    watchdog = {
-      runtimeTime = "60s";
-      rebootTime = "10min";
-    };
+  };
 
+  # Hardware watchdog — sp5100_tco (AMD)
+  systemd.settings.Manager = {
+    RuntimeWatchdogSec = "60s";
+    RebootWatchdogSec = "10min";
   };
 }

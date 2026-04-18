@@ -1,4 +1,4 @@
-{ config, pkgs, inputs, ... }:
+{ config, pkgs, inputs, constants, ... }:
 
 {
   # Use the GRUB 2 boot loader.
@@ -199,7 +199,7 @@
 
           {
             # Public key of the server (not a file path).
-            publicKey = "2OIP77a10/Fas+eCvYQNa3ixFNOq0JqZIuSk1tY/QTM=";
+            publicKey = constants.network.wireguard.rpiServerPubKey;
 
             # Route only VPN subnet — avoids default route conflict at boot
             # (0.0.0.0/0 caused a routing loop before the WiFi route was established)

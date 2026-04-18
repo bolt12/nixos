@@ -1,6 +1,6 @@
 { config, pkgs, lib, constants, ... }:
 let
-  inherit (constants) ports storage;
+  inherit (constants) ports storage network;
 in
 {
   services.ntfy-sh = {
@@ -9,7 +9,7 @@ in
     settings = {
       # Network
       listen-http = "0.0.0.0:${toString ports.ntfy}";
-      base-url = "http://10.100.0.100:${toString ports.ntfy}";
+      base-url = "http://${network.ninho.vpnIp}:${toString ports.ntfy}";
 
       # Limits (generous for home server)
       message-size-limit = "4K";

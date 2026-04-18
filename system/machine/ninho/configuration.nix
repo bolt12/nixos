@@ -259,14 +259,11 @@
         80     # HTTP
         8920   # Jellyfin HTTPS
         22000  # Syncthing file transfers
-        10200  # Whisper (alt)
-        10201  # Whisper (alt)
-        10301  # Whisper (alt)
       ] ++ (with constants.ports; [
         immich grafana emanote onlyoffice llamaswap nextcloud
         homepage jellyfin prowlarr radarr sonarr lidarr readarr
-        bitmagnet deluge jellyseerr syncthing coolercontrol whisper
-      ]);
+        bitmagnet deluge jellyseerr syncthing coolercontrol
+      ]) ++ builtins.attrValues constants.wyoming;
       allowedUDPPorts = [
         51820  # WireGuard
         22000  # Syncthing discovery
@@ -278,15 +275,15 @@
 
     # WireGuard VPN
     wireguard.interfaces.wg0 = {
-      ips = [ "10.100.0.100/24" ];
+      ips = [ "${constants.network.ninho.vpnIp}/24" ];
       listenPort = 51820;
       privateKeyFile = "/etc/wireguard/private";
 
       peers = [
         {
-          publicKey = "2OIP77a10/Fas+eCvYQNa3ixFNOq0JqZIuSk1tY/QTM=";
+          publicKey = constants.network.wireguard.rpiServerPubKey;
           allowedIPs = [ "0.0.0.0/0" ];  # Full tunnel
-          endpoint = "192.168.1.110:51820";
+          endpoint = "${constants.network.rpi.lanIp}:${toString constants.network.wireguard.port}";
           persistentKeepalive = 25;
         }
       ];
@@ -532,7 +529,7 @@
     useGlobalPkgs = true;
     useUserPackages = true;
     backupFileExtension = "hm-backup";
-    extraSpecialArgs = { inherit inputs system; };
+    extraSpecialArgs = { inherit inputs system constants; };
 
     users.bolt = { nixpkgs, ... }: {
       imports = [ ../../../home-manager/users/bolt/home.nix ];

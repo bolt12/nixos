@@ -161,7 +161,7 @@
               home-manager = {
                 useGlobalPkgs = true;
                 useUserPackages = true;
-                extraSpecialArgs = { inherit inputs system; };
+                extraSpecialArgs = { inherit inputs system constants; };
                 users.bolt = { nixpkgs, ... }: {
                   imports = [ ./home-manager/users/bolt-with-de/home.nix ];
                 };
@@ -191,28 +191,28 @@
         bolt = home-manager.lib.homeManagerConfiguration {
           pkgs = pkgsFor system;
           modules = [ ./home-manager/users/bolt/home.nix ];
-          extraSpecialArgs = { inherit inputs system; };
+          extraSpecialArgs = { inherit inputs system constants; };
         };
 
         # Bolt desktop configuration for bolt-nixos
         bolt-with-de = home-manager.lib.homeManagerConfiguration {
           pkgs = pkgsFor system;
           modules = [ ./home-manager/users/bolt-with-de/home.nix ];
-          extraSpecialArgs = { inherit inputs system; };
+          extraSpecialArgs = { inherit inputs system constants; };
         };
 
         # Pollard configuration for ninho server
         pollard = home-manager.lib.homeManagerConfiguration {
           pkgs = pkgsFor system;
           modules = [ ./home-manager/users/pollard/home.nix ];
-          extraSpecialArgs = { inherit inputs system; };
+          extraSpecialArgs = { inherit inputs system constants; };
         };
 
         # SteamDeck home-manager configuration
         steam-deck = home-manager.lib.homeManagerConfiguration {
           pkgs = pkgsFor "x86_64-linux";
           modules = [ ./home-manager/users/steam-deck/home.nix ];
-          extraSpecialArgs = { inherit inputs; system = "x86_64-linux"; };
+          extraSpecialArgs = { inherit inputs constants; system = "x86_64-linux"; };
         };
       };
 

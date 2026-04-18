@@ -8,6 +8,7 @@
   pkgs,
   raspberry-pi-nix,
   inputs,
+  constants,
   ...
 }@attrs:
 
@@ -253,8 +254,9 @@ in
         ips = [ "10.100.0.1/24" ];
 
         # Lower MTU for mobile clients — mobile carriers often filter ICMP
-        # "fragmentation needed", breaking PMTUD. Default 1420 + 80 byte
-        # WireGuard overhead = 1500, which exceeds carrier tunnel MTUs.
+        # "fragmentation needed", breaking PMTUD. WG overhead is 60 B (IPv4) /
+        # 80 B (IPv6); defaults (1420) leave little headroom once a carrier
+        # adds its own tunnel. 1320 is defensive across carriers.
         mtu = 1320;
 
         # The port that WireGuard listens to. Must be accessible by the client.
@@ -293,7 +295,7 @@ in
           {
             # Ninho Home Server
             publicKey = "xSZiLvopp4Q/eMMxYyzQrdmvt/dyejc2CR4/dzsm5gw=";
-            allowedIPs = [ "10.100.0.100/32" ];
+            allowedIPs = [ "${constants.network.ninho.vpnIp}/32" ];
           }
           {
             # Pollard MacOs

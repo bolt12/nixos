@@ -1,4 +1,4 @@
-{ config, pkgs, inputs, ... }:
+{ config, pkgs, inputs, constants, ... }:
 {
   # Swap stable Jellyfin module for unstable (has hardwareAcceleration options)
   disabledModules = [ "${inputs.nixpkgs}/nixos/modules/services/misc/jellyfin.nix" ];
@@ -41,7 +41,7 @@
     jellyseerr = {
       enable = true;
       openFirewall = true;
-      port = 8200;
+      port = constants.ports.jellyseerr;
       package = pkgs.unstable.jellyseerr;
     };
   };

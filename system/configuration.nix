@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, lib, pkgs, inputs, system, ... }@attrs:
+{ config, lib, pkgs, inputs, system, constants, ... }@attrs:
 
 {
   imports =
@@ -127,7 +127,7 @@
     backupFileExtension = "hm-backup";
 
     extraSpecialArgs = {
-      inherit inputs system;
+      inherit inputs system constants;
     };
 
     users.bolt = { nixpkgs, ... }: {
@@ -170,10 +170,10 @@
       #   attic cache info <cache-name>
       # and add it to extra-trusted-public-keys below
       extra-substituters = [
-        "http://10.100.0.100:8090/main"
+        "http://${constants.network.ninho.vpnIp}:${toString constants.ports.attic}/main"
       ];
       extra-trusted-public-keys = [
-        # "<cache-name>:<public-key>" — fill in after creating the cache on ninho
+        main:VdiNUDiBDk2MHuiyWAVxrF8npWlaYA8PrnlXmKxjzbM=
       ];
     };
   };

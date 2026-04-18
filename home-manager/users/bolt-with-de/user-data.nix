@@ -1,92 +1,9 @@
-{ pkgs, config, lib, ... }:
+{ pkgs, config, lib, constants, ... }:
 
 # User-specific data for bolt-with-de (X1 Carbon laptop)
 # Contains Syncthing configuration for syncing with ninho server
 let
-  # Define the ignore patterns in a "heredoc" string
-  docsIgnorePatterns = pkgs.writeText "documents-stignore" ''
-    // (?d) = allow Syncthing to delete ignored files when their parent
-    // directory is removed on the remote side. Without this, directories
-    // containing only ignored build artifacts can never be cleaned up,
-    // causing perpetual "Failed to sync" warnings and a red tray icon.
-
-    // --- Version control ---
-    // Sync working trees only; use git push/pull for repo state
-    (?d).git
-
-    // --- General ---
-    (?d).DS_Store
-    (?d)Thumbs.db
-    (?d)*~
-    (?d)*.lock
-    (?d).claude
-
-    // --- C / C++ / CMake ---
-    (?d)CMakeFiles
-    (?d)CMakeCache.txt
-    (?d)cmake_install.cmake
-    (?d)Makefile
-    (?d)*.a
-    (?d)*.so
-    (?d)*.dylib
-
-    // --- Haskell (Cabal / Stack) ---
-    (?d)dist-newstyle
-    (?d).stack-work
-    (?d)cabal.sandbox.config
-    (?d).cabal-sandbox
-    (?d)*.o
-    (?d)*.hi
-    (?d)*.chi
-    (?d)*.chs.h
-    (?d)*.dyn_o
-    (?d)*.dyn_hi
-
-    // --- Agda ---
-    (?d)*.agdai
-    (?d)MAlonzo
-
-    // --- Lean ---
-    (?d).lake
-    (?d)lake-packages
-    (?d)build/bin
-    (?d)build/ir
-    (?d)build/lib
-
-    // --- Java ---
-    (?d)*.class
-    (?d).gradle
-    (?d).settings
-    (?d).classpath
-    (?d).project
-    (?d)target
-
-    // --- JS / Node ---
-    (?d)node_modules
-    (?d).next
-    (?d).nuxt
-    (?d).parcel-cache
-    (?d).turbo
-    (?d).angular
-    (?d)bower_components
-
-    // --- Nix ---
-    (?d)result
-    (?d)result-*
-    (?d).direnv
-
-    // --- Chrome extensions ---
-    (?d).chrome-profile
-
-    // --- IDE / editor ---
-    (?d).idea
-    (?d).vscode
-    (?d)*.swp
-    (?d)*.swo
-
-    // --- Generated output ---
-    (?d)Bolt/Playground/Haskell/generative-art/showcases
-  '';
+  docsIgnorePatterns = import ../../common/syncthing-ignores.nix { inherit pkgs; };
 in
 {
   # This places the file at ~/Documents/.stignore
@@ -113,9 +30,8 @@ in
     doom = "${config.userConfig.homeDirectory}/.emacs.d/bin/doom";
 
     # WireGuard endpoint toggle — skip MEO hairpin NAT when on home LAN
-    # See system/machine/rpi/rpi5.nix for peer/IP details
-    vpn-home = "sudo wg set wg0 peer 2OIP77a10/Fas+eCvYQNa3ixFNOq0JqZIuSk1tY/QTM= endpoint 192.168.1.110:51820";
-    vpn-away = "sudo wg set wg0 peer 2OIP77a10/Fas+eCvYQNa3ixFNOq0JqZIuSk1tY/QTM= endpoint rpi-nixos.ddns.net:51820";
+    vpn-home = "sudo wg set ${constants.network.wireguard.interface} peer ${constants.network.wireguard.rpiServerPubKey} endpoint ${constants.network.rpi.lanIp}:${toString constants.network.wireguard.port}";
+    vpn-away = "sudo wg set ${constants.network.wireguard.interface} peer ${constants.network.wireguard.rpiServerPubKey} endpoint ${constants.network.rpi.hostname}:${toString constants.network.wireguard.port}";
   };
 
   # Syncthing configuration for X1 laptop

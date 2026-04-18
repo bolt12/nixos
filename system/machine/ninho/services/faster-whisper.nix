@@ -1,4 +1,7 @@
 { config, pkgs, constants, ... }:
+let
+  inherit (constants) wyoming;
+in
 {
   # ===========================================================================
   # Wyoming Voice Services - Speech-to-Text & Text-to-Speech
@@ -18,7 +21,7 @@
       model = "turbo";
       language = "en";
       device = "cuda";
-      uri = "tcp://0.0.0.0:10300";
+      uri = "tcp://0.0.0.0:${toString wyoming.whisperEn}";
     };
 
     # Portuguese - fine-tuned model for better accuracy
@@ -29,7 +32,7 @@
       model = "dwhoelz/whisper-medium-pt-ct2";
       language = "pt";
       device = "cuda";
-      uri = "tcp://0.0.0.0:10301";
+      uri = "tcp://0.0.0.0:${toString wyoming.whisperPt}";
     };
   };
 
@@ -39,19 +42,19 @@
     en = {
       enable = true;
       voice = "en-us-ryan-medium";
-      uri = "tcp://0.0.0.0:10200";
+      uri = "tcp://0.0.0.0:${toString wyoming.piperEn}";
       useCUDA = false;  # CPU is faster for Piper
     };
     pt = {
       enable = true;
       voice = "pt_PT-tugão-medium";
-      uri = "tcp://0.0.0.0:10201";
+      uri = "tcp://0.0.0.0:${toString wyoming.piperPt}";
       useCUDA = false;  # CPU is faster for Piper
     };
   };
 
   # Open firewall for Wyoming protocol (STT and TTS ports)
-  networking.firewall.allowedTCPPorts = [ 10200 10201 10202 10300 10301 10302 ];
+  networking.firewall.allowedTCPPorts = builtins.attrValues wyoming;
 
   # Ensure CUDA drivers are available for all instances
   systemd.services."wyoming-faster-whisper-en" = {

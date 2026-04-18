@@ -4,6 +4,7 @@
   pkgs,
   inputs,
   system,
+  constants,
   ...
 }:
 
@@ -17,7 +18,7 @@ let
     name = "glaude";
     runtimeInputs = [ ];
     text = ''
-      export ANTHROPIC_BASE_URL="http://10.100.0.100:8080"
+      export ANTHROPIC_BASE_URL="http://${constants.network.ninho.vpnIp}:${toString constants.ports.llamaswap}"
       export API_TIMEOUT_MS="3000000"
       export CLAUDE_CODE_MAX_OUTPUT_TOKENS=100000
       export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
@@ -34,7 +35,7 @@ let
     name = "olaude-qwen3-5-9B";
     runtimeInputs = [ ];
     text = ''
-      export ANTHROPIC_BASE_URL="http://10.100.0.100:8080"
+      export ANTHROPIC_BASE_URL="http://${constants.network.ninho.vpnIp}:${toString constants.ports.llamaswap}"
       export API_TIMEOUT_MS="3000000"
       export CLAUDE_CODE_MAX_OUTPUT_TOKENS=100000
       export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
@@ -49,7 +50,7 @@ let
     name = "olaude-qwen3-5-27B";
     runtimeInputs = [ ];
     text = ''
-      export ANTHROPIC_BASE_URL="http://10.100.0.100:8080"
+      export ANTHROPIC_BASE_URL="http://${constants.network.ninho.vpnIp}:${toString constants.ports.llamaswap}"
       export API_TIMEOUT_MS="3000000"
       export CLAUDE_CODE_MAX_OUTPUT_TOKENS=100000
       export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
@@ -64,12 +65,12 @@ let
     name = "olaude-qwen3-6-35B-A3B";
     runtimeInputs = [ ];
     text = ''
-      export ANTHROPIC_BASE_URL="http://10.100.0.100:8080"
+      export ANTHROPIC_BASE_URL="http://${constants.network.ninho.vpnIp}:${toString constants.ports.llamaswap}"
       export API_TIMEOUT_MS="3000000"
       export CLAUDE_CODE_MAX_OUTPUT_TOKENS=100000
       export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
       export ANTHROPIC_DEFAULT_OPUS_MODEL="qwen3.6-35B-A3B-full"
-      export ANTHROPIC_DEFAULT_SONNET_MODEL="qwen3.5-36B-A3B-full"
+      export ANTHROPIC_DEFAULT_SONNET_MODEL="qwen3.6-35B-A3B-full"
       export ANTHROPIC_DEFAULT_HAIKU_MODEL="''${OLAUDE_HAIKU:-qwen3.6-35B-A3B-full}"
       exec claude "$@"
     '';
@@ -80,7 +81,7 @@ let
     name = "olaude-gemma-4-26B-A4B";
     runtimeInputs = [ ];
     text = ''
-      export ANTHROPIC_BASE_URL="http://10.100.0.100:8080"
+      export ANTHROPIC_BASE_URL="http://${constants.network.ninho.vpnIp}:${toString constants.ports.llamaswap}"
       export API_TIMEOUT_MS="3000000"
       export CLAUDE_CODE_MAX_OUTPUT_TOKENS=100000
       export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1

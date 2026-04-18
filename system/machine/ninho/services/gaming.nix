@@ -17,6 +17,20 @@
 #   - Connect to: ninho server IP, Sunshine will handle the rest
 # ============================================================================
 
+let
+  # Register the ultrawide modeline (HDMI dummy plug EDID doesn't advertise
+  # 3440x1440) and pick the best available mode. Modeline from: gtf 3440 1440 60
+  xrandr = "${pkgs.xorg.xrandr}/bin/xrandr";
+  applyUltrawideMode = ''
+    ${xrandr} --newmode "3440x1440_60" 419.11 3440 3688 4064 4688 1440 1441 1444 1490 -HSync +VSync 2>/dev/null || true
+    ${xrandr} --addmode HDMI-0 "3440x1440_60" 2>/dev/null || true
+
+    ${xrandr} --output HDMI-0 --mode "3440x1440_60" --rate 60 --scale 1x1 --panning 3440x1440 || \
+    ${xrandr} --output HDMI-0 --mode 2560x1440 --rate 60 --scale 1x1 --panning 2560x1440 || \
+    ${xrandr} --output HDMI-0 --mode 1920x1080 --rate 60 || \
+    true
+  '';
+in
 {
   # ==========================================================================
   # X11 DISPLAY SERVER & DISPLAY MANAGER
@@ -37,20 +51,9 @@
     Option "ModeValidation" "AllowNonEdidModes"
   '';
 
-  # Set display resolution early (runs when X server starts, before session)
-  # Register ultrawide mode (HDMI dummy plug EDID doesn't advertise 3440x1440)
-  # so Steam Link / Sunshine can use it when streaming to the BlitzWolf ultrawide.
-  # Modeline from: gtf 3440 1440 60
-  # Default to 3440x1440 ultrawide; fall back to 2560x1440, then 1080p.
-  services.xserver.displayManager.setupCommands = ''
-    ${pkgs.xorg.xrandr}/bin/xrandr --newmode "3440x1440_60" 419.11 3440 3688 4064 4688 1440 1441 1444 1490 -HSync +VSync 2>/dev/null || true
-    ${pkgs.xorg.xrandr}/bin/xrandr --addmode HDMI-0 "3440x1440_60" 2>/dev/null || true
-
-    ${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-0 --mode "3440x1440_60" --rate 60 --scale 1x1 --panning 3440x1440 || \
-    ${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-0 --mode 2560x1440 --rate 60 --scale 1x1 --panning 2560x1440 || \
-    ${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-0 --mode 1920x1080 --rate 60 || \
-    true
-  '';
+  # Set display resolution early (runs when X server starts, before session).
+  # Default to 3440x1440 ultrawide for Steam Link / Sunshine; fall back to 2560x1440, then 1080p.
+  services.xserver.displayManager.setupCommands = applyUltrawideMode;
 
   # Start a minimal desktop session (required for Sunshine)
   services.xserver.desktopManager.xfce = {
@@ -68,12 +71,7 @@
     # Disable XFCE compositor to fix game streaming black screen issues
     ${pkgs.xfce.xfconf}/bin/xfconf-query -c xfwm4 -p /general/use_compositing -s false || true
 
-    # Ensure ultrawide mode is registered and resolution is set
-    ${pkgs.xorg.xrandr}/bin/xrandr --newmode "3440x1440_60" 419.11 3440 3688 4064 4688 1440 1441 1444 1490 -HSync +VSync 2>/dev/null || true
-    ${pkgs.xorg.xrandr}/bin/xrandr --addmode HDMI-0 "3440x1440_60" 2>/dev/null || true
-
-    ${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-0 --mode "3440x1440_60" --rate 60 --scale 1x1 --panning 3440x1440 || \
-    ${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-0 --mode 2560x1440 --rate 60 --scale 1x1 --panning 2560x1440 || true
+    ${applyUltrawideMode}
   '';
 
   # ==========================================================================
