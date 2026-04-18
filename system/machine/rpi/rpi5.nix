@@ -227,6 +227,9 @@ in
     # Open ports in the firewall.
     firewall = {
       enable = true;
+      # Trust VPN interface — all peers are personal devices, and this also
+      # enables wg0→wg0 forwarding (peer-to-peer traffic like phone → ninho)
+      trustedInterfaces = [ "wg0" ];
       allowedTCPPorts = [
         22
         25
@@ -249,19 +252,13 @@ in
         # Determines the IP address and subnet of the server's end of the tunnel interface.
         ips = [ "10.100.0.1/24" ];
 
+        # Lower MTU for mobile clients — mobile carriers often filter ICMP
+        # "fragmentation needed", breaking PMTUD. Default 1420 + 80 byte
+        # WireGuard overhead = 1500, which exceeds carrier tunnel MTUs.
+        mtu = 1320;
+
         # The port that WireGuard listens to. Must be accessible by the client.
         listenPort = 51820;
-
-        # This allows the wireguard server to route your traffic to the internet and hence be like a VPN
-        # For this to work you have to set the dnsserver IP of your router (or dnsserver of choice) in your clients
-        postSetup = ''
-          ${pkgs.iptables}/bin/iptables -t nat -A POSTROUTING -s 10.100.0.0/24 -o end0 -j MASQUERADE
-        '';
-
-        # This undoes the above command
-        postShutdown = ''
-          ${pkgs.iptables}/bin/iptables -t nat -D POSTROUTING -s 10.100.0.0/24 -o end0 -j MASQUERADE
-        '';
 
         # Path to the private key file.
         privateKeyFile = "/home/bolt/wireguard-keys/privatekey";

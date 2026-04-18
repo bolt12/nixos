@@ -60,6 +60,7 @@
     kavita = 8110;
     memos = 8111;
     bazarr = 8112;
+    open-webui = 8113;
     comfy-ui = 8188;
 
     # Monitoring

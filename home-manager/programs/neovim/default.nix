@@ -10,6 +10,16 @@ let
     ];
   };
 
+  # Nightly renamed nvim.desktop → org.neovim.nvim.desktop but the nixpkgs
+  # wrapper hardcodes the old name.  Add a compat symlink so wrapping succeeds.
+  neovim-nightly = unstable.neovim-unwrapped.overrideAttrs (old: {
+    postFixup = (old.postFixup or "") + ''
+      if [ -f $out/share/applications/org.neovim.nvim.desktop ] && [ ! -f $out/share/applications/nvim.desktop ]; then
+        ln -s org.neovim.nvim.desktop $out/share/applications/nvim.desktop
+      fi
+    '';
+  });
+
   plugins = pkgs.vimPlugins;
   plugins-unstable = unstable.vimPlugins;
 
@@ -157,7 +167,7 @@ in
 {
   programs.neovim = {
     enable       = true;
-    package      = unstable.neovim;
+    package      = neovim-nightly;
     extraConfig  = vimConfig;
     plugins      = myVimPlugins;
     viAlias      = true;

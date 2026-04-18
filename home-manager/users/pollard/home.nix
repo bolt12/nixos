@@ -81,31 +81,6 @@
     };
   };
 
-  # Reservation checker (user-level service for pollard only)
-  systemd.user.services.reservation-checker = {
-    Unit = {
-      Description = "Online Reservations checker";
-      After = [ "network.target" ];
-    };
-
-    Service = {
-      Type = "simple";
-      WorkingDirectory = "/home/pollard/projects/online-reservations";
-      ExecStart = "/home/pollard/projects/online-reservations/reservation_checker.py";
-      Restart = "always";
-      RestartSec = "5";
-      Environment = [
-        "PYTHONUNBUFFERED=1"
-        "NIX_PATH=nixpkgs=${pkgs.path}"
-        "PATH=${pkgs.lib.makeBinPath [ pkgs.nix ]}"
-      ];
-    };
-
-    Install = {
-      WantedBy = [ "default.target" ];
-    };
-  };
-
   # No desktop services for headless configuration
   services = {};
 }

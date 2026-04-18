@@ -111,6 +111,11 @@ in
 
     # Tool shortcuts
     doom = "${config.userConfig.homeDirectory}/.emacs.d/bin/doom";
+
+    # WireGuard endpoint toggle — skip MEO hairpin NAT when on home LAN
+    # See system/machine/rpi/rpi5.nix for peer/IP details
+    vpn-home = "sudo wg set wg0 peer 2OIP77a10/Fas+eCvYQNa3ixFNOq0JqZIuSk1tY/QTM= endpoint 192.168.1.110:51820";
+    vpn-away = "sudo wg set wg0 peer 2OIP77a10/Fas+eCvYQNa3ixFNOq0JqZIuSk1tY/QTM= endpoint rpi-nixos.ddns.net:51820";
   };
 
   # Syncthing configuration for X1 laptop

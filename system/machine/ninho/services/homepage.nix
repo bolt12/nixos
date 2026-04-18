@@ -386,6 +386,13 @@ in
         {
           AI = [
             {
+              "Open WebUI" = {
+                href = "http://${ninhoIp}:${toString ports.open-webui}";
+                description = "Multimodal Chat UI";
+                icon = "open-webui";
+              };
+            }
+            {
               "llama-swap" = {
                 href = "http://${ninhoIp}:${toString ports.llamaswap}";
                 description = "LLM Inference (RTX 5090)";

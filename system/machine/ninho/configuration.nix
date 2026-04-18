@@ -428,10 +428,14 @@
       ╚═══════════════════════════════════════════════════╝
     '';
 
-    # Udev rules for Bluetooth - Disable USB autosuspend for MediaTek MT7922
+    # Udev rules
     udev.extraRules = ''
       # Keep MediaTek MT7922 Bluetooth powered on (fixes EBUSY error)
       ACTION=="add", SUBSYSTEM=="usb", ATTRS{idVendor}=="0489", ATTRS{idProduct}=="e13a", ATTR{power/control}="on"
+
+      # Disable SATA link power management on HDD controller (PCI 0000:11:00.0, ata7-12)
+      # med_power_with_dipm causes CRC/handshake errors on Seagate IronWolf drives
+      ACTION=="add", SUBSYSTEM=="scsi_host", KERNELS=="0000:11:00.0", ATTR{link_power_management_policy}="max_performance"
     '';
 
     # Journald - prevent log exhaustion that can cause disk space issues

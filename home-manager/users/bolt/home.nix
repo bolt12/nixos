@@ -1,4 +1,11 @@
-{ config, lib, pkgs, inputs, system, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  inputs,
+  system,
+  ...
+}:
 
 # Bolt's headless configuration for the ninho server
 # This configuration includes development tools and specialized packages
@@ -68,12 +75,28 @@ let
     '';
   };
 
-  # Pi coding agent wrapper for Ninho local models (Qwen via OpenAI-compatible API)
+  # Claude wrapper with Gemma 4 26B A4B MoE (fast, ~4B active)
+  olaude-gemma-4-26B-A4B = pkgs.writeShellApplication {
+    name = "olaude-gemma-4-26B-A4B";
+    runtimeInputs = [ ];
+    text = ''
+      export ANTHROPIC_BASE_URL="http://10.100.0.100:8080"
+      export API_TIMEOUT_MS="3000000"
+      export CLAUDE_CODE_MAX_OUTPUT_TOKENS=100000
+      export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
+      export ANTHROPIC_DEFAULT_OPUS_MODEL="gemma-4-26B-A4B"
+      export ANTHROPIC_DEFAULT_SONNET_MODEL="gemma-4-26B-A4B"
+      export ANTHROPIC_DEFAULT_HAIKU_MODEL="''${OLAUDE_HAIKU:-gemma-4-26B-A4B}"
+      exec claude "$@"
+    '';
+  };
+
+  # Pi coding agent wrapper for Ninho local models
   pi-local = pkgs.writeShellApplication {
     name = "pi-local";
     runtimeInputs = [ ];
     text = ''
-      exec pi --provider ninho --model qwen3.5-27B-full "$@"
+      exec pi --provider ninho --model "''${PI_LOCAL_MODEL:-gemma-4-26B-A4B}" "$@"
     '';
   };
 
@@ -96,7 +119,7 @@ in
     # Package profiles (headless - no desktop/wayland)
     ../../profiles/system-tools.nix
     ../../profiles/development.nix
-    ../../profiles/specialized.nix   # Agda, Lean, Arduino, etc.
+    ../../profiles/specialized.nix # Agda, Lean, Arduino, etc.
 
     # Program configurations
     ../../programs/ai-cmd/default.nix
@@ -123,7 +146,6 @@ in
     };
   };
 
-
   home = {
     username = config.userConfig.username;
     homeDirectory = config.userConfig.homeDirectory;
@@ -138,8 +160,8 @@ in
     };
 
     sessionVariables = {
-      EDITOR="nvim";
-      VISUAL="nvim";
+      EDITOR = "nvim";
+      VISUAL = "nvim";
     };
 
     sessionPath = [
@@ -154,6 +176,7 @@ in
       olaude-qwen3-5-9B
       olaude-qwen3-5-27B
       olaude-qwen3-5-35B-A3B
+      olaude-gemma-4-26B-A4B
       pi-local
       pi-glm
     ];
@@ -193,7 +216,9 @@ in
     };
     Service = {
       Type = "simple";
-      ExecStart = "${inputs.emanote.packages.${system}.default}/bin/emanote --layers \"%h/journal\" run --no-ws --host=0.0.0.0 --port=7000";
+      ExecStart = "${
+        inputs.emanote.packages.${system}.default
+      }/bin/emanote --layers \"%h/journal\" run --no-ws --host=0.0.0.0 --port=7000";
       Restart = "always";
       RestartSec = "10";
     };
@@ -201,5 +226,5 @@ in
   };
 
   # No desktop services for headless configuration
-  services = {};
+  services = { };
 }

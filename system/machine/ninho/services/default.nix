@@ -27,5 +27,6 @@
     ./atuin.nix          # Shell history sync server
     ./network-watchdog.nix # RTL8126A NIC failure recovery
     ./attic.nix            # Nix binary cache server
+    ./open-webui.nix       # Multimodal chat UI for llama-swap
   ];
 }

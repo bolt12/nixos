@@ -454,46 +454,27 @@ vim.g.haskell_tools = {
 EOF
 
 lua << EOF
-vim.lsp.config('zk', {
-  cmd = {'zk', 'lsp'},
-  filetypes = {'markdown'},
-  root_dir = function()
-    return vim.loop.cwd()
-  end,
-  settings = {}
-})
+require('zk').setup({
+  picker = 'telescope',
+  lsp = {
+    config = {
+      cmd = { 'zk', 'lsp' },
+      name = 'zk',
+      on_attach = function(_, buffer)
+        local opts = { noremap = true, silent = true, buffer = buffer }
 
-local lspconfig = require('lspconfig')
-
-vim.api.nvim_create_autocmd('LspAttach', {
-  callback = function(args)
-    local buffer = args.buf
-    local client = vim.lsp.get_client_by_id(args.data.client_id)
-
-    if not client or client.config.name ~= 'zk' then
-      return
-    end
-
-    local opts = { noremap = true, silent = true, buffer = buffer }
-
-    vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
-    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
-    vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
-    vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
-    vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
-    vim.keymap.set('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, opts)
-    vim.keymap.set('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, opts)
-    vim.keymap.set('n', '<leader>wl', function()
-      print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-    end, opts)
-    vim.keymap.set('n', '<leader>D', vim.lsp.buf.type_definition, opts)
-    vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
-    vim.keymap.set({ 'n', 'v' }, '<leader>ca', vim.lsp.buf.code_action, opts)
-    vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
-    vim.keymap.set('n', '<leader>f', function()
-      vim.lsp.buf.format { async = true }
-    end, opts)
-  end
+        vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
+        vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
+        vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
+        vim.keymap.set({ 'n', 'v' }, '<leader>ca', vim.lsp.buf.code_action, opts)
+        vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
+      end,
+    },
+    auto_attach = {
+      enabled = true,
+      filetypes = { 'markdown' },
+    },
+  },
 })
 EOF
 
@@ -631,7 +612,7 @@ let g:llama_config = {
   \ 'enable_at_startup': v:false,
   \ 'auto_fim': v:true,
   \ 'show_info': 1,
-  \ 'model_fim': 'qwen3.5-27B-full',
+  \ 'model_fim': 'gemma-4-26B-A4B',
   \ 'model_inst': 'qwen3-coder-next-full',
   \ 'n_prefix': 768,
   \ 'n_suffix': 192,

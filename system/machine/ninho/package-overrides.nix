@@ -31,13 +31,13 @@ in
         rocmSupport = false;
         metalSupport = false;
       }).overrideAttrs (oldAttrs: {
-        version = "8635";
+        version = "8778";
 
         src = pkgs.fetchFromGitHub {
           owner = "ggml-org";
           repo = "llama.cpp";
-          tag = "b8635";
-          hash = "sha256-KdSiGELpa8WxSC8wjZ8pi3Anv+Y3ZlqN+5qTdwNjuJI=";
+          tag = "b8778";
+          hash = "sha256-C4rmxR9PdKJTtHXE8E1uiWSIGvXjess/eRVD0R35Sx8=";
           leaveDotGit = true;
           postFetch = ''
             git -C "$out" rev-parse --short HEAD > $out/COMMIT
@@ -56,7 +56,7 @@ in
         '';
 
         # Webui npm deps hash changed with this source version
-        npmDepsHash = "sha256-DxgUDVr+kwtW55C4b89Pl+j3u2ILmACcQOvOBjKWAKQ=";
+        npmDepsHash = "sha256-RAFtsbBGBjteCt5yXhrmHL39rIDJMCFBETgzId2eRRk=";
 
         # b8635 removed tools/server/public/index.html.gz from the source tree,
         # but upstream nixpkgs postPatch still tries to rm it — use -f to tolerate

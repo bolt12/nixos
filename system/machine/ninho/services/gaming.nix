@@ -31,16 +31,23 @@
     user = "bolt";
   };
 
-  # Set display resolution early (runs when X server starts, before session)
-  # Register ultrawide mode (HDMI dummy plug EDID doesn't advertise it) so Sunshine
-  # can switch to it when an ultrawide Moonlight client connects.
-  # Default to 1440p; fall back to 1080p if dummy plug doesn't support it.
-  services.xserver.displayManager.setupCommands = ''
-    ${pkgs.xorg.xrandr}/bin/xrandr --newmode "2560x1080_60" 230.00 2560 2720 2992 3424 1080 1081 1084 1118 -HSync +VSync 2>/dev/null || true
-    ${pkgs.xorg.xrandr}/bin/xrandr --addmode HDMI-0 "2560x1080_60" 2>/dev/null || true
+  # Allow NVIDIA to accept custom modelines not in the HDMI dummy plug's EDID.
+  # Without this, xrandr --addmode silently fails for non-EDID resolutions.
+  services.xserver.screenSection = ''
+    Option "ModeValidation" "AllowNonEdidModes"
+  '';
 
+  # Set display resolution early (runs when X server starts, before session)
+  # Register ultrawide mode (HDMI dummy plug EDID doesn't advertise 3440x1440)
+  # so Steam Link / Sunshine can use it when streaming to the BlitzWolf ultrawide.
+  # Modeline from: gtf 3440 1440 60
+  # Default to 3440x1440 ultrawide; fall back to 2560x1440, then 1080p.
+  services.xserver.displayManager.setupCommands = ''
+    ${pkgs.xorg.xrandr}/bin/xrandr --newmode "3440x1440_60" 419.11 3440 3688 4064 4688 1440 1441 1444 1490 -HSync +VSync 2>/dev/null || true
+    ${pkgs.xorg.xrandr}/bin/xrandr --addmode HDMI-0 "3440x1440_60" 2>/dev/null || true
+
+    ${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-0 --mode "3440x1440_60" --rate 60 --scale 1x1 --panning 3440x1440 || \
     ${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-0 --mode 2560x1440 --rate 60 --scale 1x1 --panning 2560x1440 || \
-    ${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-0 --mode 1920x1080 --rate 60 --scale 1x1 --panning 1920x1080 || \
     ${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-0 --mode 1920x1080 --rate 60 || \
     true
   '';
@@ -62,11 +69,11 @@
     ${pkgs.xfce.xfconf}/bin/xfconf-query -c xfwm4 -p /general/use_compositing -s false || true
 
     # Ensure ultrawide mode is registered and resolution is set
-    ${pkgs.xorg.xrandr}/bin/xrandr --newmode "2560x1080_60" 230.00 2560 2720 2992 3424 1080 1081 1084 1118 -HSync +VSync 2>/dev/null || true
-    ${pkgs.xorg.xrandr}/bin/xrandr --addmode HDMI-0 "2560x1080_60" 2>/dev/null || true
+    ${pkgs.xorg.xrandr}/bin/xrandr --newmode "3440x1440_60" 419.11 3440 3688 4064 4688 1440 1441 1444 1490 -HSync +VSync 2>/dev/null || true
+    ${pkgs.xorg.xrandr}/bin/xrandr --addmode HDMI-0 "3440x1440_60" 2>/dev/null || true
 
-    ${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-0 --mode 2560x1440 --rate 60 --scale 1x1 --panning 2560x1440 || \
-    ${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-0 --mode 1920x1080 --rate 60 --scale 1x1 --panning 1920x1080 || true
+    ${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-0 --mode "3440x1440_60" --rate 60 --scale 1x1 --panning 3440x1440 || \
+    ${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-0 --mode 2560x1440 --rate 60 --scale 1x1 --panning 2560x1440 || true
   '';
 
   # ==========================================================================

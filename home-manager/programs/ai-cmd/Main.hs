@@ -1,51 +1,46 @@
-{-# LANGUAGE GHC2024 #-}
+{-# LANGUAGE GHC2024           #-}
+{-# LANGUAGE MultiWayIf        #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE MultiWayIf #-}
 
 module Main (main) where
 
-import Control.Exception (SomeException, bracket_, catch, try)
-import Control.Monad (when)
-import Data.Aeson (Value (..), decode, encode, object, (.=))
-import Data.Aeson.Key qualified as Key
-import Data.Aeson.KeyMap qualified as KM
-import Data.ByteString.Lazy qualified as LBS
-import Data.Maybe (fromMaybe)
-import Data.Text (Text)
-import Data.Text qualified as T
-import Data.Text.Encoding qualified as TE
-import Data.Text.IO qualified as TIO
-import Data.Vector qualified as V
-import Network.HTTP.Client
-  ( HttpException,
-    Request,
-    RequestBody (RequestBodyLBS),
-    httpLbs,
-    method,
-    newManager,
-    parseRequest,
-    requestBody,
-    requestHeaders,
-    responseBody,
-  )
-import Network.HTTP.Client.TLS (tlsManagerSettings)
-import Options.Applicative
-import Options.Applicative.Help.Pretty (vsep)
-import System.Console.Haskeline (defaultSettings, getInputLineWithInitial, runInputT)
-import System.Directory (findExecutable, getCurrentDirectory, getHomeDirectory, listDirectory)
-import System.Environment (lookupEnv)
-import System.Exit (ExitCode (..), exitFailure, exitWith)
-import System.IO
-  ( BufferMode (LineBuffering, NoBuffering),
-    hFlush,
-    hPutStrLn,
-    hSetBuffering,
-    hSetEcho,
-    stderr,
-    stdin,
-    stdout,
-  )
-import System.Process (readProcess, system)
+import           Control.Exception               (SomeException, bracket_,
+                                                  catch, try)
+import           Control.Monad                   (when)
+import           Data.Aeson                      (Value (..), decode, encode,
+                                                  object, (.=))
+import qualified Data.Aeson.Key                  as Key
+import qualified Data.Aeson.KeyMap               as KM
+import qualified Data.ByteString.Lazy            as LBS
+import           Data.Maybe                      (fromMaybe)
+import           Data.Text                       (Text)
+import qualified Data.Text                       as T
+import qualified Data.Text.Encoding              as TE
+import qualified Data.Text.IO                    as TIO
+import qualified Data.Vector                     as V
+import           Network.HTTP.Client             (HttpException, Request,
+                                                  RequestBody (RequestBodyLBS),
+                                                  httpLbs, method, newManager,
+                                                  parseRequest, requestBody,
+                                                  requestHeaders, responseBody)
+import           Network.HTTP.Client.TLS         (tlsManagerSettings)
+import           Options.Applicative
+import           Options.Applicative.Help.Pretty (vsep)
+import           System.Console.Haskeline        (defaultSettings,
+                                                  getInputLineWithInitial,
+                                                  runInputT)
+import           System.Directory                (findExecutable,
+                                                  getCurrentDirectory,
+                                                  getHomeDirectory,
+                                                  listDirectory)
+import           System.Environment              (lookupEnv)
+import           System.Exit                     (ExitCode (..), exitFailure,
+                                                  exitWith)
+import           System.IO                       (BufferMode (LineBuffering, NoBuffering),
+                                                  hFlush, hPutStrLn,
+                                                  hSetBuffering, hSetEcho,
+                                                  stderr, stdin, stdout)
+import           System.Process                  (readProcess, system)
 
 data Backend
   = LlamaBackend !Request !Text
@@ -53,7 +48,7 @@ data Backend
 
 data Opts = Opts
   { optClaude :: !Bool,
-    optInput :: ![Text]
+    optInput  :: ![Text]
   }
 
 optsParser :: ParserInfo Opts
@@ -92,7 +87,7 @@ loadConfig opts = do
      | Just "claude" <- envBackend -> pure ClaudeBackend
      | otherwise -> do
         url <- fromMaybe "http://10.100.0.100:8080" <$> lookupEnv "AI_CMD_URL"
-        model <- fromMaybe "qwen3.5-27B-full" <$> lookupEnv "AI_CMD_MODEL"
+        model <- fromMaybe "gemma-4-26B-A4B" <$> lookupEnv "AI_CMD_MODEL"
         req <- parseRequest (url <> "/v1/chat/completions")
         pure $ LlamaBackend req (T.pack model)
 
@@ -247,7 +242,7 @@ editAndRun :: Text -> IO ()
 editAndRun cmd = do
   result <- runInputT defaultSettings (getInputLineWithInitial "$ " (T.unpack cmd, ""))
   case result of
-    Nothing -> putStrLn "aborted"
+    Nothing     -> putStrLn "aborted"
     Just edited -> runTracked edited >>= exitWith
 
 -- ------------------------------------------------------------------ Main
@@ -272,10 +267,10 @@ main = do
 
   choice <- promptAction
   case choice of
-    'e' -> run cmd
+    'e'  -> run cmd
     '\n' -> run cmd
-    'd' -> editAndRun cmd
-    _ -> putStrLn "aborted"
+    'd'  -> editAndRun cmd
+    _    -> putStrLn "aborted"
   where
     getInput :: Opts -> IO Text
     getInput opts
