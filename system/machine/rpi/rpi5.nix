@@ -15,6 +15,13 @@
 let
   # Get emanote from the flake input
   emanotePackage = inputs.emanote.packages.${pkgs.system}.default;
+
+  # This RPi is the public journal gateway (single-user: bolt).
+  # The service is intentionally system-level so the journal survives user-session
+  # logouts and boots before any login. The path is bolt-scoped by design; if this
+  # ever becomes multi-user, lift journalDir to a NixOS option.
+  emanoteUser = "bolt";
+  journalDir = "/home/${emanoteUser}/journal";
 in
 {
   imports = [ ./services/dns-blocklist.nix ];
@@ -50,7 +57,7 @@ in
     services = {
       iwd.serviceConfig.Restart = "always";
 
-      # Emanote systemd service - now using the flake input version
+      # Emanote public journal gateway (see let-binding for scoping rationale)
       emanote = {
         enable = true;
         description = "Emanote web server";
@@ -59,12 +66,11 @@ in
 
         serviceConfig = {
           Type = "simple";
-          User = "bolt";
+          User = emanoteUser;
           Group = "users";
-          # Ensure the journal directory exists and is owned by bolt
-          ExecStartPre = "${pkgs.coreutils}/bin/mkdir -p /home/bolt/journal";
+          ExecStartPre = "${pkgs.coreutils}/bin/mkdir -p ${journalDir}";
           ExecStart = ''
-            ${emanotePackage}/bin/emanote --layers "/home/bolt/journal" run --no-ws --host=0.0.0.0 --port=7000
+            ${emanotePackage}/bin/emanote --layers "${journalDir}" run --no-ws --host=0.0.0.0 --port=${toString constants.ports.emanote}
           '';
           Restart = "always";
           RestartSec = "10";
@@ -74,8 +80,8 @@ in
           PrivateTmp = true;
           ProtectSystem = "strict";
           ProtectHome = "tmpfs";
-          ReadWritePaths = [ "/home/bolt/journal" ];
-          BindReadOnlyPaths = [ "/home/bolt/journal" ];
+          ReadWritePaths = [ journalDir ];
+          BindReadOnlyPaths = [ journalDir ];
         };
       };
     };
@@ -237,8 +243,8 @@ in
         53
         465
         587
-        7000
-        7654
+        constants.ports.emanote
+        7654   # Tang server (Clevis/LUKS auto-unlock advertisement)
       ];
       allowedUDPPorts = [
         53

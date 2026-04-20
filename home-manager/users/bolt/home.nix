@@ -13,84 +13,38 @@
 # but excludes desktop environment components
 
 let
-  # Claude wrapper with GLM configuration
-  glaude = pkgs.writeShellApplication {
-    name = "glaude";
-    runtimeInputs = [ ];
-    text = ''
-      export ANTHROPIC_BASE_URL="http://${constants.network.ninho.vpnIp}:${toString constants.ports.llamaswap}"
-      export API_TIMEOUT_MS="3000000"
-      export CLAUDE_CODE_MAX_OUTPUT_TOKENS=100000
-      export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
-      export ANTHROPIC_DEFAULT_OPUS_MODEL="GLM-5"
-      export ANTHROPIC_DEFAULT_SONNET_MODEL="GLM-5"
-      export ANTHROPIC_DEFAULT_HAIKU_MODEL="GLM-4.5-Air"
-      exec claude "$@"
-    '';
-  };
+  llamaswapUrl = "http://${constants.network.ninho.vpnIp}:${toString constants.ports.llamaswap}";
 
-  # Claude wrapper with only local llm setup
+  # Wraps `claude` to route through ninho's llama-swap endpoint with a chosen model.
+  #  - model:        used for Opus and Sonnet slots
+  #  - haikuModel:   used for Haiku slot (defaults to `model`)
+  #  - haikuEnvVar:  if set, lets that env var override haikuModel at run-time
+  mkClaudeWrapper = { name, model, haikuModel ? model, haikuEnvVar ? null }:
+    let
+      haikuExpr =
+        if haikuEnvVar == null
+        then haikuModel
+        else "\${${haikuEnvVar}:-${haikuModel}}";
+    in
+    pkgs.writeShellApplication {
+      inherit name;
+      runtimeInputs = [ ];
+      text = ''
+        export ANTHROPIC_BASE_URL="${llamaswapUrl}"
+        export API_TIMEOUT_MS="3000000"
+        export CLAUDE_CODE_MAX_OUTPUT_TOKENS=100000
+        export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
+        export ANTHROPIC_DEFAULT_OPUS_MODEL="${model}"
+        export ANTHROPIC_DEFAULT_SONNET_MODEL="${model}"
+        export ANTHROPIC_DEFAULT_HAIKU_MODEL="${haikuExpr}"
+        exec claude "$@"
+      '';
+    };
 
-  olaude-qwen3-5-9B = pkgs.writeShellApplication {
-    name = "olaude-qwen3-5-9B";
-    runtimeInputs = [ ];
-    text = ''
-      export ANTHROPIC_BASE_URL="http://${constants.network.ninho.vpnIp}:${toString constants.ports.llamaswap}"
-      export API_TIMEOUT_MS="3000000"
-      export CLAUDE_CODE_MAX_OUTPUT_TOKENS=100000
-      export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
-      export ANTHROPIC_DEFAULT_OPUS_MODEL="qwen3.5-9B-full"
-      export ANTHROPIC_DEFAULT_SONNET_MODEL="qwen3.5-9B-full"
-      export ANTHROPIC_DEFAULT_HAIKU_MODEL="''${OLAUDE_HAIKU:-qwen3.5-9B-full}"
-      exec claude "$@"
-    '';
-  };
-
-  olaude-qwen3-5-27B = pkgs.writeShellApplication {
-    name = "olaude-qwen3-5-27B";
-    runtimeInputs = [ ];
-    text = ''
-      export ANTHROPIC_BASE_URL="http://${constants.network.ninho.vpnIp}:${toString constants.ports.llamaswap}"
-      export API_TIMEOUT_MS="3000000"
-      export CLAUDE_CODE_MAX_OUTPUT_TOKENS=100000
-      export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
-      export ANTHROPIC_DEFAULT_OPUS_MODEL="qwen3.5-27B-full"
-      export ANTHROPIC_DEFAULT_SONNET_MODEL="qwen3.5-27B-full"
-      export ANTHROPIC_DEFAULT_HAIKU_MODEL="''${OLAUDE_HAIKU:-qwen3.5-27B-full}"
-      exec claude "$@"
-    '';
-  };
-
-  olaude-qwen3-6-35B-A3B = pkgs.writeShellApplication {
-    name = "olaude-qwen3-6-35B-A3B";
-    runtimeInputs = [ ];
-    text = ''
-      export ANTHROPIC_BASE_URL="http://${constants.network.ninho.vpnIp}:${toString constants.ports.llamaswap}"
-      export API_TIMEOUT_MS="3000000"
-      export CLAUDE_CODE_MAX_OUTPUT_TOKENS=100000
-      export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
-      export ANTHROPIC_DEFAULT_OPUS_MODEL="qwen3.6-35B-A3B-full"
-      export ANTHROPIC_DEFAULT_SONNET_MODEL="qwen3.6-35B-A3B-full"
-      export ANTHROPIC_DEFAULT_HAIKU_MODEL="''${OLAUDE_HAIKU:-qwen3.6-35B-A3B-full}"
-      exec claude "$@"
-    '';
-  };
-
-  # Claude wrapper with Gemma 4 26B A4B MoE (fast, ~4B active)
-  olaude-gemma-4-26B-A4B = pkgs.writeShellApplication {
-    name = "olaude-gemma-4-26B-A4B";
-    runtimeInputs = [ ];
-    text = ''
-      export ANTHROPIC_BASE_URL="http://${constants.network.ninho.vpnIp}:${toString constants.ports.llamaswap}"
-      export API_TIMEOUT_MS="3000000"
-      export CLAUDE_CODE_MAX_OUTPUT_TOKENS=100000
-      export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
-      export ANTHROPIC_DEFAULT_OPUS_MODEL="gemma-4-26B-A4B"
-      export ANTHROPIC_DEFAULT_SONNET_MODEL="gemma-4-26B-A4B"
-      export ANTHROPIC_DEFAULT_HAIKU_MODEL="''${OLAUDE_HAIKU:-gemma-4-26B-A4B}"
-      exec claude "$@"
-    '';
-  };
+  glaude                 = mkClaudeWrapper { name = "glaude";                 model = "GLM-5";             haikuModel = "GLM-4.5-Air"; };
+  olaude-qwen3-5-27B     = mkClaudeWrapper { name = "olaude-qwen3-5-27B";     model = "qwen3.5-27B-full";     haikuEnvVar = "OLAUDE_HAIKU"; };
+  olaude-qwen3-6-35B-A3B = mkClaudeWrapper { name = "olaude-qwen3-6-35B-A3B"; model = "qwen3.6-35B-A3B-full"; haikuEnvVar = "OLAUDE_HAIKU"; };
+  olaude-gemma-4-26B-A4B = mkClaudeWrapper { name = "olaude-gemma-4-26B-A4B"; model = "gemma-4-26B-A4B";      haikuEnvVar = "OLAUDE_HAIKU"; };
 
   # Pi coding agent wrapper for Ninho local models
   pi-local = pkgs.writeShellApplication {
@@ -197,11 +151,11 @@ in
         };
 
         "rpi" = {
-          hostname = "10.100.1.1";
+          hostname = constants.network.rpi.vpnIp;
           user = "bolt";
         };
         "ninho" = {
-          hostname = "10.100.1.100";
+          hostname = constants.network.ninho.vpnIp;
           user = "bolt";
         };
       };
@@ -218,7 +172,7 @@ in
       Type = "simple";
       ExecStart = "${
         inputs.emanote.packages.${system}.default
-      }/bin/emanote --layers \"%h/journal\" run --no-ws --host=0.0.0.0 --port=7000";
+      }/bin/emanote --layers \"%h/journal\" run --no-ws --host=0.0.0.0 --port=${toString constants.ports.emanote}";
       Restart = "always";
       RestartSec = "10";
     };

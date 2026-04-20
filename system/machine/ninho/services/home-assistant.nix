@@ -2646,7 +2646,7 @@ in
                   icon = "mdi:play-box-multiple";
                   icon_color = "purple";
                   layout_options = { grid_columns = 1; grid_rows = 1; };
-                  tap_action = { action = "url"; url_path = "http://${network.ninho.vpnIp}:8096"; };
+                  tap_action = { action = "url"; url_path = "http://${network.ninho.vpnIp}:${toString ports.jellyfin}"; };
                 }
                 {
                   type = "custom:mushroom-template-card";
@@ -2655,7 +2655,7 @@ in
                   icon = "mdi:music";
                   icon_color = "green";
                   layout_options = { grid_columns = 1; grid_rows = 1; };
-                  tap_action = { action = "url"; url_path = "http://${network.ninho.vpnIp}:8105"; };
+                  tap_action = { action = "url"; url_path = "http://${network.ninho.vpnIp}:${toString ports.navidrome}"; };
                 }
                 {
                   type = "custom:mushroom-template-card";
@@ -2664,7 +2664,7 @@ in
                   icon = "mdi:movie-search";
                   icon_color = "amber";
                   layout_options = { grid_columns = 1; grid_rows = 1; };
-                  tap_action = { action = "url"; url_path = "http://${network.ninho.vpnIp}:8200"; };
+                  tap_action = { action = "url"; url_path = "http://${network.ninho.vpnIp}:${toString ports.jellyseerr}"; };
                 }
               ];
             }
@@ -2693,7 +2693,7 @@ in
                   icon = "mdi:play-box-multiple";
                   icon_color = "purple";
                   layout_options = { grid_columns = 1; grid_rows = 1; };
-                  tap_action = { action = "url"; url_path = "http://${network.ninho.vpnIp}:8096"; };
+                  tap_action = { action = "url"; url_path = "http://${network.ninho.vpnIp}:${toString ports.jellyfin}"; };
                 }
                 {
                   type = "custom:mushroom-template-card";
@@ -2702,7 +2702,7 @@ in
                   icon = "mdi:music";
                   icon_color = "green";
                   layout_options = { grid_columns = 1; grid_rows = 1; };
-                  tap_action = { action = "url"; url_path = "http://${network.ninho.vpnIp}:8105"; };
+                  tap_action = { action = "url"; url_path = "http://${network.ninho.vpnIp}:${toString ports.navidrome}"; };
                 }
                 {
                   type = "custom:mushroom-template-card";
@@ -2711,7 +2711,7 @@ in
                   icon = "mdi:movie-search";
                   icon_color = "amber";
                   layout_options = { grid_columns = 1; grid_rows = 1; };
-                  tap_action = { action = "url"; url_path = "http://${network.ninho.vpnIp}:8200"; };
+                  tap_action = { action = "url"; url_path = "http://${network.ninho.vpnIp}:${toString ports.jellyseerr}"; };
                 }
                 {
                   type = "custom:mushroom-template-card";
@@ -2720,7 +2720,7 @@ in
                   icon = "mdi:book-open-page-variant";
                   icon_color = "teal";
                   layout_options = { grid_columns = 1; grid_rows = 1; };
-                  tap_action = { action = "url"; url_path = "http://${network.ninho.vpnIp}:8110"; };
+                  tap_action = { action = "url"; url_path = "http://${network.ninho.vpnIp}:${toString ports.kavita}"; };
                 }
               ];
             }
@@ -2815,7 +2815,7 @@ in
                   icon = "mdi:cloud";
                   icon_color = "blue";
                   layout_options = { grid_columns = 1; grid_rows = 1; };
-                  tap_action = { action = "url"; url_path = "http://${network.ninho.vpnIp}:8081"; };
+                  tap_action = { action = "url"; url_path = "http://${network.ninho.vpnIp}:${toString ports.nextcloud}"; };
                 }
                 {
                   type = "custom:mushroom-template-card";
@@ -2833,7 +2833,7 @@ in
                   icon = "mdi:folder";
                   icon_color = "orange";
                   layout_options = { grid_columns = 1; grid_rows = 1; };
-                  tap_action = { action = "url"; url_path = "http://${network.ninho.vpnIp}:8107"; };
+                  tap_action = { action = "url"; url_path = "http://${network.ninho.vpnIp}:${toString ports.filebrowser}"; };
                 }
                 {
                   type = "custom:mushroom-template-card";
@@ -2842,7 +2842,7 @@ in
                   icon = "mdi:image-multiple";
                   icon_color = "indigo";
                   layout_options = { grid_columns = 1; grid_rows = 1; };
-                  tap_action = { action = "url"; url_path = "http://${network.ninho.vpnIp}:2283"; };
+                  tap_action = { action = "url"; url_path = "http://${network.ninho.vpnIp}:${toString ports.immich}"; };
                 }
               ];
             }
@@ -2858,7 +2858,7 @@ in
                   icon = "mdi:brain";
                   icon_color = "yellow";
                   layout_options = { grid_columns = 1; grid_rows = 1; };
-                  tap_action = { action = "url"; url_path = "http://${network.ninho.vpnIp}:8080"; };
+                  tap_action = { action = "url"; url_path = "http://${network.ninho.vpnIp}:${toString ports.llamaswap}"; };
                 }
                 {
                   type = "custom:mushroom-template-card";
@@ -2867,7 +2867,7 @@ in
                   icon = "mdi:image-auto-adjust";
                   icon_color = "pink";
                   layout_options = { grid_columns = 1; grid_rows = 1; };
-                  tap_action = { action = "url"; url_path = "http://${network.ninho.vpnIp}:8188"; };
+                  tap_action = { action = "url"; url_path = "http://${network.ninho.vpnIp}:${toString ports.comfy-ui}"; };
                 }
                 {
                   type = "custom:mushroom-template-card";
@@ -2910,7 +2910,7 @@ in
                   icon = "mdi:chart-areaspline";
                   icon_color = "orange";
                   layout_options = { grid_columns = 1; grid_rows = 1; };
-                  tap_action = { action = "url"; url_path = "http://${network.ninho.vpnIp}:3000"; };
+                  tap_action = { action = "url"; url_path = "http://${network.ninho.vpnIp}:${toString ports.grafana}"; };
                 }
                 {
                   type = "custom:mushroom-template-card";
@@ -2919,7 +2919,7 @@ in
                   icon = "mdi:heart-pulse";
                   icon_color = "green";
                   layout_options = { grid_columns = 1; grid_rows = 1; };
-                  tap_action = { action = "url"; url_path = "http://${network.ninho.vpnIp}:8109"; };
+                  tap_action = { action = "url"; url_path = "http://${network.ninho.vpnIp}:${toString ports.uptime-kuma}"; };
                 }
                 {
                   type = "custom:mushroom-template-card";
@@ -2928,7 +2928,7 @@ in
                   icon = "mdi:bell";
                   icon_color = "red";
                   layout_options = { grid_columns = 1; grid_rows = 1; };
-                  tap_action = { action = "url"; url_path = "http://${network.ninho.vpnIp}:8106"; };
+                  tap_action = { action = "url"; url_path = "http://${network.ninho.vpnIp}:${toString ports.ntfy}"; };
                 }
                 {
                   type = "custom:mushroom-template-card";
@@ -2937,7 +2937,7 @@ in
                   icon = "mdi:view-dashboard";
                   icon_color = "grey";
                   layout_options = { grid_columns = 1; grid_rows = 1; };
-                  tap_action = { action = "url"; url_path = "http://${network.ninho.vpnIp}:8082"; };
+                  tap_action = { action = "url"; url_path = "http://${network.ninho.vpnIp}:${toString ports.homepage}"; };
                 }
               ];
             }

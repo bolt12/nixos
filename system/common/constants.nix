@@ -33,7 +33,6 @@
   # Service ports (centralized port allocation)
   ports = {
     nextcloud = 8081;
-    onlyoffice = 8000;
     immich = 2283;
     grafana = 3000;
     llamaswap = 8080;

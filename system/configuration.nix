@@ -166,14 +166,11 @@
       # Ninho Attic binary cache (accessible via WireGuard VPN)
       # Low connect-timeout so nix doesn't stall when VPN is down
       connect-timeout = 2;
-      # TODO: after first deploy, get the public key with:
-      #   attic cache info <cache-name>
-      # and add it to extra-trusted-public-keys below
       extra-substituters = [
         "http://${constants.network.ninho.vpnIp}:${toString constants.ports.attic}/main"
       ];
       extra-trusted-public-keys = [
-        main:VdiNUDiBDk2MHuiyWAVxrF8npWlaYA8PrnlXmKxjzbM=
+        "main:VdiNUDiBDk2MHuiyWAVxrF8npWlaYA8PrnlXmKxjzbM="
       ];
     };
   };

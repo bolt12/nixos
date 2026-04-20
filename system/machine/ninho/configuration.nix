@@ -260,7 +260,7 @@
         8920   # Jellyfin HTTPS
         22000  # Syncthing file transfers
       ] ++ (with constants.ports; [
-        immich grafana emanote onlyoffice llamaswap nextcloud
+        immich grafana emanote llamaswap nextcloud
         homepage jellyfin prowlarr radarr sonarr lidarr readarr
         bitmagnet deluge jellyseerr syncthing coolercontrol
       ]) ++ builtins.attrValues constants.wyoming;
@@ -513,12 +513,23 @@
     };
   };
 
-  # This creates the dir if missing, sets ownership, and sets the SGID bit.
   systemd.tmpfiles.rules = [
-    "d /storage 2775 root storage-users - -"
-    "d /storage/backup 2775 root storage-users - -"
-    "d /storage/media 2775 root storage-users - -"
-    "d /storage/data 2775 root storage-users - -"
+    # Storage directories — SGID so new files inherit storage-users.
+    "d ${constants.storage.root}   2775 root storage-users - -"
+    "d ${constants.storage.backup} 2775 root storage-users - -"
+    "d ${constants.storage.media}  2775 root storage-users - -"
+    "d ${constants.storage.data}   2775 root storage-users - -"
+
+    # CoolerControl config seed — programs.coolercontrol exposes only
+    # {enable, nvidiaSupport}; the daemon writes device settings back to
+    # config.toml, so `C` (create-if-missing) seeds the bind addresses
+    # once and leaves daemon-managed state untouched on later boots.
+    "d /etc/coolercontrol 0755 root root - -"
+    "C /etc/coolercontrol/config.toml 0644 root root - ${pkgs.writeText "coolercontrol-seed.toml" ''
+      [settings]
+      ipv4_address = "0.0.0.0"
+      ipv6_address = "::"
+    ''}"
   ];
 
   # ==========================================================================
@@ -673,24 +684,6 @@
       in
         "${nvidia-smi} -pl 450";
     };
-  };
-
-  # Configure CoolerControl to listen on all interfaces
-  # CoolerControl uses a config file, not environment variables
-  systemd.services.coolercontrold = {
-    preStart = ''
-      # Create config directory if it doesn't exist
-      mkdir -p /etc/coolercontrol
-
-      # Add API binding configuration if not present
-      if [ -f /etc/coolercontrol/config.toml ]; then
-        # Check if ipv4_address is already configured
-        if ! grep -q "^ipv4_address" /etc/coolercontrol/config.toml; then
-          # Add network settings to the [settings] section
-          sed -i '/^\[settings\]/a ipv4_address = "0.0.0.0"\nipv6_address = "::"' /etc/coolercontrol/config.toml
-        fi
-      fi
-    '';
   };
 
   # Install MOTD scripts

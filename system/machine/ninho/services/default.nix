@@ -3,7 +3,7 @@
   imports = [
     ./permissions.nix    # Centralized permission management
     ./databases.nix      # PostgreSQL
-    ./nextcloud.nix      # File sync (includes OnlyOffice)
+    ./nextcloud.nix      # File sync
     ./immich.nix         # Photo backup
     ./llama-cpp.nix      # LLM inference with CUDA
     ./faster-whisper.nix      # Speech-to-text with CUDA

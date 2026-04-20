@@ -4,6 +4,10 @@
 # Contains Syncthing configuration for syncing with ninho server
 let
   docsIgnorePatterns = import ../../common/syncthing-ignores.nix { inherit pkgs; };
+  projectAliases = import ../../common/project-aliases.nix {
+    desktopPrefix = "Desktop";
+    homeDirectory = config.userConfig.homeDirectory;
+  };
 in
 {
   # This places the file at ~/Documents/.stignore
@@ -12,27 +16,13 @@ in
     source = docsIgnorePatterns;
   };
 
-  userConfig.bash.extraAliases = lib.mkForce {
-    # Project directories
-    uminho    = "cd ${config.userConfig.homeDirectory}/Desktop/Bolt/UMinho/";
-    tese      = "cd ${config.userConfig.homeDirectory}/Desktop/Bolt/UMinho/5ºAno/Tese";
-    haskell   = "cd ${config.userConfig.homeDirectory}/Desktop/Bolt/Playground/Haskell/";
-    talks     = "cd ${config.userConfig.homeDirectory}/Desktop/Bolt/Playground/Talks/";
-    agdacd    = "cd ${config.userConfig.homeDirectory}/Desktop/Bolt/Playground/Agda/";
-    playg     = "cd ${config.userConfig.homeDirectory}/Desktop/Bolt/Playground/";
-
-    # Work directories
-    welltyped = "cd ${config.userConfig.homeDirectory}/Desktop/Bolt/UMinho/Profissional/Well-Typed/";
-    iohk      = "cd ${config.userConfig.homeDirectory}/Desktop/Bolt/UMinho/Profissional/Well-Typed/Projects/IOHK";
-    hsbindgen = "cd ${config.userConfig.homeDirectory}/Desktop/Bolt/UMinho/Profissional/Well-Typed/Projects/hs-bindgen";
-
-    # Tool shortcuts
-    doom = "${config.userConfig.homeDirectory}/.emacs.d/bin/doom";
-
+  # mkForce because bolt/user-data.nix (imported via bolt/home.nix) sets this
+  # with the ninho-side desktop prefix; the laptop needs the rooted prefix.
+  userConfig.bash.extraAliases = lib.mkForce (projectAliases // {
     # WireGuard endpoint toggle — skip MEO hairpin NAT when on home LAN
     vpn-home = "sudo wg set ${constants.network.wireguard.interface} peer ${constants.network.wireguard.rpiServerPubKey} endpoint ${constants.network.rpi.lanIp}:${toString constants.network.wireguard.port}";
     vpn-away = "sudo wg set ${constants.network.wireguard.interface} peer ${constants.network.wireguard.rpiServerPubKey} endpoint ${constants.network.rpi.hostname}:${toString constants.network.wireguard.port}";
-  };
+  });
 
   # Syncthing configuration for X1 laptop
   # This overrides the base bolt configuration from bolt/user-data.nix
