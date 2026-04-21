@@ -31,6 +31,7 @@ let
       runtimeInputs = [ ];
       text = ''
         export ANTHROPIC_BASE_URL="${llamaswapUrl}"
+        export ANTHROPIC_API_KEY="not-needed"
         export API_TIMEOUT_MS="3000000"
         export CLAUDE_CODE_MAX_OUTPUT_TOKENS=100000
         export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
