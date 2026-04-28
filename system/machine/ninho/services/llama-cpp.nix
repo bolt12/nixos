@@ -4,20 +4,23 @@ let
   inherit (pkgs) llama-cpp-cuda whisper-cpp-cuda stable-diffusion-cpp-cuda writeShellScript;
 
   # Model paths
-  whisper-model-path = "/var/lib/llama-cpp/models/ggml-large-v3-q8_0.bin";
+  whisper-model-path = "/var/lib/llama-cpp/models/ggml-large-v3.bin";
   sd-model-dir = "/var/lib/llama-cpp/models/sd";
   sd3-model-dir = "/var/lib/llama-cpp/models/sd3";
 
   # Whisper wrapper: downloads model on first use, then execs whisper-server
   # llama-swap uses shlex + exec (no sh -c), so && chains don't work in cmd
+  # `-s` (not `-f`) guards against a prior aborted wget leaving a 0-byte file;
+  # `wget && mv` ensures the tmp file is only promoted on full success.
   whisper-wrapper = writeShellScript "whisper-wrapper" ''
-    if [ ! -f "${whisper-model-path}" ]; then
-      echo "Downloading whisper large-v3 Q8_0 model..."
+    if [ ! -s "${whisper-model-path}" ]; then
+      echo "Downloading whisper large-v3 F16 model..."
       mkdir -p "$(dirname "${whisper-model-path}")"
       ${pkgs.wget}/bin/wget -q --show-progress -O "${whisper-model-path}.tmp" \
-        "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-q8_0.bin"
-      mv "${whisper-model-path}.tmp" "${whisper-model-path}"
-      echo "Whisper large-v3 model download complete."
+          "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3.bin" \
+        && mv "${whisper-model-path}.tmp" "${whisper-model-path}" \
+        || { rm -f "${whisper-model-path}.tmp"; echo "Whisper model download failed" >&2; exit 1; }
+      echo "Whisper large-v3 F16 model download complete."
     fi
     exec "$@"
   '';
@@ -32,8 +35,9 @@ let
       fi
       echo "Downloading $(basename "$dest")..."
       mkdir -p "$(dirname "$dest")"
-      ${pkgs.wget}/bin/wget -q --show-progress -O "$dest.tmp" "$url"
-      mv "$dest.tmp" "$dest"
+      ${pkgs.wget}/bin/wget -q --show-progress -O "$dest.tmp" "$url" \
+        && mv "$dest.tmp" "$dest" \
+        || { rm -f "$dest.tmp"; echo "Download failed: $url" >&2; exit 1; }
     }
     download "https://huggingface.co/leejet/FLUX.1-schnell-gguf/resolve/main/flux1-schnell-q8_0.gguf" \
       "${sd-model-dir}/flux1-schnell-q8_0.gguf"
@@ -57,8 +61,9 @@ let
       fi
       echo "Downloading $(basename "$dest")..."
       mkdir -p "$(dirname "$dest")"
-      ${pkgs.wget}/bin/wget -q --show-progress -O "$dest.tmp" "$url"
-      mv "$dest.tmp" "$dest"
+      ${pkgs.wget}/bin/wget -q --show-progress -O "$dest.tmp" "$url" \
+        && mv "$dest.tmp" "$dest" \
+        || { rm -f "$dest.tmp"; echo "Download failed: $url" >&2; exit 1; }
     }
     download "https://huggingface.co/second-state/stable-diffusion-3.5-medium-GGUF/resolve/main/sd3.5_medium-Q8_0.gguf" \
       "${sd3-model-dir}/sd3.5_medium-Q8_0.gguf"
@@ -333,6 +338,32 @@ in
               --jinja
           '';
           aliases = [ "qwen3.6-35B-A3B-full" ];
+        };
+
+        # Qwen3.6 27B (262K native context)
+        "qwen3.6-27B-full" = {
+          cmd = ''
+            ${wyoming-wrapper} ${llama-cpp-cuda}/bin/llama-server \
+              -hf unsloth/Qwen3.6-27B-GGUF:Q5_K_M \
+              --metrics \
+              --host 0.0.0.0 \
+              --port ''${PORT} \
+              --temp 0.6 \
+              --top-p 0.95 \
+              --top-k 20 \
+              --min-p 0.0 \
+              --presence-penalty 0.0 \
+              --repeat-penalty 1.0 \
+              -n 32768 \
+              -fit on \
+              --flash-attn on \
+              --cache-type-k q8_0 \
+              --cache-type-v q8_0 \
+              --no-mmap \
+              --chat-template-kwargs '{"preserve_thinking": true}' \
+              --jinja
+          '';
+          aliases = [ "qwen3.6-27B-full" ];
         };
 
         # Gemma 4 26B A4B MoE (~4B active, fast inference)

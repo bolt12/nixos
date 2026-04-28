@@ -6,8 +6,8 @@ Multi-mode LLM assistant integrating with a local llama-swap instance (OpenAI-co
 
 **Modes:**
 
-- **Code Assistant** (`<leader>p` in visual mode): Select code, type a prompt, get a response, replace/append/yank the result. Uses `qwen3-coder-next-full` at temperature 0.35.
-- **Journal Summary** (`<leader>j` in visual mode): Select journal entries, get an automatic weekly summary appended below. Uses `glm-4.7-flash-full-creative` at temperature 1.0.
+- **Code Assistant** (`<leader>p` in visual mode): Select code, type a prompt, get a response, replace/append/yank the result. Uses `qwen3.6-27B-full` at temperature 0.35.
+- **Journal Summary** (`<leader>j` in visual mode): Select journal entries, get an automatic weekly summary appended below. Uses `qwen3.6-27B-full` at temperature 1.0.
 - **LLM Menu** (`<leader>l` in visual mode): Full menu with mode selection, model picker (fetched live from API), and image generation stub.
 
 All popups display available keybindings in their border text.

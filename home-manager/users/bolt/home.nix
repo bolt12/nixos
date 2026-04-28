@@ -44,6 +44,7 @@ let
 
   glaude                 = mkClaudeWrapper { name = "glaude";                 model = "GLM-5";             haikuModel = "GLM-4.5-Air"; };
   olaude-qwen3-5-27B     = mkClaudeWrapper { name = "olaude-qwen3-5-27B";     model = "qwen3.5-27B-full";     haikuEnvVar = "OLAUDE_HAIKU"; };
+  olaude-qwen3-6-27B     = mkClaudeWrapper { name = "olaude-qwen3-6-27B";     model = "qwen3.6-27B-full";     haikuEnvVar = "OLAUDE_HAIKU"; };
   olaude-qwen3-6-35B-A3B = mkClaudeWrapper { name = "olaude-qwen3-6-35B-A3B"; model = "qwen3.6-35B-A3B-full"; haikuEnvVar = "OLAUDE_HAIKU"; };
   olaude-gemma-4-26B-A4B = mkClaudeWrapper { name = "olaude-gemma-4-26B-A4B"; model = "gemma-4-26B-A4B";      haikuEnvVar = "OLAUDE_HAIKU"; };
 
@@ -52,7 +53,7 @@ let
     name = "pi-local";
     runtimeInputs = [ ];
     text = ''
-      exec pi --provider ninho --model "''${PI_LOCAL_MODEL:-gemma-4-26B-A4B}" "$@"
+      exec pi --provider ninho --model "''${PI_LOCAL_MODEL:-qwen3.6-27B-full}" "$@"
     '';
   };
 
@@ -130,6 +131,7 @@ in
     packages = [
       glaude
       olaude-qwen3-5-27B
+      olaude-qwen3-6-27B
       olaude-qwen3-6-35B-A3B
       olaude-gemma-4-26B-A4B
       pi-local

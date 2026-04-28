@@ -62,7 +62,7 @@ optsParser =
               vsep
                 [ "Environment variables:",
                   "  AI_CMD_URL      OpenAI-compatible API base URL (default: http://10.100.0.100:8080)",
-                  "  AI_CMD_MODEL    Model name for llama backend (default: qwen3.5-27B-full)",
+                  "  AI_CMD_MODEL    Model name for llama backend (default: qwen3.6-27B-full)",
                   "  AI_CMD_BACKEND  Default backend: llama or claude (default: llama)",
                   "",
                   "After generating a command you are prompted:",
@@ -87,7 +87,7 @@ loadConfig opts = do
      | Just "claude" <- envBackend -> pure ClaudeBackend
      | otherwise -> do
         url <- fromMaybe "http://10.100.0.100:8080" <$> lookupEnv "AI_CMD_URL"
-        model <- fromMaybe "gemma-4-26B-A4B" <$> lookupEnv "AI_CMD_MODEL"
+        model <- fromMaybe "qwen3.6-27B-full" <$> lookupEnv "AI_CMD_MODEL"
         req <- parseRequest (url <> "/v1/chat/completions")
         pure $ LlamaBackend req (T.pack model)
 
