@@ -270,7 +270,7 @@ in
           # List of allowed peers.
           {
             # X1 G8 Carbon
-            publicKey = "hUUAT7Dny5aFJHvwUE9poaaAcEheyEDMhff5AwQPiRk=";
+            publicKey = "mFi3yUWeb8f3VZDVJXclrOPSCaOLuHkiNL6DxpnZsmQ=";
             allowedIPs = [ "10.100.0.2/32" ];
           }
           {
