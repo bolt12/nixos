@@ -17,7 +17,10 @@
       systemd-boot.enable = true;
     };
 
-    kernelModules = [ "acpi_call" ];
+    kernelModules = [
+      "acpi_call"
+      "hid_cherry"
+    ];
     extraModulePackages = with config.boot.kernelPackages; [ acpi_call ];
     blacklistedKernelModules = [ ];
     plymouth.enable = true;

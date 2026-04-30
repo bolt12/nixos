@@ -87,6 +87,12 @@ in
     };
   };
 
+  boot.kernel.sysctl = {
+    # The generic hardening value can exceed Raspberry Pi's ARM64 VA range and
+    # make systemd-sysctl fail activation with "vm/mmap_rnd_bits: Invalid argument".
+    "vm.mmap_rnd_bits" = lib.mkForce 24;
+  };
+
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment = {
