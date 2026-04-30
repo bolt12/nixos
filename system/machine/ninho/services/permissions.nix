@@ -1,3 +1,4 @@
+# Centralized group/permission management — wires service users into media + storage-users.
 { config, ... }:
 {
   # ============================================================================
@@ -11,37 +12,79 @@
   # Needed for some reason this isn't set
   users.users.prowlarr.isSystemUser = true;
   users.users.prowlarr.group = "prowlarr";
-  users.groups.prowlarr = {};
+  users.groups.prowlarr = { };
 
   # Create the media group for shared media access
-  users.groups.media = {};
+  users.groups.media = { };
 
   # Add all service users to appropriate groups
   users.users = {
     # Media server - needs access to media files and hardware acceleration
-    jellyfin.extraGroups = [ "media" "storage-users" "render" "video" "immich" "nextcloud" ];
+    jellyfin.extraGroups = [
+      "media"
+      "storage-users"
+      "render"
+      "video"
+      "immich"
+      "nextcloud"
+    ];
 
     # Servarr stack - needs access to media files for management
-    prowlarr.extraGroups = [ "media" "storage-users" ];
-    radarr.extraGroups   = [ "media" "storage-users" ];
-    sonarr.extraGroups   = [ "media" "storage-users" ];
-    lidarr.extraGroups   = [ "media" "storage-users" ];
-    readarr.extraGroups  = [ "media" "storage-users" ];
+    prowlarr.extraGroups = [
+      "media"
+      "storage-users"
+    ];
+    radarr.extraGroups = [
+      "media"
+      "storage-users"
+    ];
+    sonarr.extraGroups = [
+      "media"
+      "storage-users"
+    ];
+    lidarr.extraGroups = [
+      "media"
+      "storage-users"
+    ];
+    readarr.extraGroups = [
+      "media"
+      "storage-users"
+    ];
 
     # Download clients - need access to media files for downloads
-    deluge.extraGroups = [ "media" "storage-users" ];
+    deluge.extraGroups = [
+      "media"
+      "storage-users"
+    ];
 
     # Cloud services - need access to share photos/files with other services
-    nextcloud.extraGroups = [ "media" "storage-users" ];
-    immich.extraGroups = [ "media" "storage-users" "render" "video" ];
+    nextcloud.extraGroups = [
+      "media"
+      "storage-users"
+    ];
+    immich.extraGroups = [
+      "media"
+      "storage-users"
+      "render"
+      "video"
+    ];
 
     # Music streaming
-    navidrome.extraGroups = [ "media" "storage-users" ];
+    navidrome.extraGroups = [
+      "media"
+      "storage-users"
+    ];
 
     # Book reader - needs media access for ebooks
-    kavita.extraGroups = [ "media" "storage-users" ];
+    kavita.extraGroups = [
+      "media"
+      "storage-users"
+    ];
 
     # Subtitle manager - needs media access
-    bazarr.extraGroups = [ "media" "storage-users" ];
+    bazarr.extraGroups = [
+      "media"
+      "storage-users"
+    ];
   };
 }

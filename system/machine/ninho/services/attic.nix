@@ -1,3 +1,4 @@
+# Attic Nix binary cache server.
 {
   config,
   pkgs,
@@ -8,7 +9,6 @@ let
   inherit (constants) ports;
 in
 {
-  # Attic - self-hosted Nix binary cache
   services.atticd = {
     enable = true;
 

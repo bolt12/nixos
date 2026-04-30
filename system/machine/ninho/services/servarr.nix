@@ -1,4 +1,11 @@
-{ config, pkgs, inputs, constants, ... }:
+# *arr stack: Prowlarr, Radarr, Sonarr, Lidarr, Readarr, Deluge.
+{
+  config,
+  pkgs,
+  inputs,
+  constants,
+  ...
+}:
 let
   inherit (constants) ports storage;
 in

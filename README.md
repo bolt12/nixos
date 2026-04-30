@@ -321,3 +321,49 @@ To add a new user configuration:
 6. Add to system configuration if using NixOS-integrated home-manager
 
 See `home-manager/MIGRATION_SUMMARY.md` for detailed architecture documentation.
+
+## Forking Guide — adapting this config for your machines
+
+Nothing in this repo is a Nix-style "framework" — services are plain
+NixOS modules and homeConfig modules, so picking a piece and copy-pasting
+it into your own flake is the intended workflow. The list below is what
+you must change to make a fork actually run.
+
+### Per-machine values you must change
+
+| Where | What |
+| --- | --- |
+| `system/common/constants.nix` | Everything in the **INFRASTRUCTURE-SPECIFIC** block at the top: LAN subnet/gateway, ninho/rpi VPN IPs and hostnames, WireGuard pubkey, storage paths. The **CONVENTIONAL** block (port grid, Wyoming voice ports) is usually fine to keep. |
+| `home-manager/users/<user>/user-data.nix` | `userConfig.username`, `homeDirectory`, `git.{userName,userEmail}`, `sway.{primaryMonitor,externalMonitor,wallpaperPath}`, `agda.libraryRoot`. Personal aliases and Syncthing device IDs also live here. |
+| `system/machine/ninho/configuration.nix` SSH `authorizedKeys` blocks | Initrd LUKS unlock keys (~line 120) and the bolt/pollard account keys (~line 488 and ~line 511). |
+| `system/machine/ninho/configuration.nix` LUKS UUIDs (~84-105) | Run `blkid` on each LUKS partition and replace. |
+| `system/machine/ninho/configuration.nix` `initialPassword = "ninho"` | Placeholder password — change before first boot, then `passwd` after login. |
+| `system/machine/ninho/boot.nix` | `boot.kernelPackages = pkgs.linuxPackages_6_18`, `kernelModules = [ ... "nvidia" ... ]`, and `nixpkgs.config.cudaSupport` are RTX 5090-specific. Drop or swap if you're on AMD/Intel. |
+| `system/machine/ninho/hardware-configuration.nix` | Regenerate via `nixos-generate-config --root /mnt`. |
+| `/etc/wireguard/private` on each WG host | One-time: `sudo install -m600 -o root -g root /path/to/your/wg-private /etc/wireguard/private`. The constant lives at `system/common/constants.nix → paths.wireguardPrivateKey`. |
+
+### Embedded credentials inventory (rotate after forking)
+
+These currently ship in plaintext and are flagged for future migration to
+sops-nix. Rotate after you fork — and treat the forked tree as private
+until you do, or move these to your own secrets backend before publishing:
+
+- `system/machine/ninho/services/homepage.nix` — service API keys for the
+  homepage dashboard widgets (deluge/miniflux/kavita/grafana auth).
+- `system/machine/ninho/services/llama-cpp.nix` `peers.z-ai.apiKey` —
+  cloud LLM passthrough.
+- `system/machine/ninho/services/anki-sync-server.nix:28` — bolt's anki
+  account password.
+- `system/machine/ninho/services/nextcloud.nix` — admin password
+  bootstrapped via tmpfiles.
+- `system/machine/ninho/services/monitoring/exporters.nix` — exportarr
+  API key files seeded via tmpfiles (`/var/lib/secrets/*-api-key`).
+
+### Quick start
+
+1. Fork the repo and clone it to `~/nixos`.
+2. Edit the values above.
+3. `nix develop` to enter the dev shell (nixfmt, statix, deadnix, etc.).
+4. `nix run .#dry-ninho` (or `.#dry-bolt`) to confirm the config evaluates.
+5. `nix run .#deploy-ninho` (or `.#deploy-bolt`) to switch the system.
+6. `home-manager switch --flake .#<user>` for per-user activation.

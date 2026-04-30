@@ -42,11 +42,46 @@ with lib;
 
     bash.extraAliases = mkOption {
       type = types.attrs;
-      default = {};
+      default = { };
       description = "User-specific bash aliases";
       example = {
         projects = "cd ~/projects";
         work = "cd ~/work";
+      };
+    };
+
+    sway = {
+      primaryMonitor = mkOption {
+        type = types.str;
+        default = "eDP-1";
+        description = "Primary Sway output name";
+        example = "eDP-1";
+      };
+
+      externalMonitor = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        description = "External monitor output name (null = laptop only)";
+        example = "OOO BW-GM3 0000000000001";
+      };
+
+      wallpaperPath = mkOption {
+        type = types.path;
+        # Resolved relative to home-manager/common/ → home-manager/background.png
+        default = ../background.png;
+        description = "Sway desktop wallpaper image";
+      };
+    };
+
+    agda = {
+      libraryRoot = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        description = ''
+          Root path containing standard-library, agda-categories, agda-prelude.
+          Set to null to skip Agda library wiring entirely.
+        '';
+        example = "/home/bolt/Desktop/Bolt/Playground/Agda";
       };
     };
   };

@@ -1,4 +1,11 @@
-{ config, pkgs, inputs, constants, ... }:
+# Jellyfin media server with NVENC hardware transcoding (RTX 5090).
+{
+  config,
+  pkgs,
+  inputs,
+  constants,
+  ...
+}:
 {
   # Swap stable Jellyfin module for unstable (has hardwareAcceleration options)
   disabledModules = [ "${inputs.nixpkgs}/nixos/modules/services/misc/jellyfin.nix" ];

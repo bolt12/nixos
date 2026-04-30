@@ -1,4 +1,11 @@
-{ config, pkgs, lib, constants, ... }:
+# Comic / e-book reader scanning constants.storage.data.
+{
+  config,
+  pkgs,
+  lib,
+  constants,
+  ...
+}:
 let
   inherit (constants) ports storage;
   kavitaHome = "${storage.data}/kavita";
@@ -29,7 +36,10 @@ in
   ];
 
   # Grant read access to media folder (for ebooks)
-  users.users.kavita.extraGroups = [ "media" "storage-users" ];
+  users.users.kavita.extraGroups = [
+    "media"
+    "storage-users"
+  ];
 
   # Open firewall
   networking.firewall.allowedTCPPorts = [ ports.kavita ];

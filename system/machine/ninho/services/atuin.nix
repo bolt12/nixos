@@ -1,7 +1,14 @@
-{ config, pkgs, constants, ... }:
+# Atuin shell-history sync server.
+{
+  config,
+  pkgs,
+  constants,
+  ...
+}:
 let
   inherit (constants) ports;
-in {
+in
+{
   services.atuin = {
     enable = true;
     port = ports.atuin;

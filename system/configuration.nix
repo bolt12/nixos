@@ -2,29 +2,36 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, lib, pkgs, inputs, system, constants, ... }@attrs:
+{
+  config,
+  lib,
+  pkgs,
+  inputs,
+  system,
+  constants,
+  ...
+}@attrs:
 
 {
-  imports =
-    [
-      # Include the results of the hardware scan.
-      ./machine/x1-g8/hardware-configuration.nix
-      # Machine-specific configuration
-      ./machine/x1-g8/default.nix
+  imports = [
+    # Include the results of the hardware scan.
+    ./machine/x1-g8/hardware-configuration.nix
+    # Machine-specific configuration
+    ./machine/x1-g8/default.nix
 
-      # Import nixos home manager module
-      inputs.home-manager.nixosModules.home-manager
-    ];
+    # Import nixos home manager module
+    inputs.home-manager.nixosModules.home-manager
+  ];
 
   networking = {
     hostName = "bolt-nixos";
     # Enables wireless support and openvpn via network manager.
     networkmanager = {
       enable = true;
-      dns    = "none";
+      dns = "none";
     };
-    nameservers =
-    [ "10.100.0.1" # RPI 5 VPN IP
+    nameservers = [
+      constants.network.rpi.vpnIp # RPi 5 acts as recursive DNS over VPN
       "1.1.1.1"
       "8.8.8.8"
       "8.8.4.4"
@@ -32,15 +39,15 @@
 
     # Enable WireGuard
     firewall = {
-      enable            = true;
+      enable = true;
       trustedInterfaces = [ "wg0" ];
-      allowedTCPPorts   = [
-        8000  # Development
-        8384  # Syncthing web UI
+      allowedTCPPorts = [
+        8000 # Development
+        constants.ports.syncthing # Syncthing web UI
         22000 # Syncthing file transfers
       ];
-      allowedUDPPorts   = [
-        51820 # WireGuard
+      allowedUDPPorts = [
+        constants.network.wireguard.port
         22000 # Syncthing discovery
         21027 # Syncthing discovery
       ];
@@ -68,7 +75,7 @@
   # started in user sessions.
   # programs.mtr.enable = true;
   programs.gnupg.agent = {
-    enable           = true;
+    enable = true;
     enableSSHSupport = true;
   };
 
@@ -81,29 +88,33 @@
 
   hardware = {
     bluetooth = {
-      enable         = true;
-      settings       = {
-        General.Enable =
-          lib.concatStringsSep "," [ "Source" "Sink" "Media" "Socket" ];
+      enable = true;
+      settings = {
+        General.Enable = lib.concatStringsSep "," [
+          "Source"
+          "Sink"
+          "Media"
+          "Socket"
+        ];
       };
     };
     enableRedistributableFirmware = true;
-    enableAllFirmware             = true;
+    enableAllFirmware = true;
   };
 
   # Making fonts accessible to applications.
   fonts = {
-    fontDir.enable         = true;
-    enableDefaultPackages  = true;
+    fontDir.enable = true;
+    enableDefaultPackages = true;
   };
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users = {
     users.bolt = {
       isNormalUser = true;
-      home         = "/home/bolt";
-      description  = "Armando Santos";
-      extraGroups  = [
+      home = "/home/bolt";
+      description = "Armando Santos";
+      extraGroups = [
         "audio"
         "sound"
         "video"
@@ -114,15 +125,16 @@
         "plugdev"
         "root"
       ];
-      openssh.authorizedKeys.keys =
-        [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOK8UTLb9TxZdIEX5wU4d4qkJhE+i94TnucxtZmdl+ZM bolt@rpi-nixos" ];
+      openssh.authorizedKeys.keys = [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOK8UTLb9TxZdIEX5wU4d4qkJhE+i94TnucxtZmdl+ZM bolt@rpi-nixos"
+      ];
     };
 
   };
 
   # Home Manager Configuration:
   home-manager = {
-    useGlobalPkgs   = true;
+    useGlobalPkgs = true;
     useUserPackages = true;
     backupFileExtension = "hm-backup";
 
@@ -130,9 +142,11 @@
       inherit inputs system constants;
     };
 
-    users.bolt = { nixpkgs, ... }: {
-      imports = [ ../home-manager/users/bolt-with-de/home.nix ];
-    };
+    users.bolt =
+      { nixpkgs, ... }:
+      {
+        imports = [ ../home-manager/users/bolt-with-de/home.nix ];
+      };
   };
 
   # Allow unfree packages
@@ -143,8 +157,8 @@
     # Automate garbage collection
     gc = {
       automatic = true;
-      dates     = "monthly";
-      options   = "--delete-older-than 7d";
+      dates = "monthly";
+      options = "--delete-older-than 7d";
     };
 
     # Avoid unwanted garbage collection when using nix-direnv
@@ -158,10 +172,16 @@
       auto-optimise-store = true;
 
       # Enable flakes and nix command for all users (including root)
-      experimental-features = [ "nix-command" "flakes" ];
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
 
       # Required by Cachix to be used as non-root user
-      trusted-users = [ "root" "bolt" ];
+      trusted-users = [
+        "root"
+        "bolt"
+      ];
 
       # Ninho Attic binary cache (accessible via WireGuard VPN)
       # Low connect-timeout so nix doesn't stall when VPN is down

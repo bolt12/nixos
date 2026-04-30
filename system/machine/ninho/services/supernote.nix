@@ -1,4 +1,11 @@
-{ config, pkgs, lib, constants, ... }:
+# Supernote private cloud (constants.storage.data/supernote).
+{
+  config,
+  pkgs,
+  lib,
+  constants,
+  ...
+}:
 
 let
   inherit (constants) storage;
@@ -143,7 +150,10 @@ in
   # Systemd service to manage docker-compose
   systemd.services.supernote-cloud = {
     description = "Supernote Private Cloud";
-    after = [ "docker.service" "network-online.target" ];
+    after = [
+      "docker.service"
+      "network-online.target"
+    ];
     wants = [ "network-online.target" ];
     wantedBy = [ "multi-user.target" ];
 
@@ -177,9 +187,9 @@ in
 
   # Open firewall ports
   networking.firewall.allowedTCPPorts = [
-    19072  # HTTP access
-    19443  # HTTPS access
-    18072  # WebSocket sync (optional)
+    19072 # HTTP access
+    19443 # HTTPS access
+    18072 # WebSocket sync (optional)
   ];
 
   # Add docker-compose to system packages

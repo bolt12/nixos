@@ -1,9 +1,17 @@
-{ pkgs, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 let
   mod = "Mod1";
   lockCmd = "swaylock --clock --indicator --effect-blur 7x5 --effect-vignette 0.5:0.5 --grace 5 --fade-in 0.2";
-  wallpaper = ../../background.png;
+  wallpaper = config.userConfig.sway.wallpaperPath;
+  primary = config.userConfig.sway.primaryMonitor;
+  external = config.userConfig.sway.externalMonitor;
+  hasExternal = external != null;
 in
 {
   services.gnome-keyring.enable = true;
@@ -316,7 +324,8 @@ in
 
         # Toggle LG monitor (for when it's cabled but powered off —
         # kanshi can't tell, so manually disable to trigger BlitzWolf-only profile)
-        "${mod}+Shift+m" = ''exec swaymsg -t get_outputs | jq -r '.[] | select(.name | test("DP-[0-9]+")) | select(.make == "LG Electronics") | .name' | xargs -I{} swaymsg output "{}" toggle'';
+        "${mod}+Shift+m" =
+          ''exec swaymsg -t get_outputs | jq -r '.[] | select(.name | test("DP-[0-9]+")) | select(.make == "LG Electronics") | .name' | xargs -I{} swaymsg output "{}" toggle'';
       };
 
       modes = {
@@ -404,16 +413,18 @@ in
       # Performance tuning
       output * max_render_time 6
 
-      # Workspace output assignments (with fallback monitors)
-      workspace 1 output "OOO BW-GM3 0000000000001" eDP-1
-      workspace 2 output "OOO BW-GM3 0000000000001" eDP-1
-      workspace 3 output "LG Electronics LG HDR 4K 0x000694F9" eDP-1
+      # Workspace output assignments (external preferred, primary as fallback)
+      ${lib.optionalString hasExternal ''
+        workspace 1 output "${external}" ${primary}
+        workspace 2 output "${external}" ${primary}
+        workspace 3 output "LG Electronics LG HDR 4K 0x000694F9" ${primary}
 
-      # Default focus on ultrawide
-      focus output "OOO BW-GM3 0000000000001"
+        # Default focus on the external monitor
+        focus output "${external}"
+      ''}
 
-      # Laptop lid switch
-      set $laptop eDP-1
+      # Laptop lid switch (assumes the primary output is the laptop panel)
+      set $laptop ${primary}
       bindswitch --reload --locked lid:on output $laptop disable
       bindswitch --reload --locked lid:off output $laptop enable
     '';

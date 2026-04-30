@@ -21,6 +21,7 @@
 
     # Add desktop-specific profiles
     ../../profiles/desktop.nix
+    ../../profiles/fonts.nix
     ../../profiles/wayland.nix
 
     # Add desktop-specific modules

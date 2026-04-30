@@ -1,4 +1,10 @@
-{ config, pkgs, constants, ... }:
+# Wyoming faster-whisper STT (en + pt) with CUDA acceleration.
+{
+  config,
+  pkgs,
+  constants,
+  ...
+}:
 let
   inherit (constants) wyoming;
 in
@@ -43,13 +49,13 @@ in
       enable = true;
       voice = "en-us-ryan-medium";
       uri = "tcp://0.0.0.0:${toString wyoming.piperEn}";
-      useCUDA = false;  # CPU is faster for Piper
+      useCUDA = false; # CPU is faster for Piper
     };
     pt = {
       enable = true;
       voice = "pt_PT-tugão-medium";
       uri = "tcp://0.0.0.0:${toString wyoming.piperPt}";
-      useCUDA = false;  # CPU is faster for Piper
+      useCUDA = false; # CPU is faster for Piper
     };
   };
 
@@ -62,11 +68,11 @@ in
     requires = [ "nvidia-persistenced.service" ];
 
     serviceConfig = {
-      PrivateDevices = false;  # Allow GPU access
+      PrivateDevices = false; # Allow GPU access
     };
 
     environment = {
-      CUDA_VISIBLE_DEVICES = "0";  # RTX 5090
+      CUDA_VISIBLE_DEVICES = "0"; # RTX 5090
     };
   };
 
@@ -75,11 +81,11 @@ in
     requires = [ "nvidia-persistenced.service" ];
 
     serviceConfig = {
-      PrivateDevices = false;  # Allow GPU access
+      PrivateDevices = false; # Allow GPU access
     };
 
     environment = {
-      CUDA_VISIBLE_DEVICES = "0";  # RTX 5090
+      CUDA_VISIBLE_DEVICES = "0"; # RTX 5090
     };
   };
 }

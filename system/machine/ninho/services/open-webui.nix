@@ -1,4 +1,11 @@
-{ config, pkgs, lib, constants, ... }:
+# Open-WebUI chat frontend that talks to llama-swap.
+{
+  config,
+  pkgs,
+  lib,
+  constants,
+  ...
+}:
 let
   inherit (constants) ports;
 in

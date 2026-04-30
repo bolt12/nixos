@@ -1,3 +1,9 @@
 .aider*
 *.vim
 dist-newstyle/
+
+# Editor/tooling local state
+tags
+.codex
+result
+result-*

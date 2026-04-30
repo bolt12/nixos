@@ -109,21 +109,70 @@
     };
   };
 
-  outputs = { self
-            , nixpkgs
-            , home-manager
-            , colmena
-            , ... }@inputs:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      home-manager,
+      colmena,
+      ...
+    }@inputs:
     let
       system = "x86_64-linux";
-      # Import centralized constants
-      constants = import ./system/common/constants.nix { lib = nixpkgs.lib; };
-    in {
+      lib = nixpkgs.lib;
+      pkgs = nixpkgs.legacyPackages.${system};
+
+      # Centralized constants (ports, IPs, storage paths, …).
+      constants = import ./system/common/constants.nix { inherit lib; };
+
+      # Single source of truth for the unstable overlay; reused for
+      # NixOS systems (via overlays.nix) and standalone homeConfigurations.
+      unstableOverlay = import ./system/common/unstable-overlay.nix { inherit inputs; };
+
+      # Build a NixOS system with the conventional specialArgs and, optionally,
+      # standalone-style home-manager wiring. Keeping this small on purpose:
+      # bolt-rpi5-sd-image and the ninho-internal HM wiring don't fit and
+      # stay separate.
+      mkSystem =
+        {
+          modules,
+          system ? "x86_64-linux",
+          hmUser ? null,
+          hmModule ? null,
+        }:
+        nixpkgs.lib.nixosSystem {
+          inherit system;
+          specialArgs = { inherit inputs system constants; };
+          modules =
+            modules
+            ++ lib.optionals (hmUser != null) [
+              inputs.home-manager.nixosModules.home-manager
+              {
+                home-manager = {
+                  useGlobalPkgs = true;
+                  useUserPackages = true;
+                  extraSpecialArgs = { inherit inputs system constants; };
+                  users.${hmUser}.imports = [ hmModule ];
+                };
+              }
+            ];
+        };
+
+      # Wrap a one-line invocation as a `nix run`-able app.
+      mkApp = name: description: text: {
+        type = "app";
+        program = "${
+          pkgs.writeShellApplication {
+            inherit name text;
+          }
+        }/bin/${name}";
+        meta.description = description;
+      };
+    in
+    {
       # NixOS x86 configurations
       nixosConfigurations = {
-        bolt-nixos = nixpkgs.lib.nixosSystem {
-          inherit system;
-          specialArgs = {inherit inputs system constants;};
+        bolt-nixos = mkSystem {
           modules = [
             ./system/configuration.nix
             ./system/common/overlays.nix
@@ -131,90 +180,80 @@
           ];
         };
 
-        bolt-rpi5-sd-image = (nixpkgs.lib.nixosSystem {
-          system = "aarch64-linux";
-          specialArgs = {inherit inputs;};
-          modules = [
-            inputs.raspberry-pi-nix.nixosModules.raspberry-pi
-            inputs.raspberry-pi-nix.nixosModules.sd-image
-            ./system/machine/rpi/rpi-basic.nix
-          ];
-        }).config.system.build.sdImage;
+        # SD-image build is structurally different (different return value,
+        # aarch64, no constants) so it stays out of mkSystem.
+        bolt-rpi5-sd-image =
+          (nixpkgs.lib.nixosSystem {
+            system = "aarch64-linux";
+            specialArgs = { inherit inputs; };
+            modules = [
+              inputs.raspberry-pi-nix.nixosModules.raspberry-pi
+              inputs.raspberry-pi-nix.nixosModules.sd-image
+              ./system/machine/rpi/rpi-basic.nix
+            ];
+          }).config.system.build.sdImage;
 
-        ninho-nixos = nixpkgs.lib.nixosSystem {
-          inherit system;
-          specialArgs = {inherit inputs system constants;};
+        ninho-nixos = mkSystem {
           modules = [
             ./system/machine/ninho/configuration.nix
             ./system/common/overlays.nix
           ];
         };
 
-        bolt-x200 = nixpkgs.lib.nixosSystem {
-          inherit system;
-          specialArgs = { inherit inputs system constants; };
+        bolt-x200 = mkSystem {
           modules = [
             ./system/machine/thinkpadx200/default.nix
             ./system/common/overlays.nix
-            inputs.home-manager.nixosModules.home-manager
-            {
-              home-manager = {
-                useGlobalPkgs = true;
-                useUserPackages = true;
-                extraSpecialArgs = { inherit inputs system constants; };
-                users.bolt = { nixpkgs, ... }: {
-                  imports = [ ./home-manager/users/bolt-with-de/home.nix ];
-                };
-              };
-            }
           ];
+          hmUser = "bolt";
+          hmModule = ./home-manager/users/bolt-with-de/home.nix;
         };
       };
 
-      # Home Manager activation script (standalone)
-      # pkgsFor includes the unstable overlay so HM modules can use pkgs.unstable.*
-      homeConfigurations = let
-        pkgsFor = sys: import nixpkgs {
-          system = sys;
-          config.allowUnfree = true;
-          overlays = [
-            (final: prev: {
-              unstable = import inputs.nixpkgs-unstable {
-                system = sys;
-                config.allowUnfree = true;
-              };
-            })
-          ];
-        };
-      in {
-        # Bolt headless configuration for ninho server
-        bolt = home-manager.lib.homeManagerConfiguration {
-          pkgs = pkgsFor system;
-          modules = [ ./home-manager/users/bolt/home.nix ];
-          extraSpecialArgs = { inherit inputs system constants; };
-        };
+      # Standalone home-manager activations.
+      # `pkgsFor` exposes pkgs.unstable.* the same way NixOS systems do.
+      homeConfigurations =
+        let
+          pkgsFor =
+            sys:
+            import nixpkgs {
+              system = sys;
+              config.allowUnfree = true;
+              overlays = [ unstableOverlay ];
+            };
+        in
+        {
+          # Bolt headless configuration for ninho server
+          bolt = home-manager.lib.homeManagerConfiguration {
+            pkgs = pkgsFor system;
+            modules = [ ./home-manager/users/bolt/home.nix ];
+            extraSpecialArgs = { inherit inputs system constants; };
+          };
 
-        # Bolt desktop configuration for bolt-nixos
-        bolt-with-de = home-manager.lib.homeManagerConfiguration {
-          pkgs = pkgsFor system;
-          modules = [ ./home-manager/users/bolt-with-de/home.nix ];
-          extraSpecialArgs = { inherit inputs system constants; };
-        };
+          # Bolt desktop configuration for bolt-nixos
+          bolt-with-de = home-manager.lib.homeManagerConfiguration {
+            pkgs = pkgsFor system;
+            modules = [ ./home-manager/users/bolt-with-de/home.nix ];
+            extraSpecialArgs = { inherit inputs system constants; };
+          };
 
-        # Pollard configuration for ninho server
-        pollard = home-manager.lib.homeManagerConfiguration {
-          pkgs = pkgsFor system;
-          modules = [ ./home-manager/users/pollard/home.nix ];
-          extraSpecialArgs = { inherit inputs system constants; };
-        };
+          # Pollard configuration for ninho server
+          pollard = home-manager.lib.homeManagerConfiguration {
+            pkgs = pkgsFor system;
+            modules = [ ./home-manager/users/pollard/home.nix ];
+            extraSpecialArgs = { inherit inputs system constants; };
+          };
 
-        # SteamDeck home-manager configuration
-        steam-deck = home-manager.lib.homeManagerConfiguration {
-          pkgs = pkgsFor "x86_64-linux";
-          modules = [ ./home-manager/users/steam-deck/home.nix ];
-          extraSpecialArgs = { inherit inputs constants; system = "x86_64-linux"; };
+          # SteamDeck home-manager configuration
+          steam-deck = home-manager.lib.homeManagerConfiguration {
+            pkgs = pkgsFor "x86_64-linux";
+            modules = [ ./home-manager/users/steam-deck/home.nix ];
+            extraSpecialArgs = {
+              inherit inputs constants;
+              system = "x86_64-linux";
+            };
+          };
         };
-      };
 
       # Colmena deployment configuration
       colmena = {
@@ -227,33 +266,74 @@
         };
 
         # RPI 5 deployment target
-        rpi-5 = { name, nodes, pkgs, ... }: {
-          deployment = {
-            targetHost = "192.168.1.110";
-            targetUser = "root";
-            # Build locally via QEMU binfmt emulation (not cross-compilation)
-            buildOnTarget = false;
-            allowLocalDeployment = false;
+        rpi-5 =
+          {
+            name,
+            nodes,
+            pkgs,
+            ...
+          }:
+          {
+            deployment = {
+              targetHost = "192.168.1.110";
+              targetUser = "root";
+              # Build locally via QEMU binfmt emulation (not cross-compilation)
+              buildOnTarget = false;
+              allowLocalDeployment = false;
+            };
+
+            imports = [
+              inputs.raspberry-pi-nix.nixosModules.raspberry-pi
+              ./system/machine/rpi/hardware-configuration.nix
+              ./system/machine/rpi/rpi-basic.nix
+              ./system/machine/rpi/rpi5.nix
+            ];
+
+            nixpkgs.system = "aarch64-linux";
           };
-
-          imports = [
-            inputs.raspberry-pi-nix.nixosModules.raspberry-pi
-            ./system/machine/rpi/hardware-configuration.nix
-            ./system/machine/rpi/rpi-basic.nix
-            ./system/machine/rpi/rpi5.nix
-          ];
-
-          nixpkgs.system = "aarch64-linux";
-        };
       };
 
       # Formatter for `nix fmt`
-      formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixfmt-rfc-style;
+      formatter.${system} = pkgs.nixfmt-rfc-style;
 
       # Build checks for `nix flake check`
-      checks.x86_64-linux = {
+      checks.${system} = {
         ninho = self.nixosConfigurations.ninho-nixos.config.system.build.toplevel;
         bolt-nixos = self.nixosConfigurations.bolt-nixos.config.system.build.toplevel;
       };
+
+      # `nix develop` — tools used while editing this repo.
+      devShells.${system}.default = pkgs.mkShellNoCC {
+        packages = [
+          pkgs.nixfmt-rfc-style # `nix fmt`
+          pkgs.statix # lints
+          pkgs.deadnix # dead-code finder
+          pkgs.nil # LSP for editors that want it
+          pkgs.colmena # rpi deploys (disambiguates from the `colmena` flake input)
+          pkgs.git
+        ];
+      };
+
+      # `nix run .#<name>` shortcuts for common operations.
+      apps.${system} = {
+        deploy-ninho = mkApp "deploy-ninho" "Switch ninho-nixos to the current flake (sudo)." ''
+          exec sudo nixos-rebuild switch --flake .#ninho-nixos "$@"
+        '';
+        deploy-bolt = mkApp "deploy-bolt" "Switch bolt-nixos to the current flake (sudo)." ''
+          exec sudo nixos-rebuild switch --flake .#bolt-nixos "$@"
+        '';
+        dry-ninho = mkApp "dry-ninho" "Dry-build ninho-nixos without activating." ''
+          exec nixos-rebuild dry-build --flake .#ninho-nixos "$@"
+        '';
+        dry-bolt = mkApp "dry-bolt" "Dry-build bolt-nixos without activating." ''
+          exec nixos-rebuild dry-build --flake .#bolt-nixos "$@"
+        '';
+        fmt = mkApp "fmt" "Format every Nix file via nixfmt-rfc-style." ''
+          exec nix fmt -- "$@"
+        '';
+        update = mkApp "update" "Update flake.lock to the latest pinned inputs." ''
+          exec nix flake update "$@"
+        '';
+      };
     };
-  }
+}

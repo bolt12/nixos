@@ -116,8 +116,8 @@ in
       listenStream = [ "7654" ];
       ipAddressAllow = [
         "127.0.0.0/8"
-        "192.168.1.0/24"
-        "10.100.0.0/24"
+        constants.network.lan.subnet
+        constants.network.wireguard.subnet
       ];
     };
 
@@ -221,7 +221,7 @@ in
     nameservers = [
       "127.0.0.1"
       "1.1.1.1"
-      "192.168.1.254"
+      constants.network.lan.gateway
     ];
 
     # enable NAT
@@ -244,20 +244,18 @@ in
         465
         587
         constants.ports.emanote
-        7654   # Tang server (Clevis/LUKS auto-unlock advertisement)
+        7654 # Tang server (Clevis/LUKS auto-unlock advertisement)
       ];
       allowedUDPPorts = [
         53
-        51820
+        constants.network.wireguard.port
       ];
     };
 
     wireguard.interfaces = {
-      # "wg0" is the network interface name. You can name the interface arbitrarily.
       wg0 = {
         generatePrivateKeyFile = true;
-        # Determines the IP address and subnet of the server's end of the tunnel interface.
-        ips = [ "10.100.0.1/24" ];
+        ips = [ constants.network.wireguard.rpiIp ];
 
         # Lower MTU for mobile clients — mobile carriers often filter ICMP
         # "fragmentation needed", breaking PMTUD. WG overhead is 60 B (IPv4) /
@@ -265,11 +263,8 @@ in
         # adds its own tunnel. 1320 is defensive across carriers.
         mtu = 1320;
 
-        # The port that WireGuard listens to. Must be accessible by the client.
-        listenPort = 51820;
-
-        # Path to the private key file.
-        privateKeyFile = "/home/bolt/wireguard-keys/privatekey";
+        listenPort = constants.network.wireguard.port;
+        privateKeyFile = constants.paths.wireguardPrivateKey;
 
         peers = [
           # List of allowed peers.

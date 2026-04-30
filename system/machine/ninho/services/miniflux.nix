@@ -1,9 +1,12 @@
-{ config, pkgs, lib, ... }:
-let
-  constants = import ../../../common/constants.nix { inherit lib; };
-in
+# Miniflux RSS reader, backed by the shared PostgreSQL in databases.nix.
 {
-  # Miniflux RSS reader
+  config,
+  pkgs,
+  lib,
+  constants,
+  ...
+}:
+{
   services.miniflux = {
     enable = true;
 

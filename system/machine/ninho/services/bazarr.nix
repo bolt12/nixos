@@ -1,4 +1,11 @@
-{ config, pkgs, lib, constants, ... }:
+# Subtitle auto-downloader for Sonarr / Radarr.
+{
+  config,
+  pkgs,
+  lib,
+  constants,
+  ...
+}:
 let
   inherit (constants) ports storage;
   bazarrHome = "${storage.data}/bazarr";
@@ -17,5 +24,8 @@ in
   ];
 
   # Bazarr needs access to media files for subtitle matching
-  users.users.bazarr.extraGroups = [ "media" "storage-users" ];
+  users.users.bazarr.extraGroups = [
+    "media"
+    "storage-users"
+  ];
 }

@@ -1,4 +1,11 @@
-{ config, pkgs, lib, constants, ... }:
+# Uptime Kuma — uptime / status monitoring with web UI.
+{
+  config,
+  pkgs,
+  lib,
+  constants,
+  ...
+}:
 let
   inherit (constants) ports storage;
 in
@@ -6,7 +13,7 @@ in
   services.uptime-kuma = {
     enable = true;
     package = pkgs.unstable.uptime-kuma;
-    appriseSupport = true;  # Enable notification support
+    appriseSupport = true; # Enable notification support
     settings = {
       # Port configuration via environment variable
       UPTIME_KUMA_PORT = toString ports.uptime-kuma;

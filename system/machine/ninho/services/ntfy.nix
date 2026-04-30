@@ -1,4 +1,11 @@
-{ config, pkgs, lib, constants, ... }:
+# ntfy push-notification server (alert sink for Grafana, network-watchdog, etc.).
+{
+  config,
+  pkgs,
+  lib,
+  constants,
+  ...
+}:
 let
   inherit (constants) ports storage network;
 in

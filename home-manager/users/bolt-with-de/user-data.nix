@@ -1,4 +1,10 @@
-{ pkgs, config, lib, constants, ... }:
+{
+  pkgs,
+  config,
+  lib,
+  constants,
+  ...
+}:
 
 # User-specific data for bolt-with-de (X1 Carbon laptop)
 # Contains Syncthing configuration for syncing with ninho server
@@ -16,13 +22,25 @@ in
     source = docsIgnorePatterns;
   };
 
+  # Sway monitors — laptop panel + ultrawide.
+  userConfig.sway = {
+    primaryMonitor = "eDP-1";
+    externalMonitor = "OOO BW-GM3 0000000000001";
+  };
+
+  # Agda playground location for the libraries/defaults files.
+  userConfig.agda.libraryRoot = "${config.userConfig.homeDirectory}/Desktop/Bolt/Playground/Agda";
+
   # mkForce because bolt/user-data.nix (imported via bolt/home.nix) sets this
   # with the ninho-side desktop prefix; the laptop needs the rooted prefix.
-  userConfig.bash.extraAliases = lib.mkForce (projectAliases // {
-    # WireGuard endpoint toggle — skip MEO hairpin NAT when on home LAN
-    vpn-home = "sudo wg set ${constants.network.wireguard.interface} peer ${constants.network.wireguard.rpiServerPubKey} endpoint ${constants.network.rpi.lanIp}:${toString constants.network.wireguard.port}";
-    vpn-away = "sudo wg set ${constants.network.wireguard.interface} peer ${constants.network.wireguard.rpiServerPubKey} endpoint ${constants.network.rpi.hostname}:${toString constants.network.wireguard.port}";
-  });
+  userConfig.bash.extraAliases = lib.mkForce (
+    projectAliases
+    // {
+      # WireGuard endpoint toggle — skip MEO hairpin NAT when on home LAN
+      vpn-home = "sudo wg set ${constants.network.wireguard.interface} peer ${constants.network.wireguard.rpiServerPubKey} endpoint ${constants.network.rpi.lanIp}:${toString constants.network.wireguard.port}";
+      vpn-away = "sudo wg set ${constants.network.wireguard.interface} peer ${constants.network.wireguard.rpiServerPubKey} endpoint ${constants.network.rpi.hostname}:${toString constants.network.wireguard.port}";
+    }
+  );
 
   # Syncthing configuration for X1 laptop
   # This overrides the base bolt configuration from bolt/user-data.nix

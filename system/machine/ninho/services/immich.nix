@@ -1,4 +1,10 @@
-{ config, pkgs, constants, ... }:
+# Immich photo library + ML face recognition; uses shared PostgreSQL.
+{
+  config,
+  pkgs,
+  constants,
+  ...
+}:
 let
   inherit (constants) ports storage;
   immichHome = "${storage.data}/immich";
@@ -14,13 +20,13 @@ in
 
     database = {
       enable = true;
-      createDB = true;  # Auto-creates database
-      enableVectors = false;  # x86_64 supports this
+      createDB = true; # Auto-creates database
+      enableVectors = false; # x86_64 supports this
     };
 
     machine-learning.enable = true;
 
-    redis.enable = true;  # Auto-configures Redis
+    redis.enable = true; # Auto-configures Redis
 
     accelerationDevices = null;
   };

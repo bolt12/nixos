@@ -17,6 +17,10 @@ in
     source = docsIgnorePatterns;
   };
 
+  # Agda playground location for the libraries/defaults files.
+  # bolt-with-de overrides this with its own laptop-rooted prefix when imported.
+  userConfig.agda.libraryRoot = "${config.userConfig.homeDirectory}/Desktop/Bolt/Playground/Agda";
+
   userConfig.bash.extraAliases = projectAliases // {
     # NixOS rebuild
     nrs = "nixos-rebuild-safe";

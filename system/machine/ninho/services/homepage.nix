@@ -1,3 +1,4 @@
+# homepage-dashboard with live widgets for every service. Embeds API keys (rotate on fork).
 { config, constants, ... }:
 let
   inherit (constants) network ports storage;
@@ -135,7 +136,12 @@ in
                   # Requires "server.statistics" permission
                   key = "415bvASyoUx0AhP157r3rbRzufa9Y76CXXvCRy88OrE";
                   version = 2;
-                  fields = ["photos" "videos" "storage" "users"];
+                  fields = [
+                    "photos"
+                    "videos"
+                    "storage"
+                    "users"
+                  ];
                 };
               };
             }
@@ -500,7 +506,10 @@ in
       enable = true;
       virtualHosts."${ninhoIp}" = {
         listen = [
-          { addr = ninhoIp; port = 80; }
+          {
+            addr = ninhoIp;
+            port = 80;
+          }
         ];
         locations."/" = {
           proxyPass = "http://127.0.0.1:${toString ports.homepage}";

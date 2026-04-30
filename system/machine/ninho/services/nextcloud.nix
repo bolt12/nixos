@@ -1,4 +1,10 @@
-{ config, pkgs, constants, ... }:
+# Nextcloud file sync + collaborative editing, backed by shared PostgreSQL.
+{
+  config,
+  pkgs,
+  constants,
+  ...
+}:
 let
   inherit (constants) network ports storage;
   nextcloudHostname = "nextcloud.${network.ninho.hostname}";
@@ -9,8 +15,14 @@ in
   services.nginx.virtualHosts."${nextcloudHostname}" = {
     # Listen on all interfaces (0.0.0.0)
     listen = [
-      { addr = "0.0.0.0"; port = ports.nextcloud; }
-      { addr = "[::]"; port = ports.nextcloud; }  # IPv6 support
+      {
+        addr = "0.0.0.0";
+        port = ports.nextcloud;
+      }
+      {
+        addr = "[::]";
+        port = ports.nextcloud;
+      } # IPv6 support
     ];
 
     # Disable SSL (internal network access only)
@@ -55,7 +67,7 @@ in
     };
 
     config = {
-      dbtype = "pgsql";  # Auto-creates database
+      dbtype = "pgsql"; # Auto-creates database
       adminuser = "admin";
       adminpassFile = "${nextcloudHome}/admin-password";
     };

@@ -1,4 +1,11 @@
-{ config, lib, pkgs, inputs, ... }:
+# Steam + Sunshine for Moonlight game streaming (NVIDIA-only, dummy HDMI).
+{
+  config,
+  lib,
+  pkgs,
+  inputs,
+  ...
+}:
 
 # ============================================================================
 # Game Streaming Configuration (Headless with HDMI Dummy Plug)
@@ -81,23 +88,24 @@ in
   # Enable Steam with optimizations for game streaming
   programs.steam = {
     enable = true;
-    remotePlay.openFirewall = true;  # Opens Steam Remote Play ports
-    dedicatedServer.openFirewall = true;  # Opens Source dedicated server ports
+    remotePlay.openFirewall = true; # Opens Steam Remote Play ports
+    dedicatedServer.openFirewall = true; # Opens Source dedicated server ports
 
     # Additional libraries for better compatibility
     package = pkgs.steam.override {
-      extraPkgs = pkgs: with pkgs; [
-        xorg.libXcursor
-        xorg.libXi
-        xorg.libXinerama
-        xorg.libXScrnSaver
-        libpng
-        libpulseaudio
-        libvorbis
-        stdenv.cc.cc.lib
-        libkrb5
-        keyutils
-      ];
+      extraPkgs =
+        pkgs: with pkgs; [
+          xorg.libXcursor
+          xorg.libXi
+          xorg.libXinerama
+          xorg.libXScrnSaver
+          libpng
+          libpulseaudio
+          libvorbis
+          stdenv.cc.cc.lib
+          libkrb5
+          keyutils
+        ];
     };
   };
 
@@ -117,7 +125,7 @@ in
   services.sunshine = {
     enable = true;
     autoStart = true;
-    openFirewall = true;  # Automatically opens required ports
+    openFirewall = true; # Automatically opens required ports
     package = pkgs.sunshine.override { cudaSupport = true; };
 
     # Enable hardware capabilities for best performance
@@ -131,8 +139,8 @@ in
       encoder = "nvenc";
       # Prefer AV1 (RTX 5090 has excellent AV1 NVENC — ~30-40% better quality/bitrate than H.264)
       # Falls back to HEVC/H.264 if the client doesn't support it
-      av1_mode = 2;   # 0=off, 1=allow, 2=prefer
-      hevc_mode = 2;  # 0=off, 1=allow, 2=prefer
+      av1_mode = 2; # 0=off, 1=allow, 2=prefer
+      hevc_mode = 2; # 0=off, 1=allow, 2=prefer
     };
   };
 
@@ -171,10 +179,10 @@ in
 
     # Steam
     steam
-    steamcmd  # CLI for debugging
+    steamcmd # CLI for debugging
 
     # Performance monitoring
-    iftop  # Network bandwidth monitor
+    iftop # Network bandwidth monitor
   ];
 
   # ==========================================================================
@@ -202,8 +210,14 @@ in
   # ==========================================================================
   # Add users to input/render groups for controller and GPU access
 
-  users.users.bolt.extraGroups = [ "input" "render" ];
-  users.users.pollard.extraGroups = [ "input" "render" ];
+  users.users.bolt.extraGroups = [
+    "input"
+    "render"
+  ];
+  users.users.pollard.extraGroups = [
+    "input"
+    "render"
+  ];
 
   # ==========================================================================
   # USER LINGERING & NVIDIA PERMISSIONS

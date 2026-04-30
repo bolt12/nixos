@@ -1,4 +1,11 @@
-{ config, pkgs, lib, constants, ... }:
+# Memos quick-note service, backed by the shared PostgreSQL.
+{
+  config,
+  pkgs,
+  lib,
+  constants,
+  ...
+}:
 let
   inherit (constants) ports storage;
   memosHome = "${storage.data}/memos";

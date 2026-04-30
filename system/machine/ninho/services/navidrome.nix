@@ -1,4 +1,11 @@
-{ config, pkgs, lib, constants, ... }:
+# Subsonic-compatible music server scanning constants.storage.media/music.
+{
+  config,
+  pkgs,
+  lib,
+  constants,
+  ...
+}:
 let
   inherit (constants) ports storage;
   navidromeHome = "${storage.data}/navidrome";
@@ -40,5 +47,8 @@ in
   ];
 
   # Grant navidrome read access to music folder
-  users.users.navidrome.extraGroups = [ "media" "storage-users" ];
+  users.users.navidrome.extraGroups = [
+    "media"
+    "storage-users"
+  ];
 }

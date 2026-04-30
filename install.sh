@@ -1,4 +1,26 @@
 #! /usr/bin/env bash
+#
+# install.sh — interactive rebuild menu for this NixOS configuration.
+#
+# Two phases:
+#   1. Pre-flight safety checks (run before any rebuild). Verifies you are
+#      inside this repo, fetches origin/main, refuses to proceed if your
+#      working tree is behind upstream, and warns about uncommitted changes.
+#   2. Interactive menu offering apply/test/dry-build for each system
+#      configuration plus per-user `home-manager switch` invocations and a
+#      few one-shot utilities (`nix flake check`, `nix flake update`).
+#
+# Adding a host: extend the menu in `show_menu` plus the corresponding
+# `case` branch in `main`. Each apply uses `sudo nixos-rebuild switch
+# --flake .#<name>`; standalone HM uses `home-manager switch --flake .#<user>`.
+# Operations that don't change state (test, dry, check) skip sudo.
+#
+# Quick non-interactive equivalents (Phase 0 of the overhaul):
+#   nix run .#deploy-ninho      # = sudo nixos-rebuild switch --flake .#ninho-nixos
+#   nix run .#deploy-bolt       # = sudo nixos-rebuild switch --flake .#bolt-nixos
+#   nix run .#dry-ninho         # = nixos-rebuild dry-build --flake .#ninho-nixos
+#   nix run .#fmt               # = nix fmt
+#   nix run .#update            # = nix flake update
 
 set -euo pipefail
 

@@ -1,38 +1,25 @@
-{ config, pkgs, lib, ... }:
-let
-  constants = import ../../../common/constants.nix { inherit lib; };
-in
+# Self-hosted Anki sync (clients point at http://ninho.local:27701).
 {
-  # Anki Sync Server - self-hosted flashcard syncing
-  #
-  # SETUP INSTRUCTIONS:
-  # 1. After enabling this service, create users by running:
-  #    anki-sync-server --add-user <username>
-  #    (This will prompt for password)
-  #
-  # 2. On Anki clients, configure sync settings:
-  #    - Open Anki preferences
-  #    - Go to Syncing tab
-  #    - Set custom sync server to: http://ninho.local:27701
-  #    - Use the username/password created in step 1
-
+  config,
+  pkgs,
+  lib,
+  constants,
+  ...
+}:
+{
+  # Adding a user: `anki-sync-server --add-user <name>` (interactive prompt
+  # for the password). On clients, point Anki preferences → Syncing →
+  # custom sync server at http://ninho.local:27701.
   services.anki-sync-server = {
     enable = true;
-
-    # Listen address and port
     address = "0.0.0.0";
     port = constants.ports.anki-sync-server;
-
+    openFirewall = true;
     users = [
-      { username = "bolt";
+      {
+        username = "bolt";
         password = "tlob";
       }
     ];
-
-    # Open firewall
-    openFirewall = true;
   };
-
-  # Firewall configuration (redundant but explicit)
-  networking.firewall.allowedTCPPorts = [ constants.ports.anki-sync-server ];
 }
