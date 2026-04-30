@@ -2,8 +2,6 @@
   config,
   lib,
   pkgs,
-  inputs,
-  system,
   constants,
   ...
 }:
@@ -19,12 +17,15 @@ let
   #  - model:        used for Opus and Sonnet slots
   #  - haikuModel:   used for Haiku slot (defaults to `model`)
   #  - haikuEnvVar:  if set, lets that env var override haikuModel at run-time
-  mkClaudeWrapper = { name, model, haikuModel ? model, haikuEnvVar ? null }:
+  mkClaudeWrapper =
+    {
+      name,
+      model,
+      haikuModel ? model,
+      haikuEnvVar ? null,
+    }:
     let
-      haikuExpr =
-        if haikuEnvVar == null
-        then haikuModel
-        else "\${${haikuEnvVar}:-${haikuModel}}";
+      haikuExpr = if haikuEnvVar == null then haikuModel else "\${${haikuEnvVar}:-${haikuModel}}";
     in
     pkgs.writeShellApplication {
       inherit name;
@@ -42,11 +43,31 @@ let
       '';
     };
 
-  glaude                 = mkClaudeWrapper { name = "glaude";                 model = "GLM-5";             haikuModel = "GLM-4.5-Air"; };
-  olaude-qwen3-5-27B     = mkClaudeWrapper { name = "olaude-qwen3-5-27B";     model = "qwen3.5-27B-full";     haikuEnvVar = "OLAUDE_HAIKU"; };
-  olaude-qwen3-6-27B     = mkClaudeWrapper { name = "olaude-qwen3-6-27B";     model = "qwen3.6-27B-full";     haikuEnvVar = "OLAUDE_HAIKU"; };
-  olaude-qwen3-6-35B-A3B = mkClaudeWrapper { name = "olaude-qwen3-6-35B-A3B"; model = "qwen3.6-35B-A3B-full"; haikuEnvVar = "OLAUDE_HAIKU"; };
-  olaude-gemma-4-26B-A4B = mkClaudeWrapper { name = "olaude-gemma-4-26B-A4B"; model = "gemma-4-26B-A4B";      haikuEnvVar = "OLAUDE_HAIKU"; };
+  glaude = mkClaudeWrapper {
+    name = "glaude";
+    model = "GLM-5";
+    haikuModel = "GLM-4.5-Air";
+  };
+  olaude-qwen3-5-27B = mkClaudeWrapper {
+    name = "olaude-qwen3-5-27B";
+    model = "qwen3.5-27B-full";
+    haikuEnvVar = "OLAUDE_HAIKU";
+  };
+  olaude-qwen3-6-27B = mkClaudeWrapper {
+    name = "olaude-qwen3-6-27B";
+    model = "qwen3.6-27B-full";
+    haikuEnvVar = "OLAUDE_HAIKU";
+  };
+  olaude-qwen3-6-35B-A3B = mkClaudeWrapper {
+    name = "olaude-qwen3-6-35B-A3B";
+    model = "qwen3.6-35B-A3B-full";
+    haikuEnvVar = "OLAUDE_HAIKU";
+  };
+  olaude-gemma-4-26B-A4B = mkClaudeWrapper {
+    name = "olaude-gemma-4-26B-A4B";
+    model = "gemma-4-26B-A4B";
+    haikuEnvVar = "OLAUDE_HAIKU";
+  };
 
   # Pi coding agent wrapper for Ninho local models
   pi-local = pkgs.writeShellApplication {
@@ -76,7 +97,8 @@ in
     # Package profiles (headless - no desktop/wayland)
     ../../profiles/system-tools.nix
     ../../profiles/development.nix
-    ../../profiles/specialized.nix # Agda, Lean, Arduino, etc.
+    ../../profiles/development-lean.nix # Lean toolchain — excluded on laptops
+    ../../profiles/specialized.nix
 
     # Program configurations
     ../../programs/ai-cmd/default.nix
@@ -87,6 +109,9 @@ in
     ../../programs/neovim/default.nix
     ../../programs/syncthing/default.nix
     ../../programs/tmux/default.nix
+
+    # User-level systemd services (excludable per-machine)
+    ../../services/emanote-user.nix
 
     # User-specific data (git email, bash aliases, Syncthing config, etc.)
     ./user-data.nix
@@ -165,23 +190,8 @@ in
     };
   };
 
-  # Emanote journal server (user-level — bolt's personal data)
-  systemd.user.services.emanote = {
-    Unit = {
-      Description = "Emanote journal server";
-      After = [ "network.target" ];
-    };
-    Service = {
-      Type = "simple";
-      ExecStart = "${
-        inputs.emanote.packages.${system}.default
-      }/bin/emanote --layers \"%h/journal\" run --no-ws --host=0.0.0.0 --port=${toString constants.ports.emanote}";
-      Restart = "always";
-      RestartSec = "10";
-    };
-    Install.WantedBy = [ "default.target" ];
-  };
-
-  # No desktop services for headless configuration
+  # No desktop services for headless configuration.
+  # Emanote user service lives in ../../services/emanote-user.nix (importable
+  # so machines without journal data can disable it via disabledModules).
   services = { };
 }

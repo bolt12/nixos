@@ -35,6 +35,14 @@
     ./user-data.nix
   ];
 
+  # Ninho-only modules excluded on the laptop:
+  #   - development-lean.nix: Lean4 toolchain (heavy, only used on ninho)
+  #   - emanote-user.nix: journal server (bolt's data lives on ninho)
+  disabledModules = [
+    ../../profiles/development-lean.nix
+    ../../services/emanote-user.nix
+  ];
+
   # Desktop-specific input method configuration
   i18n = {
     inputMethod = {

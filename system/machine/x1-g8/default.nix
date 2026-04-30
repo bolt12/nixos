@@ -1,26 +1,28 @@
-{ config, pkgs, inputs, constants, ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  constants,
+  ...
+}:
 
 {
   # Use the GRUB 2 boot loader.
   boot = {
     kernelPackages = pkgs.linuxPackages_latest;
-    loader         = {
+    loader = {
       efi = {
         canTouchEfiVariables = true;
       };
       systemd-boot.enable = true;
     };
 
-    # Emulate ARM on my system. Useful to deploy NixOS on ARM via Colmena
-    binfmt.emulatedSystems = [ "aarch64-linux" ];
-
-    kernelModules       = [ "acpi_call" ];
-    extraModulePackages =
-      with config.boot.kernelPackages; [ acpi_call ];
+    kernelModules = [ "acpi_call" ];
+    extraModulePackages = with config.boot.kernelPackages; [ acpi_call ];
     blacklistedKernelModules = [ ];
-    plymouth.enable          = true;
+    plymouth.enable = true;
     tmp = {
-      useTmpfs    = true;
+      useTmpfs = true;
       cleanOnBoot = true;
     };
     runSize = "75%"; # Size of useTmpfs defaults to 50% of RAM
@@ -60,23 +62,22 @@
   };
 
   powerManagement = {
-    enable          = true;
+    enable = true;
     powertop.enable = true;
   };
 
   environment = {
     etc = {
-    "greetd/environments".text = ''
-      sway
-      bash
-    '';
+      "greetd/environments".text = ''
+        sway
+        bash
+      '';
     };
 
     # Most variables moved to home-manager modules/wayland.nix for centralization
     # Keeping only system-level Java configuration here
-    variables._JAVA_OPTIONS                       =
-      "-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dsun.java2d.xrender=true";
-    variables._JAVA_AWT_WM_NONREPARENTING         = "1";
+    variables._JAVA_OPTIONS = "-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dsun.java2d.xrender=true";
+    variables._JAVA_AWT_WM_NONREPARENTING = "1";
 
     # List packages installed in system profile. To search, run:
     # $ nix search wget
@@ -104,11 +105,11 @@
 
     # Firefox NixOs wiki recommends
     pipewire = {
-      enable             = true;
-      audio.enable       = true;
-      alsa.enable        = true;
-      alsa.support32Bit  = true;
-      pulse.enable       = true;
+      enable = true;
+      audio.enable = true;
+      alsa.enable = true;
+      alsa.support32Bit = true;
+      pulse.enable = true;
       wireplumber.enable = true;
     };
 
@@ -122,11 +123,11 @@
     upower.enable = true;
 
     greetd = {
-      enable   = true;
+      enable = true;
       settings = {
         default_session = {
           command = "cage -s -- gtkgreet";
-          user    = "bolt";
+          user = "bolt";
         };
       };
     };
@@ -137,25 +138,25 @@
     };
 
     tlp = {
-      enable   = true;
+      enable = true;
       settings = {
         # Battery charge thresholds to preserve battery longevity
-        START_CHARGE_THRESH_BAT0 = 85;        # Start charging when battery drops below 85%
-        STOP_CHARGE_THRESH_BAT0  = 90;        # Stop charging at 90% to reduce battery wear
+        START_CHARGE_THRESH_BAT0 = 85; # Start charging when battery drops below 85%
+        STOP_CHARGE_THRESH_BAT0 = 90; # Stop charging at 90% to reduce battery wear
 
         # CPU scaling governors for optimal performance vs battery life balance
-        CPU_SCALING_GOVERNOR_ON_AC  = "performance"; # Max performance when plugged in
-        CPU_SCALING_GOVERNOR_ON_BAT = "powersave";   # Conserve battery when unplugged
+        CPU_SCALING_GOVERNOR_ON_AC = "performance"; # Max performance when plugged in
+        CPU_SCALING_GOVERNOR_ON_BAT = "powersave"; # Conserve battery when unplugged
 
         # Runtime power management - automatically manages device power states
-        RUNTIME_PM_ON_AC  = "on";   # Enable power management on AC (small savings)
+        RUNTIME_PM_ON_AC = "on"; # Enable power management on AC (small savings)
         RUNTIME_PM_ON_BAT = "auto"; # Aggressive power management on battery
 
         # Additional power saving tweaks for better battery life
-        WIFI_PWR_ON_AC = "off";               # Keep WiFi at full power on AC
-        WIFI_PWR_ON_BAT = "on";               # Enable WiFi power saving on battery
-        SOUND_POWER_SAVE_ON_AC = 0;           # Disable audio power saving on AC
-        SOUND_POWER_SAVE_ON_BAT = 1;          # Enable audio power saving on battery
+        WIFI_PWR_ON_AC = "off"; # Keep WiFi at full power on AC
+        WIFI_PWR_ON_BAT = "on"; # Enable WiFi power saving on battery
+        SOUND_POWER_SAVE_ON_AC = 0; # Disable audio power saving on AC
+        SOUND_POWER_SAVE_ON_BAT = 1; # Enable audio power saving on battery
       };
     };
 
@@ -217,7 +218,7 @@
   };
 
   security = {
-    pam.services.swaylock = {};
+    pam.services.swaylock = { };
 
     polkit.enable = true;
 
