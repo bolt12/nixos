@@ -52,7 +52,7 @@
       # RPi WireGuard server public key (derived from its generated private
       # key). Referenced as a peer by every client config. Update here if
       # the RPi key rotates.
-      rpiServerPubKey = "2OIP77a10/Fas+eCvYQNa3ixFNOq0JqZIuSk1tY/QTM=";
+      rpiServerPubKey = "8/0ivDjLLlkPuQYvX5mKIdf+IVeqnGHXkpxNY7EWtUM=";
     };
   };
 

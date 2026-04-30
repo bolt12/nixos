@@ -1,4 +1,10 @@
-{ config, lib, pkgs, inputs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  inputs,
+  ...
+}:
 
 # Pollard's headless configuration for the ninho server
 # Beginner-friendly setup with development tools and ZFS learning resources
@@ -54,8 +60,8 @@
     # Beginner-friendly packages for learning NixOS and ZFS
     packages = with pkgs; [
       # Learning resources
-      tldr          # Simplified man pages
-      cheat         # Command cheatsheets
+      tldr # Simplified man pages
+      cheat # Command cheatsheets
     ];
   };
 
@@ -63,7 +69,7 @@
   programs = {
     man = {
       enable = true;
-      generateCaches = true;  # Better man page search
+      generateCaches = true; # Better man page search
     };
 
     ssh = {
@@ -82,5 +88,5 @@
   };
 
   # No desktop services for headless configuration
-  services = {};
+  services = { };
 }

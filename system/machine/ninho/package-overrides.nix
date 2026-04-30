@@ -1,4 +1,9 @@
-{ pkgs, inputs, system, ... }:
+{
+  pkgs,
+  inputs,
+  system,
+  ...
+}:
 
 let
   # Import unstable with overlay to fix bellows test failures
@@ -24,94 +29,99 @@ in
   nixpkgs.overlays = [
     (final: prev: {
       # llama-cpp-cuda - Build from PR #18551 with thinking/reasoning support
-      llama-cpp-cuda = (unstable.llama-cpp.override {
-        cudaSupport = true;
-        cudaPackages = unstable.cudaPackages;
-        blasSupport = true;
-        rocmSupport = false;
-        metalSupport = false;
-      }).overrideAttrs (oldAttrs: {
-        version = "8943";
+      llama-cpp-cuda =
+        (unstable.llama-cpp.override {
+          cudaSupport = true;
+          cudaPackages = unstable.cudaPackages;
+          blasSupport = true;
+          rocmSupport = false;
+          metalSupport = false;
+        }).overrideAttrs
+          (oldAttrs: {
+            version = "8943";
 
-        src = pkgs.fetchFromGitHub {
-          owner = "ggml-org";
-          repo = "llama.cpp";
-          tag = "b8943";
-          hash = "sha256-Osc94OzRKCFSYHceI6YxuX+bdmvavuYAJTqvERsdwzQ=";
-          leaveDotGit = true;
-          postFetch = ''
-            git -C "$out" rev-parse --short HEAD > $out/COMMIT
-            find "$out" -name .git -print0 | xargs -0 rm -rf
-          '';
-        };
+            src = pkgs.fetchFromGitHub {
+              owner = "ggml-org";
+              repo = "llama.cpp";
+              tag = "b8943";
+              hash = "sha256-Osc94OzRKCFSYHceI6YxuX+bdmvavuYAJTqvERsdwzQ=";
+              leaveDotGit = true;
+              postFetch = ''
+                git -C "$out" rev-parse --short HEAD > $out/COMMIT
+                find "$out" -name .git -print0 | xargs -0 rm -rf
+              '';
+            };
 
-        cmakeFlags = (oldAttrs.cmakeFlags or []) ++ [
-          "-DGGML_NATIVE=ON"
-          "-DCMAKE_CUDA_ARCHITECTURES=89"  # RTX 5090
-        ];
+            cmakeFlags = (oldAttrs.cmakeFlags or [ ]) ++ [
+              "-DGGML_NATIVE=ON"
+              "-DCMAKE_CUDA_ARCHITECTURES=89" # RTX 5090
+            ];
 
-        preConfigure = ''
-          export NIX_ENFORCE_NO_NATIVE=0
-          ${oldAttrs.preConfigure or ""}
-        '';
+            preConfigure = ''
+              export NIX_ENFORCE_NO_NATIVE=0
+              ${oldAttrs.preConfigure or ""}
+            '';
 
-        # Webui npm deps hash changed with this source version
-        npmDepsHash = "sha256-RAFtsbBGBjteCt5yXhrmHL39rIDJMCFBETgzId2eRRk=";
+            # Webui npm deps hash changed with this source version
+            npmDepsHash = "sha256-RAFtsbBGBjteCt5yXhrmHL39rIDJMCFBETgzId2eRRk=";
 
-        # b8635 removed tools/server/public/index.html.gz from the source tree,
-        # but upstream nixpkgs postPatch still tries to rm it — use -f to tolerate
-        postPatch = builtins.replaceStrings
-          [ "rm tools/server/public/index.html.gz" ]
-          [ "rm -f tools/server/public/index.html.gz" ]
-          (oldAttrs.postPatch or "");
+            # b8635 removed tools/server/public/index.html.gz from the source tree,
+            # but upstream nixpkgs postPatch still tries to rm it — use -f to tolerate
+            postPatch =
+              builtins.replaceStrings
+                [ "rm tools/server/public/index.html.gz" ]
+                [ "rm -f tools/server/public/index.html.gz" ]
+                (oldAttrs.postPatch or "");
 
-        # Keep the original postInstall to handle installation correctly
-        postInstall = oldAttrs.postInstall or "";
-      });
+            # Keep the original postInstall to handle installation correctly
+            postInstall = oldAttrs.postInstall or "";
+          });
 
       # llama-swap v195 - Latest release with Anthropic API compatibility
       # v195 renamed ui/ → ui-svelte/, so we rebuild the UI derivation from scratch
-      llama-swap = let
-        llama-swap-src = pkgs.fetchFromGitHub {
-          owner = "mostlygeek";
-          repo = "llama-swap";
-          tag = "v199";
-          hash = "sha256-tAWXhfOWPLBuEgd+32CbuIkn1hN+4VI4xkyx7E2a81I=";
-          leaveDotGit = true;
-          postFetch = ''
-            cd "$out"
-            git rev-parse HEAD > $out/COMMIT
-            date -u -d "@$(git log -1 --pretty=%ct)" "+'%Y-%m-%dT%H:%M:%SZ'" > $out/SOURCE_DATE_EPOCH
-            find "$out" -name .git -print0 | xargs -0 rm -rf
-          '';
-        };
-        llama-swap-ui = pkgs.buildNpmPackage {
-          pname = "llama-swap-ui";
+      llama-swap =
+        let
+          llama-swap-src = pkgs.fetchFromGitHub {
+            owner = "mostlygeek";
+            repo = "llama-swap";
+            tag = "v199";
+            hash = "sha256-tAWXhfOWPLBuEgd+32CbuIkn1hN+4VI4xkyx7E2a81I=";
+            leaveDotGit = true;
+            postFetch = ''
+              cd "$out"
+              git rev-parse HEAD > $out/COMMIT
+              date -u -d "@$(git log -1 --pretty=%ct)" "+'%Y-%m-%dT%H:%M:%SZ'" > $out/SOURCE_DATE_EPOCH
+              find "$out" -name .git -print0 | xargs -0 rm -rf
+            '';
+          };
+          llama-swap-ui = pkgs.buildNpmPackage {
+            pname = "llama-swap-ui";
+            version = "199";
+            src = llama-swap-src;
+            sourceRoot = "${llama-swap-src.name}/ui-svelte";
+            npmDepsHash = "sha256-gTDsuWPLCWsPltioziygFmSQFdLqjkZpmmVWIWoZwoc=";
+            postPatch = ''
+              substituteInPlace vite.config.ts \
+                --replace-fail "../proxy/ui_dist" "${placeholder "out"}/ui_dist"
+            '';
+            postInstall = ''
+              rm -rf $out/lib
+            '';
+          };
+        in
+        unstable.llama-swap.overrideAttrs (oldAttrs: {
           version = "199";
           src = llama-swap-src;
-          sourceRoot = "${llama-swap-src.name}/ui-svelte";
-          npmDepsHash = "sha256-gTDsuWPLCWsPltioziygFmSQFdLqjkZpmmVWIWoZwoc=";
-          postPatch = ''
-            substituteInPlace vite.config.ts \
-              --replace-fail "../proxy/ui_dist" "${placeholder "out"}/ui_dist"
-          '';
-          postInstall = ''
-            rm -rf $out/lib
-          '';
-        };
-      in unstable.llama-swap.overrideAttrs (oldAttrs: {
-        version = "199";
-        src = llama-swap-src;
-        proxyVendor = true;
-        vendorHash = "sha256-TPOKqgyf8vltRLbtNWXcK3jsWsVFaSrZAc+/AMkG/8A=";
-        passthru.ui = llama-swap-ui;
+          proxyVendor = true;
+          vendorHash = "sha256-TPOKqgyf8vltRLbtNWXcK3jsWsVFaSrZAc+/AMkG/8A=";
+          passthru.ui = llama-swap-ui;
 
-        preBuild = ''
-          ldflags+=" -X main.commit=$(cat COMMIT)"
-          ldflags+=" -X main.date=$(cat SOURCE_DATE_EPOCH)"
-          cp -r ${llama-swap-ui}/ui_dist proxy/
-        '';
-      });
+          preBuild = ''
+            ldflags+=" -X main.commit=$(cat COMMIT)"
+            ldflags+=" -X main.date=$(cat SOURCE_DATE_EPOCH)"
+            cp -r ${llama-swap-ui}/ui_dist proxy/
+          '';
+        });
 
       # WhisperX v3.7.6 - Fix use_auth_token TypeError with newer pyannote
       whisperx = prev.whisperx.overridePythonAttrs (oldAttrs: {
@@ -142,7 +152,9 @@ in
           sed -i 's/diarize_df = pd.DataFrame(diarization.itertracks(yield_label=True), columns=/annotation = getattr(diarization, "speaker_diarization", diarization)\n        diarize_df = pd.DataFrame(annotation.itertracks(yield_label=True), columns=/g' whisperx/diarize.py
         '';
 
-        meta = (oldAttrs.meta or {}) // { broken = false; };
+        meta = (oldAttrs.meta or { }) // {
+          broken = false;
+        };
       });
 
       # Fix scaphandre build error with riemann_client unstable feature
@@ -165,19 +177,21 @@ in
       });
 
       # whisper-cpp-cuda - whisper.cpp with CUDA support for RTX 5090
-      whisper-cpp-cuda = (unstable.whisper-cpp.override {
-        cudaSupport = true;
-        cudaPackages = unstable.cudaPackages;
-      }).overrideAttrs (oldAttrs: {
-        cmakeFlags = (oldAttrs.cmakeFlags or [ ]) ++ [
-          "-DGGML_NATIVE=ON"
-          "-DCMAKE_CUDA_ARCHITECTURES=89" # RTX 5090
-        ];
-        preConfigure = ''
-          export NIX_ENFORCE_NO_NATIVE=0
-          ${oldAttrs.preConfigure or ""}
-        '';
-      });
+      whisper-cpp-cuda =
+        (unstable.whisper-cpp.override {
+          cudaSupport = true;
+          cudaPackages = unstable.cudaPackages;
+        }).overrideAttrs
+          (oldAttrs: {
+            cmakeFlags = (oldAttrs.cmakeFlags or [ ]) ++ [
+              "-DGGML_NATIVE=ON"
+              "-DCMAKE_CUDA_ARCHITECTURES=89" # RTX 5090
+            ];
+            preConfigure = ''
+              export NIX_ENFORCE_NO_NATIVE=0
+              ${oldAttrs.preConfigure or ""}
+            '';
+          });
 
       # stable-diffusion-cpp-cuda - stable-diffusion.cpp with CUDA for image generation
       stable-diffusion-cpp-cuda = unstable.cudaPackages.backendStdenv.mkDerivation {

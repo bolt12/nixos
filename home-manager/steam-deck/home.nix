@@ -1,4 +1,9 @@
-{ pkgs, lib, inputs, ... }:
+{
+  pkgs,
+  lib,
+  inputs,
+  ...
+}:
 
 let
 
@@ -21,37 +26,41 @@ let
   ];
 
   agdaStdlibSrc = pkgs.fetchFromGitHub {
-      owner = "agda";
-      repo = "agda-stdlib";
-      rev = "v2.0";
-      sha256 = "sha256-TjGvY3eqpF+DDwatT7A78flyPcTkcLHQ1xcg+MKgCoE="; # Replace with the correct hash
-    };
+    owner = "agda";
+    repo = "agda-stdlib";
+    rev = "v2.0";
+    sha256 = "sha256-TjGvY3eqpF+DDwatT7A78flyPcTkcLHQ1xcg+MKgCoE="; # Replace with the correct hash
+  };
 in
 {
   nix = {
     package = pkgs.nix;
-    settings.experimental-features = [ "nix-command" "flakes" ];
+    settings.experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
   };
 
   nixpkgs = {
     config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) unfreePackages;
-    config.permittedInsecurePackages = [ "python2.7-pyjwt-1.7.1"
-                                         "python2.7-certifi-2021.10.8"
-                                         "python-2.7.18.6"
-                                         "openssl-1.1.1u"
-                                         "openssl-1.1.1v"
-                                         "openssl-1.1.1w"
-                                         "electron-13.6.9"
-                                       ];
+    config.permittedInsecurePackages = [
+      "python2.7-pyjwt-1.7.1"
+      "python2.7-certifi-2021.10.8"
+      "python-2.7.18.6"
+      "openssl-1.1.1u"
+      "openssl-1.1.1v"
+      "openssl-1.1.1w"
+      "electron-13.6.9"
+    ];
     overlays = [ inputs.nixgl.overlay ];
   };
 
   home = {
     enableNixpkgsReleaseCheck = true;
 
-    username      = "deck";
+    username = "deck";
     homeDirectory = "/home/deck";
-    stateVersion  = "23.11";
+    stateVersion = "23.11";
 
     keyboard = {
       layout = "us,pt";
@@ -63,12 +72,12 @@ in
 
     # Package management handled by profiles - import as needed:
     # ../profiles/desktop.nix, ../profiles/development.nix, ../profiles/system-tools.nix etc.
-    packages = [];
+    packages = [ ];
 
     sessionVariables = {
-      EDITOR="nvim";
-      VISUAL="nvim";
-      BASH_ENV="/home/deck/.bashrc";
+      EDITOR = "nvim";
+      VISUAL = "nvim";
+      BASH_ENV = "/home/deck/.bashrc";
     };
 
     sessionPath = [
@@ -141,8 +150,7 @@ in
       "/var/lib/flatpak/exports/share"
       "/usr/local/share"
       "/usr/share"
-      ];
+    ];
   };
 
 }
-

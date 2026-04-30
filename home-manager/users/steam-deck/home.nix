@@ -1,4 +1,11 @@
-{ config, pkgs, lib, inputs, constants, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  inputs,
+  constants,
+  ...
+}:
 
 # Steam Deck home-manager configuration (standalone)
 # This runs on SteamOS (non-NixOS) using home-manager standalone mode
@@ -45,7 +52,10 @@ in
   # Nix package manager settings (Steam Deck specific)
   nix = {
     package = pkgs.nix;
-    settings.experimental-features = [ "nix-command" "flakes" ];
+    settings.experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
   };
 
   home = {
@@ -76,7 +86,7 @@ in
 
     # Minimal packages for Steam Deck
     packages = with pkgs; [
-      wireguard-tools  # WireGuard VPN tools
+      wireguard-tools # WireGuard VPN tools
     ];
 
     # WireGuard setup script
@@ -163,7 +173,7 @@ in
   };
 
   # No services for Steam Deck
-  services = {};
+  services = { };
 
   # XDG configuration for Flatpak integration
   xdg = {

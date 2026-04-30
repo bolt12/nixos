@@ -30,16 +30,16 @@
       # Aliases - short forms for common commands
       alias = {
         # Short forms for common commands - improves daily workflow efficiency
-        st = "status -s";              # Concise status overview
-        co = "checkout";               # Switch branches/restore files
-        br = "branch";                 # Branch management
-        ci = "commit";                 # Create commits
+        st = "status -s"; # Concise status overview
+        co = "checkout"; # Switch branches/restore files
+        br = "branch"; # Branch management
+        ci = "commit"; # Create commits
 
         # Advanced productivity shortcuts
-        unstage = "reset HEAD --";            # Remove files from staging area
-        last    = "log -1 HEAD";              # Show last commit details
-        visual  = "!gitk";                    # Launch visual git history viewer
-        amend   = "commit --amend --no-edit"; # Amend last commit without changing message
+        unstage = "reset HEAD --"; # Remove files from staging area
+        last = "log -1 HEAD"; # Show last commit details
+        visual = "!gitk"; # Launch visual git history viewer
+        amend = "commit --amend --no-edit"; # Amend last commit without changing message
 
         # Interactive fixup workflow - requires fzf for fuzzy commit selection
         fixup = "!git log --oneline -n 50 | fzf | cut -d' ' -f1 | xargs -r git commit --fixup";
@@ -64,7 +64,7 @@
       };
 
       mergetool = {
-        cmd    = "nvim -f -c \"Gvdiffsplit!\" \"$MERGED\"";
+        cmd = "nvim -f -c \"Gvdiffsplit!\" \"$MERGED\"";
         prompt = false;
       };
 

@@ -1,7 +1,8 @@
 # Waybar configuration module - status bar for Wayland
 # This module manages waybar configuration in a more structured way
 
-{ pkgs, ... }: {
+{ pkgs, ... }:
+{
   # Copy configuration files to appropriate locations
   xdg.configFile = {
     "waybar/config" = {

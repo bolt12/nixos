@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 # Syncthing configuration for file synchronization
 # This module provides declarative Syncthing configuration at the user level

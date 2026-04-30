@@ -8,16 +8,16 @@ let
 in
 {
   # Project directories
-  uminho  = "cd ${desktop}/Bolt/UMinho/";
-  tese    = "cd ${desktop}/Bolt/UMinho/5ºAno/Tese";
+  uminho = "cd ${desktop}/Bolt/UMinho/";
+  tese = "cd ${desktop}/Bolt/UMinho/5ºAno/Tese";
   haskell = "cd ${desktop}/Bolt/Playground/Haskell/";
-  talks   = "cd ${desktop}/Bolt/Playground/Talks/";
-  agdacd  = "cd ${desktop}/Bolt/Playground/Agda/";
-  playg   = "cd ${desktop}/Bolt/Playground/";
+  talks = "cd ${desktop}/Bolt/Playground/Talks/";
+  agdacd = "cd ${desktop}/Bolt/Playground/Agda/";
+  playg = "cd ${desktop}/Bolt/Playground/";
 
   # Work directories
   welltyped = "cd ${desktop}/Bolt/UMinho/Profissional/Well-Typed/";
-  iohk      = "cd ${desktop}/Bolt/UMinho/Profissional/Well-Typed/Projects/IOHK";
+  iohk = "cd ${desktop}/Bolt/UMinho/Profissional/Well-Typed/Projects/IOHK";
   hsbindgen = "cd ${desktop}/Bolt/UMinho/Profissional/Well-Typed/Projects/hs-bindgen";
 
   # Tool shortcuts

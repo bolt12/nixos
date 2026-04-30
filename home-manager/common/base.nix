@@ -1,4 +1,9 @@
-{ lib, pkgs, constants, ... }:
+{
+  lib,
+  pkgs,
+  constants,
+  ...
+}:
 
 # Base configuration shared across all home-manager users
 # This file contains minimal common settings that every user needs
@@ -8,7 +13,10 @@
 {
   # Enable experimental Nix features
   nix = {
-    settings.experimental-features = [ "nix-command" "flakes" ];
+    settings.experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
   };
 
   # Common programs that every user should have

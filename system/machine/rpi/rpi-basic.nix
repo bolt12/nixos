@@ -2,7 +2,14 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, lib, pkgs, raspberry-pi-nix, inputs, ... }@attrs:
+{
+  config,
+  lib,
+  pkgs,
+  raspberry-pi-nix,
+  inputs,
+  ...
+}@attrs:
 
 {
   # bcm2712 for rpi 5
@@ -61,11 +68,11 @@
 
     # Enable the OpenSSH daemon.
     openssh = {
-      enable          = true;
+      enable = true;
       settings = {
         X11Forwarding = true;
         PermitRootLogin = "yes";
-        };
+      };
     };
   };
 

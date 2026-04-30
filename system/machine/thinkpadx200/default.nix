@@ -1,4 +1,9 @@
-{ config, pkgs, inputs, ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  ...
+}:
 
 {
   # Use the GRUB 2 boot loader.
@@ -6,7 +11,7 @@
     kernelPackages = pkgs.linuxPackages_4_19;
     loader = {
       grub = {
-        enable  = true;
+        enable = true;
         device = "/dev/sda"; # or "nodev" for efi only
       };
     };
@@ -14,10 +19,9 @@
   };
 
   powerManagement = {
-    enable          = true;
+    enable = true;
     powertop.enable = true;
   };
-
 
   services = {
 
@@ -34,11 +38,11 @@
 
     # Firefox NixOs wiki recommends
     pipewire = {
-      enable             = true;
-      audio.enable       = true;
-      alsa.enable        = true;
-      alsa.support32Bit  = true;
-      pulse.enable       = true;
+      enable = true;
+      audio.enable = true;
+      alsa.enable = true;
+      alsa.support32Bit = true;
+      pulse.enable = true;
       # jack.enable      = true;
       wireplumber.enable = true;
     };
@@ -53,19 +57,19 @@
     upower.enable = true;
 
     greetd = {
-      enable   = true;
+      enable = true;
       settings = {
         default_session = {
           command = "cage -s -- gtkgreet";
-          user    = "bolt";
+          user = "bolt";
         };
       };
     };
 
     xserver = {
-      enable     = true;
+      enable = true;
       xkb = {
-        layout  = "us,pt";
+        layout = "us,pt";
         options = "caps:escape, grp:shifts_toggle";
       };
 
@@ -78,10 +82,10 @@
     };
 
     tlp = {
-      enable   = true;
+      enable = true;
       settings = {
         START_CHARGE_THRESH_BAT0 = 85;
-        STOP_CHARGE_THRESH_BAT0  = 90;
+        STOP_CHARGE_THRESH_BAT0 = 90;
       };
     };
 

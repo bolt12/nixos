@@ -8,16 +8,18 @@ let
     ];
   };
 
-in {
+in
+{
   programs.emacs = {
     enable = true;
     package = unstable.emacs;
-    extraPackages = epkgs: with epkgs; [
-      use-package
-      nix-mode
-      all-the-icons-ivy
-      doom-themes  # Add doom-themes from nixpkgs
-    ];
+    extraPackages =
+      epkgs: with epkgs; [
+        use-package
+        nix-mode
+        all-the-icons-ivy
+        doom-themes # Add doom-themes from nixpkgs
+      ];
   };
   home.file.".emacs.d" = {
     source = ./emacs.d;

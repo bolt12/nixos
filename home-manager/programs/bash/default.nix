@@ -51,17 +51,18 @@
     # Common aliases shared across all users
     # User-specific aliases are merged from config.userConfig.bash.extraAliases
     shellAliases = {
-      ls        = "ls --color=always";
-      ll        = "ls -l";
-      lla       = "ls -la";
-      docker    = "sudo docker";
-      sudo      = "sudo ";
+      ls = "ls --color=always";
+      ll = "ls -l";
+      lla = "ls -la";
+      docker = "sudo docker";
+      sudo = "sudo ";
 
       # Backward compatibility aliases for replaced tools
-      tree     = "eza --tree";
-      ncdu     = "dust";
+      tree = "eza --tree";
+      ncdu = "dust";
       neofetch = "fastfetch";
-      find     = "fd";
-    } // (config.userConfig.bash.extraAliases or {});
+      find = "fd";
+    }
+    // (config.userConfig.bash.extraAliases or { });
   };
 }
