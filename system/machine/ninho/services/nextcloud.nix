@@ -60,7 +60,6 @@ in
         notes
         notify_push
         polls
-        richdocuments
         tasks
         cospend
         ;

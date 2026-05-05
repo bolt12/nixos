@@ -1901,7 +1901,7 @@ in
                 }
                 {
                   type = "custom:mushroom-template-card";
-                  primary = "Uptime Kuma";
+                  primary = "Gatus";
                   secondary = "Status";
                   icon = "mdi:heart-pulse";
                   icon_color = "green";
@@ -1911,7 +1911,7 @@ in
                   };
                   tap_action = {
                     action = "url";
-                    url_path = "http://${network.ninho.vpnIp}:${toString ports.uptime-kuma}";
+                    url_path = "http://${network.ninho.vpnIp}:${toString ports.gatus}";
                   };
                 }
                 {

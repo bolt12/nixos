@@ -125,7 +125,8 @@
     home-assistant = 8123;
 
     # Additional services
-    uptime-kuma = 8109;
+    redlib = 8108;
+    gatus = 8109; # Status monitor (replaces uptime-kuma; same port)
     kavita = 8110;
     memos = 8111;
     bazarr = 8112;

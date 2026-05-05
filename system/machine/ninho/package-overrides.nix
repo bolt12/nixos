@@ -157,6 +157,40 @@ in
         };
       });
 
+      # redlib — pin to upstream HEAD. Reddit rotates anti-bot measures every
+      # few months; the packaged Sept-2025 build returns 403 on every request.
+      # Upstream HEAD ships boring-sys2 (BoringSSL) for TLS-fingerprint spoof.
+      # When this fails again: bump rev via
+      #   nix-prefetch-github redlib-org redlib --rev <new-rev>
+      # then rebuild and capture the new cargoHash from the FOD mismatch error.
+      redlib = prev.redlib.overrideAttrs (finalAttrs: prevAttrs: {
+        version = "0.36.0-unstable-2026-05-05";
+        src = pkgs.fetchFromGitHub {
+          owner = "redlib-org";
+          repo = "redlib";
+          rev = "a4d36e954cf1bd64f209cd8868c5a29edc81b374";
+          hash = "sha256-siyD6A12UALQIV7BMd7zu1TaojleTEYtpxPszuhx1/Y=";
+        };
+        cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
+          inherit (finalAttrs) pname version src;
+          hash = "sha256-eO3c7rlFna3DuO31etJ6S4c7NmcvgvIWZ1KVkNIuUqQ=";
+        };
+        # boring-sys2's build.rs cmakes BoringSSL and `git apply`s patches
+        # against the vendored source.
+        nativeBuildInputs = (prevAttrs.nativeBuildInputs or [ ]) ++ [
+          pkgs.cmake
+          pkgs.perl
+          pkgs.go
+          pkgs.git
+          pkgs.rustPlatform.bindgenHook
+        ];
+        # Two new oauth tests in HEAD hit Reddit's network.
+        checkFlags = (prevAttrs.checkFlags or [ ]) ++ [
+          "--skip=test_generic_web_backend"
+          "--skip=test_mobile_spoof_backend"
+        ];
+      });
+
       # Fix scaphandre build error with riemann_client unstable feature
       scaphandre = prev.scaphandre.overrideAttrs (oldAttrs: {
         # Unmark as broken and apply patch to fix the compilation error

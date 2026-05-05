@@ -6,6 +6,53 @@
   ...
 }:
 
+let
+  rpiLanEndpoint = "${constants.network.rpi.lanIp}:${toString constants.network.wireguard.port}";
+  rpiWanEndpoint = "${constants.network.rpi.hostname}:${toString constants.network.wireguard.port}";
+
+  # Select the WireGuard endpoint from the active uplink:
+  # home LAN uses the RPi's private address to avoid broken hairpin NAT,
+  # otherwise we fall back to the public DDNS endpoint.
+  selectWireGuardEndpoint = pkgs.writeShellScript "wg0-select-endpoint" ''
+    set -eu
+
+    if ! ${pkgs.iproute2}/bin/ip link show dev ${constants.network.wireguard.interface} >/dev/null 2>&1; then
+      exit 0
+    fi
+
+    default_route="$(${pkgs.iproute2}/bin/ip route show default 2>/dev/null || true)"
+    if printf '%s\n' "$default_route" | ${pkgs.gnugrep}/bin/grep -Fq "via ${constants.network.lan.gateway}"; then
+      endpoint='${rpiLanEndpoint}'
+    else
+      endpoint='${rpiWanEndpoint}'
+    fi
+
+    ${pkgs.wireguard-tools}/bin/wg set ${constants.network.wireguard.interface} \
+      peer ${constants.network.wireguard.rpiServerPubKey} \
+      endpoint "$endpoint"
+  '';
+
+  updateWireGuardEndpointOnNetworkChange = pkgs.writeShellScript "wg0-dispatcher-endpoint" ''
+    set -eu
+
+    iface="$1"
+    state="$2"
+
+    case "$state" in
+      up|dhcp4-change|dhcp6-change|connectivity-change|reapply)
+        ;;
+      *)
+        exit 0
+        ;;
+    esac
+
+    if [ "$iface" = "${constants.network.wireguard.interface}" ]; then
+      exit 0
+    fi
+
+    ${selectWireGuardEndpoint}
+  '';
+in
 {
   # Use the GRUB 2 boot loader.
   boot = {
@@ -184,6 +231,13 @@
   };
 
   networking = {
+    networkmanager.dispatcherScripts = [
+      {
+        source = updateWireGuardEndpointOnNetworkChange;
+        type = "basic";
+      }
+    ];
+
     wireguard.interfaces = {
       wg0 = {
         ips = [ constants.network.wireguard.x1Ip ];
@@ -204,6 +258,10 @@
             persistentKeepalive = 25;
           }
         ];
+
+        # Re-apply the right peer endpoint after every tunnel restart so
+        # service restarts do not undo the home-LAN override.
+        postSetup = "${selectWireGuardEndpoint}";
       };
     };
   };

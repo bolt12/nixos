@@ -7,8 +7,12 @@
     mouse = true;
     shortcut = "a";
     historyLimit = 9999999;
+    # Forward terminal focus events so Neovim's `autoread` and similar fire.
+    focusEvents = true;
     extraConfig = ''
       set -g default-terminal "screen-256color"
+      # True color (RGB) passthrough; Neovim's `termguicolors` needs this.
+      set -ga terminal-features 'screen-256color:RGB'
 
       # Clipboard: OSC 52 escape sequences (works over SSH transparently)
       set -g set-clipboard on

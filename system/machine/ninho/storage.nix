@@ -44,6 +44,15 @@
         useTemplate = [ "storage" ];
         recursive = true;
       };
+
+      # Replicated rpool/{home,root} snapshots from syncoid live here.
+      # autosnap is off — sanoid doesn't create snapshots, only prunes the
+      # ones syncoid replicates. Retention is much longer than rpool's
+      # because HDD space is cheap; this is the historical archive.
+      "storage/backup" = {
+        useTemplate = [ "longterm" ];
+        recursive = true;
+      };
     };
 
     templates = {
@@ -80,6 +89,20 @@
         monthly = 6; # 6 months (reduced from 24)
         yearly = 1; # 1 year (reduced from 5)
         autosnap = true;
+        autoprune = true;
+      };
+
+      # Long-term archive for syncoid-replicated snapshots. autosnap=false
+      # because syncoid ships sanoid's snapshots from rpool wholesale; this
+      # template only governs how long they stick around on the destination.
+      longterm = {
+        frequently = 0;
+        hourly = 0;
+        daily = 30; # 1 month
+        weekly = 12; # 3 months
+        monthly = 12; # 1 year
+        yearly = 3; # 3 years
+        autosnap = false;
         autoprune = true;
       };
     };

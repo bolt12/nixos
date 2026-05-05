@@ -20,7 +20,7 @@
     ./home-assistant.nix # Home automation platform
 
     # New services
-    ./uptime-kuma.nix # Uptime monitoring
+    ./gatus.nix # Declarative uptime monitoring (replaces uptime-kuma)
     ./kavita.nix # Ebook/comic reader
     ./memos.nix # Note-taking service
     ./bazarr.nix # Automatic subtitles for Sonarr/Radarr
@@ -28,5 +28,8 @@
     ./attic.nix # Nix binary cache server
     ./open-webui.nix # Multimodal chat UI for llama-swap
     ./morning-brief.nix # Daily LLM-summarized overnight brief → ntfy
+    ./redlib.nix # Privacy-respecting Reddit frontend
+    ./syncoid.nix # ZFS replication rpool → storage/backup (tier-2 backup)
+    ./postgres-backup.nix # Daily pg_dumpall → /storage/data/postgres-backups
   ];
 }

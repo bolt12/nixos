@@ -28,15 +28,28 @@ let
   # Register the ultrawide modeline (HDMI dummy plug EDID doesn't advertise
   # 3440x1440) and pick the best available mode. Modeline from: gtf 3440 1440 60
   xrandr = "${pkgs.xorg.xrandr}/bin/xrandr";
+  xfconfQuery = "${pkgs.xfce.xfconf}/bin/xfconf-query";
   applyUltrawideMode = ''
+    export DISPLAY="''${DISPLAY:-:0}"
+
+    # XFCE persists display state and can reapply the dummy plug's native 4K
+    # mode with fractional scaling after X setup has already run. Keep its
+    # profile from fighting the xrandr mode we need for game streaming.
+    ${xfconfQuery} -c displays -p /AutoEnableProfiles -n -t int -s 0 2>/dev/null || true
+    ${xfconfQuery} -c displays -p /Notify -n -t int -s 0 2>/dev/null || true
+    ${xfconfQuery} -c displays -p /Default/HDMI-0/Resolution -n -t string -s "3440x1440" 2>/dev/null || true
+    ${xfconfQuery} -c displays -p /Default/HDMI-0/RefreshRate -n -t double -s 60 2>/dev/null || true
+    ${xfconfQuery} -c displays -p /Default/HDMI-0/Scale -n -t double -s 1.0 2>/dev/null || true
+
     ${xrandr} --newmode "3440x1440_60" 419.11 3440 3688 4064 4688 1440 1441 1444 1490 -HSync +VSync 2>/dev/null || true
     ${xrandr} --addmode HDMI-0 "3440x1440_60" 2>/dev/null || true
 
-    ${xrandr} --output HDMI-0 --mode "3440x1440_60" --rate 60 --scale 1x1 --panning 3440x1440 || \
-    ${xrandr} --output HDMI-0 --mode 2560x1440 --rate 60 --scale 1x1 --panning 2560x1440 || \
-    ${xrandr} --output HDMI-0 --mode 1920x1080 --rate 60 || \
+    ${xrandr} --fb 3440x1440 --output HDMI-0 --mode "3440x1440_60" --rate 60 --scale 1x1 --transform none --panning 3440x1440+0+0 || \
+    ${xrandr} --fb 2560x1440 --output HDMI-0 --mode 2560x1440 --rate 60 --scale 1x1 --transform none --panning 2560x1440+0+0 || \
+    ${xrandr} --fb 1920x1080 --output HDMI-0 --mode 1920x1080 --rate 60 --scale 1x1 --transform none --panning 1920x1080+0+0 || \
     true
   '';
+  applyGamingDisplay = pkgs.writeShellScriptBin "ninho-apply-gaming-display" applyUltrawideMode;
 in
 {
   # ==========================================================================
@@ -60,7 +73,7 @@ in
 
   # Set display resolution early (runs when X server starts, before session).
   # Default to 3440x1440 ultrawide for Steam Link / Sunshine; fall back to 2560x1440, then 1080p.
-  services.xserver.displayManager.setupCommands = applyUltrawideMode;
+  services.xserver.displayManager.setupCommands = "${applyGamingDisplay}/bin/ninho-apply-gaming-display";
 
   # Start a minimal desktop session (required for Sunshine)
   services.xserver.desktopManager.xfce = {
@@ -78,7 +91,20 @@ in
     # Disable XFCE compositor to fix game streaming black screen issues
     ${pkgs.xfce.xfconf}/bin/xfconf-query -c xfwm4 -p /general/use_compositing -s false || true
 
-    ${applyUltrawideMode}
+    ${applyGamingDisplay}/bin/ninho-apply-gaming-display
+  '';
+
+  # XFCE starts its settings daemon after display-manager setupCommands and may
+  # reapply ~/.config/xfce4/.../displays.xml. Reassert the gaming resolution
+  # from session autostart after XFCE has finished restoring its profile.
+  environment.etc."xdg/autostart/ninho-gaming-display.desktop".text = ''
+    [Desktop Entry]
+    Type=Application
+    Name=Ninho Gaming Display
+    Comment=Force the headless gaming display to the BlitzWolf ultrawide resolution
+    Exec=${pkgs.runtimeShell} -c 'sleep 2; ${applyGamingDisplay}/bin/ninho-apply-gaming-display'
+    OnlyShowIn=XFCE;
+    X-GNOME-Autostart-enabled=true
   '';
 
   # ==========================================================================
@@ -171,6 +197,7 @@ in
 
   environment.systemPackages = with pkgs; [
     # Display tools (for troubleshooting)
+    applyGamingDisplay
     xorg.xrandr
     xorg.xdpyinfo
 

@@ -22,7 +22,21 @@ let
     '';
   });
 
-  plugins = pkgs.vimPlugins;
+  plugins = pkgs.vimPlugins // {
+    # Neovim 0.13 removed the `BufModifiedSet` autocmd event; barbar.nvim
+    # (still on master 2025-12-02) registers it unconditionally and crashes
+    # vim startup with E5113. Wrap the registration in `pcall` so it
+    # silently no-ops on 0.13+. The companion `exec_autocmds` call at
+    # events.lua:144 already tolerates having no listeners. Drop this
+    # override once upstream barbar.nvim grows a version check.
+    barbar-nvim = pkgs.vimPlugins.barbar-nvim.overrideAttrs (old: {
+      postPatch = (old.postPatch or "") + ''
+        substituteInPlace lua/barbar/events.lua \
+          --replace-fail "create_autocmd('BufModifiedSet'," \
+                         "pcall(create_autocmd, 'BufModifiedSet',"
+      '';
+    });
+  };
   plugins-unstable = unstable.vimPlugins;
 
   vim-bujo = pkgs.vimUtils.buildVimPlugin {
@@ -199,7 +213,10 @@ in
     withNodeJs = true;
     withPython3 = true;
     withRuby = true;
-    extraPackages = [ inputs.cornelis.packages.${pkgs.stdenv.hostPlatform.system}.cornelis ];
+    extraPackages = [
+      inputs.cornelis.packages.${pkgs.stdenv.hostPlatform.system}.cornelis
+      pkgs.tree-sitter # required by nvim-treesitter for :TSInstall / :TSUpdate
+    ];
   };
 
   xdg.configFile = {

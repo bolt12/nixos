@@ -339,20 +339,25 @@ in
                 icon = "anki";
               };
             }
+            {
+              Redlib = {
+                href = "http://${ninhoIp}:${toString ports.redlib}";
+                description = "Private Reddit frontend";
+                icon = "mdi-reddit";
+              };
+            }
           ];
         }
         {
           Monitoring = [
             {
-              "Uptime Kuma" = {
-                href = "http://${ninhoIp}:${toString ports.uptime-kuma}";
+              Gatus = {
+                href = "http://${ninhoIp}:${toString ports.gatus}";
                 description = "Status Page";
-                icon = "uptime-kuma";
+                icon = "gatus";
                 widget = {
-                  type = "uptimekuma";
-                  url = "http://${ninhoIp}:${toString ports.uptime-kuma}";
-                  # slug from Uptime Kuma monitor slug
-                  slug = "ninho";
+                  type = "gatus";
+                  url = "http://${ninhoIp}:${toString ports.gatus}";
                 };
               };
             }
