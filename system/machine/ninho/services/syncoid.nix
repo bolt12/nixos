@@ -20,6 +20,23 @@
     # own pre-send snapshot every run.
     commonArgs = [ "--no-sync-snap" ];
 
+    # Upstream default is missing two perms that incremental receives need:
+    #   destroy  — `zfs recv -F` may delete conflicting snapshots/state.
+    #   userprop — `zfs recv -s` writes `receive_resume_token` for resumable
+    #              transfers; without it, the incremental fails with a generic
+    #              "permission denied" after the data has streamed.
+    localTargetAllow = [
+      "change-key"
+      "compression"
+      "create"
+      "destroy"
+      "mount"
+      "mountpoint"
+      "receive"
+      "rollback"
+      "userprop"
+    ];
+
     commands = {
       "rpool/home".target = "storage/backup/home";
       "rpool/root".target = "storage/backup/root";

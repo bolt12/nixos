@@ -25,6 +25,7 @@ let
       zstd
       coreutils
       findutils
+      gawk
     ];
     text = ''
       DEST="${backupDir}"
