@@ -82,6 +82,11 @@ in
   };
   services.displayManager.defaultSession = "xfce";
 
+  # Thunar (auto-started by the XFCE session) spawns thunar-volman per
+  # block-device event; without the plugin installed it logs a flood of
+  # "Failed to launch the volume manager" errors on every session restart.
+  programs.thunar.plugins = with pkgs.xfce; [ thunar-volman ];
+
   # Allow local connections to X server without authentication
   # This is needed for Sunshine to access the display
   # Also disable compositor (prevents black screen in games) and ensure proper resolution

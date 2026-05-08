@@ -153,10 +153,12 @@ in
         (healthEp "Tools" "Grafana" ports.grafana "/api/health")
         (httpEp "Tools" "Home Assistant" ports.home-assistant)
         ((httpEpOrRedirect "Tools" "CoolerControl" ports.coolercontrol) // slowInterval)
-        # Anki-Sync's root POST-only handler returns 400 on GET — but that
-        # 400 is itself proof the protocol handler is alive.
-        (ep "Tools" "Anki Sync" [ "[STATUS] == any(200, 400)" ] {
-          url = http "${ninho}:${toString ports.anki-sync-server}";
+        # /sync/login is the real protocol endpoint; GET it and the server
+        # responds 405 (Method Not Allowed) — proof the handler is alive.
+        # The root path returns 404 on every method, so it can't tell a
+        # running server apart from a stopped one.
+        (ep "Tools" "Anki Sync" [ "[STATUS] == 405" ] {
+          url = http "${ninho}:${toString ports.anki-sync-server}/sync/login";
           interval = "5m";
         })
       ];

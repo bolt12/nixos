@@ -163,6 +163,9 @@
       ipv4_address = "0.0.0.0"
       ipv6_address = "::"
     ''}"
+    # alerts.json must be valid JSON — a zero-byte file makes the daemon
+    # bail out of init before binding the API on 11987 (silent on INFO).
+    "C /etc/coolercontrol/alerts.json 0644 root root - ${pkgs.writeText "coolercontrol-alerts-seed.json" ''{"alerts":[]}''}"
   ];
 
   # ==========================================================================
