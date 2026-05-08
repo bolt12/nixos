@@ -79,6 +79,8 @@
     enableSSHSupport = true;
   };
 
+  programs.niri.enable = true;
+
   # Enable Docker support.
   virtualisation = {
     docker = {

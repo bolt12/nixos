@@ -2,9 +2,13 @@
   description = "A flake to build my NixOS configuration";
 
   nixConfig = {
-    extra-substituters = [ "https://nix-community.cachix.org" ];
+    extra-substituters = [
+      "https://nix-community.cachix.org"
+      "https://niri.cachix.org"
+    ];
     extra-trusted-public-keys = [
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      "niri.cachix.org-1:Wv0OmO7PsuocRKzfDoJ3mulSl7Z6oezYhGhR+3W2964="
     ];
   };
 
@@ -39,6 +43,12 @@
     stylix = {
       url = "github:danth/stylix/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    niri = {
+      url = "github:sodiboo/niri-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs-stable.follows = "nixpkgs";
     };
 
     nix-ai-tools = {
@@ -177,6 +187,7 @@
             ./system/configuration.nix
             ./system/common/overlays.nix
             inputs.nixos-hardware.nixosModules.lenovo-thinkpad-x1-7th-gen
+            inputs.niri.nixosModules.niri
           ];
         };
 

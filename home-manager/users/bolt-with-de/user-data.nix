@@ -28,6 +28,14 @@ in
     externalMonitor = "OOO BW-GM3 0000000000001";
   };
 
+  # Niri monitors — same physical hardware. Niri matches connector names
+  # for the laptop panel and Manufacturer-Model-Serial for the BlitzWolf.
+  userConfig.niri = {
+    primaryMonitor = "eDP-1";
+    externalMonitor = "OOO BW-GM3 0000000000001";
+    portraitMonitor = "LG Electronics LG HDR 4K 0x000694F9";
+  };
+
   # Agda playground location for the libraries/defaults files.
   userConfig.agda.libraryRoot = "${config.userConfig.homeDirectory}/Desktop/Bolt/Playground/Agda";
 
