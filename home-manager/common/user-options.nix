@@ -73,6 +73,39 @@ with lib;
       };
     };
 
+    niri = {
+      primaryMonitor = mkOption {
+        type = types.str;
+        default = "eDP-1";
+        description = "Primary niri output name (laptop panel).";
+        example = "eDP-1";
+      };
+
+      externalMonitor = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        description = ''
+          Primary external monitor identifier. Niri matches by connector
+          name (e.g. "DP-1") or "Manufacturer Model Serial". Set to null
+          when no external is configured.
+        '';
+        example = "OOO BW-GM3 0000000000001";
+      };
+
+      portraitMonitor = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        description = "Optional portrait-rotated monitor identifier.";
+        example = "LG Electronics LG HDR 4K 0x000694F9";
+      };
+
+      wallpaperPath = mkOption {
+        type = types.path;
+        default = ../background.png;
+        description = "Niri desktop wallpaper (consumed by swaybg).";
+      };
+    };
+
     agda = {
       libraryRoot = mkOption {
         type = types.nullOr types.str;

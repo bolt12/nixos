@@ -6,7 +6,7 @@
     "margin-left": 8,
     "margin-right": 8,
     "spacing": 0,
-    "modules-left": ["sway/workspaces", "sway/mode", "sway/window"],
+    "modules-left": ["niri/workspaces", "niri/window", "sway/workspaces", "sway/mode", "sway/window"],
     "modules-center": ["clock", "mpris"],
     "modules-right": ["group/system", "privacy", "idle_inhibitor", "systemd-failed-units", "custom/notification", "bluetooth", "wireplumber", "custom/weather", "battery", "tray", "custom/powermenu"],
 
@@ -33,6 +33,19 @@
             "2": [],
             "3": []
         }
+    },
+    "niri/workspaces": {
+        "format": "{value}",
+        "format-icons": {
+            "active": "",
+            "default": "",
+            "empty": ""
+        }
+    },
+    "niri/window": {
+        "max-length": 60,
+        "tooltip": true,
+        "format": "{}"
     },
     "sway/mode": {
         "format": " {}"

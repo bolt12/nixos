@@ -18,6 +18,9 @@
 
     # Stylix theming
     inputs.stylix.homeModules.stylix
+    # Niri ↔ Stylix bridge (themes border colors from base16 scheme).
+    # Lives in niri-flake (not stylix); only wires into HM when imported here.
+    inputs.niri.homeModules.stylix
 
     # Add desktop-specific profiles
     ../../profiles/desktop.nix
@@ -31,6 +34,11 @@
     ../../programs/sway/default.nix
     ../../programs/waybar/default.nix
     ../../programs/fuzzel/default.nix
+    ../../programs/niri/default.nix
+    # Noctalia (Quickshell-based) is currently broken on this iGPU + Mesa —
+    # its render thread crashes inside libLLVM. Re-enable once upstream
+    # stabilizes, or once we move off Mesa 25.2.x + LLVM 21.x.
+    # ../../programs/noctalia/default.nix
 
     # Desktop-specific user data (Syncthing configuration)
     ./user-data.nix
@@ -213,6 +221,7 @@
       gtk.enable = true;
       bat.enable = true;
       fzf.enable = true;
+      niri.enable = true; # provided by inputs.niri.homeModules.stylix
     };
   };
 }

@@ -5,5 +5,6 @@
   # system/machine/<name>/package-overrides.nix.
   nixpkgs.overlays = [
     (import ./unstable-overlay.nix { inherit inputs; })
+    inputs.niri.overlays.niri
   ];
 }

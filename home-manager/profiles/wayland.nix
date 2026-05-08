@@ -10,6 +10,7 @@
 
     # Wayland compositor tools
     waybar # Status bar
+    swaybg # Static wallpaper for Wayland (used by both sway and niri)
     # fuzzel is configured via programs.fuzzel (programs/fuzzel/default.nix)
     swaynotificationcenter # Notification center (replaces mako)
     swaylock-effects # Screen locker with blur/clock (replaces swaylock-fancy)

@@ -61,7 +61,22 @@
       "Bash(do echo:*)",
       "Read(//sys/class/drm/$d/**)",
       "Read(//sys/class/drm/**)",
-      "Bash(done)"
+      "Bash(done)",
+      "Read(//nix/store/l61vfkyy0qrnz9bmgx84fa7z3bjzhyp4-source/pkgs/by-name/no/noctalia-qs/**)",
+      "Bash(nix-prefetch-github noctalia-dev *)",
+      "Bash(nix flake *)",
+      "Bash(nix-prefetch-url --unpack \"https://github.com/noctalia-dev/noctalia-qs/archive/d3e26ccd9eecde9139be00caf5dc2d4260fb31ee.tar.gz\")",
+      "Bash(nix hash *)",
+      "Bash(coredumpctl info *)",
+      "Bash(vulkaninfo --summary)",
+      "Bash(eglinfo)",
+      "Bash(glxinfo -B)",
+      "Bash(nix eval *)",
+      "WebFetch(domain:gitlab.freedesktop.org)",
+      "Bash(nix path-info *)",
+      "Bash(nix build *)",
+      "WebFetch(domain:docs.mesa3d.org)",
+      "Read(//nix/store/qvq2416cz0dnrzva073wpmvfrc8vpf10-source/**)"
     ],
     "deny": [],
     "ask": []
