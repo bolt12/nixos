@@ -80,7 +80,9 @@
   };
 
   # GPT-OSS 120B F16 - ~65GB base, MoE (5.1B active)
-  # Requires CPU offload for full context
+  # --n-cpu-moe N keeps the first N layers' MoE expert weights on CPU; gpt-oss-120b
+  # has 36 layers, so 18 splits experts roughly half/half. Reduce on OOM, raise for
+  # more VRAM headroom for KV cache.
   "gpt-oss-120b-full" = {
     cmd = ''
       ${wyoming-wrapper} ${llama-cpp-cuda}/bin/llama-server \
@@ -95,6 +97,7 @@
         --fit-ctx 131072 \
         --fit-target 256 \
         --flash-attn on \
+        --n-cpu-moe 18 \
         --batch-size 8192 \
         --ubatch-size 2048 \
         --no-mmap \
@@ -129,7 +132,7 @@
     aliases = [ "qwen3.5-27B-full" ];
   };
 
-  # Qwen3.5-27B Creative - higher temp, no reasoning, optimized for journal/creative tasks
+  # Qwen3.5-27B Creative - instruct mode (no reasoning), Unsloth instruct-general params
   "qwen3.5-27B-creative" = {
     cmd = ''
       ${wyoming-wrapper} ${llama-cpp-cuda}/bin/llama-server \
@@ -137,10 +140,10 @@
         --metrics \
         --host 0.0.0.0 \
         --port ''${PORT} \
-        --temp 1.0 \
-        --top-p 0.95 \
+        --temp 0.7 \
+        --top-p 0.8 \
         --top-k 20 \
-        --min-p 0.01 \
+        --min-p 0.0 \
         --presence-penalty 1.5 \
         --repeat-penalty 1.0 \
         --flash-attn on \
@@ -267,6 +270,28 @@
         --jinja
     '';
     aliases = [ "gemma-4-31B" ];
+  };
+
+  # Gemma 4 31B Dense — thinking mode enabled via chat-template kwarg.
+  # Emits <|channel>thought\n...<channel|> blocks before final answers.
+  "gemma-4-31B-thinking" = {
+    cmd = ''
+      ${wyoming-wrapper} ${llama-cpp-cuda}/bin/llama-server \
+        -hf unsloth/gemma-4-31B-it-GGUF:Q6_K \
+        --metrics \
+        --host 0.0.0.0 \
+        --port ''${PORT} \
+        --temp 1.0 \
+        --top-p 0.95 \
+        --top-k 64 \
+        -fit on \
+        --fit-ctx 150000 \
+        --flash-attn on \
+        --no-mmap \
+        --chat-template-kwargs '{"enable_thinking": true}' \
+        --jinja
+    '';
+    aliases = [ "gemma-4-31B-thinking" ];
   };
 
   # ===========================================================================

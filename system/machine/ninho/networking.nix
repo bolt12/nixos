@@ -69,7 +69,10 @@
       peers = [
         {
           publicKey = constants.network.wireguard.rpiServerPubKey;
-          allowedIPs = [ "0.0.0.0/0" ]; # Full tunnel
+          # Split tunnel: only WG subnet routes through wg0. Default route stays on
+          # enp11s0 so Steam/SDR and other UDP-heavy workloads avoid the RPi NAT
+          # hairpin (which fragments at MTU 1320 and breaks Steam CM connections).
+          allowedIPs = [ constants.network.wireguard.subnet ];
           endpoint = "${constants.network.rpi.lanIp}:${toString constants.network.wireguard.port}";
           persistentKeepalive = 25;
         }

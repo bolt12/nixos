@@ -38,13 +38,13 @@ in
           metalSupport = false;
         }).overrideAttrs
           (oldAttrs: {
-            version = "8943";
+            version = "9071";
 
             src = pkgs.fetchFromGitHub {
               owner = "ggml-org";
               repo = "llama.cpp";
-              tag = "b8943";
-              hash = "sha256-Osc94OzRKCFSYHceI6YxuX+bdmvavuYAJTqvERsdwzQ=";
+              tag = "b9071";
+              hash = "sha256-XguluNqsy3Ru+1ntczGI2c9RpNKJ0+lYGZRXxyqbCsA=";
               leaveDotGit = true;
               postFetch = ''
                 git -C "$out" rev-parse --short HEAD > $out/COMMIT
@@ -63,7 +63,7 @@ in
             '';
 
             # Webui npm deps hash changed with this source version
-            npmDepsHash = "sha256-RAFtsbBGBjteCt5yXhrmHL39rIDJMCFBETgzId2eRRk=";
+            npmDepsHash = "sha256-k62LIbyY2DXvs7XXbX0lNPiYxuYzeJUyQtS4eA+68f8=";
 
             # b8635 removed tools/server/public/index.html.gz from the source tree,
             # but upstream nixpkgs postPatch still tries to rm it — use -f to tolerate
@@ -84,8 +84,8 @@ in
           llama-swap-src = pkgs.fetchFromGitHub {
             owner = "mostlygeek";
             repo = "llama-swap";
-            tag = "v199";
-            hash = "sha256-tAWXhfOWPLBuEgd+32CbuIkn1hN+4VI4xkyx7E2a81I=";
+            tag = "v211";
+            hash = "sha256-pX2Wrat0ETgRJgxNvZeZIVMLzPRMUJ3jxBd4rTc1dd0=";
             leaveDotGit = true;
             postFetch = ''
               cd "$out"
@@ -96,10 +96,10 @@ in
           };
           llama-swap-ui = pkgs.buildNpmPackage {
             pname = "llama-swap-ui";
-            version = "199";
+            version = "211";
             src = llama-swap-src;
             sourceRoot = "${llama-swap-src.name}/ui-svelte";
-            npmDepsHash = "sha256-gTDsuWPLCWsPltioziygFmSQFdLqjkZpmmVWIWoZwoc=";
+            npmDepsHash = "sha256-JoVpW5+Er6K81wcVZwDJ2cEEB7awUg+TGrzzmWvbaU4=";
             postPatch = ''
               substituteInPlace vite.config.ts \
                 --replace-fail "../proxy/ui_dist" "${placeholder "out"}/ui_dist"
@@ -110,10 +110,10 @@ in
           };
         in
         unstable.llama-swap.overrideAttrs (oldAttrs: {
-          version = "199";
+          version = "211";
           src = llama-swap-src;
           proxyVendor = true;
-          vendorHash = "sha256-TPOKqgyf8vltRLbtNWXcK3jsWsVFaSrZAc+/AMkG/8A=";
+          vendorHash = "sha256-h5PDcfXTjZ7MMEp00FtcqCd4ve/XzjwgWesS03Kzdq8=";
           passthru.ui = llama-swap-ui;
 
           preBuild = ''
