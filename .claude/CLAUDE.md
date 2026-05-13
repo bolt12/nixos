@@ -55,33 +55,19 @@ Ninho is shared by **bolt** and **pollard**, each with their own clone at `$HOME
 
 Home server — AMD Ryzen 9 9950X3D, ASUS ROG Strix X870E, RTX 5090, 128GB RAM.
 
-### Network Watchdog (RTL8126A)
+### Hardware Watchdog
 
-The RTL8126A 5 GbE NIC uses the `r8169` driver which suffers from `NETDEV WATCHDOG` transmit queue timeouts roughly every 7 days. The dedicated `r8126` driver won't land upstream until kernel 6.15+. Kernel params (`pcie_aspm=off`, `r8169.aspm=0`, `r8169.use_dac=1`) mitigate but don't prevent the issue.
+`sp5100_tco` (AMD) auto-reboots on hard kernel lockups. Configured in `configuration.nix`:
+- Module loaded via `boot.kernelModules`
+- `systemd.settings.Manager.RuntimeWatchdogSec = "60s"`, `RebootWatchdogSec = "10min"`
 
-**Recovery system** (`services/network-watchdog.nix` + `scripts/network-watchdog.sh`):
-- Runs every 30s via systemd timer, escalates through 4 levels (3 consecutive failures per level):
-  - L1: interface bounce (`ip link down/up`)
-  - L2: NetworkManager reconnect
-  - L3: `modprobe -r r8169 && modprobe r8169` + restart NM + restart WireGuard
-  - L4: system reboot (defers up to 3x if ZFS scrub in progress)
-- State persisted in `/var/lib/network-watchdog/state`
-- Notifications via ntfy on `http://127.0.0.1:8106/network-watchdog`
+The kernel-level RTL8126A `NETDEV WATCHDOG` bug from older kernels was fixed upstream in 6.15+ with the native `r8126` driver. Kernel 6.18 (currently pinned for NVIDIA 580.x compat) includes it, so no userspace recovery is needed.
 
-**Supporting services:**
-- `wol-enable.service` — enables Wake-on-LAN on `enp11s0` after NetworkManager is up (for RPi-based remote recovery)
-- `preventive-reboot.timer` — calendar-based reboot every ~6 days at 04:00 (`*-*-01,07,13,19,25`), skips during ZFS scrub
-- `systemd.watchdog` — hardware watchdog via `sp5100_tco` (60s runtime, 10min reboot timeout)
-
-**Key details for future edits:**
-- WireGuard uses `networking.wireguard.interfaces.wg0` which creates `wireguard-wg0.service` (NOT `wg-quick-wg0`)
-- Gateway is discovered dynamically via `ip route show default` (no hardcoded IPs)
-- The script runs without `set -e` because recovery commands (especially L3 modprobe) must not abort mid-sequence
-- Cooldowns only gate same-level retries, not escalation to higher levels
+`pcie_aspm=off` is kept defensively in `boot.kernelParams` (also covers AHCI/SATA).
 
 ### Tang/Clevis LUKS Auto-Unlock
 
-Automatic LUKS decryption at boot via Tang (on RPi) and Clevis (in ninho's initrd). Eliminates manual passphrase entry during unattended reboots (network watchdog, preventive reboot timer).
+Automatic LUKS decryption at boot via Tang (on RPi) and Clevis (in ninho's initrd). Eliminates manual passphrase entry during unattended reboots.
 
 **Architecture:**
 - **Tang server**: RPi at `192.168.1.110:7654` (`system/machine/rpi/rpi5.nix`)

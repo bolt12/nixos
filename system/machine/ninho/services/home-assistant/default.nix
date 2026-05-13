@@ -8,8 +8,10 @@
 { ... }:
 {
   imports = [
+    ./helpers.nix
     ./templates.nix
     ./sensors.nix
+    ./utility-meters.nix
     ./rest-commands.nix
     ./automations.nix
     ./scripts.nix

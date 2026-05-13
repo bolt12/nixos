@@ -208,7 +208,7 @@ in
                         action = "call-service";
                         service = "automation.trigger";
                         service_data = {
-                          entity_id = "automation.away_mode_all_ac_off";
+                          entity_id = "automation.away_mode_all_zones_off";
                         };
                       };
                     }
@@ -942,7 +942,7 @@ in
                   chips = [
                     {
                       type = "entity";
-                      entity = "automation.workday_start_comfort";
+                      entity = "automation.workday_start_escritorio";
                       icon = "mdi:weather-sunset-up";
                       name = "Workday";
                       tap_action = {
@@ -960,18 +960,9 @@ in
                     }
                     {
                       type = "entity";
-                      entity = "automation.away_mode_all_ac_off";
+                      entity = "automation.away_mode_all_zones_off";
                       icon = "mdi:home-export-outline";
                       name = "Away";
-                      tap_action = {
-                        action = "toggle";
-                      };
-                    }
-                    {
-                      type = "entity";
-                      entity = "automation.seasonal_mode_heat_cool_auto_switch";
-                      icon = "mdi:sun-snowflake-variant";
-                      name = "Seasonal";
                       tap_action = {
                         action = "toggle";
                       };
@@ -2246,7 +2237,7 @@ in
               cards = [
                 {
                   type = "custom:mushroom-entity-card";
-                  entity = "automation.workday_start_comfort";
+                  entity = "automation.workday_start_escritorio";
                   name = "Workday Start";
                   icon = "mdi:weather-sunset-up";
                   tap_action = {
@@ -2272,7 +2263,7 @@ in
                 }
                 {
                   type = "custom:mushroom-entity-card";
-                  entity = "automation.away_mode_all_ac_off";
+                  entity = "automation.away_mode_all_zones_off";
                   name = "Away Mode";
                   icon = "mdi:home-export-outline";
                   tap_action = {
@@ -2285,33 +2276,7 @@ in
                 }
                 {
                   type = "custom:mushroom-entity-card";
-                  entity = "automation.return_home_smart_pre_heat";
-                  name = "Return Home";
-                  icon = "mdi:home-import-outline";
-                  tap_action = {
-                    action = "toggle";
-                  };
-                  layout_options = {
-                    grid_columns = 2;
-                    grid_rows = 1;
-                  };
-                }
-                {
-                  type = "custom:mushroom-entity-card";
-                  entity = "automation.seasonal_mode_heat_cool_auto_switch";
-                  name = "Seasonal Mode";
-                  icon = "mdi:sun-snowflake-variant";
-                  tap_action = {
-                    action = "toggle";
-                  };
-                  layout_options = {
-                    grid_columns = 2;
-                    grid_rows = 1;
-                  };
-                }
-                {
-                  type = "custom:mushroom-entity-card";
-                  entity = "automation.tv_on_heat_living_room";
+                  entity = "automation.tv_on_sala_comfort";
                   name = "TV On Heat";
                   icon = "mdi:television";
                   tap_action = {
@@ -2363,20 +2328,7 @@ in
                 }
                 {
                   type = "custom:mushroom-entity-card";
-                  entity = "automation.night_bedroom_prep";
-                  name = "Bedroom Prep";
-                  icon = "mdi:bed-clock";
-                  tap_action = {
-                    action = "toggle";
-                  };
-                  layout_options = {
-                    grid_columns = 2;
-                    grid_rows = 1;
-                  };
-                }
-                {
-                  type = "custom:mushroom-entity-card";
-                  entity = "automation.tv_off_late_night_shutdown";
+                  entity = "automation.tv_off_late_sala_off";
                   name = "TV Off Late";
                   icon = "mdi:television-off";
                   tap_action = {
@@ -2389,7 +2341,7 @@ in
                 }
                 {
                   type = "custom:mushroom-entity-card";
-                  entity = "automation.calendar_meeting_pre_heat";
+                  entity = "automation.calendar_meeting_escritorio";
                   name = "Meeting Pre-Heat";
                   icon = "mdi:calendar-clock";
                   tap_action = {
@@ -2402,20 +2354,7 @@ in
                 }
                 {
                   type = "custom:mushroom-entity-card";
-                  entity = "automation.cold_weather_boost";
-                  name = "Cold Boost";
-                  icon = "mdi:snowflake-alert";
-                  tap_action = {
-                    action = "toggle";
-                  };
-                  layout_options = {
-                    grid_columns = 2;
-                    grid_rows = 1;
-                  };
-                }
-                {
-                  type = "custom:mushroom-entity-card";
-                  entity = "automation.weekend_morning_comfort";
+                  entity = "automation.weekend_morning_sala";
                   name = "Weekend Morning";
                   icon = "mdi:coffee";
                   tap_action = {

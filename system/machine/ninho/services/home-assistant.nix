@@ -62,11 +62,35 @@ in
       # Enable mobile app support
       mobile_app = { };
 
-      # Recorder for history (optimized for 128GB RAM)
+      # Excludes target per-minute high-cardinality sensors that have no
+      # analytical value: network counters, *arr queue depths, system_monitor
+      # gauges, and the phone battery poll.
       recorder = {
         db_url = "sqlite:///${hassHome}/home-assistant_v2.db";
-        purge_keep_days = 30;
-        commit_interval = 1;
+        purge_keep_days = 365;
+        commit_interval = 5;
+        auto_purge = true;
+        auto_repack = true;
+        exclude = {
+          entity_globs = [
+            "sensor.*_packets_*"
+            "sensor.*_throughput_*"
+            "sensor.*_app_rx_*"
+            "sensor.*_app_tx_*"
+            "sensor.*_mobile_rx_*"
+            "sensor.*_mobile_tx_*"
+            "sensor.*_total_rx_*"
+            "sensor.*_total_tx_*"
+            "sensor.system_monitor_*"
+            "sensor.21091116ug_battery_*"
+          ];
+          entities = [
+            "sensor.sonarr_queue"
+            "sensor.radarr_queue"
+            "sensor.lidarr_wanted"
+            "sensor.lidarr_albums"
+          ];
+        };
       };
 
       # History and logbook
