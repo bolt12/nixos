@@ -74,13 +74,17 @@
     firefox.enable = true;
   };
 
+  # Stretchly — Wayland-native break reminder (replaces safeeyes, which has
+  # broken fullscreen/DND detection under Niri). Autostarted via niri's
+  # spawn-at-startup; minimizes to tray on launch.
+  home.packages = [ pkgs.stretchly ];
+
   # Desktop-specific services
   services = {
     lorri.enable = true;
     blueman-applet.enable = true;
     udiskie.enable = true;
     poweralertd.enable = true;
-    safeeyes.enable = true;
 
     # Idle management — lock after 5min, DPMS off after 10min
     swayidle = {

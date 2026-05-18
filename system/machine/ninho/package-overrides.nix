@@ -38,13 +38,13 @@ in
           metalSupport = false;
         }).overrideAttrs
           (oldAttrs: {
-            version = "9071";
+            version = "9208";
 
             src = pkgs.fetchFromGitHub {
               owner = "ggml-org";
               repo = "llama.cpp";
-              tag = "b9071";
-              hash = "sha256-XguluNqsy3Ru+1ntczGI2c9RpNKJ0+lYGZRXxyqbCsA=";
+              tag = "b9208";
+              hash = "sha256-Grt4BHz0ZlcZ1NdLh3CiXYkmMh+D0DXQb7UaECyi4kE=";
               leaveDotGit = true;
               postFetch = ''
                 git -C "$out" rev-parse --short HEAD > $out/COMMIT
@@ -62,9 +62,6 @@ in
               ${oldAttrs.preConfigure or ""}
             '';
 
-            # Webui npm deps hash changed with this source version
-            npmDepsHash = "sha256-k62LIbyY2DXvs7XXbX0lNPiYxuYzeJUyQtS4eA+68f8=";
-
             # b8635 removed tools/server/public/index.html.gz from the source tree,
             # but upstream nixpkgs postPatch still tries to rm it — use -f to tolerate
             postPatch =
@@ -72,6 +69,14 @@ in
                 [ "rm tools/server/public/index.html.gz" ]
                 [ "rm -f tools/server/public/index.html.gz" ]
                 (oldAttrs.postPatch or "");
+
+            # b9091+ moved the webui sources from tools/server/webui → tools/ui.
+            # nixpkgs's package.nix still bakes the old path into npmRoot and its
+            # npmDeps hash; override both so fetchNpmDeps reads the new lockfile.
+            # Recompute via:
+            #   nix run nixpkgs#prefetch-npm-deps -- <unpacked-src>/tools/ui/package-lock.json
+            npmRoot = "tools/ui";
+            npmDepsHash = "sha256-WaEePrEZ7O/7deP2KJhe0AwiSKYA8HOqETmMHUkmBe0=";
 
             # Keep the original postInstall to handle installation correctly
             postInstall = oldAttrs.postInstall or "";
@@ -84,8 +89,8 @@ in
           llama-swap-src = pkgs.fetchFromGitHub {
             owner = "mostlygeek";
             repo = "llama-swap";
-            tag = "v211";
-            hash = "sha256-pX2Wrat0ETgRJgxNvZeZIVMLzPRMUJ3jxBd4rTc1dd0=";
+            tag = "v216";
+            hash = "sha256-PHSY4z2h406xL+EcIYyrzr4s28txO7SCsWm8hrXf+2U=";
             leaveDotGit = true;
             postFetch = ''
               cd "$out"
@@ -96,10 +101,10 @@ in
           };
           llama-swap-ui = pkgs.buildNpmPackage {
             pname = "llama-swap-ui";
-            version = "211";
+            version = "216";
             src = llama-swap-src;
             sourceRoot = "${llama-swap-src.name}/ui-svelte";
-            npmDepsHash = "sha256-JoVpW5+Er6K81wcVZwDJ2cEEB7awUg+TGrzzmWvbaU4=";
+            npmDepsHash = "sha256-NJqEJ+XTdpPFtJJxP4CGu+JDUW7lKDcFgsixQJ3SXtQ=";
             postPatch = ''
               substituteInPlace vite.config.ts \
                 --replace-fail "../proxy/ui_dist" "${placeholder "out"}/ui_dist"
@@ -110,10 +115,10 @@ in
           };
         in
         unstable.llama-swap.overrideAttrs (oldAttrs: {
-          version = "211";
+          version = "216";
           src = llama-swap-src;
           proxyVendor = true;
-          vendorHash = "sha256-h5PDcfXTjZ7MMEp00FtcqCd4ve/XzjwgWesS03Kzdq8=";
+          vendorHash = "sha256-IpYF8vt3oIQmwZuxTLK2tx3uw4qeR9uAH1QqY5DRo2M=";
           passthru.ui = llama-swap-ui;
 
           preBuild = ''

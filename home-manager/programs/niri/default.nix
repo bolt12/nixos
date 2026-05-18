@@ -174,6 +174,7 @@ in
             "store"
           ];
         }
+        { argv = [ "stretchly" ]; }
       ];
 
       hotkey-overlay.skip-at-startup = true;

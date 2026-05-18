@@ -181,10 +181,13 @@
   };
 
   # Qwen3.6 35B A3B MoE (~3B active, 262K native context)
+  # MTP speculative decoding: --spec-type draft-mtp requires the -MTP-GGUF
+  # variant (carries the multi-token-prediction head) and --parallel 1
+  # (mainline MTP is single-stream only). Expected ~1.5-2x speedup.
   "qwen3.6-35B-A3B-full" = {
     cmd = ''
       ${wyoming-wrapper} ${llama-cpp-cuda}/bin/llama-server \
-        -hf unsloth/Qwen3.6-35B-A3B-GGUF:MXFP4_MOE \
+        -hf unsloth/Qwen3.6-35B-A3B-MTP-GGUF:MXFP4_MOE \
         --metrics \
         --host 0.0.0.0 \
         --port ''${PORT} \
@@ -200,6 +203,9 @@
         --cache-type-k q8_0 \
         --cache-type-v q8_0 \
         --no-mmap \
+        --parallel 1 \
+        --spec-type draft-mtp \
+        --spec-draft-n-max 6 \
         --chat-template-kwargs '{"preserve_thinking": true}' \
         --jinja
     '';
@@ -207,10 +213,11 @@
   };
 
   # Qwen3.6 27B (262K native context)
+  # MTP speculative decoding: see note on qwen3.6-35B-A3B-full above.
   "qwen3.6-27B-full" = {
     cmd = ''
       ${wyoming-wrapper} ${llama-cpp-cuda}/bin/llama-server \
-        -hf unsloth/Qwen3.6-27B-GGUF:Q5_K_M \
+        -hf unsloth/Qwen3.6-27B-MTP-GGUF:Q5_K_M \
         --metrics \
         --host 0.0.0.0 \
         --port ''${PORT} \
@@ -226,6 +233,9 @@
         --cache-type-k q8_0 \
         --cache-type-v q8_0 \
         --no-mmap \
+        --parallel 1 \
+        --spec-type draft-mtp \
+        --spec-draft-n-max 6 \
         --chat-template-kwargs '{"preserve_thinking": true}' \
         --jinja
     '';
