@@ -22,6 +22,9 @@
     # Lives in niri-flake (not stylix); only wires into HM when imported here.
     inputs.niri.homeModules.stylix
 
+    inputs.dms.homeModules.dank-material-shell
+    inputs.dms.homeModules.niri
+
     # Add desktop-specific profiles
     ../../profiles/desktop.nix
     ../../profiles/fonts.nix
@@ -72,6 +75,19 @@
   # Desktop-specific programs
   programs = {
     firefox.enable = true;
+
+    # `niri.enableKeybinds` and `niri.includes.enable` are off: explicit binds
+    # in programs/niri/keybindings.nix remain authoritative. Re-enable
+    # includes to inherit DMS's bar-toggle / dashboard / spotlight chords.
+    dank-material-shell = {
+      enable = false;
+      systemd.enable = true;
+      niri = {
+        enableKeybinds = false;
+        enableSpawn = true;
+        includes.enable = false;
+      };
+    };
   };
 
   # Stretchly — Wayland-native break reminder (replaces safeeyes, which has
@@ -114,81 +130,19 @@
       longitude = "-8";
     };
 
-    # Automatic display profile switching
-    # Note: kanshi detects based on connected outputs, not powered-on state.
-    # If the LG is cabled but powered off, kanshi still sees it as connected
-    # and matches the dual profile. Use Mod+Shift+m to manually toggle the
-    # LG output, or physically disconnect it for BlitzWolf-only mode.
-    kanshi = {
-      enable = true;
-      settings = [
-        {
-          # Both external monitors — BlitzWolf at full res with scaling,
-          # LG portrait at 1080p@30Hz (USB-C dock bandwidth constraint)
-          profile.name = "docked-dual";
-          profile.outputs = [
-            {
-              criteria = "eDP-1";
-              status = "disable";
-            }
-            {
-              criteria = "OOO BW-GM3 0000000000001";
-              mode = "3440x1440@60Hz";
-              scale = 1.3;
-              position = "0,0";
-            }
-            {
-              criteria = "LG Electronics LG HDR 4K 0x000694F9";
-              mode = "1920x1080@30Hz";
-              transform = "90";
-              position = "2646,0";
-            }
-          ];
-        }
-        {
-          # BlitzWolf only — full resolution with comfortable scaling
-          profile.name = "docked-blitzwolf";
-          profile.outputs = [
-            {
-              criteria = "eDP-1";
-              status = "disable";
-            }
-            {
-              criteria = "OOO BW-GM3 0000000000001";
-              mode = "3440x1440@60Hz";
-              scale = 1.3;
-              position = "0,0";
-            }
-          ];
-        }
-        {
-          # LG 4K only — full 4K possible when BlitzWolf is off
-          profile.name = "docked-lg";
-          profile.outputs = [
-            {
-              criteria = "eDP-1";
-              status = "disable";
-            }
-            {
-              criteria = "LG Electronics LG HDR 4K 0x000694F9";
-              mode = "3840x2160@30Hz";
-              scale = 2.0;
-              transform = "90";
-            }
-          ];
-        }
-        {
-          # Laptop only
-          profile.name = "undocked";
-          profile.outputs = [
-            {
-              criteria = "eDP-1";
-              status = "enable";
-            }
-          ];
-        }
-      ];
-    };
+    # kanshi was previously responsible for switching between docked-dual /
+    # docked-blitzwolf / docked-lg / undocked profiles based on detected
+    # outputs. Niri's static output declarations in programs/niri/default.nix
+    # already cover the geometry/scale/refresh per monitor, and niri silently
+    # ignores declared-but-disconnected outputs (re-applies on hotplug), so
+    # kanshi is redundant.
+    #
+    # Trade-offs accepted vs the kanshi setup:
+    #   - eDP-1 stays enabled while docked (kanshi disabled it). Toggle with
+    #     `Mod+ctrl+Shift+e` (see programs/niri/keybindings.nix) when wanted.
+    #   - The 4K-when-LG-solo profile (3840x2160@30, scale 2.0) is gone; the
+    #     LG runs at 1920x1080@30 always now. Use `Mod+ctrl+Shift+m` to
+    #     bump it to 4K mode at runtime if needed.
   };
 
   # Stylix theming — Catppuccin Mocha (unified with sway/waybar)

@@ -39,10 +39,14 @@ let
         base0C = "#89dceb";
       };
 
-  closeShader = builtins.replaceStrings
-    [ "@TINT_FROM@" "@TINT_TO@" ]
-    [ (hexToGlsl palette.base0E) (hexToGlsl palette.base0C) ]
-    (builtins.readFile ./shaders/window-close.glsl);
+  tintShader = path:
+    builtins.replaceStrings
+      [ "@TINT_FROM@" "@TINT_TO@" ]
+      [ (hexToGlsl palette.base0E) (hexToGlsl palette.base0C) ]
+      (builtins.readFile path);
+
+  closeShader = tintShader ./shaders/window-close.glsl;
+  openShader = tintShader ./shaders/window-open.glsl;
 in
 {
   programs.niri.settings.animations = {
@@ -55,9 +59,12 @@ in
     window-movement = spring 800;
     window-resize = spring 800;
 
-    window-open.kind.easing = {
-      duration-ms = 150;
-      curve = "ease-out-expo";
+    window-open = {
+      kind.easing = {
+        duration-ms = 150;
+        curve = "ease-out-expo";
+      };
+      custom-shader = openShader;
     };
     window-close = {
       kind.easing = {
@@ -67,7 +74,6 @@ in
       custom-shader = closeShader;
     };
 
-    # Hot-reload toasts get noisy when iterating on the config.
-    config-notification-open-close.enable = false;
+    config-notification-open-close.enable = true;
   };
 }

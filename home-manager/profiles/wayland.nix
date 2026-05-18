@@ -1,8 +1,43 @@
 # Wayland profile - Wayland compositor and related tools
 # This profile contains Wayland-specific applications and utilities
 
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 {
+  # Persistent clipboard daemon: keeps copied text/images alive after the
+  # source app exits (cliphist gives history; this preserves the *current*
+  # selection too).
+  systemd.user.services.wl-clip-persist = {
+    Unit = {
+      Description = "Persist clipboard after source app exits";
+      After = [ "graphical-session.target" ];
+      PartOf = [ "graphical-session.target" ];
+      ConditionEnvironment = "WAYLAND_DISPLAY";
+    };
+    Service = {
+      ExecStart = "${pkgs.wl-clip-persist}/bin/wl-clip-persist --clipboard regular";
+      Restart = "on-failure";
+      RestartSec = 3;
+    };
+    Install.WantedBy = [ "graphical-session.target" ];
+  };
+
+  # Auto-inhibit idle/lock when a fullscreen video is playing (detected via
+  # PipeWire). Replaces sway's per-app `inhibit_idle fullscreen` rules.
+  systemd.user.services.wayland-pipewire-idle-inhibit = {
+    Unit = {
+      Description = "Inhibit idle while fullscreen media is playing";
+      After = [ "graphical-session.target" ];
+      PartOf = [ "graphical-session.target" ];
+      ConditionEnvironment = "WAYLAND_DISPLAY";
+    };
+    Service = {
+      ExecStart = "${pkgs.wayland-pipewire-idle-inhibit}/bin/wayland-pipewire-idle-inhibit";
+      Restart = "on-failure";
+      RestartSec = 3;
+    };
+    Install.WantedBy = [ "graphical-session.target" ];
+  };
+
   home.packages = with pkgs.unstable; [
     # Core Wayland infrastructure
     pipewire # Audio server
@@ -25,10 +60,10 @@
     slurp # Screen region selector
     satty # Screenshot annotation tool
     pkgs.tesseract # OCR (screenshot text extraction)
+    wl-screenrec # Hardware-encoded screen recorder (dma-buf, faster than wf-recorder)
 
     # Display management
     wdisplays # Display configuration
-    # kanshi is configured via services.kanshi (users/bolt-with-de/home.nix)
     brightnessctl # Brightness control
     wlsunset # Blue light filter
     wl-gammactl # Gamma correction

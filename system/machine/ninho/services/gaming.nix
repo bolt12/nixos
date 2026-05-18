@@ -139,6 +139,11 @@ in
     };
   };
 
+  # Embedded compositor for games — provides a per-game compositor that
+  # isolates input handling from the host. The system wrapper grants
+  # CAP_SYS_NICE for realtime scheduling.
+  programs.gamescope.enable = true;
+
   # ==========================================================================
   # SUNSHINE STREAMING SERVER
   # ==========================================================================

@@ -139,12 +139,23 @@ in
   programs = {
     sway.enable = true;
     nix-ld.enable = true;
+    # Embedded compositor for games — swallows Alt+click before niri sees it,
+    # so Dota and similar can use Alt-modified mouse actions while niri's
+    # mod-key stays Alt. The system wrapper grants CAP_SYS_NICE for realtime
+    # scheduling; plain `pkgs.gamescope` in home.packages would skip that.
+    gamescope.enable = true;
   };
 
   services = {
 
-    # Systemd /run/user increase size
-    logind.settings.Login.RuntimeDirectorySize = "75%";
+    logind.settings.Login = {
+      # Systemd /run/user increase size
+      RuntimeDirectorySize = "75%";
+      # When docked (external monitors connected), keep working with the
+      # lid closed instead of suspending. niri-lid-watch (HM service)
+      # toggles eDP-1 off so we don't render to a hidden panel.
+      HandleLidSwitchDocked = "ignore";
+    };
 
     dbus.enable = true;
 
@@ -216,9 +227,24 @@ in
     flatpak.enable = true;
 
     fwupd.enable = true;
+
+    # AnnePro2 keyboard (Obins, idVendor=04d9 idProduct=a293) — let regular
+    # users open the HID nodes so ObinsKit talks to it without sudo. Running
+    # an Electron app as root requires --no-sandbox, which we intentionally
+    # avoid. We use GROUP="users" instead of TAG+="uaccess" because seat
+    # device binding under greetd+cage doesn't reliably attach USB HID nodes
+    # to seat0, so the ACL would never get applied.
+    udev.extraRules = ''
+      KERNEL=="hidraw*", ATTRS{idVendor}=="04d9", ATTRS{idProduct}=="a293", MODE="0660", GROUP="users"
+      SUBSYSTEM=="usb", ATTRS{idVendor}=="04d9", ATTRS{idProduct}=="a293", MODE="0660", GROUP="users"
+    '';
   };
 
-  # Firefox NixOS wiki recommends
+  # Portal arbitration. Without explicit `config.niri`, niri falls back to
+  # whichever backend wins detection — silently breaking PipeWire screencast
+  # in Slack/Zoom/OBS. Route ScreenCast/Screenshot to gnome (the only backend
+  # with a working niri implementation), keep FileChooser on gtk so flatpak
+  # file pickers don't try to spawn Nautilus, and leave Sway on its defaults.
   xdg = {
     portal = {
       enable = true;
@@ -226,8 +252,15 @@ in
         pkgs.xdg-desktop-portal
         pkgs.xdg-desktop-portal-gtk
         pkgs.xdg-desktop-portal-wlr
+        pkgs.xdg-desktop-portal-gnome
       ];
       wlr.enable = true;
+      config.niri = {
+        default = [ "gnome" "gtk" ];
+        "org.freedesktop.impl.portal.FileChooser" = [ "gtk" ];
+        "org.freedesktop.impl.portal.ScreenCast" = [ "gnome" ];
+        "org.freedesktop.impl.portal.Screenshot" = [ "gnome" ];
+      };
     };
   };
 

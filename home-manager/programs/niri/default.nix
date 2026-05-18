@@ -17,13 +17,15 @@ in
   imports = [
     ./keybindings.nix
     ./window-rules.nix
+    ./layer-rules.nix
     ./gestures.nix
     ./animations.nix
     ./auto-rename-workspace.nix
+    ./lid-watch.nix
   ];
 
   programs.niri = {
-    package = pkgs.niri-stable;
+    package = pkgs.niri-unstable;
 
     settings = {
       input = {
@@ -45,6 +47,9 @@ in
       };
 
       outputs = {
+        # eDP-1 starts enabled (no black-screen-at-login race when undocked).
+        # niri-lid-watch (./lid-watch.nix) flips it on/off in response to
+        # lid events, and forces it off at startup if the lid is closed.
         ${primaryMonitor} = {
           enable = true;
           mode = {
@@ -55,6 +60,9 @@ in
         };
       }
       // lib.optionalAttrs (externalMonitor != null) {
+        # BlitzWolf ultrawide sits to the right of eDP-1 (logical width 1920).
+        # Logical width at scale 1.2 = 3440 / 1.2 ≈ 2867, so the next monitor
+        # starts at 1920 + 2867 = 4787.
         ${externalMonitor} = {
           enable = true;
           mode = {
@@ -62,9 +70,9 @@ in
             height = 1440;
             refresh = 60.0;
           };
-          scale = 1.3;
+          scale = 1.2;
           position = {
-            x = 0;
+            x = 1920;
             y = 0;
           };
           variable-refresh-rate = "on-demand";
@@ -72,6 +80,7 @@ in
       }
       // lib.optionalAttrs (portraitMonitor != null) {
         # USB-C dock bandwidth caps the LG at 1080p@30 when both externals are active.
+        # LG portrait sits to the right of the BlitzWolf.
         ${portraitMonitor} = {
           enable = true;
           mode = {
@@ -82,7 +91,7 @@ in
           scale = 1.0;
           transform.rotation = 90;
           position = {
-            x = 2646;
+            x = 4787;
             y = 0;
           };
         };
@@ -114,27 +123,13 @@ in
           { proportion = 1.0 / 2.0; }
           { proportion = 2.0 / 3.0; }
         ];
-        default-column-width.proportion = 0.5;
+        default-column-width.proportion = 1.0;
         center-focused-column = "on-overflow";
         tab-indicator = {
           enable = true;
           place-within-column = true;
           hide-when-single-tab = true;
         };
-      };
-
-      workspaces = {
-        "1" = { };
-        "2" = { };
-        "3" = { };
-        "4" = { };
-        "5" = { };
-        "6" = { };
-        "7" = { };
-        "8" = { };
-        "9" = { };
-        "10" = { };
-        "scratchpad" = { };
       };
 
       spawn-at-startup = [
@@ -154,6 +149,9 @@ in
             "--indicator"
           ];
         }
+        # XWayland bridge for X11-only apps (Steam launcher, older IDEs,
+        # wine, xdotool/xev, etc). niri itself is pure Wayland.
+        { argv = [ "${pkgs.xwayland-satellite-unstable}/bin/xwayland-satellite" ]; }
         {
           argv = [
             "wl-paste"
@@ -189,6 +187,8 @@ in
         NIXOS_OZONE_WL = "1";
         MOZ_ENABLE_WAYLAND = "1";
         QT_QPA_PLATFORM = "wayland";
+        # xwayland-satellite advertises itself on DISPLAY=:0 by default.
+        DISPLAY = ":0";
       };
     };
   };

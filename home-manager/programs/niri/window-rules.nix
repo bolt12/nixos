@@ -1,5 +1,8 @@
 { ... }:
 
+let
+  inherit (import ./_lib.nix) cornerRadius8;
+in
 {
   programs.niri.settings.window-rules = [
     {
@@ -31,6 +34,12 @@
       open-floating = true;
       default-column-width.fixed = 480;
     }
+    # Blur via `background-effect` not yet typed in niri-flake DSL.
+    {
+      matches = [ { app-id = "^org\\.kde\\.konsole$"; } ];
+      geometry-corner-radius = cornerRadius8;
+      clip-to-geometry = true;
+    }
     # Mask sensitive apps from screencast/screen-share streams. Visible to
     # you locally; painted black on captures via `block-out-from`.
     {
@@ -47,12 +56,7 @@
     }
     {
       matches = [ { is-floating = true; } ];
-      geometry-corner-radius = {
-        top-left = 8.0;
-        top-right = 8.0;
-        bottom-left = 8.0;
-        bottom-right = 8.0;
-      };
+      geometry-corner-radius = cornerRadius8;
       clip-to-geometry = true;
     }
   ];

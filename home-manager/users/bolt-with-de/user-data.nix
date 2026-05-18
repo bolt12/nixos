@@ -30,9 +30,11 @@ in
 
   # Niri monitors — same physical hardware. Niri matches connector names
   # for the laptop panel and Manufacturer-Model-Serial for the BlitzWolf.
+  # The BlitzWolf reports its EDID manufacturer with a "PNP(...)" prefix in
+  # niri's output list — without it, the output config silently no-ops.
   userConfig.niri = {
     primaryMonitor = "eDP-1";
-    externalMonitor = "OOO BW-GM3 0000000000001";
+    externalMonitor = "PNP(OOO) BW-GM3 0000000000001";
     portraitMonitor = "LG Electronics LG HDR 4K 0x000694F9";
   };
 

@@ -53,6 +53,15 @@
       inputs.nixpkgs-stable.follows = "nixpkgs";
     };
 
+    # DankMaterialShell — Quickshell-based desktop shell with first-class niri
+    # integration. Replaces waybar/swaync/fuzzel/swaylock/swayidle/polkit at
+    # cutover. Imported in parallel mode (alongside waybar) for evaluation —
+    # see home-manager/users/bolt-with-de/home.nix.
+    dms = {
+      url = "github:AvengeMedia/DankMaterialShell";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     nix-ai-tools = {
       url = "github:numtide/nix-ai-tools";
     };
