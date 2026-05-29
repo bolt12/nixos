@@ -150,7 +150,7 @@
     enable = true;
     autoEnable = false;
 
-    image = ../../background.png;
+    image = ../../wallpapers/earth-moon-bg.jpg;
     base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
     polarity = "dark";
 

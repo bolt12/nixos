@@ -11,6 +11,7 @@ let
     externalMonitor
     portraitMonitor
     wallpaperPath
+    portraitWallpaperPath
     ;
 in
 {
@@ -133,14 +134,28 @@ in
       };
 
       spawn-at-startup = [
-        { argv = [ "waybar" ]; }
+        # waybar is managed as a systemd user service (see programs/waybar)
+        # so it auto-restarts on crash.
         {
+          # Single swaybg with per-output config: default fill, then override
+          # the portrait output with -m fit so a landscape source letterboxes
+          # instead of cropping.
           argv = [
             "swaybg"
+            "-o"
+            "*"
             "-i"
             "${toString wallpaperPath}"
             "-m"
             "fill"
+          ]
+          ++ lib.optionals (portraitMonitor != null) [
+            "-o"
+            portraitMonitor
+            "-i"
+            "${toString portraitWallpaperPath}"
+            "-m"
+            "fit"
           ];
         }
         {

@@ -67,8 +67,8 @@ with lib;
 
       wallpaperPath = mkOption {
         type = types.path;
-        # Resolved relative to home-manager/common/ → home-manager/background.png
-        default = ../background.png;
+        # Resolved relative to home-manager/common/ → home-manager/wallpapers/...
+        default = ../wallpapers/earth-moon-bg.jpg;
         description = "Sway desktop wallpaper image";
       };
     };
@@ -101,8 +101,18 @@ with lib;
 
       wallpaperPath = mkOption {
         type = types.path;
-        default = ../background.png;
+        default = ../wallpapers/earth-moon-bg.jpg;
         description = "Niri desktop wallpaper (consumed by swaybg).";
+      };
+
+      portraitWallpaperPath = mkOption {
+        type = types.path;
+        default = ../wallpapers/earth-moon-bg.jpg;
+        description = ''
+          Wallpaper for the portrait-rotated output. Pinned via a second
+          swaybg instance with -m fit so a landscape source letterboxes
+          instead of cropping.
+        '';
       };
     };
 
