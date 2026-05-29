@@ -38,13 +38,13 @@ in
           metalSupport = false;
         }).overrideAttrs
           (oldAttrs: {
-            version = "9208";
+            version = "9305";
 
             src = pkgs.fetchFromGitHub {
               owner = "ggml-org";
               repo = "llama.cpp";
-              tag = "b9208";
-              hash = "sha256-Grt4BHz0ZlcZ1NdLh3CiXYkmMh+D0DXQb7UaECyi4kE=";
+              tag = "b9305";
+              hash = "sha256-Q9t/xc5ZzrzB4igTeQ+lTO1ECVfADqdOWJbKWuregyY=";
               leaveDotGit = true;
               postFetch = ''
                 git -C "$out" rev-parse --short HEAD > $out/COMMIT
@@ -76,7 +76,7 @@ in
             # Recompute via:
             #   nix run nixpkgs#prefetch-npm-deps -- <unpacked-src>/tools/ui/package-lock.json
             npmRoot = "tools/ui";
-            npmDepsHash = "sha256-WaEePrEZ7O/7deP2KJhe0AwiSKYA8HOqETmMHUkmBe0=";
+            npmDepsHash = "sha256-Iyg8FpcTKf2UYHuK7mA3cTAqVaLcQPcS0YCa5Qf01Gc=";
 
             # Keep the original postInstall to handle installation correctly
             postInstall = oldAttrs.postInstall or "";
