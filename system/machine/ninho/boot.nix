@@ -9,6 +9,9 @@
     # Supported filesystems
     supportedFilesystems = [ "zfs" ];
 
+    # systemd-based stage 1 (default in 26.05); required by clevisLuksAskpass.
+    initrd.systemd.enable = true;
+
     # Override hardware-configuration.nix to add r8169 (needed for initrd networking → Clevis)
     initrd.availableKernelModules = [
       "nvme"
@@ -49,9 +52,6 @@
       "pcie_aspm=off"
 
       "iommu=pt" # IOMMU passthrough (avoids swiotlb bounce buffer faults on AHCI)
-
-      # Initrd networking for Clevis/Tang LUKS auto-unlock
-      "ip=:::::enp11s0:dhcp"
     ];
 
     # Bluetooth module configuration - Disable autosuspend for MediaTek adapters
@@ -101,9 +101,10 @@
       enable = true;
       flushBeforeStage2 = true; # Clean slate for NetworkManager in stage 2
 
-      # SSH fallback — if Tang is unreachable, SSH in to type the passphrase
-      # Port 2222 (not 22) because the initrd uses a different host key
+      # SSH fallback — if Tang is unreachable, SSH in to type the passphrase.
+      # Port 2222 (not 22) because the initrd uses a different host key.
       # Usage: ssh -p 2222 root@<ninho-lan-ip>
+      #        then: systemd-tty-ask-password-agent --query
       ssh = {
         enable = true;
         port = 2222;
@@ -111,36 +112,27 @@
           "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHKTf4Bb2BBymwZvxPtxEefspOPTACPn3HqrRiWAMJEJ armandoifsantos@gmail.com"
           "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICBqERTS3WbTIgNxGLVMNMNoI5qN277fDAkGeAboztJU claudiacorreiaa7@gmail.com"
         ];
+        # Host key is injected into the initrd automatically by this module
+        # (boot.initrd.network.ssh adds it to boot.initrd.secrets).
         hostKeys = [ "/etc/secrets/initrd/ssh_host_ed25519_key" ];
       };
-
-      postCommands = ''
-        echo 'cryptsetup-askpass' >> /root/.profile
-      '';
     };
 
-    # Clevis/Tang auto-unlock for all LUKS devices
-    initrd.clevis = {
+    # DHCP on enp11s0 inside the systemd initrd, so Tang is reachable for
+    # clevisLuksAskpass (hands off cleanly to stage-2 NetworkManager).
+    initrd.systemd.network.networks."10-enp11s0" = {
+      matchConfig.Name = "enp11s0";
+      networkConfig.DHCP = "yes";
+    };
+
+    # Clevis/Tang auto-unlock: answers each device's systemd LUKS prompt from a
+    # clevis token bound into the LUKS2 header — no JWE files, no
+    # boot.initrd.secrets. Runs in parallel with, and falls back to, the
+    # passphrase prompt. Enroll once per device above on the running system:
+    #   sudo clevis luks bind -d /dev/disk/by-uuid/<uuid> tang '{"url":"http://192.168.1.110:7654"}'
+    initrd.clevisLuksAskpass = {
       enable = true;
-      devices = {
-        "luks-rpool-nvme0n1-part2".secretFile = "/etc/secrets/initrd/luks-rpool-nvme0n1-part2.jwe";
-        "luks-rpool-nvme1n1-part2".secretFile = "/etc/secrets/initrd/luks-rpool-nvme1n1-part2.jwe";
-        "luks-storage-sda-part2".secretFile = "/etc/secrets/initrd/luks-storage-sda-part2.jwe";
-        "luks-storage-sdb-part2".secretFile = "/etc/secrets/initrd/luks-storage-sdb-part2.jwe";
-        "luks-storage-sdc-part2".secretFile = "/etc/secrets/initrd/luks-storage-sdc-part2.jwe";
-      };
-    };
-
-    # Inject secrets into initrd (avoids world-readable Nix store paths)
-    initrd.secrets = {
-      "/etc/secrets/initrd/luks-rpool-nvme0n1-part2.jwe" =
-        "/etc/secrets/initrd/luks-rpool-nvme0n1-part2.jwe";
-      "/etc/secrets/initrd/luks-rpool-nvme1n1-part2.jwe" =
-        "/etc/secrets/initrd/luks-rpool-nvme1n1-part2.jwe";
-      "/etc/secrets/initrd/luks-storage-sda-part2.jwe" = "/etc/secrets/initrd/luks-storage-sda-part2.jwe";
-      "/etc/secrets/initrd/luks-storage-sdb-part2.jwe" = "/etc/secrets/initrd/luks-storage-sdb-part2.jwe";
-      "/etc/secrets/initrd/luks-storage-sdc-part2.jwe" = "/etc/secrets/initrd/luks-storage-sdc-part2.jwe";
-      "/etc/secrets/initrd/ssh_host_ed25519_key" = "/etc/secrets/initrd/ssh_host_ed25519_key";
+      useTang = true;
     };
 
     # GRUB bootloader with mirrored boot support

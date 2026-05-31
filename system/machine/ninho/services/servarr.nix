@@ -2,7 +2,6 @@
 {
   config,
   pkgs,
-  inputs,
   constants,
   ...
 }:
@@ -11,13 +10,9 @@ let
 in
 {
 
-  # Disable the stable service
-  disabledModules = [ "${inputs.nixpkgs}/nixos/modules/services/misc/servarr/prowlarr.nix" ];
-  # Get the unstable service version
-  imports = [
-    "${inputs.nixpkgs-unstable}/nixos/modules/services/misc/servarr/prowlarr.nix"
-  ];
-
+  # 26.05 stable prowlarr now exposes the freeform `settings` interface, so the
+  # previous stable→unstable module swap is no longer needed. (The package stays
+  # pinned to unstable below for version parity with the rest of the *arr stack.)
   systemd.tmpfiles.rules = [
     # Deluge auth file
     "f /var/lib/secrets/deluge-auth 0600 deluge deluge - deluge:deluge:10"

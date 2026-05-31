@@ -10,7 +10,8 @@
 # referenced (nixpkgs requires the (final: prev: ...) shape regardless).
 _final: prev: {
   unstable = import inputs.nixpkgs-unstable {
-    inherit (prev) system;
+    # 26.05 deprecated `pkgs.system`; read the platform from stdenv instead.
+    system = prev.stdenv.hostPlatform.system;
     config.allowUnfree = true;
   };
 }

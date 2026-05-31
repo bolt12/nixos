@@ -38,13 +38,13 @@ in
           metalSupport = false;
         }).overrideAttrs
           (oldAttrs: {
-            version = "9305";
+            version = "9442";
 
             src = pkgs.fetchFromGitHub {
               owner = "ggml-org";
               repo = "llama.cpp";
-              tag = "b9305";
-              hash = "sha256-Q9t/xc5ZzrzB4igTeQ+lTO1ECVfADqdOWJbKWuregyY=";
+              tag = "b9442";
+              hash = "sha256-Qz+0JImSaAXiAkbd2DQMifhyZI59oJXhURxJZAy5n5Q=";
               leaveDotGit = true;
               postFetch = ''
                 git -C "$out" rev-parse --short HEAD > $out/COMMIT
@@ -82,15 +82,15 @@ in
             postInstall = oldAttrs.postInstall or "";
           });
 
-      # llama-swap v195 - Latest release with Anthropic API compatibility
-      # v195 renamed ui/ → ui-svelte/, so we rebuild the UI derivation from scratch
+      # llama-swap v221 - Latest release with Anthropic API compatibility
+      # (v195 renamed ui/ → ui-svelte/, so we rebuild the UI derivation from scratch)
       llama-swap =
         let
           llama-swap-src = pkgs.fetchFromGitHub {
             owner = "mostlygeek";
             repo = "llama-swap";
-            tag = "v216";
-            hash = "sha256-PHSY4z2h406xL+EcIYyrzr4s28txO7SCsWm8hrXf+2U=";
+            tag = "v221";
+            hash = "sha256-YN6jqKjTW/n69bBiVtlfodTuUWah4oHmH8cUzEKTCZ4=";
             leaveDotGit = true;
             postFetch = ''
               cd "$out"
@@ -101,13 +101,13 @@ in
           };
           llama-swap-ui = pkgs.buildNpmPackage {
             pname = "llama-swap-ui";
-            version = "216";
+            version = "221";
             src = llama-swap-src;
             sourceRoot = "${llama-swap-src.name}/ui-svelte";
             npmDepsHash = "sha256-NJqEJ+XTdpPFtJJxP4CGu+JDUW7lKDcFgsixQJ3SXtQ=";
             postPatch = ''
               substituteInPlace vite.config.ts \
-                --replace-fail "../proxy/ui_dist" "${placeholder "out"}/ui_dist"
+                --replace-fail "../internal/server/ui_dist" "${placeholder "out"}/ui_dist"
             '';
             postInstall = ''
               rm -rf $out/lib
@@ -115,15 +115,27 @@ in
           };
         in
         unstable.llama-swap.overrideAttrs (oldAttrs: {
-          version = "216";
+          version = "221";
           src = llama-swap-src;
           proxyVendor = true;
-          vendorHash = "sha256-IpYF8vt3oIQmwZuxTLK2tx3uw4qeR9uAH1QqY5DRo2M=";
-          passthru.ui = llama-swap-ui;
+          vendorHash = "sha256-n3SgvRkO/OTs/ftT89idoHBTQ1H1zr4TOj+tcBi5whc=";
+          # Merge (not replace) passthru so buildGoModule's overrideModAttrs survives.
+          passthru = (oldAttrs.passthru or { }) // {
+            ui = llama-swap-ui;
+          };
+
+          # v221's internal/process tests exec shell scripts via shebang, which
+          # fails in the Nix sandbox (no /bin/bash); skip those forking tests.
+          checkFlags = (oldAttrs.checkFlags or [ ]) ++ [
+            "-skip=TestProcessCommand_(StopForkingWrapper|StopHonorsGracefulTimeout|StopReapsForkedGrandchild)"
+          ];
 
           preBuild = ''
             ldflags+=" -X main.commit=$(cat COMMIT)"
             ldflags+=" -X main.date=$(cat SOURCE_DATE_EPOCH)"
+            # v221 embeds ui_dist from two locations (internal/server + proxy);
+            # both dirs must exist for the go:embed directives to build.
+            cp -r ${llama-swap-ui}/ui_dist internal/server/
             cp -r ${llama-swap-ui}/ui_dist proxy/
           '';
         });
@@ -131,6 +143,11 @@ in
       # WhisperX v3.7.6 - Fix use_auth_token TypeError with newer pyannote
       whisperx = prev.whisperx.overridePythonAttrs (oldAttrs: {
         version = "3.7.6";
+
+        # whisperX's metadata pins (pyannote-audio<4, torch~=2.8, torchaudio~=2.8,
+        # huggingface-hub<1) all lag 26.05's ecosystem; the postPatch below adapts
+        # the code, so relax every version bound for pythonRuntimeDepsCheckHook.
+        pythonRelaxDeps = true;
 
         src = pkgs.fetchFromGitHub {
           owner = "m-bain";
@@ -168,32 +185,51 @@ in
       # When this fails again: bump rev via
       #   nix-prefetch-github redlib-org redlib --rev <new-rev>
       # then rebuild and capture the new cargoHash from the FOD mismatch error.
-      redlib = prev.redlib.overrideAttrs (finalAttrs: prevAttrs: {
-        version = "0.36.0-unstable-2026-05-05";
-        src = pkgs.fetchFromGitHub {
-          owner = "redlib-org";
-          repo = "redlib";
-          rev = "a4d36e954cf1bd64f209cd8868c5a29edc81b374";
-          hash = "sha256-siyD6A12UALQIV7BMd7zu1TaojleTEYtpxPszuhx1/Y=";
-        };
-        cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
-          inherit (finalAttrs) pname version src;
-          hash = "sha256-eO3c7rlFna3DuO31etJ6S4c7NmcvgvIWZ1KVkNIuUqQ=";
-        };
-        # boring-sys2's build.rs cmakes BoringSSL and `git apply`s patches
-        # against the vendored source.
-        nativeBuildInputs = (prevAttrs.nativeBuildInputs or [ ]) ++ [
-          pkgs.cmake
-          pkgs.perl
-          pkgs.go
-          pkgs.git
-          pkgs.rustPlatform.bindgenHook
-        ];
-        # Two new oauth tests in HEAD hit Reddit's network.
-        checkFlags = (prevAttrs.checkFlags or [ ]) ++ [
-          "--skip=test_generic_web_backend"
-          "--skip=test_mobile_spoof_backend"
-        ];
+      redlib = prev.redlib.overrideAttrs (
+        finalAttrs: prevAttrs: {
+          version = "0.36.0-unstable-2026-05-05";
+          src = pkgs.fetchFromGitHub {
+            owner = "redlib-org";
+            repo = "redlib";
+            rev = "a4d36e954cf1bd64f209cd8868c5a29edc81b374";
+            hash = "sha256-siyD6A12UALQIV7BMd7zu1TaojleTEYtpxPszuhx1/Y=";
+          };
+          cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
+            inherit (finalAttrs) pname version src;
+            hash = "sha256-eO3c7rlFna3DuO31etJ6S4c7NmcvgvIWZ1KVkNIuUqQ=";
+          };
+          # boring-sys2's build.rs cmakes BoringSSL and `git apply`s patches
+          # against the vendored source.
+          nativeBuildInputs = (prevAttrs.nativeBuildInputs or [ ]) ++ [
+            pkgs.cmake
+            pkgs.perl
+            pkgs.go
+            pkgs.git
+            pkgs.rustPlatform.bindgenHook
+          ];
+          # Two new oauth tests in HEAD hit Reddit's network.
+          checkFlags = (prevAttrs.checkFlags or [ ]) ++ [
+            "--skip=test_generic_web_backend"
+            "--skip=test_mobile_spoof_backend"
+          ];
+        }
+      );
+
+      # miniflux 2.3.0 wraps the UI in Go's http.CrossOriginProtection,
+      # constructed with no trusted origins (internal/ui/ui.go) — it is
+      # unconfigurable (no BASE_URL / TRUSTED_REVERSE_PROXY_NETWORKS knob) and
+      # rejects plain-HTTP bare-IP LAN access with "Sec-Fetch-Site is missing,
+      # and Origin does not match Host". Upstream's only fix so far is reverting
+      # the commit in the nightly image. Strip the wrapper here; the in-house
+      # csrfMiddleware (CSRF token) still runs, matching the 2.2.19 posture.
+      # See https://github.com/miniflux/v2/issues/4338
+      miniflux = prev.miniflux.overrideAttrs (oldAttrs: {
+        postPatch = (oldAttrs.postPatch or "") + ''
+          substituteInPlace internal/ui/ui.go \
+            --replace-fail \
+              'return http.NewCrossOriginProtection().Handler(webSessionMiddleware.handle(csrfMiddleware.handle(mux)))' \
+              'return webSessionMiddleware.handle(csrfMiddleware.handle(mux))'
+        '';
       });
 
       # Fix scaphandre build error with riemann_client unstable feature
@@ -203,14 +239,17 @@ in
           broken = false;
         };
 
-        # Patch the riemann_client vendored source to fix unstable Rust feature
-        # This needs to run before cargo build starts
+        # Patch the riemann_client vendored source to drop the unstable
+        # `#![rustfmt::skip]` inner attribute that breaks the stable compiler.
+        # 26.05 switched to fetchCargoVendor, which renamed the vendor dir, so
+        # locate mod_pb.rs by content instead of a fixed glob.
         preBuild = (oldAttrs.preBuild or "") + ''
-          # The vendored dependencies are extracted to ../scaphandre-VERSION-vendor/
-          # Find and patch the riemann_client mod_pb.rs file
-          if [ -f ../scaphandre-*-vendor/riemann_client-*/src/proto/mod_pb.rs ]; then
-            echo "Patching riemann_client mod_pb.rs to remove unstable Rust feature..."
-            sed -i '/#!\[rustfmt::skip\]/d' ../scaphandre-*-vendor/riemann_client-*/src/proto/mod_pb.rs
+          found=$(find "$NIX_BUILD_TOP" -path '*/riemann_client-*/src/proto/mod_pb.rs' 2>/dev/null | head -n1)
+          if [ -n "$found" ]; then
+            echo "Patching riemann_client mod_pb.rs to remove unstable Rust feature: $found"
+            sed -i '/#!\[rustfmt::skip\]/d' "$found"
+          else
+            echo "WARNING: riemann_client mod_pb.rs not found; scaphandre patch skipped" >&2
           fi
         '';
       });

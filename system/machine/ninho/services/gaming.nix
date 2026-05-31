@@ -3,7 +3,6 @@
   config,
   lib,
   pkgs,
-  inputs,
   ...
 }:
 
@@ -27,8 +26,8 @@
 let
   # Register the ultrawide modeline (HDMI dummy plug EDID doesn't advertise
   # 3440x1440) and pick the best available mode. Modeline from: gtf 3440 1440 60
-  xrandr = "${pkgs.xorg.xrandr}/bin/xrandr";
-  xfconfQuery = "${pkgs.xfce.xfconf}/bin/xfconf-query";
+  xrandr = "${pkgs.xrandr}/bin/xrandr";
+  xfconfQuery = "${pkgs.xfconf}/bin/xfconf-query";
   applyUltrawideMode = ''
     export DISPLAY="''${DISPLAY:-:0}"
 
@@ -85,16 +84,16 @@ in
   # Thunar (auto-started by the XFCE session) spawns thunar-volman per
   # block-device event; without the plugin installed it logs a flood of
   # "Failed to launch the volume manager" errors on every session restart.
-  programs.thunar.plugins = with pkgs.xfce; [ thunar-volman ];
+  programs.thunar.plugins = [ pkgs.thunar-volman ];
 
   # Allow local connections to X server without authentication
   # This is needed for Sunshine to access the display
   # Also disable compositor (prevents black screen in games) and ensure proper resolution
   services.xserver.displayManager.sessionCommands = ''
-    ${pkgs.xorg.xhost}/bin/xhost +local:
+    ${pkgs.xhost}/bin/xhost +local:
 
     # Disable XFCE compositor to fix game streaming black screen issues
-    ${pkgs.xfce.xfconf}/bin/xfconf-query -c xfwm4 -p /general/use_compositing -s false || true
+    ${pkgs.xfconf}/bin/xfconf-query -c xfwm4 -p /general/use_compositing -s false || true
 
     ${applyGamingDisplay}/bin/ninho-apply-gaming-display
   '';
@@ -126,10 +125,10 @@ in
     package = pkgs.steam.override {
       extraPkgs =
         pkgs: with pkgs; [
-          xorg.libXcursor
-          xorg.libXi
-          xorg.libXinerama
-          xorg.libXScrnSaver
+          libxcursor
+          libxi
+          libxinerama
+          libxscrnsaver
           libpng
           libpulseaudio
           libvorbis
@@ -146,13 +145,8 @@ in
   # Sunshine is an open-source GameStream server
   # Works perfectly with Moonlight clients (better than Steam Link for headless)
 
-  # Disable the stable service
-  disabledModules = [ "${inputs.nixpkgs}/nixos/modules/services/networking/sunshine.nix" ];
-  # Get the unstable service version
-  imports = [
-    "${inputs.nixpkgs-unstable}/nixos/modules/services/networking/sunshine.nix"
-  ];
-
+  # 26.05 stable sunshine ships autoStart/capSysAdmin/settings, so the previous
+  # stable→unstable module swap is no longer needed.
   services.sunshine = {
     enable = true;
     autoStart = true;
@@ -203,8 +197,8 @@ in
   environment.systemPackages = with pkgs; [
     # Display tools (for troubleshooting)
     applyGamingDisplay
-    xorg.xrandr
-    xorg.xdpyinfo
+    pkgs.xrandr
+    pkgs.xdpyinfo
 
     # Streaming
     sunshine

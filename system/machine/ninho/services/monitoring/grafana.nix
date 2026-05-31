@@ -1,7 +1,32 @@
 # Grafana — datasources, dashboards, unified alerting + ntfy webhook routing.
 # All alert rules are inline; see grafana-dashboards/ for the JSON dashboards.
-{ ... }:
+{ pkgs, ... }:
 {
+  # Ensure /etc/secrets/grafana/secret_key exists and is readable by the grafana
+  # user (it reads it via the settings file provider). Generates one on first
+  # boot if missing; otherwise just fixes ownership/permissions.
+  systemd.services.grafana-secret-key = {
+    wantedBy = [ "multi-user.target" ];
+    before = [ "grafana.service" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+    };
+    script = ''
+      install -d -m 0750 -o grafana -g grafana /etc/secrets/grafana
+      if [ ! -s /etc/secrets/grafana/secret_key ]; then
+        ${pkgs.openssl}/bin/openssl rand -base64 32 > /etc/secrets/grafana/secret_key
+      fi
+      chown grafana:grafana /etc/secrets/grafana/secret_key
+      chmod 0400 /etc/secrets/grafana/secret_key
+    '';
+  };
+
+  systemd.services.grafana = {
+    after = [ "grafana-secret-key.service" ];
+    requires = [ "grafana-secret-key.service" ];
+  };
+
   services.grafana = {
     enable = true;
     settings = {
@@ -10,6 +35,10 @@
         http_port = 3000;
         domain = "grafana.ninho.local";
       };
+      # 26.05 removed the default for security.secret_key (signs auth cookies).
+      # Read it at runtime via Grafana's file provider (keeps it out of the store);
+      # generate once: openssl rand -base64 32 > /etc/secrets/grafana/secret_key
+      security.secret_key = "$__file{/etc/secrets/grafana/secret_key}";
       unified_alerting.enabled = true;
     };
 

@@ -17,6 +17,10 @@ in
     openFirewall = true;
     host = "0.0.0.0";
     environment = {
+      # open-webui 0.9.5 calls pathlib expanduser at startup and aborts with
+      # "Could not determine home directory" when HOME is unset (it runs without
+      # a passwd home); point it at its StateDirectory.
+      HOME = "/var/lib/open-webui";
       # Use llama-swap as the OpenAI-compatible backend
       OPENAI_API_BASE_URLS = "http://127.0.0.1:${toString ports.llamaswap}/v1";
       OPENAI_API_KEYS = "not-needed";

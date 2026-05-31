@@ -21,7 +21,8 @@ in
     database = {
       enable = true;
       createDB = true; # Auto-creates database
-      enableVectors = false; # x86_64 supports this
+      # 26.05: pgvecto.rs removed, VectorChord always used (enableVectors/
+      # enableVectorchord gone). One-time vector re-index on first start.
     };
 
     machine-learning.enable = true;

@@ -14,7 +14,7 @@
 
 let
   # Get emanote from the flake input
-  emanotePackage = inputs.emanote.packages.${pkgs.system}.default;
+  emanotePackage = inputs.emanote.packages.${pkgs.stdenv.hostPlatform.system}.default;
 
   # This RPi is the public journal gateway (single-user: bolt).
   # The service is intentionally system-level so the journal survives user-session

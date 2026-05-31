@@ -82,6 +82,8 @@ let
   cornelis = {
     # plugin packages in required Vim plugin dependencies
     plugin = inputs.cornelis.packages.${pkgs.stdenv.hostPlatform.system}.cornelis-vim;
+    # 26.05 changed the plugin language default to "lua"; this config is vimscript.
+    type = "viml";
     config = ''
       let g:cornelis_use_global_binary = 1
       let g:cornelis_split_location = 'bottom'

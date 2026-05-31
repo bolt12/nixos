@@ -8,7 +8,8 @@
 let
 
   unstable = import inputs.nixpkgs-unstable {
-    inherit (pkgs) system;
+    # 26.05 deprecated `pkgs.system`; read the platform from stdenv instead.
+    system = pkgs.stdenv.hostPlatform.system;
     overlays = [
     ];
   };

@@ -168,23 +168,24 @@ in
   programs = {
     ssh = {
       enable = true;
-      # Disable deprecated default config - explicitly set what we need
+      # 26.05 home-manager: matchBlocks is a deprecated alias for `settings`,
+      # keyed by host pattern with upstream OpenSSH directive names.
       enableDefaultConfig = false;
 
-      matchBlocks = {
-        # Default settings for all hosts (replaces deprecated defaults)
+      settings = {
+        # Default settings for all hosts
         "*" = {
-          serverAliveInterval = 60;
-          serverAliveCountMax = 3;
+          ServerAliveInterval = 60;
+          ServerAliveCountMax = 3;
         };
 
         "rpi" = {
-          hostname = constants.network.rpi.vpnIp;
-          user = "bolt";
+          HostName = constants.network.rpi.vpnIp;
+          User = "bolt";
         };
         "ninho" = {
-          hostname = constants.network.ninho.vpnIp;
-          user = "bolt";
+          HostName = constants.network.ninho.vpnIp;
+          User = "bolt";
         };
       };
     };

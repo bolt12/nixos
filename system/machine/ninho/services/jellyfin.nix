@@ -1,18 +1,11 @@
 # Jellyfin media server with NVENC hardware transcoding (RTX 5090).
 {
-  config,
-  pkgs,
-  inputs,
   constants,
   ...
 }:
 {
-  # Swap stable Jellyfin module for unstable (has hardwareAcceleration options)
-  disabledModules = [ "${inputs.nixpkgs}/nixos/modules/services/misc/jellyfin.nix" ];
-  imports = [
-    "${inputs.nixpkgs-unstable}/nixos/modules/services/misc/jellyfin.nix"
-  ];
-
+  # 26.05 stable ships the hardwareAcceleration/transcoding options, so the
+  # previous stable→unstable module swap is no longer needed.
   services = {
     jellyfin = {
       enable = true;
@@ -45,11 +38,13 @@
       };
     };
 
-    jellyseerr = {
+    # 26.05 renamed services.jellyseerr → services.seerr (jellyseerr pkg removed).
+    # Data dir stays at /var/lib/jellyseerr/config (move guarded by stateVersion
+    # >= 26.05; ours is 25.05). Stable pkgs.seerr is current → no unstable pin.
+    seerr = {
       enable = true;
       openFirewall = true;
       port = constants.ports.jellyseerr;
-      package = pkgs.unstable.jellyseerr;
     };
   };
 }
