@@ -32,7 +32,6 @@ in
     nix-ai-tools.ccstatusline # Claude code statusline
     nix-ai-tools.claude-code # Claude code
     nix-ai-tools.opencode # Opencode
-    nix-ai-tools.codex # OpenAI Codex
     nix-ai-tools.pi # Pi coding agent
 
     # System development tools

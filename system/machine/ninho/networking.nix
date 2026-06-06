@@ -91,6 +91,13 @@
     # Reduce bufferbloat for lower latency
     "net.core.netdev_max_backlog" = 5000;
 
+    # Smart queue on ninho's egress — fq_codel keeps a fair, low-latency queue
+    # so a bandwidth spike from one flow can't build a standing backlog that
+    # shows up as stutter on the Steam Remote Play / Sunshine video stream.
+    # NOTE: the dominant bufferbloat hop is usually the router's Wi-Fi downlink;
+    # enable SQM/cake there too — this only smooths the host's sending side.
+    "net.core.default_qdisc" = "fq_codel";
+
     # TCP optimization for control channel
     "net.ipv4.tcp_fastopen" = 3;
     "net.ipv4.tcp_notsent_lowat" = 16384;

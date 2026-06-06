@@ -1,10 +1,24 @@
 { ... }:
 
 let
-  inherit (import ./_lib.nix) cornerRadius8;
+  inherit (import ./_lib.nix) cornerRadius softShadow;
 in
 {
   programs.niri.settings.window-rules = [
+    # Cosy baseline for every window: rounded corners + a soft drop shadow.
+    # `clip-to-geometry` makes client content respect the rounded corners.
+    # Later, more specific rules below still override per-app as needed.
+    {
+      geometry-corner-radius = cornerRadius 10.0;
+      clip-to-geometry = true;
+      shadow = softShadow;
+    }
+    # Gently dim unfocused windows so the active column stands out. Subtle
+    # enough not to feel like a modal overlay (0.92, not the typical 0.8).
+    {
+      matches = [ { is-active = false; } ];
+      opacity = 0.92;
+    }
     {
       matches = [
         { app-id = "^nm-connection-editor$"; }
@@ -34,12 +48,6 @@ in
       open-floating = true;
       default-column-width.fixed = 480;
     }
-    # Blur via `background-effect` not yet typed in niri-flake DSL.
-    {
-      matches = [ { app-id = "^org\\.kde\\.konsole$"; } ];
-      geometry-corner-radius = cornerRadius8;
-      clip-to-geometry = true;
-    }
     # Mask sensitive apps from screencast/screen-share streams. Visible to
     # you locally; painted black on captures via `block-out-from`.
     {
@@ -53,11 +61,6 @@ in
         { app-id = "^thunderbird$"; }
       ];
       block-out-from = "screencast";
-    }
-    {
-      matches = [ { is-floating = true; } ];
-      geometry-corner-radius = cornerRadius8;
-      clip-to-geometry = true;
     }
   ];
 }

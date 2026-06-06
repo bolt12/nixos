@@ -222,6 +222,47 @@
         "type": "github"
       }
     },
+    "dms": {
+      "inputs": {
+        "flake-compat": "flake-compat_3",
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1780202106,
+        "narHash": "sha256-kHxlZkZvAmrtEgciNOfKx20sBEr3+iN4f4HabXsegLo=",
+        "owner": "AvengeMedia",
+        "repo": "DankMaterialShell",
+        "rev": "2ca2bc5fb8e7dd69722d6c36637401f30328e333",
+        "type": "github"
+      },
+      "original": {
+        "owner": "AvengeMedia",
+        "repo": "DankMaterialShell",
+        "type": "github"
+      }
+    },
+    "dms-plugin-registry": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1780396806,
+        "narHash": "sha256-jYJd4QEaQFy3gWQE7eQp/vrHWFqFU9hZm13dJ6JUSVE=",
+        "owner": "AvengeMedia",
+        "repo": "dms-plugin-registry",
+        "rev": "ea67af13d6a36e2368f48b0c3d3f54baf7e4cd24",
+        "type": "github"
+      },
+      "original": {
+        "owner": "AvengeMedia",
+        "repo": "dms-plugin-registry",
+        "type": "github"
+      }
+    },
     "e-ink-nvim": {
       "flake": false,
       "locked": {
@@ -365,6 +406,22 @@
       },
       "original": {
         "owner": "edolstra",
+        "repo": "flake-compat",
+        "type": "github"
+      }
+    },
+    "flake-compat_3": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1767039857,
+        "narHash": "sha256-vNpUSpF5Nuw8xvDLj2KCwwksIbjua2LZCqhV1LNRDns=",
+        "owner": "NixOS",
+        "repo": "flake-compat",
+        "rev": "5edf11c44bc78a0d334f6334cdaf7d60d732daab",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
         "repo": "flake-compat",
         "type": "github"
       }
@@ -1111,6 +1168,8 @@
         "HighStr-nvim": "HighStr-nvim",
         "colmena": "colmena",
         "cornelis": "cornelis",
+        "dms": "dms",
+        "dms-plugin-registry": "dms-plugin-registry",
         "e-ink-nvim": "e-ink-nvim",
         "emacs-overlay": "emacs-overlay",
         "emanote": "emanote",

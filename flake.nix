@@ -62,6 +62,15 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # DMS plugin registry — packages all DMS plugins (prefetched daily) and
+    # ships one HM/NixOS module that registers every plugin disabled-by-default.
+    # The module auto-detects our option path (programs.dank-material-shell),
+    # so plugins are enabled with `programs.dank-material-shell.plugins.<id>.enable`.
+    dms-plugin-registry = {
+      url = "github:AvengeMedia/dms-plugin-registry";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     nix-ai-tools = {
       url = "github:numtide/nix-ai-tools";
     };

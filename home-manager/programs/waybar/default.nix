@@ -1,14 +1,19 @@
 # Waybar configuration module - status bar for Wayland
 # This module manages waybar configuration in a more structured way
 
-{ pkgs, lib, ... }:
+{ pkgs, ... }:
 {
-  # Run waybar as a user service so it auto-restarts when it crashes.
+  # Waybar is no longer the daily-driver bar — DankMaterialShell took over
+  # (see users/bolt-with-de/home.nix). We keep the unit + config defined as a
+  # fallback you can start by hand (`systemctl --user start waybar` or the
+  # Mod+Shift+b bind), but it is NOT WantedBy the session, so it does not
+  # autostart on login alongside DMS.
+  #
   # The MPRIS/playerctl module has a recurring use-after-free against
-  # disappearing D-Bus players that segfaults the whole bar.
+  # disappearing D-Bus players that segfaults the bar, hence Restart=on-failure.
   systemd.user.services.waybar = {
     Unit = {
-      Description = "Waybar status bar";
+      Description = "Waybar status bar (manual fallback; DMS is the default)";
       PartOf = [ "graphical-session.target" ];
       After = [ "graphical-session.target" ];
       ConditionEnvironment = "WAYLAND_DISPLAY";
@@ -21,7 +26,7 @@
       Restart = "on-failure";
       RestartSec = 1;
     };
-    Install.WantedBy = [ "graphical-session.target" ];
+    # No Install.WantedBy: do not autostart. Started on demand only.
   };
 
   # Copy configuration files to appropriate locations

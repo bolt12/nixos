@@ -9,6 +9,7 @@
     font-awesome # Icon font
     hack-font # Monospace programming font
     inconsolata # Monospace font
+    inter # Clean UI sans-serif (Stylix sansSerif / waybar UI)
     liberation_ttf # Microsoft font alternatives
     material-icons # Material Design icons
     nerd-fonts.fira-code # Programming font with ligatures

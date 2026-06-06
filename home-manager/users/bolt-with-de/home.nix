@@ -24,6 +24,9 @@
 
     inputs.dms.homeModules.dank-material-shell
     inputs.dms.homeModules.niri
+    # Registers every DMS plugin (disabled by default); enable individual ones
+    # via programs.dank-material-shell.plugins.<id>.enable below.
+    inputs.dms-plugin-registry.modules.default
 
     # Add desktop-specific profiles
     ../../profiles/desktop.nix
@@ -41,7 +44,12 @@
     # Noctalia (Quickshell-based) is currently broken on this iGPU + Mesa —
     # its render thread crashes inside libLLVM. Re-enable once upstream
     # stabilizes, or once we move off Mesa 25.2.x + LLVM 21.x.
+    # (Noctalia v4 is now EOL / v5 is alpha; prefer the DMS trial below.)
     # ../../programs/noctalia/default.nix
+
+    # DankMaterialShell escape-hatch helpers (dms-stop / dms-start). DMS
+    # itself is enabled below via the upstream dank-material-shell module.
+    ../../programs/dms/default.nix
 
     # Desktop-specific user data (Syncthing configuration)
     ./user-data.nix
@@ -63,6 +71,7 @@
       fcitx5 = {
         addons = with pkgs; [
           fcitx5-gtk
+          qt6Packages.fcitx5-qt
           qt6Packages.fcitx5-configtool
           fcitx5-mozc
           fcitx5-nord
@@ -72,20 +81,69 @@
     };
   };
 
+  # Adopt the 26.05 HM default explicitly (keep gtk4 untheme'd; let
+  # libadwaita/Stylix manage gtk4 styling). Silences the gated warning
+  # without bumping home.stateVersion.
+  gtk.gtk4.theme = null;
+
   # Desktop-specific programs
   programs = {
-    firefox.enable = true;
+    firefox = {
+      enable = true;
+      # Adopt the 26.05 HM default (XDG path) explicitly.
+      configPath = "${config.xdg.configHome}/mozilla/firefox";
+    };
 
-    # `niri.enableKeybinds` and `niri.includes.enable` are off: explicit binds
-    # in programs/niri/keybindings.nix remain authoritative. Re-enable
-    # includes to inherit DMS's bar-toggle / dashboard / spotlight chords.
+    # DankMaterialShell is the daily-driver shell/bar (replaced waybar). The
+    # module installs Quickshell + every feature dep (dgop, matugen, cava,
+    # khal, wtype) — all enable* flags default true, so we don't list them.
+    #
+    # Autostart is via the systemd user service ONLY (Restart=on-failure,
+    # bound to the wayland target). `niri.enableSpawn` is therefore OFF: with
+    # both on, niri's spawn-at-startup AND the service would each launch DMS,
+    # double-spawning the shell.
+    #
+    # `enableKeybinds` / `includes.enable` stay OFF so our hand-authored niri
+    # binds (programs/niri/keybindings.nix) and window/layer rules remain
+    # authoritative — DMS IPC binds (Mod+Space launcher, Mod+V clipboard,
+    # etc.) can be wired in manually later if wanted.
     dank-material-shell = {
-      enable = false;
+      enable = true;
       systemd.enable = true;
+      quickshell.package = pkgs.quickshell;
       niri = {
         enableKeybinds = false;
-        enableSpawn = true;
+        enableSpawn = false;
         includes.enable = false;
+      };
+
+      # Plugins from the dms-plugin-registry module (imported above). Each is
+      # disabled by default; we opt in here. Starter set chosen for this X1:
+      # niri-/any-compatible, light deps, high value. Verified each plugin's
+      # `compositors` includes niri/any (ddcBrightness/displayProfile are
+      # hyprland-only and intentionally omitted). Browse the rest at
+      # https://danklinux.com/plugins and flip `.enable = true` to add.
+      plugins = {
+        # Power: recovers the power-profile UX we'd otherwise lose by keeping
+        # TLP over power-profiles-daemon. Bar widget + control-center toggle.
+        # Also fronts the ThinkPad charge thresholds (thinkpad_acpi exposes
+        # charge_control_{start,end}_threshold; TLP drives them at 85/90).
+        # NOTE: the dmsLenovoBatterySettings plugin is intentionally NOT used —
+        # it targets `ideapad_laptop` (consumer IdeaPads); this X1 Carbon uses
+        # `thinkpad_acpi`, so that widget would be non-functional here.
+        tlpControl.enable = true; # needs `tlp` (already enabled in x1-g8)
+
+        # Idle inhibitor toggle (handier than a keybind for ad-hoc "stay awake").
+        caffeine.enable = true;
+
+        # Launcher extensions for the Mod+d spotlight.
+        calculator.enable = true;
+        emojiLauncher.enable = true;
+
+        # Bar widgets that suit this repo / workflow.
+        nixMonitor.enable = true; # nix store / GC / build status
+        powerUsagePlugin.enable = true; # live battery watt draw
+        claudeCodeUsage.enable = true; # Claude Code token usage
       };
     };
   };
@@ -98,7 +156,10 @@
   # Desktop-specific services
   services = {
     lorri.enable = true;
-    blueman-applet.enable = true;
+    # No blueman-applet here: DankMaterialShell (the bar on niri) ships its own
+    # Bluetooth widget, so the GTK tray applet would be a duplicate icon. The
+    # Sway fallback spawns blueman-applet itself, and blueman-manager stays
+    # installed (waybar BT click + niri window rule still launch it on demand).
     udiskie.enable = true;
     poweralertd.enable = true;
 
@@ -116,12 +177,9 @@
           resumeCommand = ''swaymsg "output * dpms on"'';
         }
       ];
-      events = [
-        {
-          event = "before-sleep";
-          command = "swaylock -f --clock --indicator --effect-blur 7x5 --effect-vignette 0.5:0.5";
-        }
-      ];
+      events = {
+        before-sleep = "swaylock -f --clock --indicator --effect-blur 7x5 --effect-vignette 0.5:0.5";
+      };
     };
 
     wlsunset = {
@@ -159,9 +217,11 @@
         package = pkgs.jetbrains-mono;
         name = "JetBrains Mono";
       };
+      # Inter for UI chrome (bar, GTK apps) — the de-facto "cosy" UI font.
+      # JetBrains Mono stays the monospace/terminal face above.
       sansSerif = {
-        package = pkgs.noto-fonts;
-        name = "Noto Sans";
+        package = pkgs.inter;
+        name = "Inter";
       };
       serif = {
         package = pkgs.noto-fonts;

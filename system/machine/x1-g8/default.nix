@@ -89,6 +89,13 @@ in
     "kernel.nmi_watchdog" = 0;
   };
 
+  # Wi-Fi regulatory domain. Without this the kernel falls back to the world
+  # domain ("00"), which marks 5GHz DFS channels (100/132/...) as no-IR — the
+  # card can see those APs but is forbidden from associating, so MEO/NOS 5GHz
+  # networks on channel 100+ fail to connect. PT permits them.
+  hardware.wirelessRegulatoryDatabase = true;
+  boot.kernelParams = [ "cfg80211.ieee80211_regdom=PT" ];
+
   i18n.inputMethod.fcitx5 = {
     waylandFrontend = true;
     settings.globalOptions = {
@@ -216,13 +223,24 @@ in
 
         # Additional power saving tweaks for better battery life
         WIFI_PWR_ON_AC = "off"; # Keep WiFi at full power on AC
-        WIFI_PWR_ON_BAT = "on"; # Enable WiFi power saving on battery
+        # Keep WiFi at full power on battery too. iwlwifi 802.11 power-save
+        # makes the card miss beacons through the MEO 5G extender (extra hop),
+        # causing repeated deauth/roam churn and DHCP failures on battery while
+        # AC stays fine. Costs ~1-2% battery for a stable link.
+        WIFI_PWR_ON_BAT = "off"; # Disable WiFi power saving on battery
         SOUND_POWER_SAVE_ON_AC = 0; # Disable audio power saving on AC
         SOUND_POWER_SAVE_ON_BAT = 1; # Enable audio power saving on battery
       };
     };
 
     blueman.enable = true;
+
+    # User account info / avatars for the DankMaterialShell lock & dashboard.
+    # NOTE: power-profiles-daemon is the other DMS-recommended daemon, but it
+    # conflicts with TLP (below) — we keep TLP for its battery charge
+    # thresholds and per-AC/BAT governors, so the DMS power-profiles widget
+    # stays intentionally unavailable.
+    accounts-daemon.enable = true;
 
     flatpak.enable = true;
 
@@ -256,7 +274,10 @@ in
       ];
       wlr.enable = true;
       config.niri = {
-        default = [ "gnome" "gtk" ];
+        default = [
+          "gnome"
+          "gtk"
+        ];
         "org.freedesktop.impl.portal.FileChooser" = [ "gtk" ];
         "org.freedesktop.impl.portal.ScreenCast" = [ "gnome" ];
         "org.freedesktop.impl.portal.Screenshot" = [ "gnome" ];

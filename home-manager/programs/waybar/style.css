@@ -29,7 +29,9 @@ window#waybar {
     background: alpha(@base, 0.75);
     border-radius: 12px;
     border: 1px solid alpha(@surface0, 0.5);
-    font-family: "JetBrainsMono Nerd Font", "Noto Sans", sans-serif;
+    /* Inter renders the UI text; glyphs not in Inter (Nerd Font icons)
+       fall through to JetBrainsMono Nerd Font. */
+    font-family: "Inter", "JetBrainsMono Nerd Font", sans-serif;
     font-size: 13px;
     color: @text;
     transition-duration: 0.3s;
@@ -82,16 +84,6 @@ tooltip label {
 #workspaces button.urgent {
     background: alpha(@red, 0.3);
     color: @red;
-}
-
-/* === Sway mode === */
-#mode {
-    background: alpha(@red, 0.25);
-    color: @red;
-    border-radius: 10px;
-    padding: 2px 12px;
-    margin: 4px 4px;
-    font-weight: bold;
 }
 
 /* === Window title === */

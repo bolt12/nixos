@@ -22,7 +22,7 @@
     libreoffice # Office suite (also handles PDFs)
 
     # File management and archiving
-    xfce.thunar # File manager
+    thunar # File manager
     xarchiver # Archive manager
 
     # Graphics and design

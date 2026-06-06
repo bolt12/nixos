@@ -134,8 +134,9 @@ in
       };
 
       spawn-at-startup = [
-        # waybar is managed as a systemd user service (see programs/waybar)
-        # so it auto-restarts on crash.
+        # The bar/shell (DankMaterialShell) autostarts via its own systemd
+        # user service (dms.service), not from here. waybar is a manual
+        # fallback only. This block handles the wallpaper + other startup apps.
         {
           # Single swaybg with per-output config: default fill, then override
           # the portrait output with -m fit so a landscape source letterboxes
@@ -158,15 +159,15 @@ in
             "fit"
           ];
         }
-        {
-          argv = [
-            "nm-applet"
-            "--indicator"
-          ];
-        }
+        # No nm-applet here: DankMaterialShell (the bar on niri) ships its own
+        # NetworkManager (WiFi) widget, so the GTK tray applet would just be a
+        # duplicate icon. The Sway fallback still spawns nm-applet (it has no
+        # DMS), and networkmanagerapplet stays installed for nm-connection-editor.
         # XWayland bridge for X11-only apps (Steam launcher, older IDEs,
-        # wine, xdotool/xev, etc). niri itself is pure Wayland.
-        { argv = [ "${pkgs.xwayland-satellite-unstable}/bin/xwayland-satellite" ]; }
+        # wine, xdotool/xev, etc) runs as a systemd user service below, so it
+        # can import DISPLAY into the activation environment. niri's own
+        # `environment.DISPLAY` only reaches niri-spawned children, not apps
+        # launched via the launcher / D-Bus, which is why Steam (X11) failed.
         {
           argv = [
             "wl-paste"
@@ -206,5 +207,44 @@ in
         DISPLAY = ":0";
       };
     };
+  };
+
+  # DISPLAY must live in the systemd user manager's environment from the start,
+  # so that EVERY graphical unit launched at login (notably dms.service, the
+  # DankMaterialShell launcher) inherits it and can spawn X11 apps like Steam.
+  #
+  # `systemctl --user import-environment` (done by the service below) only
+  # affects units started AFTER the import — dms.service starts at login, before
+  # the import lands, so its launcher children never saw DISPLAY. That is why
+  # Steam worked from a terminal (fresh shell, post-import) but not from the dms
+  # menu. Setting it here writes ~/.config/environment.d, which the user manager
+  # reads before launching any unit, fixing it for all launchers.
+  systemd.user.sessionVariables.DISPLAY = ":0";
+
+  # Run xwayland-satellite as a systemd user service rather than a niri
+  # spawn-at-startup child. niri's own `environment.DISPLAY` only reaches
+  # niri-spawned children. xwayland-satellite signals readiness via sd_notify
+  # (Type=notify), and on a fixed display (:0) so the env var above is correct.
+  systemd.user.services.xwayland-satellite = {
+    Unit = {
+      Description = "Xwayland outside your Wayland (for niri)";
+      BindsTo = [ "graphical-session.target" ];
+      PartOf = [ "graphical-session.target" ];
+      After = [ "graphical-session.target" ];
+      Requisite = [ "graphical-session.target" ];
+    };
+    Service = {
+      Type = "notify";
+      NotifyAccess = "all";
+      ExecStart = "${pkgs.xwayland-satellite-unstable}/bin/xwayland-satellite :0";
+      # Belt-and-suspenders: also publish/unpublish DISPLAY to the running
+      # manager env (covers a manual restart after login). The sessionVariables
+      # entry above is what actually fixes launcher-spawned apps.
+      ExecStartPost = "${pkgs.systemd}/bin/systemctl --user import-environment DISPLAY";
+      ExecStopPost = "${pkgs.systemd}/bin/systemctl --user unset-environment DISPLAY";
+      Restart = "on-failure";
+      RestartSec = 1;
+    };
+    Install.WantedBy = [ "graphical-session.target" ];
   };
 }

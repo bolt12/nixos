@@ -29,6 +29,12 @@
     networkmanager = {
       enable = true;
       dns = "none";
+      # Use the permanent hardware MAC instead of a randomized one. NM 1.56
+      # (NixOS 26.05) defaults to per-connection MAC randomization, which broke
+      # DHCP behind the MEO Wi-Fi extender (_EXT SSIDs): it associates but only
+      # bridges DHCP for MACs it recognizes, so a randomized MAC gets no lease.
+      wifi.macAddress = "permanent";
+      ethernet.macAddress = "permanent";
     };
     nameservers = [
       constants.network.rpi.vpnIp # RPi 5 acts as recursive DNS over VPN

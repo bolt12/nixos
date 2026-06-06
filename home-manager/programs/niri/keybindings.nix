@@ -39,8 +39,24 @@ in
   programs.niri.settings.binds = lib.mkMerge [
     {
       "Mod+Return" = spawn [ "konsole" ];
-      "Mod+d" = spawn [ "fuzzel" ];
-      "Mod+v" = shell "cliphist list | fuzzel --dmenu | cliphist decode | wl-copy";
+
+      # Launcher + clipboard: DankMaterialShell's theme-matched panels.
+      # (fuzzel is still installed and drives the sway session; cliphist's
+      # store daemons in niri/default.nix still populate history — DMS's
+      # clipboard panel reads from them. Revert these two lines to
+      # `spawn [ "fuzzel" ]` / the cliphist|fuzzel pipe to go back.)
+      "Mod+d" = spawn [
+        "dms"
+        "ipc"
+        "spotlight"
+        "toggle"
+      ];
+      "Mod+v" = spawn [
+        "dms"
+        "ipc"
+        "clipboard"
+        "toggle"
+      ];
 
       "Mod+Shift+q".action.close-window = { };
 
@@ -95,6 +111,41 @@ in
       "Mod+grave".action.focus-window-previous = { };
 
       "Mod+Shift+slash".action.show-hotkey-overlay = { };
+
+      # DankMaterialShell panels (IPC). Only chords that don't clash with the
+      # binds above (notably NOT Mod+p — that family is screenshots). DMS's
+      # `enableKeybinds` is left off so these stay hand-managed here, and so
+      # Mod stays Alt rather than DMS's Super default.
+      "Mod+x" = spawn [
+        "dms"
+        "ipc"
+        "powermenu"
+        "toggle"
+      ];
+      "Mod+comma" = spawn [
+        "dms"
+        "ipc"
+        "settings"
+        "toggle"
+      ];
+      "Mod+m" = spawn [
+        "dms"
+        "ipc"
+        "processlist"
+        "toggle"
+      ];
+      "Mod+n" = spawn [
+        "dms"
+        "ipc"
+        "notifications"
+        "toggle"
+      ];
+      "Mod+alt+n" = spawn [
+        "dms"
+        "ipc"
+        "night"
+        "toggle"
+      ];
 
       "Mod+ctrl+Shift+m".action.power-off-monitors = { };
       "Mod+Shift+e" = spawn [ "wlogout" ];
@@ -170,7 +221,8 @@ in
       "Mod+Shift+s" = shell ''grim -g "$(slurp)" - | satty -f -'';
       "Mod+Shift+o" = shell ''grim -g "$(slurp)" - | tesseract stdin stdout | wl-copy'';
       # Second press SIGINTs the recorder so the MP4 finalises cleanly.
-      "Mod+Shift+r" = shell ''pkill -INT wl-screenrec || (mkdir -p "$HOME/Videos" && wl-screenrec -f "$HOME/Videos/$(date +%Y%m%d-%H%M%S).mp4")'';
+      "Mod+Shift+r" =
+        shell ''pkill -INT wl-screenrec || (mkdir -p "$HOME/Videos" && wl-screenrec -f "$HOME/Videos/$(date +%Y%m%d-%H%M%S).mp4")'';
 
       "Mod+ctrl+Left".action.focus-monitor-left = { };
       "Mod+ctrl+Right".action.focus-monitor-right = { };
