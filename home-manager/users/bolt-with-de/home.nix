@@ -11,6 +11,22 @@
 # This imports the base bolt configuration and adds desktop environment components
 # Zero redundancy: all headless config comes from ../bolt/home.nix
 
+let
+  # Power monitors on/off in a compositor-agnostic way for the swayidle
+  # service below. niri has no swaymsg; Sway has no `niri msg`. Pick at
+  # runtime from the session's $XDG_CURRENT_DESKTOP.
+  monitorsPower =
+    state:
+    pkgs.writeShellScript "monitors-${state}" ''
+      if [ "''${XDG_CURRENT_DESKTOP:-}" = "niri" ]; then
+        ${pkgs.niri}/bin/niri msg action power-${state}-monitors
+      else
+        ${pkgs.sway}/bin/swaymsg "output * dpms ${if state == "off" then "off" else "on"}"
+      fi
+    '';
+  monitorsOff = monitorsPower "off";
+  monitorsOn = monitorsPower "on";
+in
 {
   imports = [
     # Import base bolt configuration (headless)
@@ -163,7 +179,14 @@
     udiskie.enable = true;
     poweralertd.enable = true;
 
-    # Idle management — lock after 5min, DPMS off after 10min
+    # Idle management — lock after 5min, monitors off after 10min.
+    # swayidle is a generic Wayland idle client (ext-idle-notify), so it runs
+    # under niri as well as Sway. The lock command (swaylock) is portable, but
+    # the monitor-power command is compositor-specific: `swaymsg ... dpms` only
+    # works on Sway, while niri uses `niri msg action power-off-monitors`. We
+    # dispatch on $XDG_CURRENT_DESKTOP so the same service is correct in both
+    # sessions (previously this used swaymsg unconditionally, so the screen
+    # never powered off under niri — it only locked).
     swayidle = {
       enable = true;
       timeouts = [
@@ -173,8 +196,8 @@
         }
         {
           timeout = 600;
-          command = ''swaymsg "output * dpms off"'';
-          resumeCommand = ''swaymsg "output * dpms on"'';
+          command = "${monitorsOff}";
+          resumeCommand = "${monitorsOn}";
         }
       ];
       events = {

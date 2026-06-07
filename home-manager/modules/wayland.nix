@@ -24,8 +24,8 @@
     # Qt theming follows GTK
     QT_QPA_PLATFORMTHEME = "gtk3";
 
-    # Editor preferences
-    EDITOR = "nvim";
-    VISUAL = "nvim";
+    # EDITOR/VISUAL intentionally live in users/bolt/home.nix (the base
+    # config imported by every bolt variant, headless included) — not here,
+    # where they'd only cover desktop sessions and shadow the base value.
   };
 }

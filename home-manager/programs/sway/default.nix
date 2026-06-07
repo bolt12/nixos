@@ -14,7 +14,8 @@ let
   hasExternal = external != null;
 in
 {
-  services.gnome-keyring.enable = true;
+  # gnome-keyring moved to profiles/desktop.nix so it covers niri (the
+  # daily-driver session) too, not just Sway.
 
   wayland.windowManager.sway = {
     enable = true;
