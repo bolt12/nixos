@@ -26,7 +26,7 @@
   services = {
 
     # Systemd /run/user increase size
-    logind.extraConfig = "RuntimeDirectorySize=75%";
+    logind.settings.Login.RuntimeDirectorySize = "75%";
 
     dbus.enable = true;
 
@@ -100,11 +100,9 @@
   };
 
   security = {
-    pam.services.swaylock.text = ''
-      # PAM configuration file for the swaylock screen locker. By default, it includes
-      # the 'login' configuration file (see /etc/pam.d/login)
-      auth include login
-    '';
+    # Empty attrset gives swaylock the NixOS default PAM stack (auth include
+    # login), matching x1-g8 — no need for the deprecated raw `.text` form.
+    pam.services.swaylock = { };
 
     polkit.enable = true;
 

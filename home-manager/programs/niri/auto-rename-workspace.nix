@@ -28,7 +28,6 @@ let
     "vlc" = "󰕼";
     "steam" = "";
     "moonlight" = "󰊴";
-    "org.pulseaudio.pavucontrol" = "";
     "pwvucontrol" = "";
     "blueman-manager" = "";
     "nm-connection-editor" = "󰖩";

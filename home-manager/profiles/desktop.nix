@@ -3,6 +3,10 @@
 
 { pkgs, ... }:
 {
+  # Secret store for both desktop sessions (niri + Sway). Lives here rather
+  # than in the Sway module so the daily-driver niri session gets it too.
+  services.gnome-keyring.enable = true;
+
   home.packages = with pkgs; [
     # Web browsers and communication
     chromium # Primary web browser

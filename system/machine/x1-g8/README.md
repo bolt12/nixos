@@ -23,4 +23,7 @@ WireGuard client at `10.100.0.2/24` to the RPi gateway.
 - WireGuard private key lives at `constants.paths.wireguardPrivateKey`
   (`/etc/wireguard/private`); install once before deploying.
 - `nixos-hardware.nixosModules.lenovo-thinkpad-x1-7th-gen` is imported
-  via `flake.nix` — drop or replace for non-X1 hardware.
+  via `flake.nix`. There is no `x1-8th-gen` module upstream — the modules
+  jump 7th → 9th gen — and the Gen 8 X1 Carbon shares the Gen 7 Comet Lake
+  platform, so 7th-gen is the correct closest match (not a typo). Drop or
+  replace for non-X1 hardware.

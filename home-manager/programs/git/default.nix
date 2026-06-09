@@ -38,7 +38,10 @@
         # Advanced productivity shortcuts
         unstage = "reset HEAD --"; # Remove files from staging area
         last = "log -1 HEAD"; # Show last commit details
-        visual = "!gitk"; # Launch visual git history viewer
+        # `visual = "!gitk"` removed: gitk ships only in gitFull (pulls in
+        # Tcl/Tk), and this module is shared with headless users. Use the
+        # built-in TUI instead — no extra closure, works everywhere.
+        visual = "log --graph --oneline --decorate --all"; # Visual history in the terminal
         amend = "commit --amend --no-edit"; # Amend last commit without changing message
 
         # Interactive fixup workflow - requires fzf for fuzzy commit selection

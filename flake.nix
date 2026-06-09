@@ -30,7 +30,13 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    raspberry-pi-nix.url = "github:nix-community/raspberry-pi-nix";
+    raspberry-pi-nix = {
+      url = "github:nix-community/raspberry-pi-nix";
+      # Dedupe the nixpkgs closure. raspberry-pi-nix pins its own kernel/
+      # firmware *-src inputs (not nixpkgs-derived), so following our nixpkgs
+      # here only affects generic packages — the RPi-specific bits stay pinned.
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # Pin emanote to version 1.4.0.0
     emanote = {
@@ -235,6 +241,11 @@
           modules = [
             ./system/machine/thinkpadx200/default.nix
             ./system/common/overlays.nix
+            # The desktop HM module (bolt-with-de) configures programs.niri, so
+            # the niri NixOS module must be imported here too — same as
+            # bolt-nixos above. Without it, eval fails with
+            # "option home-manager.users.bolt.programs.niri does not exist".
+            inputs.niri.nixosModules.niri
           ];
           hmUser = "bolt";
           hmModule = ./home-manager/users/bolt-with-de/home.nix;
