@@ -38,13 +38,13 @@ in
           metalSupport = false;
         }).overrideAttrs
           (oldAttrs: {
-            version = "9442";
+            version = "9584";
 
             src = pkgs.fetchFromGitHub {
               owner = "ggml-org";
               repo = "llama.cpp";
-              tag = "b9442";
-              hash = "sha256-Qz+0JImSaAXiAkbd2DQMifhyZI59oJXhURxJZAy5n5Q=";
+              tag = "b9584";
+              hash = "sha256-0H0RsgV/3HWHpxUcxgPZT2yLNn//a8TidkiT9ES8yeI=";
               leaveDotGit = true;
               postFetch = ''
                 git -C "$out" rev-parse --short HEAD > $out/COMMIT
@@ -63,7 +63,7 @@ in
             '';
 
             # b8635 removed tools/server/public/index.html.gz from the source tree,
-            # but upstream nixpkgs postPatch still tries to rm it — use -f to tolerate
+            # but upstream nixpkgs postPatch still tries to rm it, so use -f to tolerate
             postPatch =
               builtins.replaceStrings
                 [ "rm tools/server/public/index.html.gz" ]
@@ -76,21 +76,21 @@ in
             # Recompute via:
             #   nix run nixpkgs#prefetch-npm-deps -- <unpacked-src>/tools/ui/package-lock.json
             npmRoot = "tools/ui";
-            npmDepsHash = "sha256-Iyg8FpcTKf2UYHuK7mA3cTAqVaLcQPcS0YCa5Qf01Gc=";
+            npmDepsHash = "sha256-pjdbI6NcZRlJVd62xhgbLhWrwFYwgsIwjORqvo1+VD8=";
 
             # Keep the original postInstall to handle installation correctly
             postInstall = oldAttrs.postInstall or "";
           });
 
-      # llama-swap v221 - Latest release with Anthropic API compatibility
+      # llama-swap v223 - Latest release with Anthropic API compatibility
       # (v195 renamed ui/ → ui-svelte/, so we rebuild the UI derivation from scratch)
       llama-swap =
         let
           llama-swap-src = pkgs.fetchFromGitHub {
             owner = "mostlygeek";
             repo = "llama-swap";
-            tag = "v221";
-            hash = "sha256-YN6jqKjTW/n69bBiVtlfodTuUWah4oHmH8cUzEKTCZ4=";
+            tag = "v223";
+            hash = "sha256-I9Tb+DBuD2HgT90sstvIJ1/PWo6GNF91nM8JhixkKBY=";
             leaveDotGit = true;
             postFetch = ''
               cd "$out"
@@ -101,7 +101,7 @@ in
           };
           llama-swap-ui = pkgs.buildNpmPackage {
             pname = "llama-swap-ui";
-            version = "221";
+            version = "223";
             src = llama-swap-src;
             sourceRoot = "${llama-swap-src.name}/ui-svelte";
             npmDepsHash = "sha256-NJqEJ+XTdpPFtJJxP4CGu+JDUW7lKDcFgsixQJ3SXtQ=";
@@ -115,7 +115,7 @@ in
           };
         in
         unstable.llama-swap.overrideAttrs (oldAttrs: {
-          version = "221";
+          version = "223";
           src = llama-swap-src;
           proxyVendor = true;
           vendorHash = "sha256-n3SgvRkO/OTs/ftT89idoHBTQ1H1zr4TOj+tcBi5whc=";
@@ -179,7 +179,7 @@ in
         };
       });
 
-      # redlib — pin to upstream HEAD. Reddit rotates anti-bot measures every
+      # redlib: pin to upstream HEAD. Reddit rotates anti-bot measures every
       # few months; the packaged Sept-2025 build returns 403 on every request.
       # Upstream HEAD ships boring-sys2 (BoringSSL) for TLS-fingerprint spoof.
       # When this fails again: bump rev via
@@ -216,7 +216,7 @@ in
       );
 
       # miniflux 2.3.0 wraps the UI in Go's http.CrossOriginProtection,
-      # constructed with no trusted origins (internal/ui/ui.go) — it is
+      # constructed with no trusted origins (internal/ui/ui.go); it is
       # unconfigurable (no BASE_URL / TRUSTED_REVERSE_PROXY_NETWORKS knob) and
       # rejects plain-HTTP bare-IP LAN access with "Sec-Fetch-Site is missing,
       # and Origin does not match Host". Upstream's only fix so far is reverting

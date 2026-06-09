@@ -127,6 +127,9 @@ in
     enable = true;
     port = ports.llamaswap;
     openFirewall = true;
+    # Bind to all interfaces (module default is "localhost"); needed so
+    # Open WebUI / other LAN clients can reach the proxy, not just ninho itself.
+    listenAddress = "0.0.0.0";
 
     settings = {
       # Health check timeout - set high to allow large model downloads
@@ -285,6 +288,11 @@ in
       # Grant write access to state directory
       StateDirectory = "llama-cpp";
       StateDirectoryMode = "0755";
+
+      # Restore full /proc visibility: upstream module sets ProcSubset=pid,
+      # which hides /proc/meminfo and breaks llama-swap's sys-stats polling
+      # ("couldn't read /proc/meminfo: no such file or directory").
+      ProcSubset = lib.mkForce "all";
 
       # Increase timeouts for large model downloads (up to 142GB!)
       TimeoutStartSec = "infinity"; # No timeout during download

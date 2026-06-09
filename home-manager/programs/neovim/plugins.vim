@@ -538,21 +538,23 @@ cmap <expr> <Tab> wilder#in_context() ? wilder#next() : "\<Tab>"
 cmap <expr> <S-Tab> wilder#in_context() ? wilder#previous() : "\<S-Tab>"
 call wilder#set_option('modes', ['/', '?', ':'])
 
+" Use the pure-Vimscript backend (neovim's builtin matchfuzzy()) rather than the
+" python3 remote plugin. The remote plugin needs a :UpdateRemotePlugins manifest
+" that home-manager never generates and that breaks on store-path changes / a
+" fresh data dir, raising 'E117: Unknown function: _wilder_python_*'.
+call wilder#set_option('use_python_remote_plugin', 0)
+
 call wilder#set_option('pipeline', [
       \   wilder#branch(
       \     wilder#substitute_pipeline(),
       \     wilder#cmdline_pipeline({
       \       'fuzzy': 1,
-      \       'sorter': wilder#python_difflib_sorter(),
       \     }),
-      \     wilder#python_search_pipeline({
-      \       'pattern': 'fuzzy',
-      \     }),
+      \     wilder#search_pipeline(),
       \   ),
       \ ])
 
 let s:highlighters = [
-        \ wilder#pcre2_highlighter(),
         \ wilder#basic_highlighter(),
         \ ]
 

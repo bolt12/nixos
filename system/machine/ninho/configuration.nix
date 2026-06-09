@@ -153,7 +153,7 @@
   virtualisation.docker.enable = true;
 
   systemd.tmpfiles.rules = [
-    # CoolerControl config seed — programs.coolercontrol exposes only
+    # CoolerControl config seed: programs.coolercontrol exposes only
     # {enable, nvidiaSupport}; the daemon writes device settings back to
     # config.toml, so `C` (create-if-missing) seeds the bind addresses
     # once and leaves daemon-managed state untouched on later boots.
@@ -163,10 +163,19 @@
       ipv4_address = "0.0.0.0"
       ipv6_address = "::"
     ''}"
-    # alerts.json must be valid JSON — a zero-byte file makes the daemon
-    # bail out of init before binding the API on 11987 (silent on INFO).
-    "C /etc/coolercontrol/alerts.json 0644 root root - ${pkgs.writeText "coolercontrol-alerts-seed.json" ''{"alerts":[]}''}"
   ];
+
+  # alerts.json must be valid JSON or the daemon aborts init before binding
+  # the API on 11987 (the error is silent at the INFO log level). A `C`
+  # tmpfiles rule only creates the file when absent: it cannot repair an
+  # existing zero-byte file, which is exactly what a watchdog reboot
+  # mid-write leaves behind. Re-seed on every start when the file is missing
+  # or empty; non-empty daemon-managed content is left untouched.
+  systemd.services.coolercontrold.serviceConfig.ExecStartPre =
+    pkgs.writeShellScript "coolercontrol-seed-alerts" ''
+      f=/etc/coolercontrol/alerts.json
+      [ -s "$f" ] || echo '{"alerts":[]}' > "$f"
+    '';
 
   # ==========================================================================
   # HOME-MANAGER
@@ -243,7 +252,7 @@
       persistent = true;
     };
 
-    # Store optimization — auto-optimise-store (above) handles this on every build
+    # Store optimization: auto-optimise-store (above) handles this on every build
   };
 
   nixpkgs.config.allowUnfree = true;
@@ -254,7 +263,7 @@
   # ==========================================================================
 
   environment.systemPackages = with pkgs; [
-    # Safe rebuild wrapper — delegates to install.sh from the user's checkout
+    # Safe rebuild wrapper: delegates to install.sh from the user's checkout
     (pkgs.writeShellApplication {
       name = "nixos-rebuild-safe";
       runtimeInputs = [ pkgs.git ];
@@ -264,7 +273,7 @@
       '';
     })
 
-    # Emergency/root tools only — user tools are in home-manager profiles
+    # Emergency/root tools only: user tools are in home-manager profiles
     vim
 
     # System administration
@@ -290,7 +299,7 @@
     # Network diagnostics
     ethtool
 
-    # Clevis — needed for JWE enrollment and key rotation (Tang/LUKS auto-unlock)
+    # Clevis: needed for JWE enrollment and key rotation (Tang/LUKS auto-unlock)
     clevis
   ];
 
