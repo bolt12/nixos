@@ -81,6 +81,15 @@
       url = "github:numtide/nix-ai-tools";
     };
 
+    # herdr: tmux-like, agent-aware terminal multiplexer (single Rust binary,
+    # AGPL). Not packaged in nixpkgs; ships its own flake + nix/package.nix.
+    # Follows our nixpkgs so the source build (Rust + vendored zig
+    # libghostty-vt) resolves against the pinned 26.05 closure.
+    herdr = {
+      url = "github:ogulcancelik/herdr";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # llama-swap - latest release for model swapping
     llama-swap = {
       url = "github:mostlygeek/llama-swap/v182";

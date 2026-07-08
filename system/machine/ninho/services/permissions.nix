@@ -1,4 +1,4 @@
-# Centralized group/permission management — wires service users into media + storage-users.
+# Centralized group/permission management: wires service users into media + storage-users.
 { config, ... }:
 {
   # ============================================================================
@@ -67,18 +67,6 @@
       "storage-users"
       "render"
       "video"
-    ];
-
-    # Music streaming
-    navidrome.extraGroups = [
-      "media"
-      "storage-users"
-    ];
-
-    # Book reader - needs media access for ebooks
-    kavita.extraGroups = [
-      "media"
-      "storage-users"
     ];
 
     # Subtitle manager - needs media access

@@ -84,6 +84,10 @@
       # Persistence daemon (required for headless)
       nvidiaPersistenced = true;
     };
+
+    # Expose the GPU to Docker containers (CDI) so Frigate can run its
+    # ONNX/TensorRT detector on the RTX 5090.
+    nvidia-container-toolkit.enable = true;
   };
 
   # Enable NVIDIA drivers (required for game streaming with Sunshine)
@@ -280,6 +284,7 @@
     nss
     nssTools
     liquidctl
+    smartmontools # smartctl CLI for manual SMART queries
 
     # ZFS tools
     zfs
@@ -293,11 +298,18 @@
     # Note: Full CUDA+CPU optimizations defined in system/common/overlays.nix
     llama-cpp-cuda
 
-    # Speech recognition with word-level timestamps & diarization (CUDA via cudaSupport)
-    whisperx
+    # Transcription + diarization (MOSS-Transcribe-Diarize, CUDA via cudaSupport).
+    # Provides `mtd-subtitle` (batch) and `mtd-subtitle-web` (local web UI).
+    (python3Packages.toPythonApplication moss-transcribe-diarize)
+    # `dnd-transcribe`: chunk-and-merge wrapper for multi-hour recordings (single
+    # MOSS call tops out near 85 min; this splits, transcribes, and merges).
+    dnd-transcribe
 
     # Network diagnostics
     ethtool
+
+    # Media diagnostics: ffprobe / ffmpeg (headless build, no GUI deps on this server)
+    ffmpeg-headless
 
     # Clevis: needed for JWE enrollment and key rotation (Tang/LUKS auto-unlock)
     clevis
@@ -340,6 +352,23 @@
           nvidia-smi = "${config.hardware.nvidia.package.bin}/bin/nvidia-smi";
         in
         "${nvidia-smi} -pl 450";
+    };
+  };
+
+  # Wake-on-LAN: arm the NIC to wake on magic packets so the RPi can power ninho
+  # back on after a mains outage (the RPi auto-reboots when power returns).
+  # NetworkManager's default wake-on-lan is "preserve", so it won't clobber this.
+  # Needs the matching UEFI setting ("Power On By PCI-E", ErP disabled) to fire
+  # from soft-off.
+  systemd.services.wol-enable = {
+    description = "Enable Wake-on-LAN (magic packet) on ${constants.network.ninho.lanInterface}";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "sys-subsystem-net-devices-${constants.network.ninho.lanInterface}.device" ];
+    bindsTo = [ "sys-subsystem-net-devices-${constants.network.ninho.lanInterface}.device" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = "${pkgs.ethtool}/bin/ethtool -s ${constants.network.ninho.lanInterface} wol g";
     };
   };
 

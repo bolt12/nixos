@@ -1,9 +1,9 @@
 # Boot, kernel, initrd, LUKS auto-unlock, GRUB, hardware watchdog.
-# Pinned kernel 6.18 — 6.19 breaks NVIDIA 580.x (vm_area_struct.__vm_flags removed).
+# Pinned kernel 6.18 (6.19 breaks NVIDIA 580.x: vm_area_struct.__vm_flags removed).
 { pkgs, ... }:
 {
   boot = {
-    # Pinned to 6.18 — 6.19 breaks NVIDIA 580.x (vm_area_struct.__vm_flags removed)
+    # Pinned to 6.18 (6.19 breaks NVIDIA 580.x: vm_area_struct.__vm_flags removed)
     kernelPackages = pkgs.linuxPackages_6_18;
 
     # Supported filesystems
@@ -52,6 +52,11 @@
       "pcie_aspm=off"
 
       "iommu=pt" # IOMMU passthrough (avoids swiotlb bounce buffer faults on AHCI)
+
+      # Steam's CHTTPClientThread does unaligned atomics that trip the kernel's
+      # split-lock detector, spamming ~130k "bus_lock trap" warnings/week. The
+      # traps are harmless; disable detection to keep the journal readable.
+      "split_lock_detect=off"
     ];
 
     # Bluetooth module configuration - Disable autosuspend for MediaTek adapters
@@ -75,10 +80,12 @@
       "luks-rpool-nvme0n1-part2" = {
         device = "/dev/disk/by-uuid/e3b307b9-0ab9-4032-8db0-9674ebd53e00";
         preLVM = true;
+        allowDiscards = true; # let ZFS TRIM reach the NVMe (see services.zfs.trim)
       };
       "luks-rpool-nvme1n1-part2" = {
         device = "/dev/disk/by-uuid/c1ac5b9e-734e-413c-b8c7-8054ef32e9aa";
         preLVM = true;
+        allowDiscards = true; # let ZFS TRIM reach the NVMe (see services.zfs.trim)
       };
 
       # Storage pool (HDD RAIDZ1)
@@ -101,7 +108,7 @@
       enable = true;
       flushBeforeStage2 = true; # Clean slate for NetworkManager in stage 2
 
-      # SSH fallback — if Tang is unreachable, SSH in to type the passphrase.
+      # SSH fallback: if Tang is unreachable, SSH in to type the passphrase.
       # Port 2222 (not 22) because the initrd uses a different host key.
       # Usage: ssh -p 2222 root@<ninho-lan-ip>
       #        then: systemd-tty-ask-password-agent --query
@@ -126,7 +133,7 @@
     };
 
     # Clevis/Tang auto-unlock: answers each device's systemd LUKS prompt from a
-    # clevis token bound into the LUKS2 header — no JWE files, no
+    # clevis token bound into the LUKS2 header. No JWE files, no
     # boot.initrd.secrets. Runs in parallel with, and falls back to, the
     # passphrase prompt. Enroll once per device above on the running system:
     #   sudo clevis luks bind -d /dev/disk/by-uuid/<uuid> tang '{"url":"http://192.168.1.110:7654"}'
@@ -144,6 +151,7 @@
 
       grub = {
         enable = true;
+        configurationLimit = 10; # cap stored generations so /boot can't fill up
         device = "nodev";
         efiSupport = true;
         enableCryptodisk = true;

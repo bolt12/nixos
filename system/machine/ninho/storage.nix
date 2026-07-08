@@ -1,9 +1,14 @@
-# Storage — ZFS pool config, sanoid snapshot policies,
+# Storage: ZFS pool config, sanoid snapshot policies,
 # and the storage directory tmpfiles seeds (root/data/media/backup).
 # Coolercontrol seed lives in configuration.nix (different concern).
 { constants, ... }:
 {
   services.zfs = {
+    # Periodic TRIM (weekly) reclaims freed blocks on the rpool NVMe SSDs.
+    # Requires allowDiscards on the rpool LUKS devices (boot.nix) to actually
+    # reach the drives; it is a harmless no-op on the storage HDDs.
+    trim.enable = true;
+
     # Auto-scrub pools weekly
     autoScrub = {
       enable = true;
@@ -46,7 +51,7 @@
       };
 
       # Replicated rpool/{home,root} snapshots from syncoid live here.
-      # autosnap is off — sanoid doesn't create snapshots, only prunes the
+      # autosnap is off, sanoid doesn't create snapshots, only prunes the
       # ones syncoid replicates. Retention is much longer than rpool's
       # because HDD space is cheap; this is the historical archive.
       "storage/backup" = {
@@ -111,7 +116,7 @@
   };
 
   systemd.tmpfiles.rules = [
-    # Storage directories — SGID so new files inherit storage-users.
+    # Storage directories: SGID so new files inherit storage-users.
     "d ${constants.storage.root}   2775 root storage-users - -"
     "d ${constants.storage.backup} 2775 root storage-users - -"
     "d ${constants.storage.media}  2775 root storage-users - -"

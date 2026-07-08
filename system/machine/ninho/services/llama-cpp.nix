@@ -1,4 +1,4 @@
-# llama-swap orchestrator + 13 model definitions (see llama-cpp/models.nix).
+# llama-swap orchestrator + 9 model definitions (see llama-cpp/models.nix).
 {
   config,
   pkgs,
@@ -10,92 +10,14 @@ let
   inherit (constants) ports;
   inherit (pkgs)
     llama-cpp-cuda
-    whisper-cpp-cuda
-    stable-diffusion-cpp-cuda
     writeShellScript
     ;
-
-  # Model paths
-  whisper-model-path = "/var/lib/llama-cpp/models/ggml-large-v3.bin";
-  sd-model-dir = "/var/lib/llama-cpp/models/sd";
-  sd3-model-dir = "/var/lib/llama-cpp/models/sd3";
-
-  # Whisper wrapper: downloads model on first use, then execs whisper-server
-  # llama-swap uses shlex + exec (no sh -c), so && chains don't work in cmd
-  # `-s` (not `-f`) guards against a prior aborted wget leaving a 0-byte file;
-  # `wget && mv` ensures the tmp file is only promoted on full success.
-  whisper-wrapper = writeShellScript "whisper-wrapper" ''
-    if [ ! -s "${whisper-model-path}" ]; then
-      echo "Downloading whisper large-v3 F16 model..."
-      mkdir -p "$(dirname "${whisper-model-path}")"
-      ${pkgs.wget}/bin/wget -q --show-progress -O "${whisper-model-path}.tmp" \
-          "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3.bin" \
-        && mv "${whisper-model-path}.tmp" "${whisper-model-path}" \
-        || { rm -f "${whisper-model-path}.tmp"; echo "Whisper model download failed" >&2; exit 1; }
-      echo "Whisper large-v3 F16 model download complete."
-    fi
-    exec "$@"
-  '';
-
-  # FLUX wrapper: downloads 4 model files on first use, then execs sd-server
-  # ~23GB total across diffusion model, VAE, CLIP-L, T5-XXL
-  sd-wrapper = writeShellScript "sd-wrapper" ''
-    download() {
-      local url="$1" dest="$2"
-      if [ -s "$dest" ]; then
-        return
-      fi
-      echo "Downloading $(basename "$dest")..."
-      mkdir -p "$(dirname "$dest")"
-      ${pkgs.wget}/bin/wget -q --show-progress -O "$dest.tmp" "$url" \
-        && mv "$dest.tmp" "$dest" \
-        || { rm -f "$dest.tmp"; echo "Download failed: $url" >&2; exit 1; }
-    }
-    download "https://huggingface.co/leejet/FLUX.1-schnell-gguf/resolve/main/flux1-schnell-q8_0.gguf" \
-      "${sd-model-dir}/flux1-schnell-q8_0.gguf"
-    # BFL repos are gated; use ungated community mirror for the VAE
-    download "https://huggingface.co/camenduru/FLUX.1-dev-ungated/resolve/main/ae.safetensors" \
-      "${sd-model-dir}/ae.safetensors"
-    download "https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/clip_l.safetensors" \
-      "${sd-model-dir}/clip_l.safetensors"
-    download "https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/t5xxl_fp16.safetensors" \
-      "${sd-model-dir}/t5xxl_fp16.safetensors"
-    exec "$@"
-  '';
-
-  # SD3.5 Medium wrapper: downloads 5 model files on first use, then execs sd-server
-  # ~9.4GB total across diffusion model, VAE, CLIP-G, CLIP-L, T5-XXL
-  sd3-wrapper = writeShellScript "sd3-wrapper" ''
-    download() {
-      local url="$1" dest="$2"
-      if [ -s "$dest" ]; then
-        return
-      fi
-      echo "Downloading $(basename "$dest")..."
-      mkdir -p "$(dirname "$dest")"
-      ${pkgs.wget}/bin/wget -q --show-progress -O "$dest.tmp" "$url" \
-        && mv "$dest.tmp" "$dest" \
-        || { rm -f "$dest.tmp"; echo "Download failed: $url" >&2; exit 1; }
-    }
-    download "https://huggingface.co/second-state/stable-diffusion-3.5-medium-GGUF/resolve/main/sd3.5_medium-Q8_0.gguf" \
-      "${sd3-model-dir}/sd3.5_medium-Q8_0.gguf"
-    # VAE not included in GGUF — download from ungated mirror (~167MB)
-    download "https://huggingface.co/adamo1139/stable-diffusion-3.5-medium-ungated/resolve/main/vae/diffusion_pytorch_model.safetensors" \
-      "${sd3-model-dir}/vae.safetensors"
-    download "https://huggingface.co/second-state/stable-diffusion-3.5-medium-GGUF/resolve/main/clip_g-Q8_0.gguf" \
-      "${sd3-model-dir}/clip_g-Q8_0.gguf"
-    download "https://huggingface.co/second-state/stable-diffusion-3.5-medium-GGUF/resolve/main/clip_l-Q8_0.gguf" \
-      "${sd3-model-dir}/clip_l-Q8_0.gguf"
-    download "https://huggingface.co/second-state/stable-diffusion-3.5-medium-GGUF/resolve/main/t5xxl-Q8_0.gguf" \
-      "${sd3-model-dir}/t5xxl-Q8_0.gguf"
-    exec "$@"
-  '';
 
   # llama-swap configuration - RTX 5090 (32GB VRAM), 128GB RAM
   # Models optimized for quality/context balance
   # Note: llama-cpp-cuda is now defined in system/common/overlays.nix
 
-  # Wrapper script for full-power models - stops Wyoming, restarts on exit
+  # Wrapper script for full-power models - stops Sunshine, restarts on exit
   # Uses a FIFO-based helper to avoid sudo (llama-swap drops all capabilities)
   # Runs child in background with signal forwarding so llama-swap can unload models
   wyoming-wrapper = writeShellScript "wyoming-wrapper" ''
@@ -133,7 +55,7 @@ in
 
     settings = {
       # Health check timeout - set high to allow large model downloads
-      # FLUX.1-schnell is ~23GB across 4 files on first load
+      # (gpt-oss-120b F16 is ~65GB on first load)
       healthCheckTimeout = 3600; # 60 minutes
 
       # startPort: sets the starting port number for the automatic ${PORT} macro.
@@ -175,20 +97,20 @@ in
           ];
         };
       };
-      models = import ./llama-cpp/models.nix {
-        inherit
-          wyoming-wrapper
-          whisper-wrapper
-          sd-wrapper
-          sd3-wrapper
-          llama-cpp-cuda
-          whisper-cpp-cuda
-          stable-diffusion-cpp-cuda
-          whisper-model-path
-          sd-model-dir
-          sd3-model-dir
-          ;
-      };
+      # Default idle TTL: llama-swap unloads a model after 15 min of inactivity
+      # so it stops squatting on VRAM. A pinned model was holding ~31GB of the
+      # 32GB card indefinitely, starving Immich's GPU machine-learning (CUDA
+      # OOM). A model can set its own `ttl` to override this default.
+      models =
+        let
+          rawModels = import ./llama-cpp/models.nix {
+            inherit
+              wyoming-wrapper
+              llama-cpp-cuda
+              ;
+          };
+        in
+        builtins.mapAttrs (_name: model: { ttl = 900; } // model) rawModels;
 
     };
   };
@@ -208,8 +130,6 @@ in
     "d /var/lib/llama-cpp 0755 llama-swap llama-swap - -"
     "d /var/lib/llama-cpp/models 0755 llama-swap llama-swap - -"
     "d /var/lib/llama-cpp/cache 0755 llama-swap llama-swap - -"
-    "d /var/lib/llama-cpp/models/sd 0755 llama-swap llama-swap - -"
-    "d /var/lib/llama-cpp/models/sd3 0755 llama-swap llama-swap - -"
     # FIFO for Wyoming service control (avoids sudo from within llama-swap)
     "p /run/wyoming-control 0660 llama-swap root - -"
   ];
@@ -241,17 +161,9 @@ in
           while read -r cmd pid; do
             case "$cmd" in
               stop)
-                /run/current-system/sw/bin/systemctl stop wyoming-faster-whisper-en || true
-                /run/current-system/sw/bin/systemctl stop wyoming-faster-whisper-pt || true
-                /run/current-system/sw/bin/systemctl stop wyoming-piper-en || true
-                /run/current-system/sw/bin/systemctl stop wyoming-piper-pt || true
                 /run/current-system/sw/bin/systemctl --user -M bolt@ stop sunshine || true
                 ;;
               start)
-                /run/current-system/sw/bin/systemctl start wyoming-faster-whisper-en || true
-                /run/current-system/sw/bin/systemctl start wyoming-faster-whisper-pt || true
-                /run/current-system/sw/bin/systemctl start wyoming-piper-en || true
-                /run/current-system/sw/bin/systemctl start wyoming-piper-pt || true
                 /run/current-system/sw/bin/systemctl --user -M bolt@ start sunshine || true
                 ;;
               *)
@@ -270,6 +182,11 @@ in
 
   # Configure llama-swap service
   systemd.services.llama-swap = {
+    # ffprobe/ffmpeg on PATH so llama.cpp's mtmd multimodal helper can demux
+    # VIDEO inputs (mtmd_helper_video_init_from_buf shells out to ffprobe). The
+    # llama-server children inherit this service's PATH.
+    path = [ pkgs.ffmpeg-headless ];
+
     serviceConfig = {
       # Use static user instead of DynamicUser (for FIFO compatibility)
       DynamicUser = lib.mkForce false;

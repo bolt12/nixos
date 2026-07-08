@@ -37,14 +37,5 @@
         enableToneMapping = true;
       };
     };
-
-    # 26.05 renamed services.jellyseerr → services.seerr (jellyseerr pkg removed).
-    # Data dir stays at /var/lib/jellyseerr/config (move guarded by stateVersion
-    # >= 26.05; ours is 25.05). Stable pkgs.seerr is current → no unstable pin.
-    seerr = {
-      enable = true;
-      openFirewall = true;
-      port = constants.ports.jellyseerr;
-    };
   };
 }

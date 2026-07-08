@@ -13,6 +13,9 @@
 {
   # Enable experimental Nix features
   nix = {
+    # HM 26.05 requires nix.package whenever nix.settings is set (it writes
+    # a versioned nix.conf). mkDefault lets users pin their own (steam-deck).
+    package = lib.mkDefault pkgs.nix;
     settings.experimental-features = [
       "nix-command"
       "flakes"

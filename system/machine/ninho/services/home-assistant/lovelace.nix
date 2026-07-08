@@ -3,6 +3,120 @@
 { constants, ... }:
 let
   inherit (constants) ports network;
+
+  # Service link cards on the Services view are all the same mushroom-template
+  # card differing only by name/subtitle/icon/color and target port, so we
+  # generate them from a list instead of hand-maintaining ~20 near-identical
+  # blocks (adding or removing a service is now one line, and ports come from
+  # constants rather than being hardcoded).
+  hostUrl = port: "http://${network.ninho.vpnIp}:${toString port}";
+  mkServiceCard =
+    {
+      name,
+      secondary,
+      icon,
+      color,
+      port,
+    }:
+    {
+      type = "custom:mushroom-template-card";
+      primary = name;
+      inherit secondary icon;
+      icon_color = color;
+      layout_options = {
+        grid_columns = 1;
+        grid_rows = 1;
+      };
+      tap_action = {
+        action = "url";
+        url_path = hostUrl port;
+      };
+    };
+  mkServiceGrid = title: services: {
+    type = "grid";
+    inherit title;
+    cards = map mkServiceCard services;
+  };
+
+  # Climate view: the AC zones show up as repeated 4-entry series/glance lists
+  # across several charts, so those entries are generated from one zone list.
+  # (The thermostat cards stay explicit; they are genuinely heterogeneous.)
+  # Names carry accents the plain-ASCII zones.nix slugs/friendly do not, so this
+  # display list is local to the dashboard rather than reused from zones.nix.
+  climateZones = [
+    {
+      slug = "sala";
+      name = "Sala";
+      color = "#FF9800";
+    }
+    {
+      slug = "escritorio";
+      name = "Escritório";
+      color = "#2196F3";
+    }
+    {
+      slug = "quarto";
+      name = "Quarto";
+      color = "#9C27B0";
+    }
+    {
+      slug = "quarto_hospedes";
+      name = "Hóspedes";
+      color = "#4CAF50";
+    }
+  ];
+  tempSeries =
+    (map (z: {
+      entity = "climate.ac_${z.slug}";
+      attribute = "current_temperature";
+      name = z.name;
+      color = z.color;
+      stroke_width = 2;
+      curve = "smooth";
+    }) climateZones)
+    ++ [
+      {
+        entity = "weather.forecast_home";
+        attribute = "temperature";
+        name = "Outdoor";
+        color = "#78909C";
+        stroke_width = 1;
+        curve = "smooth";
+        opacity = 0.5;
+      }
+    ];
+  runtimeBarSeries = map (z: {
+    entity = "sensor.ac_${z.slug}_runtime_today";
+    name = z.name;
+    color = z.color;
+  }) climateZones;
+  runtimeAreaSeries = map (z: {
+    entity = "sensor.ac_${z.slug}_runtime_today";
+    name = z.name;
+    color = z.color;
+    stroke_width = 1;
+    curve = "smooth";
+    opacity = 0.5;
+    group_by = {
+      func = "max";
+      duration = "1d";
+    };
+  }) climateZones;
+  humiditySeries = map (z: {
+    entity = "sensor.ac_${z.slug}_room_humidity";
+    name = z.name;
+    color = z.color;
+    stroke_width = 2;
+    curve = "smooth";
+  }) climateZones;
+  modeGlanceEntities = map (z: {
+    entity = "climate.ac_${z.slug}";
+    name = z.name;
+  }) climateZones;
+  humidityGlanceEntities = map (z: {
+    entity = "sensor.ac_${z.slug}_room_humidity";
+    name = z.name;
+  }) climateZones;
 in
 {
   services.home-assistant = {
@@ -592,24 +706,7 @@ in
                   card = {
                     type = "glance";
                     title = "Room Humidity";
-                    entities = [
-                      {
-                        entity = "sensor.ac_sala_room_humidity";
-                        name = "Sala";
-                      }
-                      {
-                        entity = "sensor.ac_escritorio_room_humidity";
-                        name = "Escritório";
-                      }
-                      {
-                        entity = "sensor.ac_quarto_room_humidity";
-                        name = "Quarto";
-                      }
-                      {
-                        entity = "sensor.ac_quarto_hospedes_room_humidity";
-                        name = "Hóspedes";
-                      }
-                    ];
+                    entities = humidityGlanceEntities;
                   };
                 }
                 {
@@ -619,24 +716,7 @@ in
                     grid_columns = 4;
                     grid_rows = 1;
                   };
-                  entities = [
-                    {
-                      entity = "climate.ac_sala";
-                      name = "Sala";
-                    }
-                    {
-                      entity = "climate.ac_escritorio";
-                      name = "Escritório";
-                    }
-                    {
-                      entity = "climate.ac_quarto";
-                      name = "Quarto";
-                    }
-                    {
-                      entity = "climate.ac_quarto_hospedes";
-                      name = "Hóspedes";
-                    }
-                  ];
+                  entities = modeGlanceEntities;
                 }
               ];
             }
@@ -663,49 +743,7 @@ in
                       max = 32;
                     }
                   ];
-                  series = [
-                    {
-                      entity = "climate.ac_sala";
-                      attribute = "current_temperature";
-                      name = "Sala";
-                      color = "#FF9800";
-                      stroke_width = 2;
-                      curve = "smooth";
-                    }
-                    {
-                      entity = "climate.ac_escritorio";
-                      attribute = "current_temperature";
-                      name = "Escritório";
-                      color = "#2196F3";
-                      stroke_width = 2;
-                      curve = "smooth";
-                    }
-                    {
-                      entity = "climate.ac_quarto";
-                      attribute = "current_temperature";
-                      name = "Quarto";
-                      color = "#9C27B0";
-                      stroke_width = 2;
-                      curve = "smooth";
-                    }
-                    {
-                      entity = "climate.ac_quarto_hospedes";
-                      attribute = "current_temperature";
-                      name = "Hóspedes";
-                      color = "#4CAF50";
-                      stroke_width = 2;
-                      curve = "smooth";
-                    }
-                    {
-                      entity = "weather.forecast_home";
-                      attribute = "temperature";
-                      name = "Outdoor";
-                      color = "#78909C";
-                      stroke_width = 1;
-                      curve = "smooth";
-                      opacity = 0.5;
-                    }
-                  ];
+                  series = tempSeries;
                 }
                 {
                   type = "custom:apexcharts-card";
@@ -725,49 +763,7 @@ in
                       max = 32;
                     }
                   ];
-                  series = [
-                    {
-                      entity = "climate.ac_sala";
-                      attribute = "current_temperature";
-                      name = "Sala";
-                      color = "#FF9800";
-                      stroke_width = 2;
-                      curve = "smooth";
-                    }
-                    {
-                      entity = "climate.ac_escritorio";
-                      attribute = "current_temperature";
-                      name = "Escritório";
-                      color = "#2196F3";
-                      stroke_width = 2;
-                      curve = "smooth";
-                    }
-                    {
-                      entity = "climate.ac_quarto";
-                      attribute = "current_temperature";
-                      name = "Quarto";
-                      color = "#9C27B0";
-                      stroke_width = 2;
-                      curve = "smooth";
-                    }
-                    {
-                      entity = "climate.ac_quarto_hospedes";
-                      attribute = "current_temperature";
-                      name = "Hóspedes";
-                      color = "#4CAF50";
-                      stroke_width = 2;
-                      curve = "smooth";
-                    }
-                    {
-                      entity = "weather.forecast_home";
-                      attribute = "temperature";
-                      name = "Outdoor";
-                      color = "#78909C";
-                      stroke_width = 1;
-                      curve = "smooth";
-                      opacity = 0.5;
-                    }
-                  ];
+                  series = tempSeries;
                 }
               ];
             }
@@ -788,28 +784,7 @@ in
                     grid_columns = 2;
                     grid_rows = 2;
                   };
-                  series = [
-                    {
-                      entity = "sensor.ac_sala_runtime_today";
-                      name = "Sala";
-                      color = "#FF9800";
-                    }
-                    {
-                      entity = "sensor.ac_escritorio_runtime_today";
-                      name = "Escritório";
-                      color = "#2196F3";
-                    }
-                    {
-                      entity = "sensor.ac_quarto_runtime_today";
-                      name = "Quarto";
-                      color = "#9C27B0";
-                    }
-                    {
-                      entity = "sensor.ac_quarto_hospedes_runtime_today";
-                      name = "Hóspedes";
-                      color = "#4CAF50";
-                    }
-                  ];
+                  series = runtimeBarSeries;
                 }
                 {
                   type = "custom:apexcharts-card";
@@ -825,56 +800,7 @@ in
                     grid_columns = 2;
                     grid_rows = 2;
                   };
-                  series = [
-                    {
-                      entity = "sensor.ac_sala_runtime_today";
-                      name = "Sala";
-                      color = "#FF9800";
-                      stroke_width = 1;
-                      curve = "smooth";
-                      opacity = 0.5;
-                      group_by = {
-                        func = "max";
-                        duration = "1d";
-                      };
-                    }
-                    {
-                      entity = "sensor.ac_escritorio_runtime_today";
-                      name = "Escritório";
-                      color = "#2196F3";
-                      stroke_width = 1;
-                      curve = "smooth";
-                      opacity = 0.5;
-                      group_by = {
-                        func = "max";
-                        duration = "1d";
-                      };
-                    }
-                    {
-                      entity = "sensor.ac_quarto_runtime_today";
-                      name = "Quarto";
-                      color = "#9C27B0";
-                      stroke_width = 1;
-                      curve = "smooth";
-                      opacity = 0.5;
-                      group_by = {
-                        func = "max";
-                        duration = "1d";
-                      };
-                    }
-                    {
-                      entity = "sensor.ac_quarto_hospedes_runtime_today";
-                      name = "Hóspedes";
-                      color = "#4CAF50";
-                      stroke_width = 1;
-                      curve = "smooth";
-                      opacity = 0.5;
-                      group_by = {
-                        func = "max";
-                        duration = "1d";
-                      };
-                    }
-                  ];
+                  series = runtimeAreaSeries;
                 }
                 {
                   type = "conditional";
@@ -893,36 +819,7 @@ in
                     };
                     graph_span = "24h";
                     span.end = "now";
-                    series = [
-                      {
-                        entity = "sensor.ac_sala_room_humidity";
-                        name = "Sala";
-                        color = "#FF9800";
-                        stroke_width = 2;
-                        curve = "smooth";
-                      }
-                      {
-                        entity = "sensor.ac_escritorio_room_humidity";
-                        name = "Escritório";
-                        color = "#2196F3";
-                        stroke_width = 2;
-                        curve = "smooth";
-                      }
-                      {
-                        entity = "sensor.ac_quarto_room_humidity";
-                        name = "Quarto";
-                        color = "#9C27B0";
-                        stroke_width = 2;
-                        curve = "smooth";
-                      }
-                      {
-                        entity = "sensor.ac_quarto_hospedes_room_humidity";
-                        name = "Hóspedes";
-                        color = "#4CAF50";
-                        stroke_width = 2;
-                        curve = "smooth";
-                      }
-                    ];
+                    series = humiditySeries;
                   };
                 }
               ];
@@ -1482,36 +1379,6 @@ in
                     url_path = "http://${network.ninho.vpnIp}:${toString ports.jellyfin}";
                   };
                 }
-                {
-                  type = "custom:mushroom-template-card";
-                  primary = "Navidrome";
-                  secondary = "Music";
-                  icon = "mdi:music";
-                  icon_color = "green";
-                  layout_options = {
-                    grid_columns = 1;
-                    grid_rows = 1;
-                  };
-                  tap_action = {
-                    action = "url";
-                    url_path = "http://${network.ninho.vpnIp}:${toString ports.navidrome}";
-                  };
-                }
-                {
-                  type = "custom:mushroom-template-card";
-                  primary = "Jellyseerr";
-                  secondary = "Requests";
-                  icon = "mdi:movie-search";
-                  icon_color = "amber";
-                  layout_options = {
-                    grid_columns = 1;
-                    grid_rows = 1;
-                  };
-                  tap_action = {
-                    action = "url";
-                    url_path = "http://${network.ninho.vpnIp}:${toString ports.jellyseerr}";
-                  };
-                }
               ];
             }
           ];
@@ -1527,416 +1394,156 @@ in
           path = "services";
           max_columns = 4;
           sections = [
-            # ── Media ──
-            {
-              type = "grid";
-              title = "Media";
-              cards = [
-                {
-                  type = "custom:mushroom-template-card";
-                  primary = "Jellyfin";
-                  secondary = "Media Server";
-                  icon = "mdi:play-box-multiple";
-                  icon_color = "purple";
-                  layout_options = {
-                    grid_columns = 1;
-                    grid_rows = 1;
-                  };
-                  tap_action = {
-                    action = "url";
-                    url_path = "http://${network.ninho.vpnIp}:${toString ports.jellyfin}";
-                  };
-                }
-                {
-                  type = "custom:mushroom-template-card";
-                  primary = "Navidrome";
-                  secondary = "Music";
-                  icon = "mdi:music";
-                  icon_color = "green";
-                  layout_options = {
-                    grid_columns = 1;
-                    grid_rows = 1;
-                  };
-                  tap_action = {
-                    action = "url";
-                    url_path = "http://${network.ninho.vpnIp}:${toString ports.navidrome}";
-                  };
-                }
-                {
-                  type = "custom:mushroom-template-card";
-                  primary = "Jellyseerr";
-                  secondary = "Requests";
-                  icon = "mdi:movie-search";
-                  icon_color = "amber";
-                  layout_options = {
-                    grid_columns = 1;
-                    grid_rows = 1;
-                  };
-                  tap_action = {
-                    action = "url";
-                    url_path = "http://${network.ninho.vpnIp}:${toString ports.jellyseerr}";
-                  };
-                }
-                {
-                  type = "custom:mushroom-template-card";
-                  primary = "Kavita";
-                  secondary = "Books";
-                  icon = "mdi:book-open-page-variant";
-                  icon_color = "teal";
-                  layout_options = {
-                    grid_columns = 1;
-                    grid_rows = 1;
-                  };
-                  tap_action = {
-                    action = "url";
-                    url_path = "http://${network.ninho.vpnIp}:${toString ports.kavita}";
-                  };
-                }
-              ];
-            }
-            # ── Downloads ──
-            {
-              type = "grid";
-              title = "Downloads";
-              cards = [
-                {
-                  type = "custom:mushroom-template-card";
-                  primary = "Sonarr";
-                  secondary = "TV Shows";
-                  icon = "mdi:television-classic";
-                  icon_color = "blue";
-                  layout_options = {
-                    grid_columns = 1;
-                    grid_rows = 1;
-                  };
-                  tap_action = {
-                    action = "url";
-                    url_path = "http://${network.ninho.vpnIp}:8099";
-                  };
-                }
-                {
-                  type = "custom:mushroom-template-card";
-                  primary = "Radarr";
-                  secondary = "Movies";
-                  icon = "mdi:movie";
-                  icon_color = "amber";
-                  layout_options = {
-                    grid_columns = 1;
-                    grid_rows = 1;
-                  };
-                  tap_action = {
-                    action = "url";
-                    url_path = "http://${network.ninho.vpnIp}:8098";
-                  };
-                }
-                {
-                  type = "custom:mushroom-template-card";
-                  primary = "Lidarr";
-                  secondary = "Music";
-                  icon = "mdi:music-note";
-                  icon_color = "green";
-                  layout_options = {
-                    grid_columns = 1;
-                    grid_rows = 1;
-                  };
-                  tap_action = {
-                    action = "url";
-                    url_path = "http://${network.ninho.vpnIp}:8100";
-                  };
-                }
-                {
-                  type = "custom:mushroom-template-card";
-                  primary = "Readarr";
-                  secondary = "Books";
-                  icon = "mdi:book";
-                  icon_color = "brown";
-                  layout_options = {
-                    grid_columns = 1;
-                    grid_rows = 1;
-                  };
-                  tap_action = {
-                    action = "url";
-                    url_path = "http://${network.ninho.vpnIp}:8101";
-                  };
-                }
-                {
-                  type = "custom:mushroom-template-card";
-                  primary = "Prowlarr";
-                  secondary = "Indexers";
-                  icon = "mdi:magnify";
-                  icon_color = "orange";
-                  layout_options = {
-                    grid_columns = 1;
-                    grid_rows = 1;
-                  };
-                  tap_action = {
-                    action = "url";
-                    url_path = "http://${network.ninho.vpnIp}:8097";
-                  };
-                }
-                {
-                  type = "custom:mushroom-template-card";
-                  primary = "Bazarr";
-                  secondary = "Subtitles";
-                  icon = "mdi:subtitles";
-                  icon_color = "grey";
-                  layout_options = {
-                    grid_columns = 1;
-                    grid_rows = 1;
-                  };
-                  tap_action = {
-                    action = "url";
-                    url_path = "http://${network.ninho.vpnIp}:8112";
-                  };
-                }
-                {
-                  type = "custom:mushroom-template-card";
-                  primary = "Deluge";
-                  secondary = "Torrents";
-                  icon = "mdi:download";
-                  icon_color = "blue";
-                  layout_options = {
-                    grid_columns = 1;
-                    grid_rows = 1;
-                  };
-                  tap_action = {
-                    action = "url";
-                    url_path = "http://${network.ninho.vpnIp}:8103";
-                  };
-                }
-                {
-                  type = "custom:mushroom-template-card";
-                  primary = "Bitmagnet";
-                  secondary = "DHT Indexer";
-                  icon = "mdi:magnet";
-                  icon_color = "red";
-                  layout_options = {
-                    grid_columns = 1;
-                    grid_rows = 1;
-                  };
-                  tap_action = {
-                    action = "url";
-                    url_path = "http://${network.ninho.vpnIp}:3333";
-                  };
-                }
-              ];
-            }
-            # ── Cloud & Files ──
-            {
-              type = "grid";
-              title = "Cloud & Files";
-              cards = [
-                {
-                  type = "custom:mushroom-template-card";
-                  primary = "Nextcloud";
-                  secondary = "Files";
-                  icon = "mdi:cloud";
-                  icon_color = "blue";
-                  layout_options = {
-                    grid_columns = 1;
-                    grid_rows = 1;
-                  };
-                  tap_action = {
-                    action = "url";
-                    url_path = "http://${network.ninho.vpnIp}:${toString ports.nextcloud}";
-                  };
-                }
-                {
-                  type = "custom:mushroom-template-card";
-                  primary = "Syncthing";
-                  secondary = "Sync";
-                  icon = "mdi:sync";
-                  icon_color = "cyan";
-                  layout_options = {
-                    grid_columns = 1;
-                    grid_rows = 1;
-                  };
-                  tap_action = {
-                    action = "url";
-                    url_path = "http://${network.ninho.vpnIp}:8384";
-                  };
-                }
-                {
-                  type = "custom:mushroom-template-card";
-                  primary = "FileBrowser";
-                  secondary = "Web Files";
-                  icon = "mdi:folder";
-                  icon_color = "orange";
-                  layout_options = {
-                    grid_columns = 1;
-                    grid_rows = 1;
-                  };
-                  tap_action = {
-                    action = "url";
-                    url_path = "http://${network.ninho.vpnIp}:${toString ports.filebrowser}";
-                  };
-                }
-                {
-                  type = "custom:mushroom-template-card";
-                  primary = "Immich";
-                  secondary = "Photos";
-                  icon = "mdi:image-multiple";
-                  icon_color = "indigo";
-                  layout_options = {
-                    grid_columns = 1;
-                    grid_rows = 1;
-                  };
-                  tap_action = {
-                    action = "url";
-                    url_path = "http://${network.ninho.vpnIp}:${toString ports.immich}";
-                  };
-                }
-              ];
-            }
-            # ── AI & Tools ──
-            {
-              type = "grid";
-              title = "AI & Tools";
-              cards = [
-                {
-                  type = "custom:mushroom-template-card";
-                  primary = "llama-swap";
-                  secondary = "LLM API";
-                  icon = "mdi:brain";
-                  icon_color = "yellow";
-                  layout_options = {
-                    grid_columns = 1;
-                    grid_rows = 1;
-                  };
-                  tap_action = {
-                    action = "url";
-                    url_path = "http://${network.ninho.vpnIp}:${toString ports.llamaswap}";
-                  };
-                }
-                {
-                  type = "custom:mushroom-template-card";
-                  primary = "ComfyUI";
-                  secondary = "Image Gen";
-                  icon = "mdi:image-auto-adjust";
-                  icon_color = "pink";
-                  layout_options = {
-                    grid_columns = 1;
-                    grid_rows = 1;
-                  };
-                  tap_action = {
-                    action = "url";
-                    url_path = "http://${network.ninho.vpnIp}:${toString ports.comfy-ui}";
-                  };
-                }
-                {
-                  type = "custom:mushroom-template-card";
-                  primary = "Memos";
-                  secondary = "Notes";
-                  icon = "mdi:note-text";
-                  icon_color = "teal";
-                  layout_options = {
-                    grid_columns = 1;
-                    grid_rows = 1;
-                  };
-                  tap_action = {
-                    action = "url";
-                    url_path = "http://${network.ninho.vpnIp}:8111";
-                  };
-                }
-                {
-                  type = "custom:mushroom-template-card";
-                  primary = "Miniflux";
-                  secondary = "RSS Reader";
-                  icon = "mdi:rss";
-                  icon_color = "orange";
-                  layout_options = {
-                    grid_columns = 1;
-                    grid_rows = 1;
-                  };
-                  tap_action = {
-                    action = "url";
-                    url_path = "http://${network.ninho.vpnIp}:8104";
-                  };
-                }
-                {
-                  type = "custom:mushroom-template-card";
-                  primary = "Emanote";
-                  secondary = "Zettelkasten";
-                  icon = "mdi:notebook";
-                  icon_color = "green";
-                  layout_options = {
-                    grid_columns = 1;
-                    grid_rows = 1;
-                  };
-                  tap_action = {
-                    action = "url";
-                    url_path = "http://${network.ninho.vpnIp}:7000";
-                  };
-                }
-              ];
-            }
-            # ── Monitoring ──
-            {
-              type = "grid";
-              title = "Monitoring";
-              cards = [
-                {
-                  type = "custom:mushroom-template-card";
-                  primary = "Grafana";
-                  secondary = "Metrics";
-                  icon = "mdi:chart-areaspline";
-                  icon_color = "orange";
-                  layout_options = {
-                    grid_columns = 1;
-                    grid_rows = 1;
-                  };
-                  tap_action = {
-                    action = "url";
-                    url_path = "http://${network.ninho.vpnIp}:${toString ports.grafana}";
-                  };
-                }
-                {
-                  type = "custom:mushroom-template-card";
-                  primary = "Gatus";
-                  secondary = "Status";
-                  icon = "mdi:heart-pulse";
-                  icon_color = "green";
-                  layout_options = {
-                    grid_columns = 1;
-                    grid_rows = 1;
-                  };
-                  tap_action = {
-                    action = "url";
-                    url_path = "http://${network.ninho.vpnIp}:${toString ports.gatus}";
-                  };
-                }
-                {
-                  type = "custom:mushroom-template-card";
-                  primary = "Ntfy";
-                  secondary = "Notifications";
-                  icon = "mdi:bell";
-                  icon_color = "red";
-                  layout_options = {
-                    grid_columns = 1;
-                    grid_rows = 1;
-                  };
-                  tap_action = {
-                    action = "url";
-                    url_path = "http://${network.ninho.vpnIp}:${toString ports.ntfy}";
-                  };
-                }
-                {
-                  type = "custom:mushroom-template-card";
-                  primary = "Homepage";
-                  secondary = "Dashboard";
-                  icon = "mdi:view-dashboard";
-                  icon_color = "grey";
-                  layout_options = {
-                    grid_columns = 1;
-                    grid_rows = 1;
-                  };
-                  tap_action = {
-                    action = "url";
-                    url_path = "http://${network.ninho.vpnIp}:${toString ports.homepage}";
-                  };
-                }
-              ];
-            }
+            (mkServiceGrid "Media" [
+              {
+                name = "Jellyfin";
+                secondary = "Media Server";
+                icon = "mdi:play-box-multiple";
+                color = "purple";
+                port = ports.jellyfin;
+              }
+            ])
+            (mkServiceGrid "Downloads" [
+              {
+                name = "Sonarr";
+                secondary = "TV Shows";
+                icon = "mdi:television-classic";
+                color = "blue";
+                port = ports.sonarr;
+              }
+              {
+                name = "Radarr";
+                secondary = "Movies";
+                icon = "mdi:movie";
+                color = "amber";
+                port = ports.radarr;
+              }
+              {
+                name = "Lidarr";
+                secondary = "Music";
+                icon = "mdi:music-note";
+                color = "green";
+                port = ports.lidarr;
+              }
+              {
+                name = "Readarr";
+                secondary = "Books";
+                icon = "mdi:book";
+                color = "brown";
+                port = ports.readarr;
+              }
+              {
+                name = "Prowlarr";
+                secondary = "Indexers";
+                icon = "mdi:magnify";
+                color = "orange";
+                port = ports.prowlarr;
+              }
+              {
+                name = "Bazarr";
+                secondary = "Subtitles";
+                icon = "mdi:subtitles";
+                color = "grey";
+                port = ports.bazarr;
+              }
+              {
+                name = "Deluge";
+                secondary = "Torrents";
+                icon = "mdi:download";
+                color = "blue";
+                port = ports.deluge;
+              }
+              {
+                name = "Bitmagnet";
+                secondary = "DHT Indexer";
+                icon = "mdi:magnet";
+                color = "red";
+                port = ports.bitmagnet;
+              }
+            ])
+            (mkServiceGrid "Cloud & Files" [
+              {
+                name = "Nextcloud";
+                secondary = "Files";
+                icon = "mdi:cloud";
+                color = "blue";
+                port = ports.nextcloud;
+              }
+              {
+                name = "Syncthing";
+                secondary = "Sync";
+                icon = "mdi:sync";
+                color = "cyan";
+                port = ports.syncthing;
+              }
+              {
+                name = "FileBrowser";
+                secondary = "Web Files";
+                icon = "mdi:folder";
+                color = "orange";
+                port = ports.filebrowser;
+              }
+              {
+                name = "Immich";
+                secondary = "Photos";
+                icon = "mdi:image-multiple";
+                color = "indigo";
+                port = ports.immich;
+              }
+            ])
+            (mkServiceGrid "AI & Tools" [
+              {
+                name = "llama-swap";
+                secondary = "LLM API";
+                icon = "mdi:brain";
+                color = "yellow";
+                port = ports.llamaswap;
+              }
+              {
+                name = "ComfyUI";
+                secondary = "Image Gen";
+                icon = "mdi:image-auto-adjust";
+                color = "pink";
+                port = ports.comfy-ui;
+              }
+              {
+                name = "Miniflux";
+                secondary = "RSS Reader";
+                icon = "mdi:rss";
+                color = "orange";
+                port = ports.miniflux;
+              }
+              {
+                name = "Emanote";
+                secondary = "Zettelkasten";
+                icon = "mdi:notebook";
+                color = "green";
+                port = ports.emanote;
+              }
+            ])
+            (mkServiceGrid "Monitoring" [
+              {
+                name = "Grafana";
+                secondary = "Metrics";
+                icon = "mdi:chart-areaspline";
+                color = "orange";
+                port = ports.grafana;
+              }
+              {
+                name = "Ntfy";
+                secondary = "Notifications";
+                icon = "mdi:bell";
+                color = "red";
+                port = ports.ntfy;
+              }
+              {
+                name = "Homepage";
+                secondary = "Dashboard";
+                icon = "mdi:view-dashboard";
+                color = "grey";
+                port = ports.homepage;
+              }
+            ])
           ];
         }
 
@@ -2279,45 +1886,6 @@ in
                   entity = "automation.tv_on_sala_comfort";
                   name = "TV On Heat";
                   icon = "mdi:television";
-                  tap_action = {
-                    action = "toggle";
-                  };
-                  layout_options = {
-                    grid_columns = 2;
-                    grid_rows = 1;
-                  };
-                }
-                {
-                  type = "custom:mushroom-entity-card";
-                  entity = "automation.cooking_done_notification";
-                  name = "Cooking Alert";
-                  icon = "mdi:grill";
-                  tap_action = {
-                    action = "toggle";
-                  };
-                  layout_options = {
-                    grid_columns = 2;
-                    grid_rows = 1;
-                  };
-                }
-                {
-                  type = "custom:mushroom-entity-card";
-                  entity = "automation.garmin_daily_summary";
-                  name = "Daily Health";
-                  icon = "mdi:heart-pulse";
-                  tap_action = {
-                    action = "toggle";
-                  };
-                  layout_options = {
-                    grid_columns = 2;
-                    grid_rows = 1;
-                  };
-                }
-                {
-                  type = "custom:mushroom-entity-card";
-                  entity = "automation.weekly_summary";
-                  name = "Weekly Summary";
-                  icon = "mdi:calendar-week";
                   tap_action = {
                     action = "toggle";
                   };

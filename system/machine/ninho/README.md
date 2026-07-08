@@ -1,4 +1,4 @@
-# ninho — home server
+# ninho: home server
 
 AMD Ryzen 9 9950X3D · ASUS ROG Strix X870E · RTX 5090 · 128 GB RAM ·
 2× NVMe (rpool mirror) + 3× HDD (storage RAIDZ1).
@@ -10,7 +10,7 @@ auto-unlocked at boot via Tang on the RPi).
 
 Top-level layout under `services/`:
 
-- `nextcloud`, `immich`, `jellyfin`, `jellyseerr`, `navidrome`, `kavita`
+- `nextcloud`, `immich`, `jellyfin`
 - `*arr` stack via `servarr.nix` + `bazarr` + `deluge` + `bitmagnet`
 - `home-assistant` (split into config domains under `services/home-assistant/`)
 - `monitoring` (Prometheus + exporters + Grafana, split per concern)
@@ -18,16 +18,16 @@ Top-level layout under `services/`:
   SD3.5, Whisper, Jina reranker)
 - `faster-whisper` + Wyoming voice grid (en/pt)
 - `homepage` (dashboard), `ntfy`, `home-assistant`, `atuin`, `attic`,
-  `memos`, `miniflux`, `anki-sync-server`, `open-webui`, `uptime-kuma`,
+  `miniflux`, `anki-sync-server`, `open-webui`, `uptime-kuma`,
   `supernote`, `gaming` (Steam + Sunshine).
 
 System-level pieces split out of `configuration.nix`:
 
-- `boot.nix` — kernel 6.18, initrd modules, LUKS + Clevis unlock, GRUB.
-- `networking.nix` — NetworkManager, DNS, firewall, WireGuard tunnel
+- `boot.nix`: kernel 6.18, initrd modules, LUKS + Clevis unlock, GRUB.
+- `networking.nix`: NetworkManager, DNS, firewall, WireGuard tunnel
   (10.100.0.100 to the RPi), game-streaming sysctl tuning.
-- `storage.nix` — ZFS pools, sanoid snapshot policies, storage seed dirs.
-- `users.nix` — bolt + pollard (initial password `"ninho"`, change ASAP).
+- `storage.nix`: ZFS pools, sanoid snapshot policies, storage seed dirs.
+- `users.nix`: bolt + pollard (initial password `"ninho"`, change ASAP).
 
 ## Gotchas worth knowing
 

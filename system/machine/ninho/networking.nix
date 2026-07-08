@@ -1,4 +1,4 @@
-# Networking — hostname, hostId (ZFS), NetworkManager, DNS,
+# Networking: hostname, hostId (ZFS), NetworkManager, DNS,
 # firewall (TCP/UDP allowed ports + service-port aggregation),
 # WireGuard, and game-streaming sysctl tuning.
 { constants, ... }:
@@ -46,11 +46,9 @@
         readarr
         bitmagnet
         deluge
-        jellyseerr
         syncthing
         coolercontrol
-      ])
-      ++ builtins.attrValues constants.wyoming;
+      ]);
       allowedUDPPorts = [
         constants.network.wireguard.port
         22000 # Syncthing discovery
@@ -91,11 +89,11 @@
     # Reduce bufferbloat for lower latency
     "net.core.netdev_max_backlog" = 5000;
 
-    # Smart queue on ninho's egress — fq_codel keeps a fair, low-latency queue
+    # Smart queue on ninho's egress: fq_codel keeps a fair, low-latency queue
     # so a bandwidth spike from one flow can't build a standing backlog that
     # shows up as stutter on the Steam Remote Play / Sunshine video stream.
     # NOTE: the dominant bufferbloat hop is usually the router's Wi-Fi downlink;
-    # enable SQM/cake there too — this only smooths the host's sending side.
+    # enable SQM/cake there too: this only smooths the host's sending side.
     "net.core.default_qdisc" = "fq_codel";
 
     # TCP optimization for control channel

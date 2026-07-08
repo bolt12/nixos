@@ -31,7 +31,6 @@ let
             LLAMA_SWAP_URL="http://localhost:${toString ports.llamaswap}"
             NTFY_URL="http://localhost:${toString ports.ntfy}/${topic}"
             PROM_URL="http://localhost:${toString ports.prometheus}"
-            GATUS_URL="http://localhost:${toString ports.gatus}"
             MODEL="${model}"
 
             # ---- Signals ---------------------------------------------------------
@@ -66,18 +65,11 @@ let
 
             gen_today=$(find /nix/var/nix/profiles -maxdepth 1 -name "system-*-link" -newermt "yesterday 00:00" 2>/dev/null | wc -l || echo 0)
 
-            # Currently-failing gatus endpoints — surfaces "running but degraded"
-            # services that don't show up in `systemctl --failed`.
-            gatus_failures=$(curl -fsS "$GATUS_URL/api/v1/endpoints/statuses" 2>/dev/null \
-              | jq -r '.[] | select((.results // []) | length > 0) | select(.results[-1].success | not) | "\(.group)/\(.name)"' \
-              || true)
-            [ -z "$gatus_failures" ] && gatus_failures="(none)"
-
             zfs_capacity=$(zfs list -H -o name,used,avail rpool storage 2>/dev/null \
               | awk '{printf "%-10s used=%s avail=%s\n", $1, $2, $3}' \
               || echo "(zfs list failed)")
 
-            # Last 5 snapshots on the syncoid destination — staleness ≈ replication lag.
+            # Last 5 snapshots on the syncoid destination: staleness ≈ replication lag.
             syncoid_recent=$(zfs list -H -t snapshot -o name,creation -s creation -r storage/backup 2>/dev/null \
               | tail -5 \
               || true)
@@ -120,9 +112,6 @@ let
       == Disk usage ==
       $disk_use
 
-      == Gatus failures (services up but failing health checks) ==
-      $gatus_failures
-
       == ZFS capacity ==
       $zfs_capacity
 
@@ -139,7 +128,7 @@ let
 
             # ---- LLM call --------------------------------------------------------
 
-            # Both the prompt AND the assembled JSON payload go through tempfiles —
+            # Both the prompt AND the assembled JSON payload go through tempfiles;
             # the previous `curl -d "$(jq …)"` form put the entire payload on the
             # shell command line, hitting ARG_MAX when journal warnings were
             # noisy (jq/curl: "Argument list too long").
@@ -167,7 +156,7 @@ let
                          "$response_file" 2>/dev/null \
                          || echo "Morning brief: LLM response parse error.")
             else
-              response="Morning brief: LLM call failed — see \`journalctl -u morning-brief\`."
+              response="Morning brief: LLM call failed; see \`journalctl -u morning-brief\`."
             fi
 
             # ---- ntfy priority by self-tagged severity ---------------------------
@@ -183,7 +172,7 @@ let
             body=$(printf '%s' "$response" | head -c 3500)
 
             curl -fsS -X POST "$NTFY_URL" \
-              -H "Title: ninho morning brief — $(date +%Y-%m-%d)" \
+              -H "Title: ninho morning brief $(date +%Y-%m-%d)" \
               -H "Priority: $priority" \
               -H "Tags: server,coffee" \
               --data "$body" >/dev/null

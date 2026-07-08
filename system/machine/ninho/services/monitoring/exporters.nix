@@ -1,4 +1,4 @@
-# Prometheus exporters — system, GPU, DB, ZFS, SMART, systemd, energy, *arr.
+# Prometheus exporters: system, GPU, DB, ZFS, SMART, systemd, energy, *arr.
 # Pure data; merged into services.prometheus.exporters by the module system.
 { ... }:
 {
@@ -25,7 +25,9 @@
     postgres = {
       enable = true;
       port = 9187;
-      dataSourceName = "user=prometheus host=/run/postgresql database=postgres sslmode=disable";
+      # Connect as the exporter's own OS user so local peer auth succeeds
+      # (the role is created in databases.nix).
+      dataSourceName = "user=postgres-exporter host=/run/postgresql database=postgres sslmode=disable";
     };
 
     # ZFS pool health & performance

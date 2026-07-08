@@ -42,7 +42,7 @@ in
     inputs.dms.homeModules.niri
     # Registers every DMS plugin (disabled by default); enable individual ones
     # via programs.dank-material-shell.plugins.<id>.enable below.
-    inputs.dms-plugin-registry.modules.default
+    inputs.dms-plugin-registry.homeModules.default
 
     # Add desktop-specific profiles
     ../../profiles/desktop.nix
@@ -57,7 +57,7 @@ in
     ../../programs/waybar/default.nix
     ../../programs/fuzzel/default.nix
     ../../programs/niri/default.nix
-    # Noctalia (Quickshell-based) is currently broken on this iGPU + Mesa —
+    # Noctalia (Quickshell-based) is currently broken on this iGPU + Mesa:
     # its render thread crashes inside libLLVM. Re-enable once upstream
     # stabilizes, or once we move off Mesa 25.2.x + LLVM 21.x.
     # (Noctalia v4 is now EOL / v5 is alpha; prefer the DMS trial below.)
@@ -97,11 +97,6 @@ in
     };
   };
 
-  # Adopt the 26.05 HM default explicitly (keep gtk4 untheme'd; let
-  # libadwaita/Stylix manage gtk4 styling). Silences the gated warning
-  # without bumping home.stateVersion.
-  gtk.gtk4.theme = null;
-
   # Desktop-specific programs
   programs = {
     firefox = {
@@ -112,7 +107,7 @@ in
 
     # DankMaterialShell is the daily-driver shell/bar (replaced waybar). The
     # module installs Quickshell + every feature dep (dgop, matugen, cava,
-    # khal, wtype) — all enable* flags default true, so we don't list them.
+    # khal, wtype); all enable* flags default true, so we don't list them.
     #
     # Autostart is via the systemd user service ONLY (Restart=on-failure,
     # bound to the wayland target). `niri.enableSpawn` is therefore OFF: with
@@ -121,7 +116,7 @@ in
     #
     # `enableKeybinds` / `includes.enable` stay OFF so our hand-authored niri
     # binds (programs/niri/keybindings.nix) and window/layer rules remain
-    # authoritative — DMS IPC binds (Mod+Space launcher, Mod+V clipboard,
+    # authoritative. DMS IPC binds (Mod+Space launcher, Mod+V clipboard,
     # etc.) can be wired in manually later if wanted.
     dank-material-shell = {
       enable = true;
@@ -144,7 +139,7 @@ in
         # TLP over power-profiles-daemon. Bar widget + control-center toggle.
         # Also fronts the ThinkPad charge thresholds (thinkpad_acpi exposes
         # charge_control_{start,end}_threshold; TLP drives them at 85/90).
-        # NOTE: the dmsLenovoBatterySettings plugin is intentionally NOT used —
+        # NOTE: the dmsLenovoBatterySettings plugin is intentionally NOT used:
         # it targets `ideapad_laptop` (consumer IdeaPads); this X1 Carbon uses
         # `thinkpad_acpi`, so that widget would be non-functional here.
         tlpControl.enable = true; # needs `tlp` (already enabled in x1-g8)
@@ -164,11 +159,6 @@ in
     };
   };
 
-  # Stretchly — Wayland-native break reminder (replaces safeeyes, which has
-  # broken fullscreen/DND detection under Niri). Autostarted via niri's
-  # spawn-at-startup; minimizes to tray on launch.
-  home.packages = [ pkgs.stretchly ];
-
   # Desktop-specific services
   services = {
     lorri.enable = true;
@@ -179,14 +169,14 @@ in
     udiskie.enable = true;
     poweralertd.enable = true;
 
-    # Idle management — lock after 5min, monitors off after 10min.
+    # Idle management: lock after 5min, monitors off after 10min.
     # swayidle is a generic Wayland idle client (ext-idle-notify), so it runs
     # under niri as well as Sway. The lock command (swaylock) is portable, but
     # the monitor-power command is compositor-specific: `swaymsg ... dpms` only
     # works on Sway, while niri uses `niri msg action power-off-monitors`. We
     # dispatch on $XDG_CURRENT_DESKTOP so the same service is correct in both
     # sessions (previously this used swaymsg unconditionally, so the screen
-    # never powered off under niri — it only locked).
+    # never powered off under niri; it only locked).
     swayidle = {
       enable = true;
       timeouts = [
@@ -226,7 +216,7 @@ in
     #     bump it to 4K mode at runtime if needed.
   };
 
-  # Stylix theming — Catppuccin Mocha (unified with sway/waybar)
+  # Stylix theming: Catppuccin Mocha (unified with sway/waybar)
   stylix = {
     enable = true;
     autoEnable = false;
@@ -240,7 +230,7 @@ in
         package = pkgs.jetbrains-mono;
         name = "JetBrains Mono";
       };
-      # Inter for UI chrome (bar, GTK apps) — the de-facto "cosy" UI font.
+      # Inter for UI chrome (bar, GTK apps), the de-facto "cosy" UI font.
       # JetBrains Mono stays the monospace/terminal face above.
       sansSerif = {
         package = pkgs.inter;

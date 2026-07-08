@@ -1,4 +1,4 @@
-# Grafana — datasources, dashboards, unified alerting + ntfy webhook routing.
+# Grafana: datasources, dashboards, unified alerting + ntfy webhook routing.
 # All alert rules are inline; see grafana-dashboards/ for the JSON dashboards.
 { pkgs, ... }:
 {
@@ -96,7 +96,8 @@
               ];
               group_wait = "30s";
               group_interval = "5m";
-              repeat_interval = "4h";
+              # 24h so a persistently-firing alert nags once a day, not 6×.
+              repeat_interval = "24h";
             }
           ];
         };
@@ -203,7 +204,9 @@
                         to = 0;
                       };
                       model = {
-                        expr = "smartctl_device_temperature{temperature_type=\"current\"}";
+                        # NVMe drives routinely run 55-70C under load (healthy);
+                        # excluding them leaves HDD thermal protection intact.
+                        expr = "smartctl_device_temperature{temperature_type=\"current\",device!~\"nvme.*\"}";
                         instant = true;
                       };
                     }
@@ -472,10 +475,12 @@
                       };
                     }
                   ];
-                  for = "5m";
+                  # 20m: this box sustains high CPU during transcodes/inference;
+                  # only a much longer plateau signals a genuinely stuck load.
+                  for = "20m";
                   labels.severity = "warning";
                   annotations = {
-                    summary = "CPU usage {{ $value | printf \"%.1f\" }}% (>80% for 5m)";
+                    summary = "CPU usage {{ $value | printf \"%.1f\" }}% (>80% for 20m)";
                   };
                 }
                 {
@@ -558,46 +563,9 @@
                     summary = "Swap usage {{ $value | printf \"%.1f\" }}% (>50% for 5m)";
                   };
                 }
-                {
-                  uid = "gpu-vram-high";
-                  title = "GPU VRAM High";
-                  condition = "C";
-                  data = [
-                    {
-                      refId = "A";
-                      datasourceUid = "prometheus";
-                      relativeTimeRange = {
-                        from = 300;
-                        to = 0;
-                      };
-                      model = {
-                        expr = "nvidia_smi_memory_used_bytes / nvidia_smi_memory_total_bytes * 100";
-                        instant = true;
-                      };
-                    }
-                    {
-                      refId = "C";
-                      datasourceUid = "__expr__";
-                      model = {
-                        type = "threshold";
-                        expression = "A";
-                        conditions = [
-                          {
-                            evaluator = {
-                              type = "gt";
-                              params = [ 95 ];
-                            };
-                          }
-                        ];
-                      };
-                    }
-                  ];
-                  for = "2m";
-                  labels.severity = "warning";
-                  annotations = {
-                    summary = "GPU VRAM usage {{ $value | printf \"%.1f\" }}% (>95% for 2m)";
-                  };
-                }
+                # GPU VRAM High removed: llama-swap keeps VRAM pinned near 100%
+                # by design, so a >95% alert fires constantly with no actionable
+                # signal. GPU temperature (critical group) covers real GPU faults.
                 {
                   uid = "nvme-wear-high";
                   title = "NVMe Wear High";
@@ -705,17 +673,19 @@
                           {
                             evaluator = {
                               type = "gt";
-                              params = [ 500 ];
+                              params = [ 700 ];
                             };
                           }
                         ];
                       };
                     }
                   ];
-                  for = "5m";
+                  # 700W for 15m: a 5090 + 9950X3D legitimately exceeds 500W during
+                  # inference/gaming, so only a sustained near-peak plateau alerts.
+                  for = "15m";
                   labels.severity = "warning";
                   annotations = {
-                    summary = "System power {{ $value | printf \"%.0f\" }}W (>500W for 5m)";
+                    summary = "System power {{ $value | printf \"%.0f\" }}W (>700W for 15m)";
                   };
                 }
               ];

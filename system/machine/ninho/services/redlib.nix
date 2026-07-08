@@ -1,18 +1,17 @@
-# Redlib — privacy-respecting Reddit frontend. JS-free, no tracking.
+# Redlib: privacy-respecting Reddit frontend. JS-free, no tracking.
 # Anonymous-only (no Reddit login); subscriptions persist via cookie or URL.
 # Bound on 0.0.0.0 so it's reachable from LAN and the WireGuard VPN.
 #
 # The redlib package is pinned to upstream HEAD via the overlay in
 # `system/machine/ninho/package-overrides.nix` (see comment there for the
-# bump procedure). If gatus's Redlib body assertion ever flips red on a new
-# failure pattern, add the pattern to gatus.nix:Redlib's conditions.
+# bump procedure).
 { pkgs, lib, constants, ... }:
 let
   inherit (constants) network ports;
   redlibBase = "http://${network.ninho.vpnIp}:${toString ports.redlib}";
 
   # Subscriptions pre-populated into every fresh visitor's cookie. Sorted
-  # case-insensitively for findability — add/remove freely. Reddit subreddit
+  # case-insensitively for findability: add/remove freely. Reddit subreddit
   # names are case-insensitive in URLs but redlib preserves casing in the
   # cookie, so keep the user's preferred capitalization.
   subreddits = [
@@ -115,7 +114,7 @@ let
   ];
 
   # One-shot migration: rewrite Miniflux feed/site URLs from any reddit.com
-  # host to redlib. Idempotent — re-running matches no rows. Run as:
+  # host to redlib. Idempotent: re-running matches no rows. Run as:
   #   sudo migrate-miniflux-to-redlib
   migrateScript = pkgs.writeShellApplication {
     name = "migrate-miniflux-to-redlib";

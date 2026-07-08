@@ -84,6 +84,21 @@ in
           BindReadOnlyPaths = [ journalDir ];
         };
       };
+
+      # Wake ninho on boot: when mains power returns the RPi auto-reboots, so
+      # send a WoL magic packet to bring the home server back up unattended.
+      # Fires on every boot; a packet to an already-on ninho is simply ignored.
+      wake-ninho = {
+        description = "Send Wake-on-LAN magic packet to ninho";
+        after = [ "network-online.target" ];
+        wants = [ "network-online.target" ];
+        wantedBy = [ "multi-user.target" ];
+        serviceConfig = {
+          Type = "oneshot";
+          ExecStartPre = "${pkgs.coreutils}/bin/sleep 5";
+          ExecStart = "${pkgs.wakeonlan}/bin/wakeonlan ${constants.network.ninho.lanMac}";
+        };
+      };
     };
   };
 
@@ -106,6 +121,7 @@ in
       neovim
       unbound-full
       unzip
+      wakeonlan # send WoL magic packets (wake-ninho service)
       wget
       wireguard-tools
       # Add emanote to system packages as well for manual use
@@ -142,7 +158,7 @@ in
       settings = {
         server = {
           module-config = ''"respip validator iterator"'';
-          # Logging — production settings (use unbound-control to enable debug temporarily)
+          # Logging: production settings (use unbound-control to enable debug temporarily)
           verbosity = 0;
           log-queries = "no";
           log-servfail = "yes";
@@ -240,7 +256,7 @@ in
     # Open ports in the firewall.
     firewall = {
       enable = true;
-      # Trust VPN interface — all peers are personal devices, and this also
+      # Trust VPN interface: all peers are personal devices, and this also
       # enables wg0→wg0 forwarding (peer-to-peer traffic like phone → ninho)
       trustedInterfaces = [ "wg0" ];
       allowedTCPPorts = [
@@ -263,7 +279,7 @@ in
         generatePrivateKeyFile = true;
         ips = [ constants.network.wireguard.rpiIp ];
 
-        # Lower MTU for mobile clients — mobile carriers often filter ICMP
+        # Lower MTU for mobile clients: mobile carriers often filter ICMP
         # "fragmentation needed", breaking PMTUD. WG overhead is 60 B (IPv4) /
         # 80 B (IPv6); defaults (1420) leave little headroom once a carrier
         # adds its own tunnel. 1320 is defensive across carriers.

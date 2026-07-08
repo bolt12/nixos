@@ -1,4 +1,4 @@
-# Home Assistant — slim core + HACS. Config domains live under home-assistant/.
+# Home Assistant: slim core + HACS. Config domains live under home-assistant/.
 {
   config,
   pkgs,
@@ -20,7 +20,7 @@ let
       stripRoot = false;
       hash = "sha256-iMomioxH7Iydy+bzJDbZxt6BX31UkCvqhXrxYFQV8Gw=";
     };
-    dependencies = with pkgs.home-assistant.python.pkgs; [ aiogithubapi ];
+    dependencies = with pkgs.home-assistant.python3Packages; [ aiogithubapi ];
   };
 in
 {
@@ -179,9 +179,6 @@ in
       # ─────────────────────────────────────────────────────────────
       "anthropic" # Anthropic Claude
       "ollama" # Ollama local LLM
-      "whisper" # Whisper speech-to-text
-      "wyoming" # Wyoming protocol
-      "stt" # Speech-to-text
       "tts" # Text-to-speech
       "google_translate" # Google Translate TTS
 

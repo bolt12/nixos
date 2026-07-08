@@ -40,12 +40,6 @@ in
                   icon = "jellyfin";
                 }
               ];
-              Navidrome = [
-                {
-                  href = "http://${ninhoIp}:${toString ports.navidrome}";
-                  icon = "navidrome";
-                }
-              ];
               Immich = [
                 {
                   href = "http://${ninhoIp}:${toString ports.immich}";
@@ -118,13 +112,6 @@ in
               };
             }
             {
-              Navidrome = {
-                href = "http://${ninhoIp}:${toString ports.navidrome}";
-                description = "Music Streaming";
-                icon = "navidrome";
-              };
-            }
-            {
               Immich = {
                 href = "http://${ninhoIp}:${toString ports.immich}";
                 description = "Photo Management";
@@ -142,23 +129,6 @@ in
                     "storage"
                     "users"
                   ];
-                };
-              };
-            }
-          ];
-        }
-        {
-          "Media Requests" = [
-            {
-              Jellyseer = {
-                href = "http://${ninhoIp}:${toString ports.jellyseerr}";
-                description = "Request Movies/TV";
-                icon = "jellyseerr";
-                widget = {
-                  type = "jellyseerr";
-                  url = "http://${ninhoIp}:${toString ports.jellyseerr}";
-                  enable = true; # Shows pending requests
-                  key = "MTc2NDYzMDg5OTM5ODc0ZTM1NGRiLTViYTQtNDYzNS05Njg1LTdlN2M4YTI3Mzg0MA==";
                 };
               };
             }
@@ -299,13 +269,6 @@ in
               };
             }
             {
-              Memos = {
-                href = "http://${ninhoIp}:${toString ports.memos}";
-                description = "Quick Notes";
-                icon = "memos";
-              };
-            }
-            {
               Miniflux = {
                 href = "http://${ninhoIp}:${toString ports.miniflux}";
                 description = "RSS Reader";
@@ -315,20 +278,6 @@ in
                   url = "http://${ninhoIp}:${toString ports.miniflux}";
                   username = "bolt";
                   password = "038788dd442a4d6a57304c9404c6767f9cb2ae8e6f1b2ceb49148d8574c7b7f7";
-                };
-              };
-            }
-            {
-              Kavita = {
-                href = "http://${ninhoIp}:${toString ports.kavita}";
-                description = "Ebook & Manga Reader";
-                icon = "kavita";
-                widget = {
-                  type = "kavita";
-                  url = "http://${ninhoIp}:${toString ports.kavita}";
-                  # apiKey from Kavita Settings
-                  key = "4d581159-3a4d-41b0-8d76-6bfa57801ea2";
-
                 };
               };
             }
@@ -350,17 +299,6 @@ in
         }
         {
           Monitoring = [
-            {
-              Gatus = {
-                href = "http://${ninhoIp}:${toString ports.gatus}";
-                description = "Status Page";
-                icon = "gatus";
-                widget = {
-                  type = "gatus";
-                  url = "http://${ninhoIp}:${toString ports.gatus}";
-                };
-              };
-            }
             {
               Grafana = {
                 href = "http://${ninhoIp}:${toString ports.grafana}";

@@ -23,7 +23,7 @@ let
     in
     {
       id = "zone_${z.slug}_applier";
-      alias = "Zone ${z.friendly} — Applier";
+      alias = "Zone ${z.friendly} - Applier";
       description = "React to ${modeSelect} changes and push the resolved hvac_mode + temperature to the Gree unit. Sole writer to ${climate}.";
       mode = "single";
       trigger = [
@@ -115,17 +115,17 @@ in
   services.home-assistant.config = {
     automation =
       # ─────────────────────────────────────────────────────────────
-      # Zone appliers — sole writers to climate.* entities
+      # Zone appliers - sole writers to climate.* entities
       # ─────────────────────────────────────────────────────────────
       (map mkApplier zones) ++ [
         # ─────────────────────────────────────────────────────────────
-        # Climate policy — schedule
+        # Climate policy - schedule
         # ─────────────────────────────────────────────────────────────
 
         # Night shutdown: all zones off at 23:30.
         {
           id = "night_shutdown_all_ac";
-          alias = "Night Shutdown — All Zones Off";
+          alias = "Night Shutdown - All Zones Off";
           description = "Set every zone mode to off at 23:30.";
           trigger = [
             {
@@ -148,7 +148,7 @@ in
               action = "rest_command.ntfy_notify";
               data = {
                 title = "Night Shutdown";
-                message = "Bedtime — all zones set to off";
+                message = "Bedtime - all zones set to off";
               };
             }
           ];
@@ -157,7 +157,7 @@ in
         # Workday morning: pre-heat office at 08:45 if home and outdoor cold.
         {
           id = "workday_start_escritorio";
-          alias = "Workday Start — Escritorio Comfort";
+          alias = "Workday Start - Escritorio Comfort";
           description = "Set escritorio to comfort at 08:45 weekdays if anyone is home and outdoor conditions warrant it.";
           trigger = [
             {
@@ -204,7 +204,7 @@ in
         # Weekend morning: condition the living room from 10:00.
         {
           id = "weekend_morning_sala";
-          alias = "Weekend Morning — Sala Comfort";
+          alias = "Weekend Morning - Sala Comfort";
           description = "Set sala to comfort at 10:00 on weekends if anyone is home and outdoor conditions warrant it.";
           trigger = [
             {
@@ -246,7 +246,7 @@ in
         }
 
         # ─────────────────────────────────────────────────────────────
-        # Climate policy — occupancy
+        # Climate policy - occupancy
         # ─────────────────────────────────────────────────────────────
 
         # Away mode: when nobody has been home for 15 minutes, set every zone off.
@@ -254,7 +254,7 @@ in
         # down the AC for everyone else.
         {
           id = "away_mode_all_zones_off";
-          alias = "Away Mode — All Zones Off";
+          alias = "Away Mode - All Zones Off";
           description = "All zones off when binary_sensor.anyone_home is off for 15 minutes.";
           trigger = [
             {
@@ -279,17 +279,17 @@ in
             {
               action = "rest_command.ntfy_notify";
               data = {
-                message = "Nobody home for 15 min — all zones set to off";
+                message = "Nobody home for 15 min - all zones set to off";
                 title = "Away Mode Activated";
               };
             }
           ];
         }
 
-        # Return — afternoon office reheat after lunch/gym.
+        # Return - afternoon office reheat after lunch/gym.
         {
           id = "return_lunch_escritorio";
-          alias = "Return Home — Escritorio Comfort (afternoon)";
+          alias = "Return Home - Escritorio Comfort (afternoon)";
           description = "Set escritorio to comfort when person returns 12:00–16:00 weekday.";
           trigger = [
             {
@@ -332,10 +332,10 @@ in
           ];
         }
 
-        # Return — evening sala comfort.
+        # Return - evening sala comfort.
         {
           id = "return_evening_sala";
-          alias = "Return Home — Sala Comfort (evening)";
+          alias = "Return Home - Sala Comfort (evening)";
           description = "Set sala to comfort when person returns 18:00–23:00.";
           trigger = [
             {
@@ -372,13 +372,13 @@ in
         }
 
         # ─────────────────────────────────────────────────────────────
-        # Climate policy — TV / calendar triggered
+        # Climate policy - TV / calendar triggered
         # ─────────────────────────────────────────────────────────────
 
         # TV on, evening, sala currently off, weather warrants it.
         {
           id = "tv_on_sala_comfort";
-          alias = "TV On — Sala Comfort";
+          alias = "TV On - Sala Comfort";
           description = "Bring sala to comfort when LG TV turns on in the evening.";
           trigger = [
             {
@@ -418,11 +418,11 @@ in
           ];
         }
 
-        # TV off late: sala off (let bedroom remain whatever it is — bedroom prep
+        # TV off late: sala off (let bedroom remain whatever it is - bedroom prep
         # is no longer a separate automation; configure manually if you want it).
         {
           id = "tv_off_late_sala_off";
-          alias = "TV Off Late — Sala Off";
+          alias = "TV Off Late - Sala Off";
           description = "Sala off when TV turns off after 23:00.";
           trigger = [
             {
@@ -453,10 +453,10 @@ in
           ];
         }
 
-        # Calendar — pre-heat office 15 min before scheduled meeting.
+        # Calendar - pre-heat office 15 min before scheduled meeting.
         {
           id = "calendar_meeting_escritorio";
-          alias = "Calendar Meeting — Escritorio Comfort";
+          alias = "Calendar Meeting - Escritorio Comfort";
           description = "Pre-condition escritorio 15 min before a calendar event 07:00–10:00 weekday.";
           trigger = [
             {
@@ -510,306 +510,8 @@ in
         }
 
         # ─────────────────────────────────────────────────────────────
-        # Climate alerts
-        # ─────────────────────────────────────────────────────────────
-
-        {
-          id = "low_temperature_alert";
-          alias = "Low Temperature Alert";
-          description = "Alert when any room drops below 18°C for 10 minutes.";
-          trigger = [
-            {
-              platform = "numeric_state";
-              entity_id = [
-                "climate.ac_sala"
-                "climate.ac_escritorio"
-                "climate.ac_quarto"
-              ];
-              attribute = "current_temperature";
-              below = 18;
-              "for".minutes = 10;
-            }
-          ];
-          action = [
-            {
-              action = "rest_command.ntfy_notify";
-              data = {
-                title = "Low Temperature Alert";
-                message = "{{ trigger.to_state.attributes.friendly_name }} is at {{ trigger.to_state.attributes.current_temperature }}°C";
-              };
-            }
-          ];
-        }
-
-        # ─────────────────────────────────────────────────────────────
-        # Energy summaries
-        # ─────────────────────────────────────────────────────────────
-
-        # Daily energy summary at 07:30 — yesterday's AC runtime per zone plus
-        # the running billing-period totals from utility_meter.
-        # kWh estimate: per-unit-hour input power for a Gree split inverter is
-        # typically 0.6–1.0 kW; we use 0.8 kW as a midpoint. Replace once a
-        # whole-home meter (Shelly Pro 3EM) feeds real kWh into HA.
-        {
-          id = "daily_energy_summary";
-          alias = "Daily Energy Summary";
-          description = "Morning ntfy with yesterday's AC runtime + estimated kWh + billing-period running totals.";
-          trigger = [
-            {
-              platform = "time";
-              at = "07:30:00";
-            }
-          ];
-          action = [
-            {
-              action = "rest_command.ntfy_notify";
-              data = {
-                title = "Energy Summary";
-                message = ''
-                  {% set h = (states('sensor.ac_sala_runtime_yesterday') | float(0))
-                           + (states('sensor.ac_escritorio_runtime_yesterday') | float(0))
-                           + (states('sensor.ac_quarto_runtime_yesterday') | float(0))
-                           + (states('sensor.ac_quarto_hospedes_runtime_yesterday') | float(0)) %}
-                  Yesterday's AC runtime (h):
-                    Sala:       {{ states('sensor.ac_sala_runtime_yesterday') }}
-                    Escritorio: {{ states('sensor.ac_escritorio_runtime_yesterday') }}
-                    Quarto:     {{ states('sensor.ac_quarto_runtime_yesterday') }}
-                    Hospedes:   {{ states('sensor.ac_quarto_hospedes_runtime_yesterday') }}
-                    Total:      {{ h | round(2) }} h (≈{{ (h * 0.8) | round(1) }} kWh est.)
-
-                  This billing period (since 25th):
-                    Sala:       {{ states('sensor.ac_sala_runtime_billing') }} h
-                    Escritorio: {{ states('sensor.ac_escritorio_runtime_billing') }} h
-                    Quarto:     {{ states('sensor.ac_quarto_runtime_billing') }} h
-                    Hospedes:   {{ states('sensor.ac_quarto_hospedes_runtime_billing') }} h
-                    Total:      {{ states('sensor.ac_total_runtime_billing') }} h
-                '';
-              };
-            }
-          ];
-        }
-
-        # Weekly summary (Sunday 09:00).
-        {
-          id = "weekly_summary";
-          alias = "Weekly Summary";
-          description = "Comprehensive weekly summary every Sunday at 09:00.";
-          trigger = [
-            {
-              platform = "time";
-              at = "09:00:00";
-            }
-          ];
-          condition = [
-            {
-              condition = "time";
-              weekday = [ "sun" ];
-            }
-          ];
-          action = [
-            {
-              action = "rest_command.ntfy_notify";
-              data = {
-                title = "Weekly Summary";
-                message = ''
-                  Active AC: {{ states('sensor.active_ac_units') }}
-                  Weather: {{ state_attr('weather.forecast_home', 'temperature') }}°C, {{ states('weather.forecast_home') }}
-                  Recovery: {{ states('sensor.recovery_score') if has_value('sensor.recovery_score') else 'N/A' }}% ({{ states('sensor.training_readiness') if has_value('sensor.training_readiness') else 'N/A' }})
-                  Resting HR: {{ states('sensor.garmin_connect_resting_heart_rate') if has_value('sensor.garmin_connect_resting_heart_rate') else 'N/A' }} bpm
-                  Sleep Score: {{ states('sensor.garmin_connect_sleep_score') if has_value('sensor.garmin_connect_sleep_score') else 'N/A' }}
-                  Body Battery: {{ states('sensor.garmin_connect_body_battery_most_recent') if has_value('sensor.garmin_connect_body_battery_most_recent') else 'N/A' }}
-                  Steps: {{ states('sensor.garmin_connect_total_steps') if has_value('sensor.garmin_connect_total_steps') else 'N/A' }}
-                  CPU: {{ states('sensor.system_monitor_processor_use') if has_value('sensor.system_monitor_processor_use') else 'N/A' }}%
-                  Memory: {{ states('sensor.system_monitor_memory_usage') if has_value('sensor.system_monitor_memory_usage') else 'N/A' }}%
-                  Disk: {{ states('sensor.system_monitor_disk_usage') if has_value('sensor.system_monitor_disk_usage') else 'N/A' }}%
-                  Speedtest DL: {{ states('sensor.speedtest_download') if has_value('sensor.speedtest_download') else 'N/A' }} Mbps
-                '';
-              };
-            }
-          ];
-        }
-
-        # ─────────────────────────────────────────────────────────────
-        # Notification automations
-        # ─────────────────────────────────────────────────────────────
-
-        {
-          id = "cooking_done_notification";
-          alias = "Cooking Done Notification";
-          description = "Notify when Meater probe reaches done status.";
-          trigger = [
-            {
-              platform = "state";
-              entity_id = "sensor.meater_probe_3415f6c7_cook_state";
-              to = "done";
-            }
-          ];
-          action = [
-            {
-              action = "rest_command.ntfy_notify";
-              data = {
-                title = "Cooking Done";
-                message = "Your meat is ready! Meater probe has reached target temperature.";
-              };
-            }
-            {
-              action = "webostv.command";
-              target.entity_id = "media_player.lg_webos_tv_75nano826qb";
-              data.command = "system.notifications/createToast";
-              data.payload.message = "Cooking done! Meat is ready.";
-            }
-          ];
-        }
-
-        {
-          id = "slow_network_alert";
-          alias = "Slow Network Alert";
-          description = "Alert when speedtest download drops below 50 Mbps.";
-          trigger = [
-            {
-              platform = "numeric_state";
-              entity_id = "sensor.speedtest_download";
-              below = 50;
-            }
-          ];
-          mode = "single";
-          action = [
-            {
-              action = "rest_command.ntfy_notify";
-              data = {
-                title = "Slow Network Alert";
-                message = "Download speed: {{ states('sensor.speedtest_download') }} Mbps (below 50 Mbps threshold)";
-              };
-            }
-            { delay.hours = 1; }
-          ];
-        }
-
-        {
-          id = "new_media_downloaded";
-          alias = "New Media Downloaded";
-          description = "Notify when Sonarr or Radarr finishes downloading.";
-          trigger = [
-            {
-              platform = "state";
-              entity_id = "sensor.sonarr_queue";
-            }
-            {
-              platform = "state";
-              entity_id = "sensor.radarr_queue";
-            }
-          ];
-          condition = [
-            {
-              condition = "template";
-              value_template = "{{ trigger.from_state.state | int(0) > trigger.to_state.state | int(0) }}";
-            }
-          ];
-          action = [
-            {
-              action = "rest_command.ntfy_notify";
-              data = {
-                title = "New Media Ready";
-                message = "New content downloaded and ready to watch on Jellyfin!";
-              };
-            }
-          ];
-        }
-
-        # ─────────────────────────────────────────────────────────────
         # Garmin Health & Training
         # ─────────────────────────────────────────────────────────────
-
-        # Triggered at 08:30 so Garmin Connect's overnight sync has time to
-        # populate sleep_score / total_sleep_duration / hrv_status. Each line
-        # is appended only if its source sensor has a usable value, so the
-        # brief never shows "N/A" — missing data simply doesn't appear.
-        {
-          id = "garmin_daily_summary";
-          alias = "Garmin Daily Summary";
-          description = "Morning health and recovery briefing.";
-          trigger = [
-            {
-              platform = "time";
-              at = "08:30:00";
-            }
-          ];
-          action = [
-            {
-              action = "rest_command.ntfy_notify";
-              data = {
-                title = "Daily Health Briefing";
-                message = ''
-                  {%- set rec = namespace(items=[]) -%}
-                  {%- if has_value('sensor.recovery_score') -%}
-                    {%- set rec.items = rec.items + ['Recovery Score: ' ~ states('sensor.recovery_score') ~ '%'] -%}
-                  {%- endif -%}
-                  {%- if has_value('sensor.training_readiness') -%}
-                    {%- set rec.items = rec.items + ['Training Readiness: ' ~ states('sensor.training_readiness')] -%}
-                  {%- endif -%}
-                  {%- set hrv = states('sensor.garmin_connect_hrv_status') -%}
-                  {%- if hrv not in ["unknown","unavailable","none","Unknown",""] -%}
-                    {%- set rec.items = rec.items + ['HRV Status: ' ~ hrv] -%}
-                  {%- endif -%}
-
-                  {%- set sleep = namespace(items=[]) -%}
-                  {%- if has_value('sensor.garmin_connect_sleep_score') -%}
-                    {%- set sleep.items = sleep.items + ['Sleep Score: ' ~ states('sensor.garmin_connect_sleep_score')] -%}
-                  {%- endif -%}
-                  {%- set sd = states('sensor.garmin_connect_total_sleep_duration') -%}
-                  {%- if sd not in ["unknown","unavailable","none",""] -%}
-                    {%- set sleep.items = sleep.items + ['Sleep Duration: ' ~ (sd | int / 60) | round(1) ~ 'h'] -%}
-                  {%- endif -%}
-                  {%- if has_value('sensor.garmin_connect_awake_duration') -%}
-                    {%- set sleep.items = sleep.items + ['Awake: ' ~ states('sensor.garmin_connect_awake_duration') ~ ' min'] -%}
-                  {%- endif -%}
-
-                  {%- set bb = namespace(items=[]) -%}
-                  {%- if has_value('sensor.garmin_connect_body_battery_most_recent') -%}
-                    {%- set bb.items = bb.items + ['Current: ' ~ states('sensor.garmin_connect_body_battery_most_recent') ~ '%'] -%}
-                  {%- endif -%}
-                  {%- if has_value('sensor.garmin_connect_body_battery_charged') -%}
-                    {%- set bb.items = bb.items + ['Charged Overnight: +' ~ states('sensor.garmin_connect_body_battery_charged') ~ '%'] -%}
-                  {%- endif -%}
-                  {%- if has_value('sensor.garmin_connect_body_battery_drained') -%}
-                    {%- set bb.items = bb.items + ['Drained Yesterday: −' ~ states('sensor.garmin_connect_body_battery_drained') ~ '%'] -%}
-                  {%- endif -%}
-
-                  {%- set yest = namespace(items=[]) -%}
-                  {%- if has_value('sensor.garmin_connect_resting_heart_rate') -%}
-                    {%- set yest.items = yest.items + ['Resting HR: ' ~ states('sensor.garmin_connect_resting_heart_rate') ~ ' bpm'] -%}
-                  {%- endif -%}
-                  {%- if has_value('sensor.garmin_connect_max_heart_rate') -%}
-                    {%- set yest.items = yest.items + ['Max HR: ' ~ states('sensor.garmin_connect_max_heart_rate') ~ ' bpm'] -%}
-                  {%- endif -%}
-                  {%- if has_value('sensor.garmin_connect_avg_stress_level') -%}
-                    {%- set yest.items = yest.items + ['Avg Stress: ' ~ states('sensor.garmin_connect_avg_stress_level')] -%}
-                  {%- endif -%}
-                  {%- if has_value('sensor.garmin_connect_active_kilocalories') -%}
-                    {%- set yest.items = yest.items + ['Active: ' ~ states('sensor.garmin_connect_active_kilocalories') ~ ' kcal'] -%}
-                  {%- endif -%}
-                  {%- if has_value('sensor.garmin_connect_total_steps') -%}
-                    {%- set yest.items = yest.items + ['Steps: ' ~ states('sensor.garmin_connect_total_steps')] -%}
-                  {%- endif -%}
-                  {%- if has_value('sensor.garmin_connect_last_activity') -%}
-                    {%- set yest.items = yest.items + ['Last activity: ' ~ states('sensor.garmin_connect_last_activity')] -%}
-                  {%- endif -%}
-
-                  {%- set blocks = namespace(out=[]) -%}
-                  {%- for header, items in [
-                      ['— Recovery —',     rec.items],
-                      ['— Sleep —',        sleep.items],
-                      ['— Body Battery —', bb.items],
-                      ['— Yesterday —',    yest.items],
-                  ] if items -%}
-                    {%- set blocks.out = blocks.out + [header ~ '\n' ~ (items | join('\n'))] -%}
-                  {%- endfor -%}
-                  {{ blocks.out | join('\n\n') }}
-                '';
-              };
-            }
-          ];
-        }
 
         {
           id = "post_workout_notification";
@@ -870,7 +572,7 @@ in
             {
               action = "rest_command.ntfy_notify";
               data = {
-                title = "Low Recovery — Consider Rest Day";
+                title = "Low Recovery - Consider Rest Day";
                 message = ''
                   Body Battery: {{ states('sensor.garmin_connect_body_battery_most_recent') if has_value('sensor.garmin_connect_body_battery_most_recent') else 'N/A' }}
                   Sleep Score: {{ states('sensor.garmin_connect_sleep_score') if has_value('sensor.garmin_connect_sleep_score') else 'N/A' }}
@@ -885,7 +587,7 @@ in
         {
           id = "resting_hr_elevation_alert";
           alias = "Resting HR Elevation Alert";
-          description = "Warn when resting HR is elevated above baseline — early overtraining sign.";
+          description = "Warn when resting HR is elevated above baseline - early overtraining sign.";
           trigger = [
             {
               platform = "numeric_state";
@@ -912,47 +614,12 @@ in
         }
 
         # ─────────────────────────────────────────────────────────────
-        # System monitoring
-        # ─────────────────────────────────────────────────────────────
-
-        {
-          id = "high_cpu_memory_alert";
-          alias = "High CPU/Memory Usage Alert";
-          description = "Alert when CPU or memory usage exceeds 90% for 10 minutes.";
-          trigger = [
-            {
-              platform = "numeric_state";
-              entity_id = "sensor.system_monitor_processor_use";
-              above = 90;
-              "for".minutes = 10;
-            }
-            {
-              platform = "numeric_state";
-              entity_id = "sensor.system_monitor_memory_usage";
-              above = 90;
-              "for".minutes = 10;
-            }
-          ];
-          mode = "single";
-          action = [
-            {
-              action = "rest_command.ntfy_notify";
-              data = {
-                title = "System Resource Alert";
-                message = "{{ trigger.to_state.attributes.friendly_name }}: {{ trigger.to_state.state }}% (above 90% for 10+ min)";
-              };
-            }
-            { delay.hours = 1; }
-          ];
-        }
-
-        # ─────────────────────────────────────────────────────────────
         # Google Sheets logging (Sheets OAuth must be completed via UI)
         # ─────────────────────────────────────────────────────────────
 
         {
           id = "sheets_hourly_temperature_log";
-          alias = "Sheets — Hourly Temperature Log";
+          alias = "Sheets - Hourly Temperature Log";
           description = "Log temperatures from all rooms and outdoor to Google Sheets every hour.";
           trigger = [
             {
@@ -986,11 +653,11 @@ in
           ];
         }
 
-        # Daily AC runtime — uses *_runtime_yesterday so the log records the day
+        # Daily AC runtime - uses *_runtime_yesterday so the log records the day
         # that just ended, not today's accumulation-since-midnight.
         {
           id = "sheets_daily_ac_runtime";
-          alias = "Sheets — Daily AC Runtime";
+          alias = "Sheets - Daily AC Runtime";
           description = "Log yesterday's AC runtime hours to Google Sheets at 00:05.";
           trigger = [
             {
@@ -1024,7 +691,7 @@ in
 
         {
           id = "sheets_daily_garmin_log";
-          alias = "Sheets — Daily Garmin Log";
+          alias = "Sheets - Daily Garmin Log";
           description = "Log daily Garmin health, sleep, and training metrics to Google Sheets at 23:00.";
           trigger = [
             {

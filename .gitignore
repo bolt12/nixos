@@ -7,3 +7,7 @@ tags
 .codex
 result
 result-*
+
+# Python bytecode (pet-report service is run directly, never packaged)
+__pycache__/
+*.pyc

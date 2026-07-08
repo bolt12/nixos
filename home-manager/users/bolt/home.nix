@@ -39,7 +39,11 @@ let
         export ANTHROPIC_DEFAULT_OPUS_MODEL="${model}"
         export ANTHROPIC_DEFAULT_SONNET_MODEL="${model}"
         export ANTHROPIC_DEFAULT_HAIKU_MODEL="${haikuExpr}"
-        exec claude "$@"
+        # Force the main model with --model (highest precedence). The DEFAULT_*
+        # env vars only rebind the opus/sonnet/haiku aliases, so a full model ID
+        # persisted via `/model` (e.g. claude-fable-5[1m]) would otherwise win and
+        # break against the llama-swap endpoint that doesn't serve it.
+        exec claude --model "${model}" "$@"
       '';
     };
 
@@ -47,11 +51,6 @@ let
     name = "glaude";
     model = "GLM-5";
     haikuModel = "GLM-4.5-Air";
-  };
-  olaude-qwen3-5-27B = mkClaudeWrapper {
-    name = "olaude-qwen3-5-27B";
-    model = "qwen3.5-27B-full";
-    haikuEnvVar = "OLAUDE_HAIKU";
   };
   olaude-qwen3-6-27B = mkClaudeWrapper {
     name = "olaude-qwen3-6-27B";
@@ -97,7 +96,7 @@ in
     # Package profiles (headless - no desktop/wayland)
     ../../profiles/system-tools.nix
     ../../profiles/development.nix
-    ../../profiles/development-lean.nix # Lean toolchain — excluded on laptops
+    ../../profiles/development-lean.nix # Lean toolchain (excluded on laptops)
     ../../profiles/specialized.nix
 
     # Program configurations
@@ -109,6 +108,7 @@ in
     ../../programs/neovim/default.nix
     ../../programs/syncthing/default.nix
     ../../programs/tmux/default.nix
+    ../../programs/herdr/default.nix
 
     # User-level systemd services (excludable per-machine)
     ../../services/emanote-user.nix
@@ -155,7 +155,6 @@ in
     # All packages managed through profiles
     packages = [
       glaude
-      olaude-qwen3-5-27B
       olaude-qwen3-6-27B
       olaude-qwen3-6-35B-A3B
       olaude-gemma-4-26B-A4B

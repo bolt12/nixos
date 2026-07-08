@@ -188,7 +188,6 @@ in
             "store"
           ];
         }
-        { argv = [ "stretchly" ]; }
       ];
 
       hotkey-overlay.skip-at-startup = true;
@@ -214,7 +213,7 @@ in
   # DankMaterialShell launcher) inherits it and can spawn X11 apps like Steam.
   #
   # `systemctl --user import-environment` (done by the service below) only
-  # affects units started AFTER the import — dms.service starts at login, before
+  # affects units started AFTER the import; dms.service starts at login, before
   # the import lands, so its launcher children never saw DISPLAY. That is why
   # Steam worked from a terminal (fresh shell, post-import) but not from the dms
   # menu. Setting it here writes ~/.config/environment.d, which the user manager
