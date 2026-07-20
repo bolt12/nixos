@@ -5,7 +5,12 @@
 # The redlib package is pinned to upstream HEAD via the overlay in
 # `system/machine/ninho/package-overrides.nix` (see comment there for the
 # bump procedure).
-{ pkgs, lib, constants, ... }:
+{
+  pkgs,
+  lib,
+  constants,
+  ...
+}:
 let
   inherit (constants) network ports;
   redlibBase = "http://${network.ninho.vpnIp}:${toString ports.redlib}";

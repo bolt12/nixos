@@ -25,10 +25,18 @@ jobs:
             experimental-features = nix-command flakes
             accept-flake-config = true
 
-      # Eval-only — fast, doesn't pull the world. Catches type errors,
+      # Eval-only: fast, doesn't pull the world. Catches type errors,
       # missing imports, broken option references, syntax issues.
-      - name: nix flake check (eval-only)
-        run: nix flake check --no-build --show-trace
+      #
+      # We eval the two deployed toplevels directly rather than
+      # `nix flake check --no-build`: that flag forbids the small IFD build
+      # Stylix's base16 scheme needs (bolt-nixos), so it fails on an
+      # otherwise-valid config. `nix eval` permits that IFD build while still
+      # not building the toplevels themselves.
+      - name: nix eval nixos toplevels
+        run: |
+          nix eval --show-trace .#nixosConfigurations.ninho-nixos.config.system.build.toplevel.drvPath
+          nix eval --show-trace .#nixosConfigurations.bolt-nixos.config.system.build.toplevel.drvPath
 
       - name: nix fmt --check
         run: nix fmt -- --check .

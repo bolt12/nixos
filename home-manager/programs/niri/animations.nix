@@ -16,13 +16,24 @@ let
     let
       h = lib.toLower (lib.removePrefix "#" hex);
       digitVal = {
-        "0" = 0; "1" = 1; "2" = 2; "3" = 3; "4" = 4;
-        "5" = 5; "6" = 6; "7" = 7; "8" = 8; "9" = 9;
-        "a" = 10; "b" = 11; "c" = 12; "d" = 13; "e" = 14; "f" = 15;
+        "0" = 0;
+        "1" = 1;
+        "2" = 2;
+        "3" = 3;
+        "4" = 4;
+        "5" = 5;
+        "6" = 6;
+        "7" = 7;
+        "8" = 8;
+        "9" = 9;
+        "a" = 10;
+        "b" = 11;
+        "c" = 12;
+        "d" = 13;
+        "e" = 14;
+        "f" = 15;
       };
-      pair = i:
-        digitVal.${builtins.substring i 1 h} * 16
-        + digitVal.${builtins.substring (i + 1) 1 h};
+      pair = i: digitVal.${builtins.substring i 1 h} * 16 + digitVal.${builtins.substring (i + 1) 1 h};
       norm = n: builtins.toString ((1.0 * n) / 255.0);
     in
     "${norm (pair 0)}, ${norm (pair 2)}, ${norm (pair 4)}";
@@ -39,7 +50,8 @@ let
         base0C = "#89dceb";
       };
 
-  tintShader = path:
+  tintShader =
+    path:
     builtins.replaceStrings
       [ "@TINT_FROM@" "@TINT_TO@" ]
       [ (hexToGlsl palette.base0E) (hexToGlsl palette.base0C) ]
