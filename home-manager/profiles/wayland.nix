@@ -65,7 +65,9 @@
     # Display management
     wdisplays # Display configuration
     brightnessctl # Brightness control
-    wlsunset # Blue light filter
+    # wlsunset provided by services.wlsunset (bolt-with-de/home.nix); adding it
+    # here too pulled in a second derivation and broke buildEnv with a
+    # conflicting-subpath error.
     wl-gammactl # Gamma correction
 
     # Clipboard and utilities

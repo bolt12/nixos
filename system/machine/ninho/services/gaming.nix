@@ -24,26 +24,28 @@
 # ============================================================================
 
 let
-  # Register the ultrawide modeline (HDMI dummy plug EDID doesn't advertise
-  # 3440x1440) and pick the best available mode. Modeline from: gtf 3440 1440 60
+  # The HDMI dummy plug advertises 3840x2160@60 as its native/preferred EDID
+  # mode (see `DISPLAY=:0 xrandr` — the "+" mode), so no custom modeline is
+  # needed. Selecting the native mode directly (rather than forcing a custom
+  # 3440x1440 modeline) stops XFCE's display profile from fighting xrandr, which
+  # was a source of full-frame flicker in Steam Remote Play / Sunshine captures.
+  # Client (4K monitor on x1-g8) shows this 1:1.
   xrandr = "${pkgs.xrandr}/bin/xrandr";
   xfconfQuery = "${pkgs.xfconf}/bin/xfconf-query";
   applyUltrawideMode = ''
     export DISPLAY="''${DISPLAY:-:0}"
 
-    # XFCE persists display state and can reapply the dummy plug's native 4K
-    # mode with fractional scaling after X setup has already run. Keep its
-    # profile from fighting the xrandr mode we need for game streaming.
+    # XFCE persists display state and can reapply the plug's native mode with
+    # fractional scaling after X setup has already run. Pin its profile to the
+    # native 4K mode at scale 1.0 so it does not fight the xrandr mode below.
     ${xfconfQuery} -c displays -p /AutoEnableProfiles -n -t int -s 0 2>/dev/null || true
     ${xfconfQuery} -c displays -p /Notify -n -t int -s 0 2>/dev/null || true
-    ${xfconfQuery} -c displays -p /Default/HDMI-0/Resolution -n -t string -s "3440x1440" 2>/dev/null || true
+    ${xfconfQuery} -c displays -p /Default/HDMI-0/Resolution -n -t string -s "3840x2160" 2>/dev/null || true
     ${xfconfQuery} -c displays -p /Default/HDMI-0/RefreshRate -n -t double -s 60 2>/dev/null || true
     ${xfconfQuery} -c displays -p /Default/HDMI-0/Scale -n -t double -s 1.0 2>/dev/null || true
 
-    ${xrandr} --newmode "3440x1440_60" 419.11 3440 3688 4064 4688 1440 1441 1444 1490 -HSync +VSync 2>/dev/null || true
-    ${xrandr} --addmode HDMI-0 "3440x1440_60" 2>/dev/null || true
-
-    ${xrandr} --fb 3440x1440 --output HDMI-0 --mode "3440x1440_60" --rate 60 --scale 1x1 --transform none --panning 3440x1440+0+0 || \
+    # Select the native 4K mode; fall back to lower native modes if unavailable.
+    ${xrandr} --fb 3840x2160 --output HDMI-0 --mode 3840x2160 --rate 60 --scale 1x1 --transform none --panning 3840x2160+0+0 || \
     ${xrandr} --fb 2560x1440 --output HDMI-0 --mode 2560x1440 --rate 60 --scale 1x1 --transform none --panning 2560x1440+0+0 || \
     ${xrandr} --fb 1920x1080 --output HDMI-0 --mode 1920x1080 --rate 60 --scale 1x1 --transform none --panning 1920x1080+0+0 || \
     true
@@ -71,7 +73,7 @@ in
   '';
 
   # Set display resolution early (runs when X server starts, before session).
-  # Default to 3440x1440 ultrawide for Steam Link / Sunshine; fall back to 2560x1440, then 1080p.
+  # Default to native 3840x2160 4K for Steam Remote Play / Sunshine; fall back to 2560x1440, then 1080p.
   services.xserver.displayManager.setupCommands = "${applyGamingDisplay}/bin/ninho-apply-gaming-display";
 
   # Start a minimal desktop session (required for Sunshine)
@@ -105,7 +107,7 @@ in
     [Desktop Entry]
     Type=Application
     Name=Ninho Gaming Display
-    Comment=Force the headless gaming display to the BlitzWolf ultrawide resolution
+    Comment=Force the headless gaming display to the native 4K resolution
     Exec=${pkgs.runtimeShell} -c 'sleep 2; ${applyGamingDisplay}/bin/ninho-apply-gaming-display'
     OnlyShowIn=XFCE;
     X-GNOME-Autostart-enabled=true
