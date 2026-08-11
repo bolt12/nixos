@@ -37,7 +37,7 @@
       ethernet.macAddress = "permanent";
     };
     nameservers = [
-      constants.network.rpi.vpnIp # RPi 5 acts as recursive DNS over VPN
+      constants.network.hub.vpnIp # hub is the recursive adblock DNS over the tunnel
       "1.1.1.1"
       "8.8.8.8"
       "8.8.4.4"

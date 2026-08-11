@@ -30,6 +30,14 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # disko: declarative disk partitioning. Used by nixos-anywhere to install
+    # the Hetzner hub (system/machine/hetzner/disko.nix) and by the hetzner
+    # nixosConfiguration + colmena node.
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     raspberry-pi-nix = {
       url = "github:nix-community/raspberry-pi-nix";
       # Dedupe the nixpkgs closure. raspberry-pi-nix pins its own kernel/
@@ -251,6 +259,14 @@
           ];
         };
 
+        # Hetzner Cloud VM: public WireGuard hub + tunnel DNS resolver.
+        # Installed via nixos-anywhere (see system/machine/hetzner/README.md).
+        hetzner = mkSystem {
+          modules = [
+            ./system/machine/hetzner/configuration.nix
+          ];
+        };
+
         bolt-x200 = mkSystem {
           modules = [
             ./system/machine/thinkpadx200/default.nix
@@ -347,6 +363,22 @@
 
             nixpkgs.system = "aarch64-linux";
           };
+
+        # Hetzner Cloud hub. Installed with nixos-anywhere; ongoing changes
+        # deploy from here (builds locally on x86_64, pushes over SSH).
+        hetzner =
+          { ... }:
+          {
+            deployment = {
+              targetHost = constants.network.hub.publicHost;
+              targetUser = "root";
+              buildOnTarget = false;
+            };
+
+            imports = [
+              ./system/machine/hetzner/configuration.nix
+            ];
+          };
       };
 
       # Formatter for `nix fmt`
@@ -356,6 +388,7 @@
       checks.${system} = {
         ninho = self.nixosConfigurations.ninho-nixos.config.system.build.toplevel;
         bolt-nixos = self.nixosConfigurations.bolt-nixos.config.system.build.toplevel;
+        hetzner = self.nixosConfigurations.hetzner.config.system.build.toplevel;
       };
 
       # `nix develop`: tools used while editing this repo.

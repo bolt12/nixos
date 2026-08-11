@@ -15,7 +15,7 @@
 
     # DNS servers
     nameservers = [
-      constants.network.rpi.vpnIp # RPi 5 acts as recursive DNS over VPN
+      constants.network.rpi.lanIp # RPi acts as local recursive DNS over the LAN
       "1.1.1.1"
       "8.8.8.8"
       "8.8.4.4"
@@ -66,12 +66,12 @@
 
       peers = [
         {
-          publicKey = constants.network.wireguard.rpiServerPubKey;
+          publicKey = constants.network.wireguard.serverPubKey;
           # Split tunnel: only WG subnet routes through wg0. Default route stays on
-          # enp11s0 so Steam/SDR and other UDP-heavy workloads avoid the RPi NAT
-          # hairpin (which fragments at MTU 1320 and breaks Steam CM connections).
+          # enp11s0 so ninho's internet traffic (Steam/SDR and other UDP-heavy
+          # workloads) does not detour through the remote hub.
           allowedIPs = [ constants.network.wireguard.subnet ];
-          endpoint = "${constants.network.rpi.lanIp}:${toString constants.network.wireguard.port}";
+          endpoint = "${constants.network.hub.publicHost}:${toString constants.network.wireguard.port}";
           persistentKeepalive = 25;
         }
       ];

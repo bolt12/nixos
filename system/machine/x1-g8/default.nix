@@ -6,53 +6,6 @@
   ...
 }:
 
-let
-  rpiLanEndpoint = "${constants.network.rpi.lanIp}:${toString constants.network.wireguard.port}";
-  rpiWanEndpoint = "${constants.network.rpi.hostname}:${toString constants.network.wireguard.port}";
-
-  # Select the WireGuard endpoint from the active uplink:
-  # home LAN uses the RPi's private address to avoid broken hairpin NAT,
-  # otherwise we fall back to the public DDNS endpoint.
-  selectWireGuardEndpoint = pkgs.writeShellScript "wg0-select-endpoint" ''
-    set -eu
-
-    if ! ${pkgs.iproute2}/bin/ip link show dev ${constants.network.wireguard.interface} >/dev/null 2>&1; then
-      exit 0
-    fi
-
-    default_route="$(${pkgs.iproute2}/bin/ip route show default 2>/dev/null || true)"
-    if printf '%s\n' "$default_route" | ${pkgs.gnugrep}/bin/grep -Fq "via ${constants.network.lan.gateway}"; then
-      endpoint='${rpiLanEndpoint}'
-    else
-      endpoint='${rpiWanEndpoint}'
-    fi
-
-    ${pkgs.wireguard-tools}/bin/wg set ${constants.network.wireguard.interface} \
-      peer ${constants.network.wireguard.rpiServerPubKey} \
-      endpoint "$endpoint"
-  '';
-
-  updateWireGuardEndpointOnNetworkChange = pkgs.writeShellScript "wg0-dispatcher-endpoint" ''
-    set -eu
-
-    iface="$1"
-    state="$2"
-
-    case "$state" in
-      up|dhcp4-change|dhcp6-change|connectivity-change|reapply)
-        ;;
-      *)
-        exit 0
-        ;;
-    esac
-
-    if [ "$iface" = "${constants.network.wireguard.interface}" ]; then
-      exit 0
-    fi
-
-    ${selectWireGuardEndpoint}
-  '';
-in
 {
   # Use the GRUB 2 boot loader.
   boot = {
@@ -90,7 +43,7 @@ in
   };
 
   # Wi-Fi regulatory domain. Without this the kernel falls back to the world
-  # domain ("00"), which marks 5GHz DFS channels (100/132/...) as no-IR — the
+  # domain ("00"), which marks 5GHz DFS channels (100/132/...) as no-IR: the
   # card can see those APs but is forbidden from associating, so MEO/NOS 5GHz
   # networks on channel 100+ fail to connect. PT permits them.
   hardware.wirelessRegulatoryDatabase = true;
@@ -146,7 +99,7 @@ in
   programs = {
     sway.enable = true;
     nix-ld.enable = true;
-    # Embedded compositor for games — swallows Alt+click before niri sees it,
+    # Embedded compositor for games: swallows Alt+click before niri sees it,
     # so Dota and similar can use Alt-modified mouse actions while niri's
     # mod-key stays Alt. The system wrapper grants CAP_SYS_NICE for realtime
     # scheduling; plain `pkgs.gamescope` in home.packages would skip that.
@@ -237,7 +190,7 @@ in
 
     # User account info / avatars for the DankMaterialShell lock & dashboard.
     # NOTE: power-profiles-daemon is the other DMS-recommended daemon, but it
-    # conflicts with TLP (below) — we keep TLP for its battery charge
+    # conflicts with TLP (below), so we keep TLP for its battery charge
     # thresholds and per-AC/BAT governors, so the DMS power-profiles widget
     # stays intentionally unavailable.
     accounts-daemon.enable = true;
@@ -246,7 +199,7 @@ in
 
     fwupd.enable = true;
 
-    # AnnePro2 keyboard (Obins, idVendor=04d9 idProduct=a293) — let regular
+    # AnnePro2 keyboard (Obins, idVendor=04d9 idProduct=a293): let regular
     # users open the HID nodes so ObinsKit talks to it without sudo. Running
     # an Electron app as root requires --no-sandbox, which we intentionally
     # avoid. We use GROUP="users" instead of TAG+="uaccess" because seat
@@ -259,7 +212,7 @@ in
   };
 
   # Portal arbitration. Without explicit `config.niri`, niri falls back to
-  # whichever backend wins detection — silently breaking PipeWire screencast
+  # whichever backend wins detection, silently breaking PipeWire screencast
   # in Slack/Zoom/OBS. Route ScreenCast/Screenshot to gnome (the only backend
   # with a working niri implementation), keep FileChooser on gtk so flatpak
   # file pickers don't try to spawn Nautilus, and leave Sway on its defaults.
@@ -286,13 +239,6 @@ in
   };
 
   networking = {
-    networkmanager.dispatcherScripts = [
-      {
-        source = updateWireGuardEndpointOnNetworkChange;
-        type = "basic";
-      }
-    ];
-
     wireguard.interfaces = {
       wg0 = {
         ips = [ constants.network.wireguard.x1Ip ];
@@ -301,22 +247,20 @@ in
 
         peers = [
           {
-            publicKey = constants.network.wireguard.rpiServerPubKey;
+            publicKey = constants.network.wireguard.serverPubKey;
 
-            # Route only the VPN subnet — avoids a default-route conflict at
+            # Route only the VPN subnet, avoiding a default-route conflict at
             # boot (0.0.0.0/0 caused a routing loop before WiFi came up).
             allowedIPs = [ constants.network.wireguard.subnet ];
 
-            endpoint = "${constants.network.rpi.hostname}:${toString constants.network.wireguard.port}";
+            # Single static endpoint: the hub is remote now, so there is no
+            # home-LAN hairpin to detect and work around.
+            endpoint = "${constants.network.hub.publicHost}:${toString constants.network.wireguard.port}";
 
             # Keepalives keep NAT tables alive on the upstream router.
             persistentKeepalive = 25;
           }
         ];
-
-        # Re-apply the right peer endpoint after every tunnel restart so
-        # service restarts do not undo the home-LAN override.
-        postSetup = "${selectWireGuardEndpoint}";
       };
     };
   };

@@ -135,9 +135,9 @@ in
         ListenPort = ${toString constants.network.wireguard.port}
 
         [Peer]
-        # RPI5 WireGuard Server
-        PublicKey = ${constants.network.wireguard.rpiServerPubKey}
-        Endpoint = ${constants.network.rpi.hostname}:${toString constants.network.wireguard.port}
+        # WireGuard hub (Hetzner)
+        PublicKey = ${constants.network.wireguard.serverPubKey}
+        Endpoint = ${constants.network.hub.publicHost}:${toString constants.network.wireguard.port}
         AllowedIPs = ${constants.network.wireguard.subnet}
         PersistentKeepalive = 25
         EOF
@@ -146,9 +146,9 @@ in
         echo
         echo "Next steps:"
         echo "1. Copy your public key above"
-        echo "2. On RPI server, update system/machine/rpi/rpi5.nix:"
+        echo "2. On the hub, update system/machine/hetzner/wireguard.nix:"
         echo "   Change Steam Deck peer publicKey to: $PUBLIC_KEY"
-        echo "3. Rebuild RPI server: sudo nixos-rebuild switch --flake .#"
+        echo "3. Deploy the hub: colmena apply --on hetzner"
         echo "4. On Steam Deck, copy config: sudo cp $KEYS_DIR/wg0.conf $WG_CONFIG"
         echo "5. Enable WireGuard: sudo systemctl enable wg-quick@wg0"
         echo "6. Start WireGuard: sudo systemctl start wg-quick@wg0"

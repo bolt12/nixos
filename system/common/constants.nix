@@ -22,11 +22,13 @@
   # ---------------------------------------------------------------------------
   # Network: INFRASTRUCTURE-SPECIFIC
   # ---------------------------------------------------------------------------
-  # `ninho` is my home server, `rpi` is a Raspberry Pi 5 acting as VPN
-  # gateway / DNS / Tang server. The WireGuard subnet (`10.100.0.0/24`)
-  # is private and arbitrary; pick anything that doesn't collide with your
-  # LAN or other VPNs. The `rpiServerPubKey` is derived from the RPi's
-  # WireGuard private key: rotate here whenever that key rotates.
+  # `ninho` is my home server. `hub` is a Hetzner Cloud VM that is the public
+  # WireGuard server + tunnel DNS resolver (it took over from the RPi when the
+  # home ISP switch removed the public IP). `rpi` is now LAN-only (Tang + local
+  # adblock DNS). The WireGuard subnet (`10.100.0.0/24`) is private and
+  # arbitrary; pick anything that doesn't collide with your LAN or other VPNs.
+  # `serverPubKey` is derived from the hub's WireGuard private key (reused from
+  # the RPi): rotate here whenever that key rotates.
   network = {
     lan = {
       subnet = "192.168.1.0/24";
@@ -41,10 +43,17 @@
       lanInterface = "enp11s0";
       lanMac = "a0:ad:9f:13:7e:80";
     };
+    # Public WireGuard hub + tunnel DNS resolver (Hetzner Cloud VM). Reuses the
+    # RPi's key and VPN address, so clients only had to change endpoint.
+    hub = {
+      publicHost = "2.28.9.140"; # rDNS static.140.9.28.2.clients.your-server.de
+      ipv6 = "2a01:4f8:c015:61f9::1";
+      vpnIp = "10.100.0.1"; # DNS resolver address, over the tunnel (== wireguard.serverIp, bare form)
+      externalInterface = "eth0"; # public NIC (usePredictableInterfaceNames = false)
+    };
+    # RPi: LAN-only now (Tang + local adblock DNS). No longer on the VPN.
     rpi = {
-      vpnIp = "10.100.0.1";
       lanIp = "192.168.1.110";
-      hostname = "rpi-nixos.ddns.net";
     };
     wireguard = {
       port = 51820;
@@ -53,11 +62,10 @@
       # CIDR forms used by per-host wireguard `address`/`ips` settings.
       ninhoIp = "10.100.0.100/24";
       x1Ip = "10.100.0.2/24";
-      rpiIp = "10.100.0.1/24";
-      # RPi WireGuard server public key (derived from its generated private
-      # key). Referenced as a peer by every client config. Update here if
-      # the RPi key rotates.
-      rpiServerPubKey = "8/0ivDjLLlkPuQYvX5mKIdf+IVeqnGHXkpxNY7EWtUM=";
+      serverIp = "10.100.0.1/24"; # the hub's wg0 address
+      # WireGuard server (hub) public key, derived from the reused private key.
+      # Referenced as a peer by every client config. Update here if it rotates.
+      serverPubKey = "8/0ivDjLLlkPuQYvX5mKIdf+IVeqnGHXkpxNY7EWtUM=";
     };
   };
 

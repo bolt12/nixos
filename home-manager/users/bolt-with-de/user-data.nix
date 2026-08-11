@@ -22,16 +22,16 @@ in
     source = docsIgnorePatterns;
   };
 
-  # Sway monitors — laptop panel + ultrawide.
+  # Sway monitors: laptop panel + ultrawide.
   userConfig.sway = {
     primaryMonitor = "eDP-1";
     externalMonitor = "OOO BW-GM3 0000000000001";
   };
 
-  # Niri monitors — same physical hardware. Niri matches connector names
+  # Niri monitors: same physical hardware. Niri matches connector names
   # for the laptop panel and Manufacturer-Model-Serial for the BlitzWolf.
   # The BlitzWolf reports its EDID manufacturer with a "PNP(...)" prefix in
-  # niri's output list — without it, the output config silently no-ops.
+  # niri's output list; without it, the output config silently no-ops.
   userConfig.niri = {
     primaryMonitor = "eDP-1";
     externalMonitor = "PNP(OOO) BW-GM3 0000000000001";
@@ -43,14 +43,9 @@ in
 
   # mkForce because bolt/user-data.nix (imported via bolt/home.nix) sets this
   # with the ninho-side desktop prefix; the laptop needs the rooted prefix.
-  userConfig.bash.extraAliases = lib.mkForce (
-    projectAliases
-    // {
-      # WireGuard endpoint toggle — skip MEO hairpin NAT when on home LAN
-      vpn-home = "sudo wg set ${constants.network.wireguard.interface} peer ${constants.network.wireguard.rpiServerPubKey} endpoint ${constants.network.rpi.lanIp}:${toString constants.network.wireguard.port}";
-      vpn-away = "sudo wg set ${constants.network.wireguard.interface} peer ${constants.network.wireguard.rpiServerPubKey} endpoint ${constants.network.rpi.hostname}:${toString constants.network.wireguard.port}";
-    }
-  );
+  # No VPN endpoint toggle any more: the hub is remote, so one static endpoint
+  # (set in the flake) serves both home and away.
+  userConfig.bash.extraAliases = lib.mkForce projectAliases;
 
   # Syncthing configuration for X1 laptop
   # This overrides the base bolt configuration from bolt/user-data.nix

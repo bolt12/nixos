@@ -179,7 +179,7 @@ in
         };
 
         "rpi" = {
-          HostName = constants.network.rpi.vpnIp;
+          HostName = constants.network.rpi.lanIp;
           User = "bolt";
         };
         "ninho" = {
