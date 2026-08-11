@@ -17,6 +17,7 @@
     ./ntfy.nix # Push notification service
     ./home-assistant.nix # Home automation platform
     ./frigate.nix # NVR: camera detection (LibreYOLO YOLOv9), clips + API
+    ./pet-report.nix # Pet-activity journal: Frigate events + the vision model
 
     # New services
     ./bazarr.nix # Automatic subtitles for Sonarr/Radarr

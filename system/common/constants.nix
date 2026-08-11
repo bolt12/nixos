@@ -130,6 +130,8 @@
     # Additional services
     redlib = 8108;
     frigate = 8114; # NVR (Docker stable-tensorrt): camera detection + clips + API
+    pet-report = 8115; # Pet-activity journal over Frigate: web UI via nginx
+    pet-report-backend = 8116; # ...and its API, loopback only, behind that nginx
     bazarr = 8112;
     open-webui = 8113;
     comfy-ui = 8188;

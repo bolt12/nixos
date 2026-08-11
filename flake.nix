@@ -34,7 +34,7 @@
       url = "github:nix-community/raspberry-pi-nix";
       # Dedupe the nixpkgs closure. raspberry-pi-nix pins its own kernel/
       # firmware *-src inputs (not nixpkgs-derived), so following our nixpkgs
-      # here only affects generic packages — the RPi-specific bits stay pinned.
+      # here only affects generic packages: the RPi-specific bits stay pinned.
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -59,16 +59,16 @@
       inputs.nixpkgs-stable.follows = "nixpkgs";
     };
 
-    # DankMaterialShell — Quickshell-based desktop shell with first-class niri
+    # DankMaterialShell: Quickshell-based desktop shell with first-class niri
     # integration. Replaces waybar/swaync/fuzzel/swaylock/swayidle/polkit at
-    # cutover. Imported in parallel mode (alongside waybar) for evaluation —
+    # cutover. Imported in parallel mode (alongside waybar) for evaluation;
     # see home-manager/users/bolt-with-de/home.nix.
     dms = {
       url = "github:AvengeMedia/DankMaterialShell";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # DMS plugin registry — packages all DMS plugins (prefetched daily) and
+    # DMS plugin registry: packages all DMS plugins (prefetched daily) and
     # ships one HM/NixOS module that registers every plugin disabled-by-default.
     # The module auto-detects our option path (programs.dank-material-shell),
     # so plugins are enabled with `programs.dank-material-shell.plugins.<id>.enable`.
@@ -90,10 +90,15 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # llama-swap - latest release for model swapping
-    llama-swap = {
-      url = "github:mostlygeek/llama-swap/v182";
-      flake = false;
+    # pet-report: VLM-driven pet-activity journal layered over Frigate.
+    # Temporarily tracking the PR #3 branch (bolt12/1) to trial it before
+    # merging; revert to git+file:///home/bolt/pet-report (or the merged main)
+    # afterwards. The `follows` only dedupes the lock, since pet-report's
+    # overlay builds against whichever haskellPackages it is applied to (ours),
+    # not the nixpkgs it pins.
+    pet-report = {
+      url = "github:bolt12/pet-report?ref=bolt12/1";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # Needed for steam-deck
@@ -251,7 +256,7 @@
             ./system/machine/thinkpadx200/default.nix
             ./system/common/overlays.nix
             # The desktop HM module (bolt-with-de) configures programs.niri, so
-            # the niri NixOS module must be imported here too — same as
+            # the niri NixOS module must be imported here too, same as
             # bolt-nixos above. Without it, eval fails with
             # "option home-manager.users.bolt.programs.niri does not exist".
             inputs.niri.nixosModules.niri
@@ -353,7 +358,7 @@
         bolt-nixos = self.nixosConfigurations.bolt-nixos.config.system.build.toplevel;
       };
 
-      # `nix develop` — tools used while editing this repo.
+      # `nix develop`: tools used while editing this repo.
       devShells.${system}.default = pkgs.mkShellNoCC {
         packages = [
           pkgs.nixfmt-rfc-style # `nix fmt`
