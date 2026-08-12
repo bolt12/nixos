@@ -15,9 +15,9 @@
 {
   imports = [
     # Include the results of the hardware scan.
-    ./machine/x1-g8/hardware-configuration.nix
+    ./hardware-configuration.nix
     # Machine-specific configuration
-    ./machine/x1-g8/default.nix
+    ./default.nix
 
     # Import nixos home manager module
     inputs.home-manager.nixosModules.home-manager
@@ -122,16 +122,14 @@
       isNormalUser = true;
       home = "/home/bolt";
       description = "Armando Santos";
+      # No "root" (gid 0): wheel already grants sudo. "sound"/"sway"/"plugdev"
+      # dropped as undefined groups (verified absent from config.users.groups).
       extraGroups = [
         "audio"
-        "sound"
         "video"
         "wheel"
         "networkmanager"
         "docker"
-        "sway"
-        "plugdev"
-        "root"
       ];
       openssh.authorizedKeys.keys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOK8UTLb9TxZdIEX5wU4d4qkJhE+i94TnucxtZmdl+ZM bolt@rpi-nixos"
@@ -150,11 +148,7 @@
       inherit inputs system constants;
     };
 
-    users.bolt =
-      { nixpkgs, ... }:
-      {
-        imports = [ ../home-manager/users/bolt-with-de/home.nix ];
-      };
+    users.bolt.imports = [ ../../../home-manager/users/bolt-with-de/home.nix ];
   };
 
   # Allow unfree packages

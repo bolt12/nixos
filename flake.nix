@@ -177,11 +177,12 @@
     }@inputs:
     let
       system = "x86_64-linux";
-      lib = nixpkgs.lib;
+      inherit (nixpkgs) lib;
       pkgs = nixpkgs.legacyPackages.${system};
 
-      # Centralized constants (ports, IPs, storage paths, …).
-      constants = import ./system/common/constants.nix { inherit lib; };
+      # Centralized constants (ports, IPs, storage paths, …). Plain data, not a
+      # module: imported directly, no arguments.
+      constants = import ./system/common/constants.nix;
 
       # Single source of truth for the unstable overlay; reused for
       # NixOS systems (via overlays.nix) and standalone homeConfigurations.
@@ -232,7 +233,7 @@
       nixosConfigurations = {
         bolt-nixos = mkSystem {
           modules = [
-            ./system/configuration.nix
+            ./system/machine/x1-g8/configuration.nix
             ./system/common/overlays.nix
             inputs.nixos-hardware.nixosModules.lenovo-thinkpad-x1-7th-gen
             inputs.niri.nixosModules.niri
@@ -283,47 +284,59 @@
       };
 
       # Standalone home-manager activations.
-      # `pkgsFor` exposes pkgs.unstable.* the same way NixOS systems do.
+      # `pkgsFor` exposes pkgs.unstable.* the same way NixOS systems do; `mkHome`
+      # mirrors `mkSystem` so all four entries share one wiring definition.
       homeConfigurations =
         let
           pkgsFor =
-            sys:
+            sys: extraOverlays:
             import nixpkgs {
               system = sys;
               config.allowUnfree = true;
-              overlays = [ unstableOverlay ];
+              overlays = [ unstableOverlay ] ++ extraOverlays;
+            };
+          mkHome =
+            {
+              module,
+              extraModules ? [ ],
+              extraOverlays ? [ ],
+              sys ? system,
+            }:
+            home-manager.lib.homeManagerConfiguration {
+              pkgs = pkgsFor sys extraOverlays;
+              modules = [ module ] ++ extraModules;
+              extraSpecialArgs = {
+                inherit inputs constants;
+                system = sys;
+              };
             };
         in
         {
           # Bolt headless configuration for ninho server
-          bolt = home-manager.lib.homeManagerConfiguration {
-            pkgs = pkgsFor system;
-            modules = [ ./home-manager/users/bolt/home.nix ];
-            extraSpecialArgs = { inherit inputs system constants; };
-          };
+          bolt = mkHome { module = ./home-manager/users/bolt/home.nix; };
 
-          # Bolt desktop configuration for bolt-nixos
-          bolt-with-de = home-manager.lib.homeManagerConfiguration {
-            pkgs = pkgsFor system;
-            modules = [ ./home-manager/users/bolt-with-de/home.nix ];
-            extraSpecialArgs = { inherit inputs system constants; };
+          # Bolt desktop configuration for bolt-nixos.
+          #
+          # Normally activated through the bolt-nixos NixOS system, which wires
+          # this file as a home-manager user and injects the programs.niri HM
+          # options via inputs.niri.nixosModules.niri. The standalone
+          # `home-manager switch --flake .#bolt-with-de` path has no niri NixOS
+          # module, so pull in the niri home module (options) plus the niri
+          # overlay (pkgs.niri-unstable) here to supply what that module needs.
+          # The NixOS path gets both from the system side and never imports these.
+          bolt-with-de = mkHome {
+            module = ./home-manager/users/bolt-with-de/home.nix;
+            extraModules = [ inputs.niri.homeModules.niri ];
+            extraOverlays = [ inputs.niri.overlays.niri ];
           };
 
           # Pollard configuration for ninho server
-          pollard = home-manager.lib.homeManagerConfiguration {
-            pkgs = pkgsFor system;
-            modules = [ ./home-manager/users/pollard/home.nix ];
-            extraSpecialArgs = { inherit inputs system constants; };
-          };
+          pollard = mkHome { module = ./home-manager/users/pollard/home.nix; };
 
           # SteamDeck home-manager configuration
-          steam-deck = home-manager.lib.homeManagerConfiguration {
-            pkgs = pkgsFor "x86_64-linux";
-            modules = [ ./home-manager/users/steam-deck/home.nix ];
-            extraSpecialArgs = {
-              inherit inputs constants;
-              system = "x86_64-linux";
-            };
+          steam-deck = mkHome {
+            module = ./home-manager/users/steam-deck/home.nix;
+            sys = "x86_64-linux";
           };
         };
 
@@ -385,6 +398,9 @@
       formatter.${system} = pkgs.nixfmt-rfc-style;
 
       # Build checks for `nix flake check`
+      # bolt-x200 is intentionally absent: it is an incomplete stub (no
+      # hardware-configuration.nix / root filesystem), so its toplevel cannot
+      # build. Add it here once a real hardware-configuration.nix exists.
       checks.${system} = {
         ninho = self.nixosConfigurations.ninho-nixos.config.system.build.toplevel;
         bolt-nixos = self.nixosConfigurations.bolt-nixos.config.system.build.toplevel;

@@ -1,4 +1,4 @@
-{ ... }:
+_:
 
 let
   inherit (import ./_lib.nix) cornerRadius softShadow;
@@ -17,7 +17,7 @@ in
       geometry-corner-radius = cornerRadius 10.0;
       shadow = softShadow;
     }
-    # Notifications / control center (swaync) — match the launcher treatment.
+    # Notifications / control center (swaync), match the launcher treatment.
     {
       matches = [
         { namespace = "^swaync-control-center$"; }

@@ -10,7 +10,7 @@
 # as sensor.zone_<slug>_target_temp. input_boolean.ac_automations_enabled is a
 # kill-switch: when off, appliers refuse to actuate but policy automations
 # still update the input_select so you can see what *would* have happened.
-{ ... }:
+_:
 let
   zones = import ./zones.nix;
 

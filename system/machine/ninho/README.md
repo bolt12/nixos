@@ -17,8 +17,8 @@ Top-level layout under `services/`:
 - `llama-cpp` + `llama-cpp/models.nix` (llama-swap with 13 models, FLUX,
   SD3.5, Whisper, Jina reranker)
 - `faster-whisper` + Wyoming voice grid (en/pt)
-- `homepage` (dashboard), `ntfy`, `home-assistant`, `atuin`, `attic`,
-  `miniflux`, `anki-sync-server`, `open-webui`, `uptime-kuma`,
+- `homepage` (dashboard), `ntfy`, `atuin`, `attic`, `miniflux`,
+  `anki-sync-server`, `open-webui`, `redlib`, `frigate` + `pet-report`,
   `supernote`, `gaming` (Steam + Sunshine).
 
 System-level pieces split out of `configuration.nix`:
@@ -36,10 +36,11 @@ System-level pieces split out of `configuration.nix`:
   up.
 - **NVIDIA-only.** RTX 5090 is hard-coded into kernelModules, NVENC for
   Jellyfin, gaming.nix, and CUDA. Forks on AMD/Intel must rip these out.
-- **Tang/Clevis.** Initrd contacts the RPi (`192.168.1.110:7654`) to
-  decrypt JWE blobs and unlock the 5 LUKS volumes. Manual SSH-based
-  fallback on port 2222. See top-level `CLAUDE.md → "Tang/Clevis LUKS
-  Auto-Unlock"` for enrollment steps.
+- **Tang/Clevis.** Initrd contacts the RPi (`192.168.1.110:7654`) to unlock
+  the 5 LUKS volumes from clevis tokens bound into each LUKS2 header
+  (`boot.initrd.clevisLuksAskpass`). Manual SSH-based fallback on port 2222.
+  See the top-level `CLAUDE.md`, "Tang/Clevis LUKS Auto-Unlock", for
+  enrollment steps.
 - **r8169 in initrd.** RTL8126A 5 GbE NIC needs the r8169 driver baked
   into initrd for Tang networking (`boot.initrd.availableKernelModules`).
 - **Hardware watchdog.** `sp5100_tco` reboots on hard kernel lockups

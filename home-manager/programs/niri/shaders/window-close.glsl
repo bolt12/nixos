@@ -33,7 +33,7 @@ vec4 close_color(vec3 coords_geo, vec3 size_geo) {
     vec3 tintTo   = vec3(@TINT_TO@);
     vec3 tint     = mix(tintFrom, tintTo, clamp(coords_geo.y, 0.0, 1.0));
 
-    // Mix tint into the texture as it fades — at p=0 pure texture, at p=1
+    // Mix tint into the texture as it fades, at p=0 pure texture, at p=1
     // pure transparent (with a brief tinted flash around p=0.5).
     float flash = smoothstep(0.0, 0.5, p) * (1.0 - smoothstep(0.5, 1.0, p));
     color.rgb = mix(color.rgb, tint, 0.35 * flash);

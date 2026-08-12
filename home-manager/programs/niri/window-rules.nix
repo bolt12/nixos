@@ -1,4 +1,4 @@
-{ ... }:
+_:
 
 let
   inherit (import ./_lib.nix) cornerRadius softShadow;

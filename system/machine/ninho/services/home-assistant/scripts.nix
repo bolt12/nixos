@@ -1,8 +1,7 @@
-# Home Assistant — reusable script definitions invoked by automations and the UI.
+# Home Assistant, reusable script definitions invoked by automations and the UI.
 # Scripts go through input_select.zone_*_mode so the applier remains the sole
 # writer to climate.* entities.
-{ ... }:
-{
+_: {
   services.home-assistant.config = {
     script = {
       all_ac_off = {

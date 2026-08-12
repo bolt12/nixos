@@ -1,4 +1,4 @@
-# ntfy push-notification server (alert sink for Grafana, network-watchdog, etc.).
+# ntfy push-notification server (alert sink for Grafana, etc.).
 {
   config,
   pkgs,
@@ -7,7 +7,7 @@
   ...
 }:
 let
-  inherit (constants) ports storage network;
+  inherit (constants) ports network;
 in
 {
   services.ntfy-sh = {

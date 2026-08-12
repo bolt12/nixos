@@ -3,7 +3,7 @@
 ## Repository Layout
 
 ```
-flake.nix                              # Entry point — NixOS configs, HM configs, Colmena, checks
+flake.nix                              # Entry point: NixOS configs, HM configs, Colmena, checks
 system/
   common/constants.nix                 # Centralized ports, IPs, storage paths
   common/overlays.nix                  # Package overlays (CUDA, unstable, etc.)
@@ -34,7 +34,7 @@ Ninho is shared by **bolt** and **pollard**, each with their own clone at `$HOME
 - **Home-manager first**: user-specific services and data belong in `home-manager/users/<user>/`, not in `system/`. System config is for system-level concerns only (user declarations, groups, system services).
 - **No hardcoded home paths in system services**: use `%h` (systemd user specifier) or `config.userConfig.homeDirectory` in HM modules. If a system service genuinely needs a user path, use a NixOS option or `constants.nix`.
 - **Dual-checkout model**: both users have independent git clones. Always `git pull` before rebuilding. The `install.sh` pre-flight checks enforce this (aborts if behind `origin/main`).
-- **Port allocation**: all service ports go in `system/common/constants.nix` — never hardcode port numbers in service modules.
+- **Port allocation**: all service ports go in `system/common/constants.nix`, never hardcoded in service modules.
 - **Format with nixfmt**: `nix fmt` uses `nixfmt-rfc-style`.
 
 ## Rebuild Commands
@@ -53,7 +53,7 @@ Ninho is shared by **bolt** and **pollard**, each with their own clone at `$HOME
 
 ## Machine: ninho
 
-Home server — AMD Ryzen 9 9950X3D, ASUS ROG Strix X870E, RTX 5090, 128GB RAM.
+Home server: AMD Ryzen 9 9950X3D, ASUS ROG Strix X870E, RTX 5090, 128GB RAM.
 
 ### Hardware Watchdog
 
@@ -70,47 +70,36 @@ The kernel-level RTL8126A `NETDEV WATCHDOG` bug from older kernels was fixed ups
 Automatic LUKS decryption at boot via Tang (on RPi) and Clevis (in ninho's initrd). Eliminates manual passphrase entry during unattended reboots.
 
 **Architecture:**
-- **Tang server**: RPi at `192.168.1.110:7654` (`system/machine/rpi/rpi5.nix`)
-- **Clevis client**: ninho initrd contacts Tang to decrypt JWE → unlock all 5 LUKS devices
-- **Initrd networking**: DHCP on `enp11s0` via `ip=:::::enp11s0:dhcp` kernel param, `r8169` in initrd modules
-- **SSH fallback**: port 2222 (not 22 — separate host key avoids known_hosts conflicts)
+- **Tang server**: RPi at `192.168.1.110:7654` (`system/machine/rpi/rpi5.nix`, `constants.ports.tang`)
+- **Clevis client**: `boot.initrd.clevisLuksAskpass` (ninho `boot.nix`) answers each device's systemd LUKS prompt from a clevis token bound into that device's LUKS2 header. No JWE files and no `boot.initrd.secrets` for the unlock: the token lives in the header, so enrollment is per-device on the running system.
+- **Initrd networking**: systemd stage-1 DHCP on `enp11s0` (`boot.initrd.systemd.network.networks."10-enp11s0"`), with `r8169` added to `boot.initrd.availableKernelModules` in `boot.nix`.
+- **SSH fallback**: port 2222 (not 22, a separate host key avoids known_hosts conflicts). The host key is the one secret still on disk, `/etc/secrets/initrd/ssh_host_ed25519_key`, added to the initrd by `boot.initrd.network.ssh.hostKeys`.
 
-**Secrets** (stored in `/etc/secrets/initrd/`, injected via `boot.initrd.secrets`):
-- `luks-rpool-nvme0n1-part2.jwe`, `luks-rpool-nvme1n1-part2.jwe` — root pool NVMe
-- `luks-storage-sd{a,b,c}-part2.jwe` — storage pool HDDs
-- `ssh_host_ed25519_key` — initrd SSH host key
-
-**Manual enrollment steps** (required after initial deploy or key rotation):
-1. Deploy Tang to RPi: `eval $(ssh-agent) && ssh-add ~/.ssh/id_ed25519 && colmena apply --on rpi-5 --impure`
+**Enrollment** (once per device after initial deploy, or after a Tang key rotation):
+1. Deploy Tang to the RPi: `eval $(ssh-agent) && ssh-add ~/.ssh/id_ed25519 && colmena apply --on rpi-5 --impure`
 2. Verify Tang: `ssh root@192.168.1.110 "curl -sf http://127.0.0.1:7654/adv" | jq .`
-3. Generate initrd SSH key: `sudo ssh-keygen -t ed25519 -N "" -f /etc/secrets/initrd/ssh_host_ed25519_key`
-4. Create JWE files:
+3. Generate the initrd SSH host key (first time only): `sudo ssh-keygen -t ed25519 -N "" -f /etc/secrets/initrd/ssh_host_ed25519_key`
+4. Bind each LUKS device to Tang, for every UUID under `boot.initrd.luks.devices` in `boot.nix`:
    ```
-   echo -n "PASSPHRASE" | sudo clevis encrypt tang '{"url":"http://192.168.1.110:7654"}' | sudo tee /etc/secrets/initrd/luks-rpool-nvme0n1-part2.jwe > /dev/null
-   for dev in luks-rpool-nvme1n1-part2 luks-storage-sda-part2 luks-storage-sdb-part2 luks-storage-sdc-part2; do
-     sudo cp /etc/secrets/initrd/luks-rpool-nvme0n1-part2.jwe /etc/secrets/initrd/${dev}.jwe
-   done
-   sudo chmod 600 /etc/secrets/initrd/*.jwe
+   sudo clevis luks bind -d /dev/disk/by-uuid/<uuid> tang '{"url":"http://192.168.1.110:7654"}'
    ```
-5. Rebuild ninho (bakes JWE into initrd): `sudo nixos-rebuild switch --flake .#ninho-nixos`
-6. Reboot and verify: `journalctl -b | grep -i clevis`
+5. Reboot and verify: `journalctl -b | grep -i clevis`
 
-**SSH fallback** (if Tang unreachable during boot):
+**SSH fallback** (if Tang is unreachable at boot):
 ```
 ssh -p 2222 root@<ninho-lan-ip>
-# cryptsetup-askpass runs automatically
+# cryptsetup-askpass runs automatically; type the passphrase
 ```
 
 **Key details for future edits:**
-- `boot.initrd.availableKernelModules` is overridden in `configuration.nix` (not `hardware-configuration.nix`) to add `r8169`
-- `flushBeforeStage2 = true` tears down initrd networking so NetworkManager starts clean
-- Each LUKS device has its own JWE file (allows per-device passphrase changes later)
-- Tang is stateless — rotating keys requires re-enrolling all Clevis clients
-- `boot.initrd.secrets` files must exist on disk before `nixos-rebuild switch` — create placeholders if enrolling later
-- Colmena RPi deploy requires: ssh-agent with key loaded, `--impure` flag, `targetUser = "root"` (no interactive sudo support)
+- `boot.initrd.availableKernelModules` is set in `boot.nix` (not `hardware-configuration.nix`) to add `r8169`.
+- `flushBeforeStage2 = true` tears down initrd networking so NetworkManager starts clean in stage 2.
+- The clevis token is per-device (bound into each LUKS2 header), so a device's passphrase can change independently; re-bind that device with step 4 afterwards.
+- Tang is stateless. Rotating its keys requires re-binding every Clevis client (rerun step 4 per device).
+- Colmena RPi deploy requires: ssh-agent with the key loaded, `--impure`, and `targetUser = "root"` (no interactive sudo).
 
 ### llama-swap / stable-diffusion.cpp
 
 **Key details for future edits:**
-- SD3.5 GGUF quantizations (e.g. from second-state) strip the VAE (`first_stage_model` tensors) — a separate `--vae` safetensors file is required when using `--diffusion-model` with split GGUF components in stable-diffusion.cpp
-- Wyoming faster-whisper uses CTranslate2 format; whisper.cpp (whisper-server) uses GGML format — model files are not interchangeable between the two
+- SD3.5 GGUF quantizations (e.g. from second-state) strip the VAE (`first_stage_model` tensors), so a separate `--vae` safetensors file is required when using `--diffusion-model` with split GGUF components in stable-diffusion.cpp
+- Wyoming faster-whisper uses CTranslate2 format; whisper.cpp (whisper-server) uses GGML format, and model files are not interchangeable between the two

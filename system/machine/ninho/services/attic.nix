@@ -37,17 +37,26 @@ in
   #   EOF
   #   sudo chmod 600 /etc/attic/attic/config.toml
   systemd.services.attic-watch-store = {
-    description = "Attic watch-store — auto-push to local cache";
+    description = "Attic watch-store: auto-push to local cache";
     wantedBy = [ "multi-user.target" ];
     after = [ "atticd.service" ];
     requires = [ "atticd.service" ];
 
     serviceConfig = {
+      # Skip (not fail) when the manually-created config.toml is absent, so a
+      # fresh deploy does not crash-loop before enrollment.
+      ExecCondition = "${pkgs.coreutils}/bin/test -f /etc/attic/attic/config.toml";
       ExecStart = "${pkgs.attic-client}/bin/attic watch-store local:main";
       Restart = "on-failure";
-      RestartSec = 5;
+      RestartSec = 30;
       User = "root";
       Environment = "XDG_CONFIG_HOME=/etc/attic";
+    };
+
+    # Backstop against a tight restart loop if the client keeps failing.
+    unitConfig = {
+      StartLimitIntervalSec = 300;
+      StartLimitBurst = 5;
     };
   };
 }

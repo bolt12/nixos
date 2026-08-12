@@ -18,6 +18,13 @@
   # Disable libcamera (not compiling)
   raspberry-pi-nix.libcamera-overlay.enable = false;
 
+  # The linux-rpi kernel doesn't build the TPM modules (tpm_crb/tpm_tis) that
+  # systemd initrd's TPM2 support adds to boot.initrd.availableKernelModules on
+  # aarch64 (nixpkgs 26.05 defaults both boot.initrd.systemd.enable and its
+  # .tpm2.enable to true). The Pi has no TPM, so turn it off; otherwise the
+  # initrd module closure fails with "modprobe: FATAL: Module tpm-crb not found".
+  boot.initrd.systemd.tpm2.enable = false;
+
   networking = {
     hostName = "rpi-nixos";
     wireless = {
@@ -41,6 +48,7 @@
       bolt = {
         initialPassword = "tlob";
         isNormalUser = true;
+        # No "root" (gid 0): wheel already grants sudo on this Tang keyserver.
         extraGroups = [
           "audio"
           "video"
@@ -48,7 +56,6 @@
           "networkmanager"
           "docker"
           "podman"
-          "root"
         ];
 
         openssh.authorizedKeys.keys = [

@@ -1,4 +1,5 @@
 {
+  config,
   lib,
   pkgs,
   constants,
@@ -58,6 +59,32 @@
   # Suppress home-manager news notifications
   news.display = "silent";
 
-  # Enable nixpkgs release check
-  home.enableNixpkgsReleaseCheck = true;
+  home = {
+    enableNixpkgsReleaseCheck = true;
+
+    # Identity is declared once via userConfig (common/user-options.nix) and
+    # bridged to the home-manager builtins here, so each user file only sets
+    # userConfig.{username,homeDirectory} rather than repeating both pairs.
+    # mkDefault so a NixOS-integrated HM run defers to the system user's
+    # name/home (home-manager's nixos module sets those); standalone
+    # activations, which have no system user, still get them from userConfig.
+    username = lib.mkDefault config.userConfig.username;
+    homeDirectory = lib.mkDefault config.userConfig.homeDirectory;
+
+    # Shared keyboard layout (US/PT, caps->escape, shift+shift layout toggle);
+    # mkDefault so a user can diverge.
+    keyboard = {
+      layout = lib.mkDefault "us,pt";
+      options = lib.mkDefault [
+        "caps:escape"
+        "grp:shifts_toggle"
+      ];
+    };
+
+    # Default editor for every user; mkDefault so a user can override.
+    sessionVariables = {
+      EDITOR = lib.mkDefault "nvim";
+      VISUAL = lib.mkDefault "nvim";
+    };
+  };
 }

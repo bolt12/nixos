@@ -5,7 +5,12 @@
 
     # Core Wayland variables
     XDG_SESSION_TYPE = "wayland";
-    XDG_CURRENT_DESKTOP = "sway";
+    # niri is the daily driver. Pinning "sway" here leaked into niri's inherited
+    # environment and made xdg-desktop-portal read "sway", so the portal's
+    # config.niri ScreenCast routing (programs/niri) never applied and screencast
+    # broke. The sway fallback re-exports its own value via
+    # dbus-update-activation-environment at runtime, so "niri" is correct for both.
+    XDG_CURRENT_DESKTOP = "niri";
 
     # Wayland backend selection for various toolkits
     SDL_VIDEODRIVER = "wayland"; # SDL applications (games, media)
@@ -25,7 +30,7 @@
     QT_QPA_PLATFORMTHEME = "gtk3";
 
     # EDITOR/VISUAL intentionally live in users/bolt/home.nix (the base
-    # config imported by every bolt variant, headless included) — not here,
+    # config imported by every bolt variant, headless included), not here,
     # where they'd only cover desktop sessions and shadow the base value.
   };
 }

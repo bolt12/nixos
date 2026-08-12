@@ -6,7 +6,7 @@ This configuration is designed for the **ninho server** with a focus on learning
 
 - **Minimal Package Set**: Core system tools and development essentials
 - **Learning Resources**: tldr, cheat, man pages with search
-- **Modern CLI Tools**: bat, eza, fd, ripgrep (easier than traditional tools)
+- **Modern CLI Tools**: bat, eza, fd, ripgrep
 - **ZFS Tools**: Complete ZFS management toolchain
 
 ## NixOS Learning Aliases

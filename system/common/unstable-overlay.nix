@@ -25,5 +25,5 @@ in
   # libluajit .so into the wrapper's lua buildEnv, which refuses the conflicting
   # subpath. Pin luajit to the unstable build so the neovim wrapper, whichever
   # package set a plugin comes from, only ever sees one luajit.
-  luajit = unstable.luajit;
+  inherit (unstable) luajit;
 }

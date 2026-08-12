@@ -37,6 +37,14 @@ jobs:
         run: |
           nix eval --show-trace .#nixosConfigurations.ninho-nixos.config.system.build.toplevel.drvPath
           nix eval --show-trace .#nixosConfigurations.bolt-nixos.config.system.build.toplevel.drvPath
+          # hetzner is public-facing; the standalone HM configs (esp. bolt-with-de)
+          # are not covered by nix flake check. Eval them here so a regression in
+          # any of them fails CI. bolt-x200 is a known stub (no root fs), skipped.
+          nix eval --show-trace .#nixosConfigurations.hetzner.config.system.build.toplevel.drvPath
+          nix eval --show-trace .#homeConfigurations.bolt.activationPackage.drvPath
+          nix eval --show-trace .#homeConfigurations.bolt-with-de.activationPackage.drvPath
+          nix eval --show-trace .#homeConfigurations.pollard.activationPackage.drvPath
+          nix eval --show-trace .#homeConfigurations.steam-deck.activationPackage.drvPath
 
       - name: nix fmt --check
         run: nix fmt -- --check .

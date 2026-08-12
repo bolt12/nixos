@@ -23,9 +23,6 @@ in
     "d ${bazarrHome} 0750 bazarr bazarr - -"
   ];
 
-  # Bazarr needs access to media files for subtitle matching
-  users.users.bazarr.extraGroups = [
-    "media"
-    "storage-users"
-  ];
+  # Group membership (media, storage-users) is assigned centrally in
+  # services/permissions.nix, like the rest of the *arr stack.
 }

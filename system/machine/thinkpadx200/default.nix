@@ -5,10 +5,18 @@
   ...
 }:
 
+# NOTE: this machine is an incomplete stub. It has no hardware-configuration.nix
+# (no fileSystems / root filesystem), so its toplevel does not build and it is
+# excluded from flake checks. Run `nixos-generate-config` on the X200 and add the
+# result before deploying or enabling CI for it.
+
 {
   # Use the GRUB 2 boot loader.
   boot = {
-    kernelPackages = pkgs.linuxPackages_4_19;
+    # linuxPackages_4_19 was removed from nixpkgs 26.05 (EOL upstream), which
+    # left this config un-evaluable. The X200 (Core 2 Duo, GM45) has no special
+    # kernel needs, so track the current 6.12 LTS.
+    kernelPackages = pkgs.linuxPackages_6_12;
     loader = {
       grub = {
         enable = true;
@@ -94,14 +102,35 @@
     flatpak.enable = true;
   };
 
+  # Flatpak requires XDG desktop portals with an implementation (asserted by the
+  # flatpak module). gtk covers this X11/greetd session.
+  xdg.portal = {
+    enable = true;
+    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+  };
+
   networking = {
     hostName = "bolt-x200";
     useDHCP = true;
   };
 
+  # The desktop home-manager config is attached for user bolt (flake.nix
+  # mkSystem hmUser), and greetd logs bolt in, so the account must exist.
+  users.users.bolt = {
+    isNormalUser = true;
+    home = "/home/bolt";
+    description = "Armando Santos";
+    extraGroups = [
+      "wheel"
+      "networkmanager"
+      "audio"
+      "video"
+    ];
+  };
+
   security = {
     # Empty attrset gives swaylock the NixOS default PAM stack (auth include
-    # login), matching x1-g8 — no need for the deprecated raw `.text` form.
+    # login), matching x1-g8; no need for the deprecated raw `.text` form.
     pam.services.swaylock = { };
 
     polkit.enable = true;

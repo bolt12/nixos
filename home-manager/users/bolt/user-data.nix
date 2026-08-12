@@ -25,8 +25,10 @@ in
     # NixOS rebuild
     nrs = "nixos-rebuild-safe";
 
-    # Run commands as pollard with access to her user session
-    run-as-pollard = "sudo XDG_RUNTIME_DIR=/run/user/$(id -u pollard) -u pollard";
+    # Run commands as pollard with access to her user session. sudo options
+    # (-u) must precede any VAR=value assignment, or -u is treated as part of
+    # the command and never applies.
+    run-as-pollard = "sudo -u pollard XDG_RUNTIME_DIR=/run/user/$(id -u pollard)";
   };
 
   # Syncthing configuration for ninho server

@@ -56,7 +56,7 @@
         },
         "dynamic-order": ["title", "artist"],
         "max-length": 35,
-        "tooltip-format": "{player}: {title} — {artist} ({album})"
+        "tooltip-format": "{player}: {title}, {artist} ({album})"
     },
 
     "group/system": {
@@ -163,7 +163,7 @@
         "on-click": "pwvucontrol",
         "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
         "scroll-step": 2,
-        "tooltip-format": "{volume}% — {node_name}"
+        "tooltip-format": "{volume}%, {node_name}"
     },
 
     "custom/weather": {

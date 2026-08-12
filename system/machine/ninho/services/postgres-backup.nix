@@ -1,4 +1,4 @@
-# Daily Postgres logical backup — pg_dumpall → zstd → /storage/data/postgres-backups.
+# Daily Postgres logical backup, pg_dumpall → zstd → /storage/data/postgres-backups.
 #
 # Why a logical dump on top of ZFS snapshots: a snapshot of /var/lib/postgresql
 # is crash-consistent at the block level, but a running cluster's WAL state
@@ -39,7 +39,7 @@ let
       # --clean --if-exists makes the dump self-contained for restore-onto-empty:
       #   zstdcat <file>.sql.zst | psql -U postgres -d postgres
       # Globals (roles, tablespaces) are included automatically by pg_dumpall.
-      # zstd level 15 is past the compression-curve knee — going to 19 spends
+      # zstd level 15 is past the compression-curve knee, going to 19 spends
       # 15× more wall-clock time for ~2-3% better ratio, and contends with the
       # sanoid 15-min snapshot cadence on the same CPU.
       pg_dumpall --clean --if-exists | zstd -T0 -15 -q -o "$TMP"
@@ -70,7 +70,7 @@ in
       Type = "oneshot";
       User = "postgres";
       ExecStart = "${backupScript}/bin/postgres-backup";
-      # Files default to 0640 (owner rw, group r) — others can't read even if
+      # Files default to 0640 (owner rw, group r), others can't read even if
       # they somehow get the path.
       UMask = "0027";
     };

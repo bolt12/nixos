@@ -1,6 +1,6 @@
 # Bolt's Headless Configuration
 
-This configuration is designed for the **ninho server** (headless environment).
+For the **ninho server** (headless).
 
 ## Features
 
@@ -17,7 +17,7 @@ This configuration is automatically applied when the ninho server rebuilds:
 sudo nixos-rebuild switch --flake .#ninho-nixos
 ```
 
-Or test standalone (requires standalone homeConfigurations in flake.nix):
+Or activate standalone:
 
 ```bash
 home-manager switch --flake .#bolt

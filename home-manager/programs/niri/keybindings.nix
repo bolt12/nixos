@@ -15,7 +15,7 @@ let
   # a string (global workspace name). With on-demand workspaces the named
   # form silently no-ops because no workspace carries the name "1".."10".
   # Pass integers so Mod+N jumps to (or creates) the Nth workspace on the
-  # focused monitor — niri's native per-monitor model.
+  # focused monitor, niri's native per-monitor model.
   workspaceBinds = lib.listToAttrs (
     lib.concatMap (
       n:
@@ -42,7 +42,7 @@ in
 
       # Launcher + clipboard: DankMaterialShell's theme-matched panels.
       # (fuzzel is still installed and drives the sway session; cliphist's
-      # store daemons in niri/default.nix still populate history — DMS's
+      # store daemons in niri/default.nix still populate history, DMS's
       # clipboard panel reads from them. Revert these two lines to
       # `spawn [ "fuzzel" ]` / the cliphist|fuzzel pipe to go back.)
       "Mod+d" = spawn [
@@ -113,7 +113,7 @@ in
       "Mod+Shift+slash".action.show-hotkey-overlay = { };
 
       # DankMaterialShell panels (IPC). Only chords that don't clash with the
-      # binds above (notably NOT Mod+p — that family is screenshots). DMS's
+      # binds above (notably NOT Mod+p, that family is screenshots). DMS's
       # `enableKeybinds` is left off so these stay hand-managed here, and so
       # Mod stays Alt rather than DMS's Super default.
       "Mod+x" = spawn [
@@ -157,7 +157,7 @@ in
 
     (lib.optionalAttrs (portraitMonitor != null) {
       "Mod+Shift+m" = shell ''niri msg output "${portraitMonitor}" toggle || true'';
-      # 4K@30 is only feasible when BlitzWolf is off — the USB-C dock can't
+      # 4K@30 is only feasible when BlitzWolf is off, the USB-C dock can't
       # sustain both at full bandwidth.
       "Mod+alt+Shift+m" = shell ''niri msg output "${portraitMonitor}" mode 3840x2160@30.000 || true'';
     })

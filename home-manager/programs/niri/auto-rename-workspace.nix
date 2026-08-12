@@ -52,8 +52,8 @@ let
         local app_id ws_idx ws_name glyph
         app_id=$(niri msg --json focused-window 2>/dev/null | jq -r '.app_id // ""')
         IFS=$'\t' read -r ws_idx ws_name < <(
-          niri msg --json focused-workspace 2>/dev/null \
-            | jq -r '"\(.idx // "")\t\(.name // "")"'
+          niri msg --json workspaces 2>/dev/null \
+            | jq -r 'map(select(.is_focused)) | .[0] | "\(.idx // "")\t\(.name // "")"'
         ) || true
 
         [ -z "$ws_idx" ] && return 0

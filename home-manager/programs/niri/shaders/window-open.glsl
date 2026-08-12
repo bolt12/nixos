@@ -26,7 +26,7 @@ vec4 open_color(vec3 coords_geo, vec3 size_geo) {
         color = vec4(0.0);
     }
 
-    // Same accent gradient as window-close — Stylix base16 substitution at
+    // Same accent gradient as window-close, Stylix base16 substitution at
     // HM-eval time. Wash a brief tint through the middle of the open.
     vec3 tintFrom = vec3(@TINT_FROM@);
     vec3 tintTo   = vec3(@TINT_TO@);
@@ -35,7 +35,7 @@ vec4 open_color(vec3 coords_geo, vec3 size_geo) {
     float flash = smoothstep(0.0, 0.5, p) * (1.0 - smoothstep(0.5, 1.0, p));
     color.rgb = mix(color.rgb, tint, 0.35 * flash);
 
-    // Overall alpha ramp — fade in.
+    // Overall alpha ramp, fade in.
     color *= p;
 
     return color;

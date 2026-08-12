@@ -1,7 +1,7 @@
 # Shared project / work directory aliases for bolt.
 # The desktop prefix differs across hosts:
-#   laptop (bolt-with-de) — ~/Desktop/...
-#   ninho (bolt)          — ~/x1-g8-laptop/Desktop/... (Syncthing-replicated)
+#   laptop (bolt-with-de), ~/Desktop/...
+#   ninho (bolt)         , ~/x1-g8-laptop/Desktop/... (Syncthing-replicated)
 { desktopPrefix, homeDirectory }:
 let
   desktop = "${homeDirectory}/${desktopPrefix}";

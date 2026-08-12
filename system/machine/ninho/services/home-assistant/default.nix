@@ -1,4 +1,4 @@
-# Home Assistant — split into one file per config domain.
+# Home Assistant, split into one file per config domain.
 #
 # The slim core (services.home-assistant.{enable, package, openFirewall,
 # configDir, http, recorder, frontend, mobile_app, …, extraComponents,

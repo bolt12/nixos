@@ -1,4 +1,4 @@
-# Home Assistant — rest_command service definitions (HTTP calls invoked by automations).
+# Home Assistant, rest_command service definitions (HTTP calls invoked by automations).
 # Module-merged into services.home-assistant.config by ./default.nix.
 { constants, ... }:
 let

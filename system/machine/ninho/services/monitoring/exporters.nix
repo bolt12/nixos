@@ -1,7 +1,6 @@
 # Prometheus exporters: system, GPU, DB, ZFS, SMART, systemd, energy, *arr.
 # Pure data; merged into services.prometheus.exporters by the module system.
-{ ... }:
-{
+_: {
   services.prometheus.exporters = {
     # System metrics (CPU, RAM, Disk, Network)
     node = {

@@ -326,8 +326,10 @@ in
     # Allow input group access to /dev/uinput for virtual devices
     KERNEL=="uinput", SUBSYSTEM=="misc", MODE="0660", GROUP="input", OPTIONS+="static_node=uinput"
 
-    # Allow video group access to NVIDIA capability devices (required for NVENC/NVDEC)
-    SUBSYSTEM=="nvidia-caps", MODE="0666"
+    # Allow video group access to NVIDIA capability devices (required for NVENC/NVDEC).
+    # Sunshine runs as bolt, who is in the video group, so 0660+video suffices
+    # (the previous 0666 granted world read/write).
+    SUBSYSTEM=="nvidia-caps", MODE="0660", GROUP="video"
   '';
 
   # ==========================================================================

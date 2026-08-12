@@ -40,7 +40,7 @@
         last = "log -1 HEAD"; # Show last commit details
         # `visual = "!gitk"` removed: gitk ships only in gitFull (pulls in
         # Tcl/Tk), and this module is shared with headless users. Use the
-        # built-in TUI instead — no extra closure, works everywhere.
+        # built-in TUI instead: no extra closure, works everywhere.
         visual = "log --graph --oneline --decorate --all"; # Visual history in the terminal
         amend = "commit --amend --no-edit"; # Amend last commit without changing message
 
@@ -63,11 +63,14 @@
       };
 
       merge = {
-        tool = "vimdiff";
+        # Use a named custom tool so mergetool.<name>.cmd is honored. A builtin
+        # name such as "vimdiff" makes git run its own recipe and ignore the
+        # mergetool.cmd below, so the fugitive-based command never ran.
+        tool = "nvimmerge";
       };
 
       mergetool = {
-        cmd = "nvim -f -c \"Gvdiffsplit!\" \"$MERGED\"";
+        nvimmerge.cmd = "nvim -f -c \"Gvdiffsplit!\" \"$MERGED\"";
         prompt = false;
       };
 

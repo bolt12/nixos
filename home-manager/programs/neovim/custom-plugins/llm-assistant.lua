@@ -142,9 +142,9 @@ writer created it themselves.
 
 ## Your Task
 
-Read the provided journal entries and produce ONE image prompt that abstractly captures the week's essence — its emotional arc, recurring themes, and defining energy.
+Read the provided journal entries and produce ONE image prompt that abstractly captures the week's essence, its emotional arc, recurring themes, and defining energy.
 
-## Process (internal — do NOT include in output)
+## Process (internal, do NOT include in output)
 
 1. **Analyze** the journal entries for:
    - Dominant emotions and emotional trajectory (rising, falling, turbulent, calm)
@@ -172,7 +172,7 @@ Write the prompt optimized for Stable Diffusion / FLUX models:
 Output ONLY the prompt block, no titles, explanations, or commentary:
 
 [PROMPT]
-[Your detailed abstract image prompt here — comma-separated keywords and short phrases, 2-4 sentences, symbolic/metaphorical imagery, include style/lighting/mood direction]
+[Your detailed abstract image prompt here, comma-separated keywords and short phrases, 2-4 sentences, symbolic/metaphorical imagery, include style/lighting/mood direction]
 [/PROMPT]]=],
       result_action = "append_below",
       needs_prompt = false,

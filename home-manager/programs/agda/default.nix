@@ -1,4 +1,4 @@
-# Agda library wiring — generates ~/.agda/{libraries,defaults,executables}
+# Agda library wiring, generates ~/.agda/{libraries,defaults,executables}
 # from `userConfig.agda.libraryRoot`. Set the option in your user-data.nix
 # (e.g. `userConfig.agda.libraryRoot = "${config.userConfig.homeDirectory}/Desktop/.../Agda";`)
 # or leave it null to skip wiring entirely.

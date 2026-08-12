@@ -1,4 +1,4 @@
-# Fonts profile — system-wide typography for the desktop user.
+# Fonts profile, system-wide typography for the desktop user.
 # Imported alongside `desktop.nix`; lifted out so headless users (or forks
 # that prefer a thinner font set) can opt out without editing desktop apps.
 { pkgs, ... }:

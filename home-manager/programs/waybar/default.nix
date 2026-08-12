@@ -3,7 +3,7 @@
 
 { pkgs, ... }:
 {
-  # Waybar is no longer the daily-driver bar — DankMaterialShell took over
+  # Waybar is no longer the daily-driver bar, DankMaterialShell took over
   # (see users/bolt-with-de/home.nix). We keep the unit + config defined as a
   # fallback you can start by hand (`systemctl --user start waybar` or the
   # Mod+Shift+b bind), but it is NOT WantedBy the session, so it does not

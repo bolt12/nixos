@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 #
-# install.sh — interactive rebuild menu for this NixOS configuration.
+# install.sh: interactive rebuild menu for this NixOS configuration.
 #
 # Two phases:
 #   1. Pre-flight safety checks (run before any rebuild). Verifies you are
@@ -76,7 +76,7 @@ preflight_checks() {
         fi
     fi
 
-    # 4. Warn about uncommitted changes (don't abort — user may be testing)
+    # 4. Warn about uncommitted changes (don't abort; user may be testing)
     if ! git diff --quiet HEAD 2>/dev/null || ! git diff --cached --quiet 2>/dev/null; then
         echo -e "${YELLOW}WARNING: You have uncommitted changes. The rebuild will use your working tree.${NC}"
     fi
@@ -208,10 +208,10 @@ echo ""
 echo -e "${YELLOW}NixOS System Configurations:${NC}"
 echo "  1) Apply: bolt-nixos (X1 Carbon Laptop)"
 echo "  2) Apply: ninho-nixos (Home Server)"
-echo "  3) Apply: bolt-x200 (ThinkPad X200)"
+echo "  3) Apply: bolt-x200 (ThinkPad X200) [stub: needs hardware-configuration.nix to build]"
 echo "  4) Test: bolt-nixos (no activation)"
 echo "  5) Test: ninho-nixos (no activation)"
-echo "  6) Test: bolt-x200 (no activation)"
+echo "  6) Test: bolt-x200 (no activation) [stub: will not build]"
 echo ""
 echo -e "${YELLOW}SD Image Builds:${NC}"
 echo "  7) Build: Raspberry Pi 5 SD Image"

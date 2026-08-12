@@ -96,7 +96,7 @@ in
   config = lib.mkIf cfg.enable {
     services.unbound = {
       enable = true;
-      user = cfg.user;
+      inherit (cfg) user;
       settings = {
         server = {
           module-config = ''"respip validator iterator"'';

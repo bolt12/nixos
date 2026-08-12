@@ -9,8 +9,7 @@
 # Single disk, enumerated as /dev/sda (virtio-scsi,
 # /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_124945215). /dev/sda is unambiguous
 # here; swap in the by-id path if this box ever gains a second disk.
-{ ... }:
-{
+_: {
   disko.devices.disk.main = {
     type = "disk";
     device = "/dev/sda";

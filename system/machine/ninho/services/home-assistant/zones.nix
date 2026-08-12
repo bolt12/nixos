@@ -24,7 +24,11 @@
   }
   {
     slug = "quarto_hospedes";
-    friendly = "Hospedes";
+    # friendly must slugify back to slug: generated sensor/template entities are
+    # named from `friendly`, while automations/utility-meters reference `slug`.
+    # "Hospedes" slugifies to "hospedes" (orphaning them); "Quarto Hospedes"
+    # slugifies to "quarto_hospedes".
+    friendly = "Quarto Hospedes";
     eco = 17;
     comfort = 20;
     boost = 21;

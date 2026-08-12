@@ -3,20 +3,20 @@
 # DankMaterialShell (DMS) escape-hatch helpers.
 #
 # DMS itself is the daily-driver shell/bar, enabled via the upstream
-# `dank-material-shell` HM module in users/bolt-with-de/home.nix — that module
+# `dank-material-shell` HM module in users/bolt-with-de/home.nix, that module
 # installs the dms-shell + Quickshell packages, every feature dependency
 # (dgop, matugen, cava, khal, wtype), and the autostart systemd user service.
 # We do NOT duplicate any of that here.
 #
 # This module only ships two small convenience scripts for when DMS misbehaves
-# (it's Quickshell-based — the same engine whose threaded render loop crashed
+# (it's Quickshell-based, the same engine whose threaded render loop crashed
 # Noctalia on this iGPU):
 #
-#   dms-stop  — kill DMS and start waybar as a fallback bar
-#   dms-start — kill waybar and (re)start DMS via its systemd service
+#   dms-stop , kill DMS and start waybar as a fallback bar
+#   dms-start, kill waybar and (re)start DMS via its systemd service
 #
 # DMS runs under the systemd user service `dms.service`, so the normal control
-# path is `systemctl --user restart dms` — these wrappers just add the
+# path is `systemctl --user restart dms`, these wrappers just add the
 # waybar handoff and a broad kill for stuck Quickshell processes.
 
 let

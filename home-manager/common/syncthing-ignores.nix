@@ -1,7 +1,7 @@
 # Shared Syncthing `.stignore` patterns for bolt's machines.
 # Build artifacts + VCS noise that shouldn't cross the sync boundary.
 # The `(?d)` prefix lets Syncthing clean up ignored files whose parent
-# directory gets removed remotely — without it, build-artifact-only
+# directory gets removed remotely; without it, build-artifact-only
 # directories linger forever and trigger a red tray icon.
 #
 # Pollard's ignore set is intentionally distinct and lives inline.
@@ -16,8 +16,9 @@ pkgs.writeText "documents-stignore" ''
   (?d).DS_Store
   (?d)Thumbs.db
   (?d)*~
-  (?d)*.lock
   (?d).claude
+  // NB: do not blanket-ignore *.lock here; dependency lockfiles
+  // (flake.lock, Cargo.lock, package-lock.json) must replicate.
 
   // --- C / C++ / CMake ---
   (?d)CMakeFiles

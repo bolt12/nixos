@@ -1,20 +1,20 @@
-# AGENTS.md — NixOS Configuration Repository
+# AGENTS.md: NixOS Configuration Repository
 
 Instructions for AI agents working on this codebase. Read fully before making changes.
 
 ## Repository Layout
 
 ```
-flake.nix                              # Entry point — NixOS configs, HM configs, Colmena, checks
+flake.nix                              # Entry point: NixOS configs, HM configs, Colmena, checks
 system/
   common/constants.nix                 # Centralized ports, IPs, storage paths
   common/overlays.nix                  # Package overlays (CUDA, unstable, etc.)
-  configuration.nix                    # bolt-nixos (X1 Carbon laptop)
   machine/ninho/configuration.nix      # ninho-nixos (home server)
   machine/ninho/services/              # ~25 service modules (Nextcloud, Immich, Jellyfin, etc.)
-  machine/rpi/                         # RPi 5 (Tang server, DNS, WireGuard gateway)
-  machine/thinkpadx200/                # ThinkPad X200
-  machine/x1-g8/                       # X1 Carbon Gen 8 hardware
+  machine/hetzner/                     # hetzner (public WireGuard hub + tunnel DNS)
+  machine/rpi/                         # RPi 5 (Tang server, LAN DNS)
+  machine/thinkpadx200/                # ThinkPad X200 (incomplete stub)
+  machine/x1-g8/                       # bolt-nixos (X1 Carbon Gen 8 laptop)
 home-manager/
   common/base.nix                      # Shared HM base (starship, direnv, bat, etc.)
   common/user-options.nix              # Custom options: userConfig.{username,homeDirectory,git,...}
@@ -37,7 +37,7 @@ install.sh                             # Interactive rebuild menu with pre-fligh
 
 3. **Dual-checkout model**: ninho is shared by **bolt** and **pollard**, each with their own clone at `$HOME/nixos/`. Never assume a single source of truth. Always verify the repo is up-to-date before rebuilding (`install.sh` enforces this with pre-flight checks).
 
-4. **Port allocation**: all service ports go in `system/common/constants.nix`. Never hardcode port numbers in service modules — import `constants` and use `constants.ports.<name>`.
+4. **Port allocation**: all service ports go in `system/common/constants.nix`. Never hardcode port numbers in service modules. Import `constants` and use `constants.ports.<name>`.
 
 5. **Format with nixfmt**: run `nix fmt` (uses `nixfmt-rfc-style`). Check before committing.
 
@@ -54,7 +54,7 @@ install.sh                             # Interactive rebuild menu with pre-fligh
 | bolt | `home-manager/users/bolt/home.nix` | Primary admin, Haskell dev |
 | pollard | `home-manager/users/pollard/home.nix` | Software engineer, learning NixOS |
 
-Both users are declared in `system/machine/ninho/configuration.nix` (groups, SSH keys, lingering). Their packages, services, and dotfiles are entirely in HM.
+Both users are declared in `system/machine/ninho/users.nix` (groups, SSH keys, lingering). Their packages, services, and dotfiles are entirely in HM.
 
 ### File Ownership
 
@@ -92,50 +92,36 @@ Both users are declared in `system/machine/ninho/configuration.nix` (groups, SSH
 
 ## Machine: ninho
 
-Home server — AMD Ryzen 9 9950X3D, ASUS ROG Strix X870E, RTX 5090, 128GB RAM.
+Home server: AMD Ryzen 9 9950X3D, ASUS ROG Strix X870E, RTX 5090, 128GB RAM.
 
-### Network Watchdog (RTL8126A)
+### Network / RTL8126A NIC
 
-The RTL8126A 5 GbE NIC uses the `r8169` driver which suffers from `NETDEV WATCHDOG` transmit queue timeouts roughly every 7 days. The dedicated `r8126` driver won't land upstream until kernel 6.15+. Kernel params (`pcie_aspm=off`, `r8169.aspm=0`, `r8169.use_dac=1`) mitigate but don't prevent the issue.
-
-**Recovery system** (`services/network-watchdog.nix` + `scripts/network-watchdog.sh`):
-- Runs every 30s via systemd timer, escalates through 4 levels (3 consecutive failures per level):
-  - L1: interface bounce (`ip link down/up`)
-  - L2: NetworkManager reconnect
-  - L3: `modprobe -r r8169 && modprobe r8169` + restart NM + restart WireGuard
-  - L4: system reboot (defers up to 3x if ZFS scrub in progress)
-- State persisted in `/var/lib/network-watchdog/state`
-- Notifications via ntfy on `http://127.0.0.1:8106/network-watchdog`
+The RTL8126A 5 GbE NIC hit `NETDEV WATCHDOG` transmit-queue timeouts under the old `r8169` driver. Kernel 6.15+ ships the native `r8126` driver, which fixes it, and ninho runs 6.18 (pinned for NVIDIA driver compat), so the old userland recovery service and preventive-reboot timer are retired. `pcie_aspm=off` stays in `boot.kernelParams` defensively (also covers AHCI/SATA).
 
 **Supporting services:**
-- `wol-enable.service` — enables Wake-on-LAN on `enp11s0` after NetworkManager is up (for RPi-based remote recovery)
-- `preventive-reboot.timer` — calendar-based reboot every ~6 days at 04:00 (`*-*-01,07,13,19,25`), skips during ZFS scrub
-- `systemd.watchdog` — hardware watchdog via `sp5100_tco` (60s runtime, 10min reboot timeout)
+- `wol-enable.service`: enables Wake-on-LAN on `enp11s0` once NetworkManager is up (for RPi-based remote power-on).
+- `systemd.watchdog`: hardware watchdog via `sp5100_tco` (60s runtime, 10min reboot timeout).
 
-**Key details for future edits:**
-- WireGuard uses `networking.wireguard.interfaces.wg0` which creates `wireguard-wg0.service` (NOT `wg-quick-wg0`)
-- Gateway is discovered dynamically via `ip route show default` (no hardcoded IPs)
-- The script runs without `set -e` because recovery commands (especially L3 modprobe) must not abort mid-sequence
-- Cooldowns only gate same-level retries, not escalation to higher levels
+**Key detail:** WireGuard uses `networking.wireguard.interfaces.wg0`, which creates `wireguard-wg0.service` (NOT `wg-quick-wg0`).
 
 ### Tang/Clevis LUKS Auto-Unlock
 
-Automatic LUKS decryption at boot via Tang (on RPi) and Clevis (in ninho's initrd). Eliminates manual passphrase entry during unattended reboots (network watchdog, preventive reboot timer).
+Automatic LUKS decryption at boot via Tang (on the RPi) and Clevis (in ninho's initrd), so unattended reboots don't wait at a passphrase prompt.
 
 **Architecture:**
-- **Tang server**: RPi at `192.168.1.110:7654` (`system/machine/rpi/rpi5.nix`)
-- **Clevis client**: ninho initrd contacts Tang to decrypt JWE → unlock all 5 LUKS devices
-- **Initrd networking**: DHCP on `enp11s0` via `ip=:::::enp11s0:dhcp` kernel param, `r8169` in initrd modules
-- **SSH fallback**: port 2222 (not 22 — separate host key avoids known_hosts conflicts)
+- **Tang server**: RPi at `192.168.1.110:7654` (`system/machine/rpi/rpi5.nix`, `constants.ports.tang`).
+- **Clevis client**: `boot.initrd.clevisLuksAskpass` (ninho `boot.nix`) unlocks all 5 LUKS devices from clevis tokens bound into each LUKS2 header. No JWE files and no `boot.initrd.secrets` for the unlock: the token lives in the header, enrolled per-device with `clevis luks bind` on the running system.
+- **Initrd networking**: systemd stage-1 DHCP on `enp11s0` (`boot.initrd.systemd.network`), `r8169` in initrd modules.
+- **SSH fallback**: port 2222 (not 22; a separate host key avoids known_hosts conflicts).
 
 **Key details for future edits:**
-- `boot.initrd.availableKernelModules` is overridden in `configuration.nix` (not `hardware-configuration.nix`) to add `r8169`
-- `flushBeforeStage2 = true` tears down initrd networking so NetworkManager starts clean
-- Each LUKS device has its own JWE file (allows per-device passphrase changes later)
-- Tang is stateless — rotating keys requires re-enrolling all Clevis clients
+- `boot.initrd.availableKernelModules` is set in `boot.nix` (not `hardware-configuration.nix`) to add `r8169`.
+- `flushBeforeStage2 = true` tears down initrd networking so NetworkManager starts clean in stage 2.
+- Each LUKS device carries its own clevis token in its LUKS2 header (allows per-device passphrase changes later).
+- Tang is stateless: rotating its keys requires re-binding every Clevis client.
 
 ### llama-swap / stable-diffusion.cpp
 
 **Key details for future edits:**
-- SD3.5 GGUF quantizations (e.g. from second-state) strip the VAE (`first_stage_model` tensors) — a separate `--vae` safetensors file is required when using `--diffusion-model` with split GGUF components in stable-diffusion.cpp
-- Wyoming faster-whisper uses CTranslate2 format; whisper.cpp (whisper-server) uses GGML format — model files are not interchangeable between the two
+- SD3.5 GGUF quantizations (e.g. from second-state) strip the VAE (`first_stage_model` tensors), so a separate `--vae` safetensors file is required when using `--diffusion-model` with split GGUF components in stable-diffusion.cpp.
+- Wyoming faster-whisper uses CTranslate2 format; whisper.cpp (whisper-server) uses GGML format, and model files are not interchangeable between the two.

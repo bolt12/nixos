@@ -6,22 +6,11 @@
 }:
 
 let
-  # Import unstable with overlay to fix bellows test failures
+  # Unstable pinned to this machine's system (unfree allowed) for the CUDA/llama
+  # builds below. Home Assistant builds from the shared pkgs.unstable, not this
+  # instance, so a bellows test-disable override here never reached it; dropped.
   unstable = import inputs.nixpkgs-unstable {
     inherit system;
-    overlays = [
-      (final: prev: {
-        python313 = prev.python313.override {
-          packageOverrides = pyfinal: pysuper: {
-            # Disable tests for bellows - test_ash_end_to_end is flaky with Python 3.13
-            bellows = pysuper.bellows.overridePythonAttrs (oldAttrs: {
-              doCheck = false;
-              doInstallCheck = false;
-            });
-          };
-        };
-      })
-    ];
     config.allowUnfree = true;
   };
 in
@@ -32,7 +21,7 @@ in
       llama-cpp-cuda =
         (unstable.llama-cpp.override {
           cudaSupport = true;
-          cudaPackages = unstable.cudaPackages;
+          inherit (unstable) cudaPackages;
           blasSupport = true;
           rocmSupport = false;
           metalSupport = false;

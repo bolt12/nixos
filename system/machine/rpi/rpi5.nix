@@ -54,10 +54,16 @@ in
   };
 
   systemd = {
+    # Provision the journal dir outside the service sandbox. emanote's
+    # ProtectHome=tmpfs hides /home and BindReadOnlyPaths=journalDir fails if the
+    # dir is absent, so an in-sandbox ExecStartPre mkdir cannot create it.
+    tmpfiles.rules = [
+      "d ${journalDir} 0755 ${emanoteUser} users - -"
+    ];
     services = {
       iwd.serviceConfig.Restart = "always";
 
-      # Emanote public journal gateway (see let-binding for scoping rationale)
+      # Emanote LAN journal gateway (see let-binding for scoping rationale)
       emanote = {
         enable = true;
         description = "Emanote web server";
@@ -68,7 +74,6 @@ in
           Type = "simple";
           User = emanoteUser;
           Group = "users";
-          ExecStartPre = "${pkgs.coreutils}/bin/mkdir -p ${journalDir}";
           ExecStart = ''
             ${emanotePackage}/bin/emanote --layers "${journalDir}" run --no-ws --host=0.0.0.0 --port=${toString constants.ports.emanote}
           '';
@@ -133,11 +138,10 @@ in
     # Serves key advertisement on port 7654 for initrd Clevis clients
     tang = {
       enable = true;
-      listenStream = [ "7654" ];
+      listenStream = [ (toString constants.ports.tang) ];
       ipAddressAllow = [
         "127.0.0.0/8"
         constants.network.lan.subnet
-        constants.network.wireguard.subnet
       ];
     };
 
@@ -158,7 +162,6 @@ in
     interfaces = [ "0.0.0.0" ];
     accessControl = [
       "192.168.0.0/16 allow"
-      "10.100.0.0/16 allow"
     ];
   };
 
@@ -174,12 +177,9 @@ in
       enable = true;
       allowedTCPPorts = [
         22
-        25
         53
-        465
-        587
         constants.ports.emanote
-        7654 # Tang server (Clevis/LUKS auto-unlock advertisement)
+        constants.ports.tang # Tang server (Clevis/LUKS auto-unlock advertisement)
       ];
       allowedUDPPorts = [
         53

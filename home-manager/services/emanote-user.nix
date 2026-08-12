@@ -1,5 +1,5 @@
 # Emanote journal server (user-level systemd service).
-# Bolt-specific personal journal — pulled in only on machines where bolt's
+# Bolt-specific personal journal, pulled in only on machines where bolt's
 # journal layers actually live. Currently: ninho (headless bolt).
 
 {

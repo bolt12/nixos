@@ -17,7 +17,13 @@
 #
 # Each section below is annotated.
 # =============================================================================
-{ lib, ... }:
+let
+  # Bare VPN addresses. The /24 CIDR forms under `wireguard` below are derived
+  # from these so a hand-edit can't leave the mask out of sync with the address
+  # (unbound binds the bare form on the hub; wg0 assigns the CIDR form).
+  ninhoVpnIp = "10.100.0.100";
+  hubVpnIp = "10.100.0.1";
+in
 {
   # ---------------------------------------------------------------------------
   # Network: INFRASTRUCTURE-SPECIFIC
@@ -35,7 +41,7 @@
       gateway = "192.168.1.254";
     };
     ninho = {
-      vpnIp = "10.100.0.100";
+      vpnIp = ninhoVpnIp;
       hostname = "ninho.local";
       # Wired NIC (RTL8126A) + its MAC. Used to arm Wake-on-LAN on ninho and to
       # target the magic packet from the RPi so it can power ninho back on after
@@ -48,7 +54,7 @@
     hub = {
       publicHost = "2.28.9.140"; # rDNS static.140.9.28.2.clients.your-server.de
       ipv6 = "2a01:4f8:c015:61f9::1";
-      vpnIp = "10.100.0.1"; # DNS resolver address, over the tunnel (== wireguard.serverIp, bare form)
+      vpnIp = hubVpnIp; # DNS resolver address, over the tunnel (bare form of wireguard.serverIp)
       externalInterface = "eth0"; # public NIC (usePredictableInterfaceNames = false)
     };
     # RPi: LAN-only now (Tang + local adblock DNS). No longer on the VPN.
@@ -60,9 +66,10 @@
       interface = "wg0";
       subnet = "10.100.0.0/24";
       # CIDR forms used by per-host wireguard `address`/`ips` settings.
-      ninhoIp = "10.100.0.100/24";
+      # ninhoIp/serverIp are derived from the bare addresses in the `let` above.
+      ninhoIp = "${ninhoVpnIp}/24";
       x1Ip = "10.100.0.2/24";
-      serverIp = "10.100.0.1/24"; # the hub's wg0 address
+      serverIp = "${hubVpnIp}/24"; # the hub's wg0 address
       # WireGuard server (hub) public key, derived from the reused private key.
       # Referenced as a peer by every client config. Update here if it rotates.
       serverPubKey = "8/0ivDjLLlkPuQYvX5mKIdf+IVeqnGHXkpxNY7EWtUM=";
@@ -152,5 +159,8 @@
 
     # Nix cache
     attic = 8090;
+
+    # Tang (RPi): Clevis/LUKS auto-unlock key advertisement
+    tang = 7654;
   };
 }

@@ -1,333 +1,134 @@
 nix-config
 ==========
 
-My current - and always evolving - NixOS configuration files, home-manager, neovim, etc.
+My NixOS and home-manager configuration: five machines and four home-manager
+users built from one flake. Always evolving.
 
 ![desktop](imgs/desktop.png)
 
 ![desktop-1](imgs/desktop-1.png)
 
-## What is Nix/NixOS?
-
-**Nix** is a purely functional package manager, and **NixOS** is a Linux distribution built on top of it. Unlike traditional package managers that mutate system state, Nix treats packages as immutable values in a pure functional language.
-
-### Why Nix? A Functional Programmer's Perspective
-
-If you value **functional programming principles**, Nix will feel like home:
-
-#### Immutability
-- Packages are never modified after installation - they're **immutable values**
-- Each package is stored in `/nix/store/` with a cryptographic hash: `/nix/store/abc123-package-1.2.3/`
-- Installing a new version doesn't overwrite the old one - both coexist peacefully
-- No more "it works on my machine" - if the hash matches, the package is identical
-
-#### Determinism
-- **Reproducible builds**: Same inputs → Same outputs, always
-- Package definitions are pure functions: `package = f(dependencies, source, buildScript)`
-- No hidden global state, no implicit dependencies
-- Rollbacks are instant - just switch to a previous generation's closure
-
-#### Referential Transparency
-- Dependencies are explicit in the derivation (Nix's "build recipe")
-- No `/usr/lib` pollution - each package references its exact dependencies by hash
-- Change a dependency? The hash changes, giving you a new package - old one unaffected
-
-#### Composability
-- Mix and match packages from different versions (stable, unstable, specific commits)
-- Layer configurations: common base + user-specific + machine-specific
-- Override packages without forking: `package.override { enableFeature = true; }`
-
-### Development Environments: Why Everything Else Falls Short
-
-#### The Problem with Traditional Tools
-
-**Virtualenv/venv (Python)**:
-```bash
-# Global pollution, version conflicts, manual management
-python -m venv myenv
-source myenv/bin/activate  # Pollutes your shell
-pip install requests==2.28.0  # Hope it doesn't conflict with system packages!
-```
-- ❌ Only isolates Python packages, not system dependencies (libssl, gcc, etc.)
-- ❌ Breaks when you upgrade system Python
-- ❌ Doesn't handle non-Python dependencies (postgres, redis, etc.)
-- ❌ State lives in a directory you must remember to activate
-
-**Docker**:
-```dockerfile
-# Heavy, slow, requires root/daemon, not reproducible
-FROM ubuntu:latest  # "latest" = non-deterministic
-RUN apt-get update && apt-get install -y nodejs  # which version? ¯\_(ツ)_/¯
-```
-- ❌ "Works on my machine" still applies (base image differences)
-- ❌ Massive overhead (full OS, container runtime, daemon)
-- ❌ Can't easily mix with host tools (editor, git, etc.)
-- ❌ Dockerfile layer caching is fragile and non-deterministic
-
-**asdf/mise**:
-```bash
-# Better, but still imperative and stateful
-asdf install nodejs 18.0.0
-asdf global nodejs 18.0.0  # Mutates global state
-```
-- ❌ Still doesn't handle system dependencies
-- ❌ Installation is imperative and can fail midway
-- ❌ No guarantees about reproducibility across machines
-
-#### The Nix Way
-
-**Declarative, Pure, Reproducible**:
-
-Create a `shell.nix`:
-```nix
-{ pkgs ? import <nixpkgs> {} }:
-
-pkgs.mkShell {
-  buildInputs = with pkgs; [
-    nodejs_18      # Exact version
-    postgresql_15  # Including system dependencies
-    redis
-    python311      # Multiple Pythons? No problem
-  ];
-
-  shellHook = ''
-    export DATABASE_URL="postgresql://localhost/mydb"
-    echo "Welcome to the project environment!"
-  '';
-}
-```
-
-Enter the environment:
-```bash
-nix-shell  # Downloads and activates everything, instantly
-# OR
-nix develop  # With flakes - even more reproducible
-```
-
-**What you get**:
-- ✅ **Instant, deterministic environments**: Same hash = identical environment
-- ✅ **No global pollution**: Exit the shell, environment vanishes
-- ✅ **Complete isolation**: All dependencies (including system libs) are isolated
-- ✅ **Composition**: Overlay environments, share common bases
-- ✅ **Cross-project**: Multiple projects with conflicting dependencies? No problem
-- ✅ **Garbage collected**: Unused environments are automatically cleaned up
-- ✅ **Zero daemon**: No Docker daemon, no background processes
-
-**Real example from this repo**:
-```nix
-# Any contributor can get the exact environment:
-nix develop
-# Now they have the same tools, same versions, same everything
-```
-
-### Practical Benefits
-
-**For Users**:
-- Atomic upgrades: Either everything updates or nothing does
-- Instant rollbacks: Boot into previous system state from GRUB
-- Multiple users, multiple environments, zero conflicts
-- Test changes safely: `nixos-rebuild test` (doesn't modify boot)
-
-**For Developers**:
-- One `shell.nix` replaces: venv, rbenv, nvm, docker-compose, Makefile setup
-- CI/CD is just: `nix build` - if it builds locally, it builds in CI
-- Share exact environments with teammates via a single file
-- No "setup instructions" doc - just `nix develop`
-
-**For Operations**:
-- Entire server config in one repo (system + users + services)
-- Deploy with `nixos-rebuild switch --flake .#server`
-- Rollback failed deploys: just reboot and select previous generation
-- No config drift: Nix derivation = exact system state
-
-### Why This Repository Demonstrates Nix's Power
-
-This configuration shows Nix at its best:
-- **Multiple users** (bolt, pollard) with different needs, zero conflicts
-- **Multiple machines** (desktop, server, Raspberry Pi) from one repo
-- **Composable configs**: bolt-with-de imports bolt + adds desktop (DRY principle)
-- **Reproducible**: Clone this repo, run `nixos-rebuild`, get the exact same system
-- **Type-safe**: Options module validates configuration at evaluation time
-
-## Programs
-
-The home-manager configuration contains details about all the software I use. Here's a shout-out to the ones I use the most and that are customized to my needs.
-
-| Type           | Program      |
-| :------------- | :----------: |
-| Editor         | [NeoVim](https://github.com/neovim/neovim) |
-| Launcher       | [Wofi](https://github.com/mikn/wofi) |
-| Shell          | [Bash](https://www.gnu.org/software/bash/) |
-| Status Bar     | [Waybar](https://github.com/Alexays/Waybar) |
-| Terminal       | [Konsole](https://konsole.kde.org/) |
-| Window Manager | [Sway](https://github.com/swaywm/sway) |
-
-## Structure
-
-Here is an overview of the repository structure:
+## Layout
 
 ```
-├── flake.nix              # Main flake configuration
-├── home-manager/          # Home-manager user configurations
-│   ├── common/            # Shared configuration
-│   │   ├── base.nix       # Common programs and settings
-│   │   └── user-options.nix  # Parameterization options
-│   ├── users/             # Per-user configurations
-│   │   ├── bolt/          # Headless config for ninho server
-│   │   ├── bolt-with-de/  # Desktop config for bolt-nixos
-│   │   ├── pollard/       # Beginner-friendly config
-│   │   └── steam-deck/    # Steam Deck configuration
-│   ├── profiles/          # Modular package collections
-│   │   ├── desktop.nix    # GUI applications
-│   │   ├── development.nix # Development tools
-│   │   ├── system-tools.nix # CLI utilities
-│   │   ├── specialized.nix # Agda, Lean, Arduino, etc.
-│   │   └── wayland.nix    # Wayland compositor packages
-│   ├── programs/          # Program-specific configurations
-│   │   ├── neovim/        # Neovim with plugins and LSP
-│   │   ├── git/           # Git with aliases and delta
-│   │   ├── bash/          # Bash with custom prompt
-│   │   ├── sway/          # Sway window manager
-│   │   └── ... (10+ more)
-│   └── xdg/               # XDG desktop configurations
-├── imgs/                  # Screenshots
-├── install.sh             # Interactive installation script
-└── system/                # NixOS system configurations
-    ├── configuration.nix  # Main desktop/laptop config
-    └── machine/           # Machine-specific configurations
-        ├── ninho/         # Home server with ZFS RAID
-        ├── rpi/           # Raspberry Pi configurations
-        ├── x1-g8/         # ThinkPad X1 Gen 8
-        └── thinkpadx200/ # ThinkPad X200
+flake.nix                    # Entry point: NixOS + HM configs, colmena, checks, apps
+home-manager/
+  common/                    # Shared base + the userConfig option system
+    base.nix                 # Settings every user gets (nix, gpg, atuin, identity bridge)
+    user-options.nix         # Typed userConfig.* options (git, monitors, agda, aliases)
+  profiles/                  # Package collections mixed per user (desktop, development, ...)
+  programs/                  # Per-program config (neovim, niri, git, waybar, ...)
+  modules/ services/ xdg/    # Wayland env, user services, xdg wiring
+  users/                     # Per-user configs (home.nix + user-data.nix)
+    bolt/  bolt-with-de/  pollard/  steam-deck/
+system/
+  common/                    # constants.nix (ports/IPs/paths), overlays, shared services
+  machine/                   # One directory per host
+    ninho/  hetzner/  rpi/  x1-g8/  thinkpadx200/
+install.sh                   # Interactive rebuild menu with pre-flight safety checks
 ```
 
-### Key Directories
+The home-manager side layers three ways: `common/base.nix` for everything shared,
+`profiles/` for reusable package sets, and `users/<name>/` for per-user choices.
+`bolt-with-de` imports `bolt` and adds the desktop on top, so the headless and
+desktop configs never duplicate.
 
-- **`home-manager/`**: User environment configurations using home-manager
-  - **`common/`**: Shared configuration and parameterization framework
-  - **`users/`**: Per-user configurations (bolt, bolt-with-de, pollard, steam-deck)
-  - **`profiles/`**: Modular package collections that can be mixed and matched
-  - **`programs/`**: Detailed program configurations (neovim, git, sway, etc.)
-- **`system/`**: NixOS system-level configurations
-  - **`machine/`**: Hardware-specific configurations for different devices
-- **`flake.nix`**: Main flake defining all configurations and home-manager integrations
+## Machines
 
-### Configuration Architecture
+| Config | Arch | Host | Notes |
+|--------|------|------|-------|
+| `bolt-nixos` | x86_64 | ThinkPad X1 Carbon Gen 8 | Laptop, niri desktop (sway fallback), user `bolt` |
+| `ninho-nixos` | x86_64 | Home server | Ryzen 9 9950X3D, RTX 5090, 128GB, ZFS; ~25 services; users `bolt` + `pollard` |
+| `hetzner` | x86_64 | Hetzner Cloud VM | Public WireGuard hub + tunnel-only DNS resolver; deployed with colmena |
+| `bolt-rpi5-sd-image` | aarch64 | Raspberry Pi 5 | Tang (LUKS auto-unlock), LAN DNS, Wake-on-LAN; SD image + colmena `rpi-5` node |
+| `bolt-x200` | x86_64 | ThinkPad X200 | Incomplete stub (no `hardware-configuration.nix` yet), does not build |
 
-This repository uses a **modular, multi-user architecture**:
+## Home-manager users
 
-1. **Common Base** (`home-manager/common/`): Shared settings across all users
-2. **Profiles** (`home-manager/profiles/`): Reusable package collections
-3. **User Configs** (`home-manager/users/`): Per-user configurations that compose profiles
-4. **Zero Redundancy**: `bolt-with-de` imports `bolt` as base and adds desktop components
-
-Each user has:
-- `home.nix` - Main configuration file
-- `user-data.nix` - Personal git config and bash aliases
-- `README.md` - Usage documentation
-
-See `home-manager/MIGRATION_SUMMARY.md` for detailed architecture documentation.
-
-## Configurations
-
-This repository includes multiple system and user configurations:
-
-### NixOS Systems
-
-| System | Architecture | Description | Users |
-|--------|--------------|-------------|-------|
-| **bolt-nixos** | x86_64 | Main desktop/laptop with Sway | bolt (with DE) |
-| **ninho-nixos** | x86_64 | Home server with ZFS RAID | bolt, pollard |
-| **bolt-rpi5** | aarch64 | Raspberry Pi 5 | - |
-
-### Home-Manager Users
-
-| User | Target | GUI | Description |
-|------|--------|-----|-------------|
-| **bolt** | ninho | No | Headless with development tools |
-| **bolt-with-de** | bolt-nixos | Yes (Sway) | Full desktop environment |
-| **pollard** | ninho | No | Beginner-friendly with learning resources |
-| **steam-deck** | Steam Deck | Gaming | Minimal standalone configuration |
+| User | Target | Desktop | Notes |
+|------|--------|---------|-------|
+| `bolt` | ninho | No | Headless, full development toolchain |
+| `bolt-with-de` | bolt-nixos | niri | Desktop; imports `bolt` and adds the compositor, bar, theming |
+| `pollard` | ninho | No | Headless |
+| `steam-deck` | Steam Deck | Gaming | Standalone on SteamOS (non-NixOS) via home-manager |
 
 ## Usage
 
-### System Rebuilds (NixOS)
+### System rebuilds
 
 ```shell
-# Rebuild main desktop/laptop (bolt-nixos)
 sudo nixos-rebuild switch --flake .#bolt-nixos
-
-# Rebuild home server (ninho-nixos)
 sudo nixos-rebuild switch --flake .#ninho-nixos
-
-# Test configuration before applying
-sudo nixos-rebuild test --flake .#ninho-nixos
+sudo nixos-rebuild test   --flake .#ninho-nixos   # apply without touching the bootloader
 ```
 
-### Standalone Home-Manager
+The `rpi` and `hetzner` hosts deploy from colmena (they have no local checkout):
 
 ```shell
-# Apply user configuration independently
+eval $(ssh-agent) && ssh-add ~/.ssh/id_ed25519
+colmena apply --on rpi-5 --impure
+colmena apply --on hetzner
+```
+
+### Standalone home-manager
+
+```shell
 home-manager switch --flake .#bolt
 home-manager switch --flake .#pollard
 home-manager switch --flake .#steam-deck
+home-manager switch --flake .#bolt-with-de   # bolt-nixos also applies this via nixos-rebuild
 ```
 
-### Interactive Installation Script
+### Interactive menu
 
-The repository includes an interactive installation script:
+`./install.sh` runs pre-flight checks (in a git repo, in sync with `origin/main`)
+and offers apply/test/dry per host plus the per-user activations above.
+
+### nix run shortcuts
 
 ```shell
-./install.sh
+nix run .#dry-ninho      # nixos-rebuild dry-build --flake .#ninho-nixos
+nix run .#deploy-ninho   # sudo nixos-rebuild switch --flake .#ninho-nixos
+nix run .#fmt            # format every Nix file with nixfmt-rfc-style
+nix run .#update         # nix flake update
 ```
 
-This will present a menu of available configurations to apply.
+## Programs
 
-## Install
+The home-manager config carries the details for everything I use. The ones I
+touch the most:
 
-On a fresh NixOS installation, run the following commands:
+| Type | Program |
+|------|---------|
+| Editor | [Neovim](https://github.com/neovim/neovim) |
+| Compositor | [niri](https://github.com/YaLTeR/niri) (Sway as fallback) |
+| Bar | [DankMaterialShell](https://github.com/AvengeMedia/DankMaterialShell) (Waybar as fallback) |
+| Launcher | [fuzzel](https://codeberg.org/dnkl/fuzzel) |
+| Terminal | [Konsole](https://konsole.kde.org/) |
+| Shell | [Bash](https://www.gnu.org/software/bash/) |
 
-```shell
-mkdir DELETE_ME && cd DELETE_ME
-nix-shell --run \
-  "wget -c https://github.com/bolt12/nixos/archive/master.tar.gz && tar --strip-components=1 -xvf master.tar.gz" \
-  -p wget s-tar
-chmod +x install.sh && ./install.sh
-```
+## Adding a new user
 
-## Adding a New User
-
-To add a new user configuration:
-
-1. Create a new directory: `home-manager/users/newuser/`
-2. Copy a template:
+1. Create `home-manager/users/newuser/` (copy an existing user as a template):
    ```shell
    cp -r home-manager/users/pollard/* home-manager/users/newuser/
    ```
-3. Edit `home-manager/users/newuser/home.nix`:
-   - Update `userConfig.username`, `homeDirectory`
-   - Choose which profiles to import
-4. Edit `home-manager/users/newuser/user-data.nix`:
-   - Set git user name and email
-   - Add personal bash aliases
-5. Add to `flake.nix`:
+2. Edit `home.nix`: set `userConfig.username` / `homeDirectory` and choose which
+   profiles and programs to import.
+3. Edit `user-data.nix`: git name/email and personal aliases.
+4. Register it in `flake.nix` under `homeConfigurations` via the `mkHome` helper:
    ```nix
-   homeConfigurations.newuser = home-manager.lib.homeManagerConfiguration {
-     pkgs = nixpkgs.legacyPackages.${system};
-     modules = [ ./home-manager/users/newuser/home.nix ];
-     extraSpecialArgs = { inherit inputs system; };
-   };
+   newuser = mkHome { module = ./home-manager/users/newuser/home.nix; };
    ```
-6. Add to system configuration if using NixOS-integrated home-manager
+5. For a NixOS-integrated user, wire it under `home-manager.users.<name>` in the
+   host's config instead (see `system/machine/ninho/configuration.nix`).
 
-See `home-manager/MIGRATION_SUMMARY.md` for detailed architecture documentation.
+## Forking Guide, adapting this config for your machines
 
-## Forking Guide — adapting this config for your machines
-
-Nothing in this repo is a Nix-style "framework" — services are plain
-NixOS modules and homeConfig modules, so picking a piece and copy-pasting
-it into your own flake is the intended workflow. The list below is what
-you must change to make a fork actually run.
+Nothing here is a Nix-style "framework": services are plain NixOS modules and
+home-manager modules, so picking a piece and copy-pasting it into your own flake
+is the intended workflow. The list below is what you must change to make a fork
+actually run.
 
 ### Per-machine values you must change
 
@@ -335,35 +136,42 @@ you must change to make a fork actually run.
 | --- | --- |
 | `system/common/constants.nix` | Everything in the **INFRASTRUCTURE-SPECIFIC** block at the top: LAN subnet/gateway, ninho/rpi VPN IPs and hostnames, WireGuard pubkey, storage paths. The **CONVENTIONAL** block (port grid, Wyoming voice ports) is usually fine to keep. |
 | `home-manager/users/<user>/user-data.nix` | `userConfig.username`, `homeDirectory`, `git.{userName,userEmail}`, `sway.{primaryMonitor,externalMonitor,wallpaperPath}`, `agda.libraryRoot`. Personal aliases and Syncthing device IDs also live here. |
-| `system/machine/ninho/configuration.nix` SSH `authorizedKeys` blocks | Initrd LUKS unlock keys (~line 120) and the bolt/pollard account keys (~line 488 and ~line 511). |
-| `system/machine/ninho/configuration.nix` LUKS UUIDs (~84-105) | Run `blkid` on each LUKS partition and replace. |
-| `system/machine/ninho/configuration.nix` `initialPassword = "ninho"` | Placeholder password — change before first boot, then `passwd` after login. |
-| `system/machine/ninho/boot.nix` | `boot.kernelPackages = pkgs.linuxPackages_6_18`, `kernelModules = [ ... "nvidia" ... ]`, and `nixpkgs.config.cudaSupport` are RTX 5090-specific. Drop or swap if you're on AMD/Intel. |
+| `system/machine/ninho/boot.nix` | Initrd SSH keys for the LUKS unlock fallback (~line 118) and the LUKS partition UUIDs (~line 80-103). Run `blkid` on each LUKS partition and replace the UUIDs. |
+| `system/machine/ninho/users.nix` | The bolt/pollard account SSH keys (~line 26, 50) and `initialPassword = "ninho"` (~line 25, 47). The password is a placeholder: change it before first boot, then `passwd` after login. |
+| `system/machine/ninho/boot.nix` kernel/GPU | `boot.kernelPackages = pkgs.linuxPackages_6_18`, `kernelModules = [ ... "nvidia" ... ]`, and `nixpkgs.config.cudaSupport` are RTX 5090-specific. Drop or swap if you're on AMD/Intel. |
 | `system/machine/ninho/hardware-configuration.nix` | Regenerate via `nixos-generate-config --root /mnt`. |
-| `/etc/wireguard/private` on each WG host | One-time: `sudo install -m600 -o root -g root /path/to/your/wg-private /etc/wireguard/private`. The constant lives at `system/common/constants.nix → paths.wireguardPrivateKey`. |
+| `/etc/wireguard/private` on each WG host | One-time: `sudo install -m600 -o root -g root /path/to/your/wg-private /etc/wireguard/private`. The constant lives at `system/common/constants.nix`, `paths.wireguardPrivateKey`. |
 
 ### Embedded credentials inventory (rotate after forking)
 
-These currently ship in plaintext and are flagged for future migration to
-sops-nix. Rotate after you fork — and treat the forked tree as private
-until you do, or move these to your own secrets backend before publishing:
+These currently ship in plaintext in the tree and land world-readable in the Nix
+store. Rotate them after you fork, and treat the forked tree as private until you
+do, or move them to a secrets backend (sops-nix / agenix) before publishing:
 
-- `system/machine/ninho/services/homepage.nix` — service API keys for the
-  homepage dashboard widgets (deluge/miniflux/kavita/grafana auth).
-- `system/machine/ninho/services/llama-cpp.nix` `peers.z-ai.apiKey` —
-  cloud LLM passthrough.
-- `system/machine/ninho/services/anki-sync-server.nix:28` — bolt's anki
-  account password.
-- `system/machine/ninho/services/nextcloud.nix` — admin password
-  bootstrapped via tmpfiles.
-- `system/machine/ninho/services/monitoring/exporters.nix` — exportarr
-  API key files seeded via tmpfiles (`/var/lib/secrets/*-api-key`).
+- `system/machine/ninho/services/llama-cpp.nix`, `peers.z-ai.apiKey`: a live paid
+  cloud LLM key. Rotate this at the provider, since it is already in git history.
+- `system/machine/ninho/services/homepage.nix`: service API keys for the homepage
+  dashboard widgets (deluge/miniflux/kavita/grafana auth).
+- `system/machine/ninho/services/anki-sync-server.nix`: bolt's anki account password.
+- `system/machine/ninho/services/nextcloud.nix`: admin password bootstrapped via tmpfiles.
+- `system/machine/ninho/services/monitoring/exporters.nix`: exportarr API key files
+  seeded via tmpfiles (`/var/lib/secrets/*-api-key`).
 
 ### Quick start
 
 1. Fork the repo and clone it to `~/nixos`.
 2. Edit the values above.
-3. `nix develop` to enter the dev shell (nixfmt, statix, deadnix, etc.).
+3. `nix develop` to enter the dev shell (nixfmt, statix, deadnix, nil, colmena).
 4. `nix run .#dry-ninho` (or `.#dry-bolt`) to confirm the config evaluates.
 5. `nix run .#deploy-ninho` (or `.#deploy-bolt`) to switch the system.
 6. `home-manager switch --flake .#<user>` for per-user activation.
+
+## Install on a fresh machine
+
+```shell
+mkdir DELETE_ME && cd DELETE_ME
+nix-shell --run \
+  "wget -c https://github.com/bolt12/nixos/archive/main.tar.gz && tar --strip-components=1 -xvf main.tar.gz" \
+  -p wget s-tar
+chmod +x install.sh && ./install.sh
+```

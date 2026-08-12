@@ -1,6 +1,6 @@
-# Home Assistant — template sensors. Module-merged into
+# Home Assistant, template sensors. Module-merged into
 # services.home-assistant.config by ./default.nix.
-{ ... }:
+_:
 let
   zones = import ./zones.nix;
 

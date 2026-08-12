@@ -56,7 +56,7 @@ optsParser =
   info
     (helper <*> parser)
     ( fullDesc
-        <> header "ai — natural language shell command generator"
+        <> header "ai, natural language shell command generator"
         <> footerDoc
           ( Just $
               vsep

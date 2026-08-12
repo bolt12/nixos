@@ -290,7 +290,7 @@ in
         # Lock screen (swaylock-effects with blur + clock)
         "${mod}+Shift+x" = "exec ${lockCmd}";
 
-        # Volume (wpctl — PipeWire native)
+        # Volume (wpctl, PipeWire native)
         "XF86AudioRaiseVolume" = "exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+";
         "XF86AudioLowerVolume" = "exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-";
         "XF86AudioMute" = "exec wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
@@ -312,7 +312,7 @@ in
         # Screenshot annotation (satty)
         "${mod}+Shift+s" = ''exec grim -g "$(slurp)" - | satty -f -'';
 
-        # OCR — capture region, extract text to clipboard
+        # OCR, capture region, extract text to clipboard
         "${mod}+Shift+o" = ''exec grim -g "$(slurp)" - | tesseract stdin stdout | wl-copy'';
 
         # Window switcher (swayr)
@@ -323,7 +323,7 @@ in
         "${mod}+u" = "border pixel 1";
         "${mod}+i" = "border normal";
 
-        # Toggle LG monitor (for when it's cabled but powered off —
+        # Toggle LG monitor (for when it's cabled but powered off ,
         # kanshi can't tell, so manually disable to trigger BlitzWolf-only profile)
         "${mod}+Shift+m" =
           ''exec swaymsg -t get_outputs | jq -r '.[] | select(.name | test("DP-[0-9]+")) | select(.make == "LG Electronics") | .name' | xargs -I{} swaymsg output "{}" toggle'';
@@ -357,7 +357,7 @@ in
         }
 
         # Restart portal services so they pick up the Wayland environment
-        # PipeWire is started via socket activation by systemd — no restart needed
+        # PipeWire is started via socket activation by systemd, no restart needed
         {
           command = "systemctl --user restart xdg-desktop-portal.service xdg-desktop-portal-gtk.service xdg-desktop-portal-wlr.service";
         }
@@ -375,7 +375,7 @@ in
         # Input method
         { command = "fcitx5"; }
 
-        # Autotiling — auto-alternate horizontal/vertical splits
+        # Autotiling, auto-alternate horizontal/vertical splits
         {
           command = "autotiling";
           always = true;

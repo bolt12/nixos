@@ -158,12 +158,15 @@ in
     wantedBy = [ "multi-user.target" ];
 
     preStart = ''
-      # Download database initialization SQL if not present
+      set -e
+      # Download the DB-init SQL if absent. Fail (do not start compose) on a
+      # failed download: a missing bind source makes docker substitute an empty
+      # directory and break the MariaDB init, which then self-perpetuates.
+      # -f so an HTTP error is a curl failure rather than a saved error page.
       if [ ! -f ${dataDir}/supernotedb.sql ]; then
         echo "Downloading supernotedb.sql..."
-        ${pkgs.curl}/bin/curl -L -o ${dataDir}/supernotedb.sql \
-          https://supernote-private-cloud.supernote.com/docker-deploy/supernotedb.sql || \
-          echo "WARNING: Failed to download supernotedb.sql. You'll need to download it manually."
+        ${pkgs.curl}/bin/curl -fL -o ${dataDir}/supernotedb.sql \
+          https://supernote-private-cloud.supernote.com/docker-deploy/supernotedb.sql
       fi
 
       # Copy compose files to data directory

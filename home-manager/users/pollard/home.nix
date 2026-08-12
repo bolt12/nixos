@@ -41,17 +41,8 @@
   };
 
   home = {
-    username = config.userConfig.username;
-    homeDirectory = config.userConfig.homeDirectory;
+    # username, homeDirectory, keyboard and EDITOR/VISUAL come from common/base.nix.
     stateVersion = "25.05";
-
-    keyboard = {
-      layout = "us,pt";
-      options = [
-        "caps:escape"
-        "grp:shifts_toggle"
-      ];
-    };
 
     sessionPath = [
       "${config.userConfig.homeDirectory}/.local/bin"

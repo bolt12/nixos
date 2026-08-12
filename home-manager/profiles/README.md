@@ -1,6 +1,6 @@
 # Home Manager Profiles
 
-This directory contains modular package profiles that can be mixed and matched to create different system configurations. This approach provides better organization, maintainability, and flexibility compared to monolithic package lists.
+Package profiles imported per user. Each file groups related packages so a user config picks the sets it needs instead of one flat list.
 
 ## Profile Structure
 
@@ -68,16 +68,6 @@ imports = [
   ./profiles/specialized.nix  # For research/academic work
 ];
 ```
-
-## Benefits of This Approach
-
-1. **Complete Modularity**: All packages organized into logical profiles
-2. **Zero Redundancy**: Each package defined exactly once in its most appropriate location  
-3. **Clean Configuration**: Main home.nix is now focused purely on core system configuration
-4. **Flexible Composition**: Mix and match profiles based on system requirements
-5. **Easy Maintenance**: Add/remove/modify packages in dedicated profile files
-6. **Clear Organization**: Related tools grouped together with comprehensive documentation
-7. **Better Performance**: Faster evaluation due to reduced complexity in main config
 
 ## Adding New Packages
 

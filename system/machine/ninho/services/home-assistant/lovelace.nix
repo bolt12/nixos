@@ -69,8 +69,8 @@ let
     (map (z: {
       entity = "climate.ac_${z.slug}";
       attribute = "current_temperature";
-      name = z.name;
-      color = z.color;
+      inherit (z) name;
+      inherit (z) color;
       stroke_width = 2;
       curve = "smooth";
     }) climateZones)
@@ -87,13 +87,13 @@ let
     ];
   runtimeBarSeries = map (z: {
     entity = "sensor.ac_${z.slug}_runtime_today";
-    name = z.name;
-    color = z.color;
+    inherit (z) name;
+    inherit (z) color;
   }) climateZones;
   runtimeAreaSeries = map (z: {
     entity = "sensor.ac_${z.slug}_runtime_today";
-    name = z.name;
-    color = z.color;
+    inherit (z) name;
+    inherit (z) color;
     stroke_width = 1;
     curve = "smooth";
     opacity = 0.5;
@@ -104,18 +104,18 @@ let
   }) climateZones;
   humiditySeries = map (z: {
     entity = "sensor.ac_${z.slug}_room_humidity";
-    name = z.name;
-    color = z.color;
+    inherit (z) name;
+    inherit (z) color;
     stroke_width = 2;
     curve = "smooth";
   }) climateZones;
   modeGlanceEntities = map (z: {
     entity = "climate.ac_${z.slug}";
-    name = z.name;
+    inherit (z) name;
   }) climateZones;
   humidityGlanceEntities = map (z: {
     entity = "sensor.ac_${z.slug}_room_humidity";
-    name = z.name;
+    inherit (z) name;
   }) climateZones;
 in
 {

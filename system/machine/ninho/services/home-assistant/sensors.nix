@@ -1,11 +1,11 @@
-# Home Assistant — history_stats sensors. Module-merged into
+# Home Assistant, history_stats sensors. Module-merged into
 # services.home-assistant.config by ./default.nix.
 #
 # For each AC zone we keep three rolling-window runtime sensors:
-#   *_runtime_today      — accumulates from 00:00 today
-#   *_runtime_yesterday  — fixed yesterday window (used by daily summary)
-#   *_runtime_total      — cumulative since 2026-01-01 (feeds utility_meter)
-{ ... }:
+#   *_runtime_today     , accumulates from 00:00 today
+#   *_runtime_yesterday , fixed yesterday window (used by daily summary)
+#   *_runtime_total     , cumulative since 2026-01-01 (feeds utility_meter)
+_:
 let
   zones = import ./zones.nix;
   acStates = [

@@ -10,24 +10,24 @@
 
 ## NixOS Configuration
 
-The ninho server is configured with comprehensive NVIDIA GPU support for the RTX 5090 in a **headless** configuration (no X11/Wayland display server).
+The ninho server runs the RTX 5090 headless (no X11/Wayland display server).
 
 ### Key Configuration Elements
 
 #### 1. Kernel Module Loading (Critical for Headless)
 
 ```nix
-# Force load NVIDIA modules in initrd (required for headless servers)
-boot.initrd.kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ];
+# Load NVIDIA modules in stage 2, NOT initrd (initrd load hangs boot with a dummy HDMI plug)
+boot.kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ];
 
 # Kernel parameters
 boot.kernelParams = [
   "nvidia-drm.modeset=1"
-  "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
+  "nvidia-drm.fbdev=1"
 ];
 ```
 
-**Why**: On headless servers without a display manager, NVIDIA modules don't auto-load via X11. Loading them in `initrd.kernelModules` ensures they're available at boot time, before any services need GPU access.
+**Why**: On a headless server without a display manager the NVIDIA modules don't auto-load via X11, so they go in `boot.kernelModules` to load in stage 2. They stay out of initrd because loading them there hangs boot when a dummy HDMI plug is attached.
 
 #### 2. X Server Configuration (Required Even for Headless)
 
@@ -35,10 +35,6 @@ boot.kernelParams = [
 services.xserver = {
   enable = true;  # Required for videoDrivers to work
   videoDrivers = [ "nvidia" ];
-
-  # Headless configuration - no actual X server running
-  displayManager.startx.enable = false;
-  desktopManager.gnome.enable = false;
 };
 ```
 
@@ -108,13 +104,13 @@ boot.kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ];
 ```nix
 boot.kernelParams = [
   "nvidia-drm.modeset=1"
-  "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
+  "nvidia-drm.fbdev=1"
 ];
 ```
 
 **Parameters explained**:
 - `nvidia-drm.modeset=1`: Enables DRM kernel mode setting (better stability)
-- `NVreg_PreserveVideoMemoryAllocations=1`: Preserves video memory on suspend/resume
+- `nvidia-drm.fbdev=1`: Enables the NVIDIA framebuffer device (improves KMS capture, driver 560+)
 
 ## Installed Tools
 
@@ -265,11 +261,11 @@ If GPU jobs fail with OOM:
 
 ## Headless Configuration
 
-Since this is a headless server:
-- ✅ No X server needed (driver works without display)
-- ✅ Persistence daemon keeps GPU initialized
-- ✅ SSH access for monitoring (nvidia-smi works over SSH)
-- ✅ CUDA workloads work without display attached
+On this headless server:
+- No X server runs; the driver works without a display.
+- The persistence daemon keeps the GPU initialized.
+- `nvidia-smi` works over SSH for monitoring.
+- CUDA workloads run with no display attached.
 
 ## Future Enhancements
 
@@ -315,6 +311,4 @@ docker run --gpus all nvidia/cuda:12.7-base nvidia-smi
 
 ---
 
-**Configuration File**: `/home/bolt/GitHub/nixos/system/machine/ninho/configuration.nix:201-240`
-
-**Last Updated**: 2025-11-25
+**Configuration**: `system/machine/ninho/configuration.nix` (`hardware.nvidia`, `services.xserver`) and `system/machine/ninho/boot.nix` (NVIDIA kernel modules and params).

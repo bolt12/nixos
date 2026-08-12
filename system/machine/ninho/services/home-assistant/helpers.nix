@@ -1,15 +1,15 @@
-# Home Assistant — input helpers backing the zone-mode AC abstraction and the
+# Home Assistant, input helpers backing the zone-mode AC abstraction and the
 # audit trail. Module-merged into services.home-assistant.config.
 #
 # Each AC zone has:
-#   input_select.zone_<slug>_mode    — off | eco | comfort | boost
-#   input_text.ac_<slug>_last_intent — most recent *policy* decision (which
+#   input_select.zone_<slug>_mode   , off | eco | comfort | boost
+#   input_text.ac_<slug>_last_intent, most recent *policy* decision (which
 #                                      automation set the mode and why).
 #                                      UI-driven changes go to HA's logbook,
 #                                      not this audit text.
 #
 # input_boolean.ac_automations_enabled is the kill-switch for all appliers.
-{ ... }:
+_:
 let
   zones = import ./zones.nix;
   modes = [
@@ -36,7 +36,7 @@ let
   });
 
   intentTexts = byKey (z: "ac_${z.slug}_last_intent") (z: {
-    name = "AC ${z.friendly} — Last Intent";
+    name = "AC ${z.friendly}, Last Intent";
     max = 255;
     icon = "mdi:history";
   });
