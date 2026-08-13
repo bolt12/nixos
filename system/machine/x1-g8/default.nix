@@ -14,7 +14,13 @@
       efi = {
         canTouchEfiVariables = true;
       };
-      systemd-boot.enable = true;
+      systemd-boot = {
+        enable = true;
+        # Cap kernels/initrds kept in the small EFI partition so it cannot fill
+        # and break the bootloader install during `nixos-rebuild switch`. Lower
+        # this if `df -h /boot` shows a tiny ESP.
+        configurationLimit = 10;
+      };
     };
 
     kernelModules = [
