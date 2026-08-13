@@ -9,9 +9,9 @@ local curl = require("plenary.curl")
 -- ==========================================================================
 
 local Config = {
-  api_url = "http://10.100.0.100:8080/v1/chat/completions",
-  models_url = "http://10.100.0.100:8080/v1/models",
-  images_url = "http://10.100.0.100:8080/v1/images/generations",
+  api_url = "http://100.64.0.3:8080/v1/chat/completions",
+  models_url = "http://100.64.0.3:8080/v1/models",
+  images_url = "http://100.64.0.3:8080/v1/images/generations",
   api_key = "not-needed",
   request_timeout = 120000,
   image_timeout = 600000, -- 10 min (accounts for first-time model download)

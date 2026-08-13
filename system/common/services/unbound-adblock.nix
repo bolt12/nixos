@@ -74,7 +74,7 @@ in
     interfaces = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       example = [
-        "10.100.0.1"
+        "100.64.0.5"
         "127.0.0.1"
       ];
       description = ''
@@ -87,7 +87,7 @@ in
       type = lib.types.listOf lib.types.str;
       example = [
         "0.0.0.0/0 refuse"
-        "10.100.0.0/24 allow"
+        "100.64.0.0/10 allow"
       ];
       description = "unbound access-control entries (order matters; refuse-by-default recommended for public hosts).";
     };

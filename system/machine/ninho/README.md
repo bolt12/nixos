@@ -24,8 +24,9 @@ Top-level layout under `services/`:
 System-level pieces split out of `configuration.nix`:
 
 - `boot.nix`: kernel 6.18, initrd modules, LUKS + Clevis unlock, GRUB.
-- `networking.nix`: NetworkManager, DNS, firewall, WireGuard tunnel
-  (10.100.0.100 to the RPi), game-streaming sysctl tuning.
+- `networking.nix`: NetworkManager, DNS (hub adblock resolver over Tailscale,
+  RPi LAN fallback), firewall, Tailscale client via `services.headscaleClient`
+  (`100.64.0.3`), game-streaming sysctl tuning.
 - `storage.nix`: ZFS pools, sanoid snapshot policies, storage seed dirs.
 - `users.nix`: bolt + pollard (initial password `"ninho"`, change ASAP).
 
