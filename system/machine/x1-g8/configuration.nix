@@ -37,7 +37,8 @@
       ethernet.macAddress = "permanent";
     };
     nameservers = [
-      constants.network.hub.vpnIp # hub is the recursive adblock DNS over the tunnel
+      constants.network.hub.vpnIp # hub adblock resolver over the tunnel (primary)
+      constants.network.rpi.lanIp # RPi LAN resolver (fallback; only reachable at home)
       "1.1.1.1"
       "8.8.8.8"
       "8.8.4.4"
@@ -46,7 +47,10 @@
     # Enable WireGuard
     firewall = {
       enable = true;
-      trustedInterfaces = [ "wg0" ];
+      trustedInterfaces = [
+        "wg0"
+        "tailscale0"
+      ];
       allowedTCPPorts = [
         8000 # Development
         constants.ports.syncthing # Syncthing web UI
@@ -59,6 +63,23 @@
       ];
     };
 
+  };
+
+  # Tailscale client. Registers against the self-hosted Headscale on the hub for a
+  # DIRECT path to ninho (game streaming) and general access, behind one stable
+  # address that works home and away. Coexists with wg0 (default.nix). MagicDNS
+  # off (--accept-dns=false) so the hub adblock resolver stays authoritative.
+  services.tailscale = {
+    enable = true;
+    openFirewall = true; # UDP 41641 for direct NAT traversal
+    useRoutingFeatures = "client";
+    authKeyFile = "/etc/tailscale/authkey"; # hand-placed, cf. /etc/wireguard/private
+    extraUpFlags = [
+      "--login-server=${constants.network.headscale.url}"
+      "--hostname=x1-g8"
+      "--accept-dns=false"
+    ];
+    extraSetFlags = [ "--accept-dns=false" ];
   };
 
   # Select internationalisation properties.

@@ -74,6 +74,15 @@ in
       # Referenced as a peer by every client config. Update here if it rotates.
       serverPubKey = "8/0ivDjLLlkPuQYvX5mKIdf+IVeqnGHXkpxNY7EWtUM=";
     };
+
+    # Self-hosted Headscale control plane (Tailscale coordinator) on the hub.
+    # The DDNS name forward-resolves to hub.publicHost (2.28.9.140); clients dial
+    # it as their --login-server, and headscale obtains its Let's Encrypt cert for
+    # it. The adblock resolvers allowlist this name (see unbound-adblock.nix).
+    headscale = {
+      hostname = "hetzner-nixos.ddns.net";
+      url = "https://hetzner-nixos.ddns.net";
+    };
   };
 
   # ---------------------------------------------------------------------------

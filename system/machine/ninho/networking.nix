@@ -13,9 +13,13 @@
       dns = "none";
     };
 
-    # DNS servers
+    # DNS servers. Hub adblock resolver (10.100.0.1) first: it is the stable DNS
+    # anchor across the wg->tailscale transport swap (the hub keeps 10.100.0.1
+    # after the later tailscale renumber), so this list never has to change. RPi
+    # LAN resolver is the always-reachable fallback if the tunnel is down.
     nameservers = [
-      constants.network.rpi.lanIp # RPi acts as local recursive DNS over the LAN
+      constants.network.hub.vpnIp # hub adblock resolver over the tunnel (primary)
+      constants.network.rpi.lanIp # RPi LAN recursive DNS (fallback)
       "1.1.1.1"
       "8.8.8.8"
       "8.8.4.4"
@@ -24,7 +28,10 @@
     # Firewall
     firewall = {
       enable = true;
-      trustedInterfaces = [ "wg0" ];
+      trustedInterfaces = [
+        "wg0"
+        "tailscale0"
+      ];
       allowedTCPPorts = [
         22 # SSH
         80 # HTTP
@@ -76,6 +83,24 @@
         }
       ];
     };
+  };
+
+  # Tailscale client. Registers against the self-hosted Headscale on the hub and
+  # negotiates a DIRECT peer path (over ninho's public IPv6 when available) so
+  # game streaming to the laptop no longer hairpins through the wg0 hub in
+  # Germany. Coexists with wg0: tailscale0 (100.64.0.0/10, udp 41641) and wg0
+  # (10.100.0.0/24, udp 51820) are disjoint, so nothing collides.
+  services.tailscale = {
+    enable = true;
+    openFirewall = true; # UDP 41641 for direct NAT traversal
+    useRoutingFeatures = "none"; # pure host; not advertising routes or exit node
+    authKeyFile = "/etc/tailscale/authkey"; # hand-placed, cf. /etc/wireguard/private
+    extraUpFlags = [
+      "--login-server=${constants.network.headscale.url}"
+      "--hostname=ninho"
+      "--accept-dns=false" # keep the hub adblock resolver; do not push MagicDNS
+    ];
+    extraSetFlags = [ "--accept-dns=false" ]; # re-applied every rebuild
   };
 
   # Network performance tuning for game streaming (Sunshine)

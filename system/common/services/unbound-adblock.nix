@@ -91,6 +91,18 @@ in
       ];
       description = "unbound access-control entries (order matters; refuse-by-default recommended for public hosts).";
     };
+
+    allowlist = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      example = [ "example.ddns.net" ];
+      description = ''
+        Hostnames exempted from the RPZ blocklist and resolved normally. Use for
+        dynamic-DNS names (e.g. the Headscale control host) that a blocklist may
+        otherwise catch. Rendered as `local-zone: "<name>." always_transparent`,
+        which takes precedence over the RPZ.
+      '';
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -163,6 +175,12 @@ in
           ];
 
           access-control = cfg.accessControl;
+
+          # Exempt allowlisted names from the RPZ blocklist. always_transparent
+          # resolves them normally and overrides the RPZ, so a dynamic-DNS name
+          # we depend on (e.g. the Headscale control host) can't be blocked by a
+          # blocklist update on either resolver.
+          local-zone = map (h: ''"${h}." always_transparent'') cfg.allowlist;
           # nixpkgs already sets ip-freebind by default, so unbound can bind an
           # address that does not exist yet (e.g. the hub's wg0 address before
           # the tunnel is up). No consumer needs to opt in.

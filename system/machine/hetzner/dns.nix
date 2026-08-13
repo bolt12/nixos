@@ -23,6 +23,8 @@
       "127.0.0.0/8 allow"
       "${constants.network.wireguard.subnet} allow"
     ];
+    # Never block the Headscale control host: a DDNS name a blocklist could catch.
+    allowlist = [ constants.network.headscale.hostname ];
   };
 
   # The host itself resolves via the public nameservers in networking.nix, not

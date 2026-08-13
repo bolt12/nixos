@@ -163,6 +163,8 @@ in
     accessControl = [
       "192.168.0.0/16 allow"
     ];
+    # Never block the Headscale control host: a DDNS name a blocklist could catch.
+    allowlist = [ constants.network.headscale.hostname ];
   };
 
   networking = {
