@@ -38,7 +38,7 @@ in
 
       # Tailnet address pools handed to clients. Both defaults are shown for
       # clarity. Neither collides with anything you run:
-      #   v4 100.64.0.0/10  -> disjoint from the wg subnet 10.100.0.0/24 and LAN
+      #   v4 100.64.0.0/10  -> the mandated Tailscale CGNAT range
       #   v6 fd7a:115c:a1e0::/48 -> ULA, disjoint from your MEO/Hetzner GUAs
       prefixes = {
         v4 = "100.64.0.0/10";
@@ -50,15 +50,12 @@ in
         sqlite.path = "/var/lib/headscale/db.sqlite";
       };
 
-      # DNS: stay OUT of the way of the existing 10.100.0.1 tunnel adblock
-      # resolver. MagicDNS off means headscale pushes no nameservers and no
-      # search domains; override_local_dns off means it never rewrites a
-      # client's OS resolver. So wg-connected devices keep resolving via
-      # 10.100.0.1 exactly as today, and tailnet-only devices keep their own
-      # OS DNS. (You cannot point MagicDNS at 10.100.0.1 anyway: unbound is
-      # bound to wg0 + loopback only [dns.nix], so it is unreachable from the
-      # 100.64/10 tailnet. Enable MagicDNS later only once you expose an
-      # adblock resolver reachable from the tailnet.)
+      # DNS: MagicDNS off so headscale pushes no nameservers and never rewrites a
+      # client's OS resolver (override_local_dns off). Each host keeps its own
+      # nameservers pointing at the adblock resolver (the hub's unbound over the
+      # tailnet, or the RPi on the LAN). Enabling MagicDNS later would mean
+      # serving tailnet names + forwarding other queries to that adblock resolver
+      # as the global upstream.
       dns = {
         magic_dns = false;
         override_local_dns = false;
@@ -80,6 +77,15 @@ in
     80 # Let's Encrypt HTTP-01 challenge (headscale ACME)
     443 # headscale control API (HTTPS)
   ];
+
+  # This box also joins its OWN tailnet as a node (a Tailscale client alongside
+  # the Headscale server), so it appears in `headscale nodes list` and is
+  # reachable over Tailscale (e.g. SSH) like every other host. The client dials
+  # the control server by its public hostname, hairpinning back to this box.
+  services.headscaleClient = {
+    enable = true;
+    hostname = "hetzner";
+  };
 }
 
 # ---------------------------------------------------------------------------
@@ -94,8 +100,8 @@ in
 #   # 2. Find its numeric ID (0.26+ keys the --user flag on the ID, not name):
 #   headscale users list
 #
-#   # 3. Mint a reusable preauth key (24h validity) to enroll devices:
-#   headscale preauthkeys create --user <ID> --reusable --expiration 24h
+#   # 3. Mint a reusable preauth key (30d validity) to enroll devices:
+#   headscale preauthkeys create --user <ID> --reusable --expiration 720h
 #
 #   # 4. On each client (ninho, laptop, phone, ...):
 #   tailscale up --login-server=https://hetzner-nixos.ddns.net \

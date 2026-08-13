@@ -24,7 +24,10 @@ let
   journalDir = "/home/${emanoteUser}/journal";
 in
 {
-  imports = [ ../../common/services/unbound-adblock.nix ];
+  imports = [
+    ../../common/services/unbound-adblock.nix
+    ../../common/services/tailscale-client.nix
+  ];
   nixpkgs = {
     config.allowUnfree = true;
   };
@@ -167,6 +170,14 @@ in
     allowlist = [ constants.network.headscale.hostname ];
   };
 
+  # Tailscale client (see common/services/tailscale-client.nix): joins the
+  # self-hosted Headscale tailnet so the RPi is reachable at a stable tailnet
+  # address from anywhere.
+  services.headscaleClient = {
+    enable = true;
+    hostname = "rpi";
+  };
+
   networking = {
     nameservers = [
       "127.0.0.1"
@@ -177,6 +188,7 @@ in
     # Open ports in the firewall.
     firewall = {
       enable = true;
+      # tailscale0 is trusted via services.headscaleClient (tailscale-client.nix).
       allowedTCPPorts = [
         22
         53

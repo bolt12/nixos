@@ -19,6 +19,9 @@
     # Machine-specific configuration
     ./default.nix
 
+    # Shared Tailscale-client module (Headscale-joined)
+    ../../common/services/tailscale-client.nix
+
     # Import nixos home manager module
     inputs.home-manager.nixosModules.home-manager
   ];
@@ -44,20 +47,16 @@
       "8.8.4.4"
     ];
 
-    # Enable WireGuard
+    # Firewall
     firewall = {
       enable = true;
-      trustedInterfaces = [
-        "wg0"
-        "tailscale0"
-      ];
+      # tailscale0 is trusted via services.headscaleClient (tailscale-client.nix).
       allowedTCPPorts = [
         8000 # Development
         constants.ports.syncthing # Syncthing web UI
         22000 # Syncthing file transfers
       ];
       allowedUDPPorts = [
-        constants.network.wireguard.port
         22000 # Syncthing discovery
         21027 # Syncthing discovery
       ];
@@ -65,21 +64,13 @@
 
   };
 
-  # Tailscale client. Registers against the self-hosted Headscale on the hub for a
-  # DIRECT path to ninho (game streaming) and general access, behind one stable
-  # address that works home and away. Coexists with wg0 (default.nix). MagicDNS
-  # off (--accept-dns=false) so the hub adblock resolver stays authoritative.
-  services.tailscale = {
+  # Tailscale client (see common/services/tailscale-client.nix): joins the
+  # self-hosted Headscale hub for a DIRECT path to ninho (game streaming) and
+  # general access, behind one stable address that works home and away.
+  services.headscaleClient = {
     enable = true;
-    openFirewall = true; # UDP 41641 for direct NAT traversal
-    useRoutingFeatures = "client";
-    authKeyFile = "/etc/tailscale/authkey"; # hand-placed, cf. /etc/wireguard/private
-    extraUpFlags = [
-      "--login-server=${constants.network.headscale.url}"
-      "--hostname=x1-g8"
-      "--accept-dns=false"
-    ];
-    extraSetFlags = [ "--accept-dns=false" ];
+    hostname = "x1-g8";
+    routingFeatures = "client";
   };
 
   # Select internationalisation properties.

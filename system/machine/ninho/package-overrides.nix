@@ -17,7 +17,7 @@ in
 {
   nixpkgs.overlays = [
     (final: prev: {
-      # llama-cpp-cuda - Build from PR #18551 with thinking/reasoning support
+      # llama-cpp-cuda - CUDA build for Blackwell (sm_120), pinned to a llama.cpp release
       llama-cpp-cuda =
         (unstable.llama-cpp.override {
           cudaSupport = true;
@@ -27,13 +27,13 @@ in
           metalSupport = false;
         }).overrideAttrs
           (oldAttrs: {
-            version = "10299";
+            version = "10408";
 
             src = pkgs.fetchFromGitHub {
               owner = "ggml-org";
               repo = "llama.cpp";
-              tag = "b10299";
-              hash = "sha256-jx+Exq/jPYzuw5kZAXzBaKVrka1tI1Rok7opFI+D9uE=";
+              tag = "b10408";
+              hash = "sha256-b01kyCjcrAJ4zFPNRM2GU/9TR5y1mi7WIJDNYrhSJZo=";
               leaveDotGit = true;
               postFetch = ''
                 git -C "$out" rev-parse --short HEAD > $out/COMMIT
@@ -70,13 +70,13 @@ in
             # Recompute via:
             #   nix run nixpkgs#prefetch-npm-deps -- <unpacked-src>/tools/ui/package-lock.json
             npmRoot = "tools/ui";
-            npmDepsHash = "sha256-FHvd2bMvBc9EXrJEzu8EN78oUVSLcOKYCc0232V+L4A=";
+            npmDepsHash = "sha256-2Q7XhaLAArmviOLdQsNbYTfdyDE5pW9lR26cRHEVl9k=";
 
             # Keep the original postInstall to handle installation correctly
             postInstall = oldAttrs.postInstall or "";
           });
 
-      # llama-swap v247 - Latest release with Anthropic API compatibility.
+      # llama-swap v249 - Latest release with Anthropic API compatibility.
       # Provenance of the overrides below: v195 renamed ui/ → ui-svelte/ (so we
       # rebuild the UI derivation from scratch), v221 added forking process tests
       # that fail in the sandbox, v239 gated the web UI behind the embed_ui tag.
@@ -85,8 +85,8 @@ in
           llama-swap-src = pkgs.fetchFromGitHub {
             owner = "mostlygeek";
             repo = "llama-swap";
-            tag = "v247";
-            hash = "sha256-YnawuBPZMv7oc0CNEIEQAGg8Pr/0ltskCDXJvLF+VPc=";
+            tag = "v249";
+            hash = "sha256-7wXOL8XtcKV6Abdxar25C85ODQ34RYOAGYCTaCXxPpY=";
             leaveDotGit = true;
             postFetch = ''
               cd "$out"
@@ -97,7 +97,7 @@ in
           };
           llama-swap-ui = pkgs.buildNpmPackage {
             pname = "llama-swap-ui";
-            version = "247";
+            version = "249";
             src = llama-swap-src;
             sourceRoot = "${llama-swap-src.name}/ui-svelte";
             npmDepsHash = "sha256-6MPXQtmaz97D9PUU2Nn5DH/2HZNP/rnAWVSck/FiCyk=";
@@ -111,7 +111,7 @@ in
           };
         in
         unstable.llama-swap.overrideAttrs (oldAttrs: {
-          version = "247";
+          version = "249";
           src = llama-swap-src;
           proxyVendor = true;
           vendorHash = "sha256-59ep82wHrd134bCm3G8i7xhvW4M+PbIf6CcFyODTPC8=";

@@ -19,6 +19,13 @@
       "1.1.1.1"
       "8.8.8.8"
     ];
+
+    # Public firewall: SSH only here. headscale.nix adds TCP 80/443, and the
+    # tailscale-client module adds tailscale0 to trustedInterfaces + UDP 41641.
+    firewall = {
+      enable = true;
+      allowedTCPPorts = [ 22 ];
+    };
   };
 
   systemd.network = {

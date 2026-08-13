@@ -53,7 +53,6 @@ in
 
     # Network and cloud tools
     awscli2 # AWS CLI
-    wireguard-tools # VPN tools
     noip # Dynamic DNS client
 
     # Haskell development environment - comprehensive toolchain

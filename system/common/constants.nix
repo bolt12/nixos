@@ -18,23 +18,22 @@
 # Each section below is annotated.
 # =============================================================================
 let
-  # Bare VPN addresses. The /24 CIDR forms under `wireguard` below are derived
-  # from these so a hand-edit can't leave the mask out of sync with the address
-  # (unbound binds the bare form on the hub; wg0 assigns the CIDR form).
-  ninhoVpnIp = "10.100.0.100";
-  hubVpnIp = "10.100.0.1";
+  # Tailscale addresses (auto-assigned by Headscale, stable per node key). These
+  # are what every service URL and the DNS anchor resolve to. Read once from
+  # `tailscale status`; only change if a node is deleted and re-registered.
+  ninhoVpnIp = "100.64.0.3";
+  hubVpnIp = "100.64.0.5";
+  rpiVpnIp = "100.64.0.1";
+  headscaleHostname = "hetzner-nixos.ddns.net"; # Headscale control host (No-IP DDNS -> hub v4)
 in
 {
   # ---------------------------------------------------------------------------
   # Network: INFRASTRUCTURE-SPECIFIC
   # ---------------------------------------------------------------------------
-  # `ninho` is my home server. `hub` is a Hetzner Cloud VM that is the public
-  # WireGuard server + tunnel DNS resolver (it took over from the RPi when the
-  # home ISP switch removed the public IP). `rpi` is now LAN-only (Tang + local
-  # adblock DNS). The WireGuard subnet (`10.100.0.0/24`) is private and
-  # arbitrary; pick anything that doesn't collide with your LAN or other VPNs.
-  # `serverPubKey` is derived from the hub's WireGuard private key (reused from
-  # the RPi): rotate here whenever that key rotates.
+  # `ninho` is my home server. `hub` is a Hetzner Cloud VM running the Headscale
+  # control plane + tunnel adblock DNS resolver. `rpi` runs LAN adblock DNS +
+  # Tang. All nodes reach each other over Tailscale (100.64.0.0/10, assigned by
+  # Headscale).
   network = {
     lan = {
       subnet = "192.168.1.0/24";
@@ -49,30 +48,23 @@ in
       lanInterface = "enp11s0";
       lanMac = "a0:ad:9f:13:7e:80";
     };
-    # Public WireGuard hub + tunnel DNS resolver (Hetzner Cloud VM). Reuses the
-    # RPi's key and VPN address, so clients only had to change endpoint.
+    # Hetzner Cloud VM: Headscale control plane + tunnel adblock DNS resolver.
     hub = {
       publicHost = "2.28.9.140"; # rDNS static.140.9.28.2.clients.your-server.de
       ipv6 = "2a01:4f8:c015:61f9::1";
-      vpnIp = hubVpnIp; # DNS resolver address, over the tunnel (bare form of wireguard.serverIp)
+      vpnIp = hubVpnIp; # hub DNS resolver + service anchor address, over Tailscale
       externalInterface = "eth0"; # public NIC (usePredictableInterfaceNames = false)
     };
     # RPi: LAN-only now (Tang + local adblock DNS). No longer on the VPN.
     rpi = {
       lanIp = "192.168.1.110";
+      vpnIp = rpiVpnIp; # 100.64.0.1, the RPi's tailscale address
     };
-    wireguard = {
-      port = 51820;
-      interface = "wg0";
-      subnet = "10.100.0.0/24";
-      # CIDR forms used by per-host wireguard `address`/`ips` settings.
-      # ninhoIp/serverIp are derived from the bare addresses in the `let` above.
-      ninhoIp = "${ninhoVpnIp}/24";
-      x1Ip = "10.100.0.2/24";
-      serverIp = "${hubVpnIp}/24"; # the hub's wg0 address
-      # WireGuard server (hub) public key, derived from the reused private key.
-      # Referenced as a peer by every client config. Update here if it rotates.
-      serverPubKey = "8/0ivDjLLlkPuQYvX5mKIdf+IVeqnGHXkpxNY7EWtUM=";
+    # Tailscale/Headscale runs on the mandated 100.64.0.0/10 CGNAT range. The
+    # subnet is used for trusted-network access control (e.g. home-assistant, the
+    # hub adblock resolver ACL).
+    tailscale = {
+      subnet = "100.64.0.0/10";
     };
 
     # Self-hosted Headscale control plane (Tailscale coordinator) on the hub.
@@ -80,8 +72,8 @@ in
     # it as their --login-server, and headscale obtains its Let's Encrypt cert for
     # it. The adblock resolvers allowlist this name (see unbound-adblock.nix).
     headscale = {
-      hostname = "hetzner-nixos.ddns.net";
-      url = "https://hetzner-nixos.ddns.net";
+      hostname = headscaleHostname;
+      url = "https://${headscaleHostname}";
     };
   };
 
@@ -97,17 +89,6 @@ in
     media = "/storage/media";
     backup = "/storage/backup";
     torrents = "/storage/torrents";
-  };
-
-  # ---------------------------------------------------------------------------
-  # Filesystem paths: CONVENTIONAL
-  # ---------------------------------------------------------------------------
-  # Where root-readable secrets live. `/etc/wireguard/private` is the
-  # conventional wg-quick location; you must `install -m600 -o root -g root
-  # <key> /etc/wireguard/private` once before deploying any host that uses
-  # WireGuard. Not generated automatically (intentional: it's a secret).
-  paths = {
-    wireguardPrivateKey = "/etc/wireguard/private";
   };
 
   # ---------------------------------------------------------------------------

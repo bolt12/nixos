@@ -3,6 +3,8 @@
 # WireGuard, and game-streaming sysctl tuning.
 { constants, ... }:
 {
+  imports = [ ../../common/services/tailscale-client.nix ];
+
   networking = {
     hostName = "nixos-ninho";
     # Required for ZFS (generated with: head -c4 /dev/urandom | od -A none -t x4)
@@ -13,10 +15,9 @@
       dns = "none";
     };
 
-    # DNS servers. Hub adblock resolver (10.100.0.1) first: it is the stable DNS
-    # anchor across the wg->tailscale transport swap (the hub keeps 10.100.0.1
-    # after the later tailscale renumber), so this list never has to change. RPi
-    # LAN resolver is the always-reachable fallback if the tunnel is down.
+    # DNS servers. Hub adblock resolver (constants.network.hub.vpnIp) first, over
+    # Tailscale; the RPi LAN resolver is the always-reachable fallback if the
+    # tailnet is down.
     nameservers = [
       constants.network.hub.vpnIp # hub adblock resolver over the tunnel (primary)
       constants.network.rpi.lanIp # RPi LAN recursive DNS (fallback)
@@ -28,10 +29,7 @@
     # Firewall
     firewall = {
       enable = true;
-      trustedInterfaces = [
-        "wg0"
-        "tailscale0"
-      ];
+      # tailscale0 is trusted via services.headscaleClient (tailscale-client.nix).
       allowedTCPPorts = [
         22 # SSH
         80 # HTTP
@@ -57,50 +55,21 @@
         coolercontrol
       ]);
       allowedUDPPorts = [
-        constants.network.wireguard.port
         22000 # Syncthing discovery
         21027 # Syncthing discovery
         1900 # Jellyfin SSDP
         7359 # Jellyfin discovery
       ];
     };
-
-    # WireGuard VPN
-    wireguard.interfaces.wg0 = {
-      ips = [ constants.network.wireguard.ninhoIp ];
-      listenPort = constants.network.wireguard.port;
-      privateKeyFile = constants.paths.wireguardPrivateKey;
-
-      peers = [
-        {
-          publicKey = constants.network.wireguard.serverPubKey;
-          # Split tunnel: only WG subnet routes through wg0. Default route stays on
-          # enp11s0 so ninho's internet traffic (Steam/SDR and other UDP-heavy
-          # workloads) does not detour through the remote hub.
-          allowedIPs = [ constants.network.wireguard.subnet ];
-          endpoint = "${constants.network.hub.publicHost}:${toString constants.network.wireguard.port}";
-          persistentKeepalive = 25;
-        }
-      ];
-    };
   };
 
-  # Tailscale client. Registers against the self-hosted Headscale on the hub and
-  # negotiates a DIRECT peer path (over ninho's public IPv6 when available) so
-  # game streaming to the laptop no longer hairpins through the wg0 hub in
-  # Germany. Coexists with wg0: tailscale0 (100.64.0.0/10, udp 41641) and wg0
-  # (10.100.0.0/24, udp 51820) are disjoint, so nothing collides.
-  services.tailscale = {
+  # Tailscale client (see common/services/tailscale-client.nix). Joins the
+  # self-hosted Headscale hub for a DIRECT peer path (over ninho's public IPv6
+  # when available) so game streaming to the laptop goes straight to it instead
+  # of hairpinning through a relay.
+  services.headscaleClient = {
     enable = true;
-    openFirewall = true; # UDP 41641 for direct NAT traversal
-    useRoutingFeatures = "none"; # pure host; not advertising routes or exit node
-    authKeyFile = "/etc/tailscale/authkey"; # hand-placed, cf. /etc/wireguard/private
-    extraUpFlags = [
-      "--login-server=${constants.network.headscale.url}"
-      "--hostname=ninho"
-      "--accept-dns=false" # keep the hub adblock resolver; do not push MagicDNS
-    ];
-    extraSetFlags = [ "--accept-dns=false" ]; # re-applied every rebuild
+    hostname = "ninho";
   };
 
   # Network performance tuning for game streaming (Sunshine)

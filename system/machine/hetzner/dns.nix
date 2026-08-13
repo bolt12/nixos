@@ -14,14 +14,14 @@
     # unbound binds the wg0 address before the tunnel is up because nixpkgs
     # enables ip-freebind by default, so no wg0 start-ordering is needed.
     interfaces = [
-      constants.network.hub.vpnIp
+      constants.network.hub.vpnIp # 100.64.0.5, hub tailscale address
       "127.0.0.1"
     ];
     accessControl = [
       "0.0.0.0/0 refuse"
       "::0/0 refuse"
       "127.0.0.0/8 allow"
-      "${constants.network.wireguard.subnet} allow"
+      "${constants.network.tailscale.subnet} allow" # 100.64.0.0/10 tailnet
     ];
     # Never block the Headscale control host: a DDNS name a blocklist could catch.
     allowlist = [ constants.network.headscale.hostname ];

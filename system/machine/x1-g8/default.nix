@@ -238,33 +238,6 @@
     };
   };
 
-  networking = {
-    wireguard.interfaces = {
-      wg0 = {
-        ips = [ constants.network.wireguard.x1Ip ];
-        listenPort = constants.network.wireguard.port;
-        privateKeyFile = constants.paths.wireguardPrivateKey;
-
-        peers = [
-          {
-            publicKey = constants.network.wireguard.serverPubKey;
-
-            # Route only the VPN subnet, avoiding a default-route conflict at
-            # boot (0.0.0.0/0 caused a routing loop before WiFi came up).
-            allowedIPs = [ constants.network.wireguard.subnet ];
-
-            # Single static endpoint: the hub is remote now, so there is no
-            # home-LAN hairpin to detect and work around.
-            endpoint = "${constants.network.hub.publicHost}:${toString constants.network.wireguard.port}";
-
-            # Keepalives keep NAT tables alive on the upstream router.
-            persistentKeepalive = 25;
-          }
-        ];
-      };
-    };
-  };
-
   security = {
     pam.services.swaylock = { };
 
