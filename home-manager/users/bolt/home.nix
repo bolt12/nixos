@@ -52,6 +52,11 @@ let
     model = "GLM-5";
     haikuModel = "GLM-4.5-Air";
   };
+  olaude-qwen3-8-27B = mkClaudeWrapper {
+    name = "olaude-qwen3-8-27B";
+    model = "qwen3.8-27B-full";
+    haikuEnvVar = "OLAUDE_HAIKU";
+  };
   olaude-qwen3-6-27B = mkClaudeWrapper {
     name = "olaude-qwen3-6-27B";
     model = "qwen3.6-27B-full";
@@ -73,7 +78,7 @@ let
     name = "pi-local";
     runtimeInputs = [ ];
     text = ''
-      exec pi --provider ninho --model "''${PI_LOCAL_MODEL:-qwen3.6-27B-full}" "$@"
+      exec pi --provider ninho --model "''${PI_LOCAL_MODEL:-qwen3.8-27B-full}" "$@"
     '';
   };
 
@@ -141,6 +146,7 @@ in
     # All packages managed through profiles
     packages = [
       glaude
+      olaude-qwen3-8-27B
       olaude-qwen3-6-27B
       olaude-qwen3-6-35B-A3B
       olaude-gemma-4-26B-A4B

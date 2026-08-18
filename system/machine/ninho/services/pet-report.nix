@@ -39,11 +39,13 @@ in
     llamaUrl = "http://127.0.0.1:${toString ports.llamaswap}";
     ntfyUrl = "http://127.0.0.1:${toString ports.ntfy}/pet-report";
 
-    # llama-swap alias, defined in services/llama-cpp/models.nix. The non-MTP
-    # GGUF with the mmproj loaded: MTP speculative decoding is incompatible with
-    # a vision projector, which is why this is a separate entry from
-    # qwen3.6-35B-A3B-full rather than the same model with a flag.
-    visionModel = "qwen3.6-35B-A3B-vision";
+    # llama-swap alias, defined in services/llama-cpp/models.nix. It is a separate
+    # entry from qwen3.8-27B-full deliberately, and NOT for the 3.6 reason (MTP and
+    # an mmproj coexist fine on 3.8). The -full entry runs under a wrapper that
+    # stops Frigate to free ~1.85 GiB of VRAM for its long context; this pipeline
+    # reads Frigate's HTTP API for events and snapshots, so pointing it at -full
+    # would take down the very service feeding it. This entry keeps Frigate up.
+    visionModel = "qwen3.8-27B-vision";
 
     # Mirrors cameraDefs in services/frigate.nix, which asks for exactly this.
     # Add a camera there and it belongs here too (or enable it in-app, which
@@ -87,10 +89,12 @@ in
     # morning/evening split agree with the timestamps on the events being read.
     timeZone = "Europe/Lisbon";
 
-    # Deliberately not the 08:00/20:00 upstream default. morning-brief.nix runs
-    # at 08:00 and holds llama-swap with qwen3.6-27B-full; overlapping would
-    # force a swap to the vision model mid-brief and make both slow. An hour is
-    # ample for the brief, which is a single text call.
+    # Deliberately not the 08:00/20:00 upstream default. morning-brief.nix runs at
+    # 08:00 on qwen3.8-27B-full; this runs on qwen3.8-27B-vision, a different
+    # llama-swap entry, so overlapping would force a swap mid-brief and make both
+    # slow. The gap also lets Frigate come back up: the -full entry stops it for
+    # the length of the brief, and this pipeline needs it running. An hour is ample
+    # for the brief, which is a single text call.
     batchHours = [
       9
       21

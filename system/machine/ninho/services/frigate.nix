@@ -223,6 +223,14 @@ in
     fi
   '';
 
+  # A clean `systemctl stop` otherwise leaves this unit in `failed`: the container
+  # exits 143 (SIGTERM) and the module's post-stop then errors removing a
+  # container its pre-stop already removed. Without this, anything that stops
+  # Frigate has to `reset-failed` afterwards to leave `systemctl status` honest,
+  # which pushes a quirk of THIS unit onto every caller. gpu-tenant-control in
+  # services/llama-cpp.nix stops Frigate to free VRAM and is one such caller.
+  systemd.services.docker-frigate.serviceConfig.SuccessExitStatus = [ 143 ];
+
   # LAN-only; WireGuard is already a trusted interface.
   networking.firewall.allowedTCPPorts = [ ports.frigate ];
 }

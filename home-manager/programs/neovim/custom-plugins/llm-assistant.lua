@@ -24,7 +24,7 @@ local Config = {
 
   profiles = {
     code_assistant = {
-      model = "qwen3.6-27B-full",
+      model = "qwen3.8-27B-full",
       temperature = 0.35,
       system_prompt = "You are a highly skilled and helpful assistant for a code editor. "
         .. "Your primary role is to respond to user queries related to coding. "
@@ -38,7 +38,7 @@ local Config = {
       needs_prompt = true,
     },
     journal_summary = {
-      model = "qwen3.6-27B-full",
+      model = "qwen3.8-27B-full",
       temperature = 1.0,
       system_prompt = [[You are a personal journal assistant that creates weekly summaries.
 
@@ -136,7 +136,7 @@ writer created it themselves.
       needs_prompt = false,
     },
     visual_journal = {
-      model = "qwen3.6-27B-full",
+      model = "qwen3.8-27B-full",
       temperature = 0.9,
       system_prompt = [=[You are a visual storytelling assistant that distills journal entries into a single abstract image prompt for Stable Diffusion / FLUX image generators.
 
@@ -195,6 +195,7 @@ Output ONLY the prompt block, no titles, explanations, or commentary:
       "qwen3.5-27B-full",
       "qwen3.6-27B-full",
       "qwen3.6-35B-A3B-full",
+      "qwen3.8-27B-full",
       "step-3.5-flash-full",
     },
     cloud_models = {

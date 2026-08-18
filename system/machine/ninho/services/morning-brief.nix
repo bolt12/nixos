@@ -1,6 +1,6 @@
 # Daily 08:00 brief: LLM-summarized overnight events → ntfy.
 # Pulls journal warnings, ZFS state, SMART temps/wear, failed services, etc.
-# Feeds them to qwen3.6-27B-full via llama-swap; posts the summary to ntfy.
+# Feeds them to qwen3.8-27B-full via llama-swap; posts the summary to ntfy.
 {
   config,
   lib,
@@ -12,7 +12,7 @@ let
   inherit (constants) ports storage;
 
   briefTime = "08:00:00";
-  model = "qwen3.6-27B-full";
+  model = "qwen3.8-27B-full";
   topic = "morning-brief";
 
   briefScript = pkgs.writeShellApplication {
@@ -142,7 +142,7 @@ let
               '{model: $m, messages: [{role: "user", content: $p}], max_tokens: 6000, temperature: 0.6}' \
               > "$payload_file"
 
-            # Qwen3.6 reasoning lands in .reasoning_content; the user-facing answer
+            # Qwen3.8 reasoning lands in .reasoning_content; the user-facing answer
             # is in .content. With preserve_thinking=true it's easy to truncate before
             # any .content tokens are emitted, so we budget generously and fall back
             # to a clear error if .content is empty (jq // does not catch "").

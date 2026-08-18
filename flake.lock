@@ -1197,11 +1197,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1786613593,
-        "narHash": "sha256-yJ4/IBODkd+VPGGyYFcqOD6RYWksg0g9qlvmtEJoAqU=",
+        "lastModified": 1787063003,
+        "narHash": "sha256-P5MhhKvGS+zUBPDD8Of6FwJaK+QsItlHkqsC5gp3eHc=",
         "owner": "bolt12",
         "repo": "pet-report",
-        "rev": "ad0411702195d974333be1c98cf0c0add0d399fb",
+        "rev": "e525bbcb926012e158e7b7c4d09d64376be35bf7",
         "type": "github"
       },
       "original": {
