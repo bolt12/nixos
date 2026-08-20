@@ -19,7 +19,7 @@
   imports = [
     ./hardware-configuration.nix
     ./boot.nix # Kernel, initrd, LUKS auto-unlock, GRUB, watchdog
-    ./networking.nix # NetworkManager, DNS, firewall, WireGuard
+    ./networking.nix # NetworkManager, DNS, firewall, Tailscale
     ./storage.nix # ZFS, sanoid, storage directory seeds
     ./users.nix # bolt + pollard user declarations
     ./services # All service modules (Caddy, Nextcloud, Immich, Ollama, etc.)

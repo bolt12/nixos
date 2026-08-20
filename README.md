@@ -39,7 +39,7 @@ desktop configs never duplicate.
 |--------|------|------|-------|
 | `bolt-nixos` | x86_64 | ThinkPad X1 Carbon Gen 8 | Laptop, niri desktop (sway fallback), user `bolt` |
 | `ninho-nixos` | x86_64 | Home server | Ryzen 9 9950X3D, RTX 5090, 128GB, ZFS; ~25 services; users `bolt` + `pollard` |
-| `hetzner` | x86_64 | Hetzner Cloud VM | Public WireGuard hub + tunnel-only DNS resolver; deployed with colmena |
+| `hetzner` | x86_64 | Hetzner Cloud VM | Headscale control plane + tunnel-only DNS resolver; deployed with colmena |
 | `bolt-rpi5-sd-image` | aarch64 | Raspberry Pi 5 | Tang (LUKS auto-unlock), LAN DNS, Wake-on-LAN; SD image + colmena `rpi-5` node |
 | `bolt-x200` | x86_64 | ThinkPad X200 | Incomplete stub (no `hardware-configuration.nix` yet), does not build |
 
@@ -134,13 +134,13 @@ actually run.
 
 | Where | What |
 | --- | --- |
-| `system/common/constants.nix` | Everything in the **INFRASTRUCTURE-SPECIFIC** block at the top: LAN subnet/gateway, ninho/rpi VPN IPs and hostnames, WireGuard pubkey, storage paths. The **CONVENTIONAL** block (port grid, Wyoming voice ports) is usually fine to keep. |
+| `system/common/constants.nix` | Everything in the **INFRASTRUCTURE-SPECIFIC** block at the top: LAN subnet/gateway, ninho/rpi tailnet IPs and hostnames, the Headscale DDNS hostname, storage paths. The **CONVENTIONAL** block (port grid, Wyoming voice ports) is usually fine to keep. |
 | `home-manager/users/<user>/user-data.nix` | `userConfig.username`, `homeDirectory`, `git.{userName,userEmail}`, `sway.{primaryMonitor,externalMonitor,wallpaperPath}`, `agda.libraryRoot`. Personal aliases and Syncthing device IDs also live here. |
 | `system/machine/ninho/boot.nix` | Initrd SSH keys for the LUKS unlock fallback (~line 118) and the LUKS partition UUIDs (~line 80-103). Run `blkid` on each LUKS partition and replace the UUIDs. |
 | `system/machine/ninho/users.nix` | The bolt/pollard account SSH keys (~line 26, 50) and `initialPassword = "ninho"` (~line 25, 47). The password is a placeholder: change it before first boot, then `passwd` after login. |
 | `system/machine/ninho/boot.nix` kernel/GPU | `boot.kernelPackages = pkgs.linuxPackages_6_18`, `kernelModules = [ ... "nvidia" ... ]`, and `nixpkgs.config.cudaSupport` are RTX 5090-specific. Drop or swap if you're on AMD/Intel. |
 | `system/machine/ninho/hardware-configuration.nix` | Regenerate via `nixos-generate-config --root /mnt`. |
-| `/etc/wireguard/private` on each WG host | One-time: `sudo install -m600 -o root -g root /path/to/your/wg-private /etc/wireguard/private`. The constant lives at `system/common/constants.nix`, `paths.wireguardPrivateKey`. |
+| `/etc/tailscale/authkey` on each tailnet host | One-time: `sudo install -m600 -o root -g root /path/to/your/authkey /etc/tailscale/authkey`. Consumed by `services.tailscale.authKeyFile` in `system/common/services/tailscale-client.nix`. |
 
 ### Embedded credentials inventory (rotate after forking)
 

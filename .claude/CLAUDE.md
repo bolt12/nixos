@@ -10,7 +10,7 @@ system/
   configuration.nix                    # bolt-nixos (X1 Carbon laptop)
   machine/ninho/configuration.nix      # ninho-nixos (home server)
   machine/ninho/services/              # ~25 service modules (Nextcloud, Immich, Jellyfin, etc.)
-  machine/rpi/                         # RPi 5 (Tang server, DNS, WireGuard gateway)
+  machine/rpi/                         # RPi 5 (Tang server, LAN adblock DNS)
   machine/thinkpadx200/                # ThinkPad X200
   machine/x1-g8/                       # X1 Carbon Gen 8 hardware
 home-manager/

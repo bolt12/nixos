@@ -6,38 +6,42 @@
   config,
   lib,
   pkgs,
-  raspberry-pi-nix,
   inputs,
   ...
 }@attrs:
 
 {
-  # bcm2712 for rpi 5
-  raspberry-pi-nix.board = "bcm2712";
+  # The Pi firmware loads u-boot from the FAT partition, and u-boot reads
+  # extlinux.conf from the ext4 root. sd-image-aarch64.nix sets these when
+  # building the image, but the colmena node does not import that module, so
+  # without them a deploy asserts on boot.loader.grub.devices. mkDefault keeps
+  # the image module authoritative where both apply.
+  boot.loader = {
+    grub.enable = lib.mkDefault false;
+    generic-extlinux-compatible.enable = lib.mkDefault true;
+  };
 
-  # Disable libcamera (not compiling)
-  raspberry-pi-nix.libcamera-overlay.enable = false;
-
-  # The linux-rpi kernel doesn't build the TPM modules (tpm_crb/tpm_tis) that
-  # systemd initrd's TPM2 support adds to boot.initrd.availableKernelModules on
-  # aarch64 (nixpkgs 26.05 defaults both boot.initrd.systemd.enable and its
-  # .tpm2.enable to true). The Pi has no TPM, so turn it off; otherwise the
-  # initrd module closure fails with "modprobe: FATAL: Module tpm-crb not found".
-  boot.initrd.systemd.tpm2.enable = false;
+  # Serial and HDMI console both, so a stall during boot is visible either way.
+  boot.kernelParams = [
+    "console=ttyAMA0,115200"
+    "console=tty1"
+  ];
 
   networking = {
     hostName = "rpi-nixos";
-    wireless = {
-      interfaces = [ "wlan0" ];
-      iwd.enable = true;
-    };
 
-    networkmanager = {
-      enable = true;
-      wifi.backend = "iwd";
-      wifi.powersave = false;
-    };
-
+    # Ethernet only, and deliberately without NetworkManager. NM pulls in
+    # wpa_supplicant regardless of any wifi config here: with its default
+    # backend it sets networking.wireless.enable itself
+    # (nixpkgs networkmanager.nix, the `mkIf (!delegateWireless && !enableIwd)`
+    # branch), so the radio stack comes back unless NM goes too. This box sits
+    # on a cable next to the router and its address is load-bearing for ninho's
+    # clevis unlock, so it has no use for either.
+    #
+    # DHCP comes from networking.useDHCP in hardware-configuration.nix. That is
+    # what the stock sd-image does, and it is how this Pi picked up its lease
+    # before any of this config was deployed.
+    useDHCP = true;
   };
 
   # Set your time zone.
@@ -53,7 +57,6 @@
           "audio"
           "video"
           "wheel"
-          "networkmanager"
           "docker"
           "podman"
         ];
@@ -79,23 +82,6 @@
       settings = {
         X11Forwarding = true;
         PermitRootLogin = "yes";
-      };
-    };
-  };
-
-  hardware = {
-    raspberry-pi = {
-      config = {
-        all = {
-          base-dt-params = {
-            # enable autoprobing of bluetooth driver
-            # https://github.com/raspberrypi/linux/blob/c8c99191e1419062ac8b668956d19e788865912a/arch/arm/boot/dts/overlays/README#L222-L224
-            krnbt = {
-              enable = true;
-              value = "on";
-            };
-          };
-        };
       };
     };
   };

@@ -3,8 +3,8 @@
 # systemd-networkd (not NetworkManager/scripted) because Hetzner Cloud hands out
 # IPv4 by DHCP but expects a STATIC IPv6 address in your routed /64 with a route
 # via the link-local gateway fe80::1. The NIC is pinned to eth0
-# (usePredictableInterfaceNames = false) so both this match and the NAT
-# externalInterface (see wireguard.nix) reference one stable name.
+# (usePredictableInterfaceNames = false) so constants.network.hub.externalInterface
+# names one stable interface for the match below.
 { constants, ... }:
 {
   networking = {
@@ -13,8 +13,8 @@
     usePredictableInterfaceNames = false; # NIC becomes eth0
 
     # The host resolves via public DNS, NOT its own unbound. unbound here only
-    # serves tunnel clients (see dns.nix); pointing the host at it would create a
-    # boot-time chicken-and-egg (no name resolution until wg0 + unbound are up).
+    # serves tailnet clients (see dns.nix); pointing the host at it would create a
+    # boot-time chicken-and-egg (no name resolution until unbound is up).
     nameservers = [
       "1.1.1.1"
       "8.8.8.8"

@@ -1,6 +1,6 @@
 # Redlib: privacy-respecting Reddit frontend. JS-free, no tracking.
 # Anonymous-only (no Reddit login); subscriptions persist via cookie or URL.
-# Bound on 0.0.0.0 so it's reachable from LAN and the WireGuard VPN.
+# Bound on 0.0.0.0 so it's reachable from the LAN and over Tailscale.
 #
 # The redlib package is pinned to upstream HEAD via the overlay in
 # `system/machine/ninho/package-overrides.nix` (see comment there for the

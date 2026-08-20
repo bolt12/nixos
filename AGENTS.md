@@ -11,7 +11,7 @@ system/
   common/overlays.nix                  # Package overlays (CUDA, unstable, etc.)
   machine/ninho/configuration.nix      # ninho-nixos (home server)
   machine/ninho/services/              # ~25 service modules (Nextcloud, Immich, Jellyfin, etc.)
-  machine/hetzner/                     # hetzner (public WireGuard hub + tunnel DNS)
+  machine/hetzner/                     # hetzner (Headscale control plane + tunnel DNS)
   machine/rpi/                         # RPi 5 (Tang server, LAN DNS)
   machine/thinkpadx200/                # ThinkPad X200 (incomplete stub)
   machine/x1-g8/                       # bolt-nixos (X1 Carbon Gen 8 laptop)
@@ -102,7 +102,7 @@ The RTL8126A 5 GbE NIC hit `NETDEV WATCHDOG` transmit-queue timeouts under the o
 - `wol-enable.service`: enables Wake-on-LAN on `enp11s0` once NetworkManager is up (for RPi-based remote power-on).
 - `systemd.watchdog`: hardware watchdog via `sp5100_tco` (60s runtime, 10min reboot timeout).
 
-**Key detail:** WireGuard uses `networking.wireguard.interfaces.wg0`, which creates `wireguard-wg0.service` (NOT `wg-quick-wg0`).
+**Key detail:** the tunnel is Tailscale against a self-hosted Headscale control plane, configured through the shared `services.headscaleClient` module (`system/common/services/tailscale-client.nix`). The old hand-rolled `networking.wireguard.interfaces.wg0` setup is gone; nothing in the tree defines a `wg0` any more.
 
 ### Tang/Clevis LUKS Auto-Unlock
 

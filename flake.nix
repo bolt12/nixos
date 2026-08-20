@@ -38,14 +38,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    raspberry-pi-nix = {
-      url = "github:nix-community/raspberry-pi-nix";
-      # Dedupe the nixpkgs closure. raspberry-pi-nix pins its own kernel/
-      # firmware *-src inputs (not nixpkgs-derived), so following our nixpkgs
-      # here only affects generic packages: the RPi-specific bits stay pinned.
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     # Pin emanote to version 1.4.0.0
     emanote = {
       url = "github:srid/emanote/1.4.0.0";
@@ -242,15 +234,30 @@
 
         # SD-image build is structurally different (different return value,
         # aarch64, no constants) so it stays out of mkSystem.
+        # Built from nixpkgs-unstable rather than the 26.05 pin. Pi 5 support in
+        # sd-image-aarch64.nix (a single u-boot.bin, the [pi5] and [cm5]
+        # config.txt sections, the bcm2712 dtbs) landed after 26.05 branched, so
+        # the 26.05 copy of that module produces an image a Pi 5 cannot boot.
+        #
+        # This replaces raspberry-pi-nix, whose firmware-migration-service copies
+        # the kernel onto the FAT partition on every activation and, lacking
+        # `set -e`, installs a truncated one instead of failing when it runs out
+        # of room. Upstream u-boot reads the kernel from ext4 and never touches
+        # that partition after flashing.
+        #
+        # Cross-compiled instead of emulated: this closure is small enough that
+        # cross wins, and no Haskell is in it. The colmena node stays emulated.
         bolt-rpi5-sd-image =
-          (nixpkgs.lib.nixosSystem {
-            system = "aarch64-linux";
-            specialArgs = { inherit inputs; };
+          (inputs.nixpkgs-unstable.lib.nixosSystem {
             modules = [
-              inputs.raspberry-pi-nix.nixosModules.raspberry-pi
-              inputs.raspberry-pi-nix.nixosModules.sd-image
+              "${inputs.nixpkgs-unstable}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
               ./system/machine/rpi/rpi-basic.nix
+              {
+                nixpkgs.buildPlatform.system = "x86_64-linux";
+                nixpkgs.hostPlatform.system = "aarch64-linux";
+              }
             ];
+            specialArgs = { inherit inputs constants; };
           }).config.system.build.sdImage;
 
         ninho-nixos = mkSystem {
@@ -260,7 +267,7 @@
           ];
         };
 
-        # Hetzner Cloud VM: public WireGuard hub + tunnel DNS resolver.
+        # Hetzner Cloud VM: Headscale control plane + tunnel DNS resolver.
         # Installed via nixos-anywhere (see system/machine/hetzner/README.md).
         hetzner = mkSystem {
           modules = [
@@ -347,6 +354,14 @@
             system = "x86_64-linux";
             config.allowUnfree = true;
           };
+          # rpi-5 alone tracks unstable, for the same Pi 5 support the SD image
+          # needs. Built under aarch64 binfmt emulation (ninho/boot.nix) rather
+          # than cross-compiled, because this closure carries emanote and
+          # cross-building GHC is not worth the fight.
+          nodeNixpkgs.rpi-5 = import inputs.nixpkgs-unstable {
+            system = "aarch64-linux";
+            config.allowUnfree = true;
+          };
           specialArgs = { inherit inputs constants; };
         };
 
@@ -360,7 +375,11 @@
           }:
           {
             deployment = {
-              targetHost = "192.168.1.110";
+              # Held at this address by a DHCP reservation on the router. It is
+              # not free to change: ninho's five LUKS2 headers carry clevis
+              # tokens naming this IP, so the reservation is what keeps its
+              # unattended boot working.
+              targetHost = constants.network.rpi.lanIp;
               targetUser = "root";
               # Build locally via QEMU binfmt emulation (not cross-compilation)
               buildOnTarget = false;
@@ -368,13 +387,10 @@
             };
 
             imports = [
-              inputs.raspberry-pi-nix.nixosModules.raspberry-pi
               ./system/machine/rpi/hardware-configuration.nix
               ./system/machine/rpi/rpi-basic.nix
               ./system/machine/rpi/rpi5.nix
             ];
-
-            nixpkgs.system = "aarch64-linux";
           };
 
         # Hetzner Cloud hub. Installed with nixos-anywhere; ongoing changes

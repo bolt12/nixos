@@ -6,7 +6,6 @@
   config,
   lib,
   pkgs,
-  raspberry-pi-nix,
   inputs,
   constants,
   ...
@@ -28,10 +27,6 @@ in
     ../../common/services/unbound-adblock.nix
     ../../common/services/tailscale-client.nix
   ];
-  nixpkgs = {
-    config.allowUnfree = true;
-  };
-
   nix = {
     channel.enable = true;
     gc = {
@@ -64,8 +59,6 @@ in
       "d ${journalDir} 0755 ${emanoteUser} users - -"
     ];
     services = {
-      iwd.serviceConfig.Restart = "always";
-
       # Emanote LAN journal gateway (see let-binding for scoping rationale)
       emanote = {
         enable = true;

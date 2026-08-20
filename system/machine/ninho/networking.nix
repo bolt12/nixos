@@ -1,6 +1,6 @@
 # Networking: hostname, hostId (ZFS), NetworkManager, DNS,
 # firewall (TCP/UDP allowed ports + service-port aggregation),
-# WireGuard, and game-streaming sysctl tuning.
+# Tailscale, and game-streaming sysctl tuning.
 { constants, ... }:
 {
   imports = [ ../../common/services/tailscale-client.nix ];
@@ -27,6 +27,22 @@
     ];
 
     # Firewall
+    #
+    # Careful with the port lists below: they are address-family blind. The
+    # generated firewall script pushes nearly every rule through its `ip46tables`
+    # helper, so one entry here opens the port on IPv4 and IPv6 alike, on every
+    # interface, with no source restriction. Since the 2026-08 ISP change each
+    # LAN host also gets a routable global IPv6 address over DHCPv6, and there is
+    # no NAT in front of those.
+    #
+    # What keeps these services off the internet today is the ISP router's
+    # inbound IPv6 firewall, not anything in this file. Verified 2026-08-20 by
+    # dialling ninho's global address from the Hetzner hub: connection timed out.
+    # If that ever changes, or a future router ships with it off, everything
+    # below is immediately world-reachable. Reaching these services is meant to
+    # happen over Tailscale (cf. homepage.nix and nextcloud.nix, which key their
+    # URLs to the tailnet address), so the fix would be to refuse inbound IPv6
+    # from global unicast sources rather than to prune this list.
     firewall = {
       enable = true;
       # tailscale0 is trusted via services.headscaleClient (tailscale-client.nix).

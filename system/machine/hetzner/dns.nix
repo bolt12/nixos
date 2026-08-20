@@ -1,18 +1,19 @@
-# Adblocking recursive DNS on the hub, served ONLY over the tunnel.
+# Adblocking recursive DNS on the hub, served ONLY over the tailnet.
 #
 # Uses the shared services.adblockDns module (system/common/services/
 # unbound-adblock.nix). The public-box hardening is entirely in the options:
-# bind the wg0 address + loopback (never 0.0.0.0), refuse-by-default ACL. There
-# is deliberately NO port 53 in the public firewall (see wireguard.nix): tunnel
-# reach comes from trustedInterfaces = [ "wg0" ], so an open-resolver
-# amplification leak is impossible even if the firewall were misconfigured.
+# bind the tailscale address + loopback (never 0.0.0.0), refuse-by-default ACL.
+# There is deliberately NO port 53 in the public firewall (see networking.nix):
+# tailnet reach comes from trustedInterfaces = [ "tailscale0" ], which
+# tailscale-client.nix sets, so an open-resolver amplification leak is
+# impossible even if the firewall were misconfigured.
 { constants, ... }:
 {
   services.adblockDns = {
     enable = true;
-    # Bind the tunnel address + loopback only, never 0.0.0.0 / the public IP.
-    # unbound binds the wg0 address before the tunnel is up because nixpkgs
-    # enables ip-freebind by default, so no wg0 start-ordering is needed.
+    # Bind the tailnet address + loopback only, never 0.0.0.0 / the public IP.
+    # unbound binds the tailscale address before tailscale0 exists because
+    # nixpkgs enables ip-freebind by default, so no start-ordering is needed.
     interfaces = [
       constants.network.hub.vpnIp # 100.64.0.5, hub tailscale address
       "127.0.0.1"

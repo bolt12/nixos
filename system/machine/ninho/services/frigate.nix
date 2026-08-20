@@ -231,6 +231,6 @@ in
   # services/llama-cpp.nix stops Frigate to free VRAM and is one such caller.
   systemd.services.docker-frigate.serviceConfig.SuccessExitStatus = [ 143 ];
 
-  # LAN-only; WireGuard is already a trusted interface.
+  # LAN-only; tailscale0 is already a trusted interface.
   networking.firewall.allowedTCPPorts = [ ports.frigate ];
 }

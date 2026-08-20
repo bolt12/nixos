@@ -197,7 +197,7 @@
         "bolt"
       ];
 
-      # Ninho Attic binary cache (accessible via WireGuard VPN)
+      # Ninho Attic binary cache (reached over Tailscale)
       # Low connect-timeout so nix doesn't stall when VPN is down
       connect-timeout = 2;
       extra-substituters = [

@@ -1,14 +1,15 @@
-# Self-hosted Headscale control server, COEXISTING with the WireGuard hub.
+# Self-hosted Headscale control server.
 #
 # Headscale is the open-source control plane for Tailscale clients. Running it
-# here gives your devices a DIRECT, NAT-traversed WireGuard path to each other
-# (e.g. ninho -> laptop game streaming) instead of hairpinning every packet
-# through this box's wg0 tunnel. The existing wg0 hub (wireguard.nix) stays up
-# untouched during the transition; nothing here removes or renumbers it.
+# here gives the fleet a DIRECT, NAT-traversed path between devices (e.g.
+# ninho -> laptop game streaming) instead of hairpinning every packet through
+# this box. It replaced the wg0 hub that used to live here, so nothing on this
+# machine carries peer traffic any more, bar the DERP fallback when NAT
+# traversal fails.
 #
-# What this adds on the public interface: TCP 443 (control API, HTTPS) and
-# TCP 80 (Let's Encrypt HTTP-01 challenge). WireGuard's UDP 51820 and the
-# eth0 NAT masquerade are unaffected: different protocol, different ports.
+# What this puts on the public interface: TCP 443 (control API, HTTPS) and
+# TCP 80 (Let's Encrypt HTTP-01 challenge). The tailscale client further down
+# adds UDP 41641 through its own openFirewall.
 #
 # No hand-placed secrets: headscale generates its own noise/DERP keys and the
 # SQLite DB under /var/lib/headscale on first start. The only "secret" is a
@@ -35,6 +36,13 @@ in
       # Clients embed this verbatim in `tailscale up --login-server=...`.
       # Scheme + host; :443 is implicit so it is omitted.
       server_url = "https://${controlHostname}";
+
+      # The admin gRPC API. headscale's own default binds every interface, and
+      # on this box tailscale0 is a trusted interface, so that would hand every
+      # tailnet node (the phone included) a path to the control API. The CLI
+      # used in the bootstrap block below talks over the unix socket, so nothing
+      # here needs to be reachable off loopback.
+      grpc_listen_addr = "127.0.0.1:50443";
 
       # Tailnet address pools handed to clients. Both defaults are shown for
       # clarity. Neither collides with anything you run:
@@ -71,8 +79,8 @@ in
   };
 
   # Public firewall additions. These MERGE with allowedTCPPorts = [ 22 ] in
-  # wireguard.nix (NixOS concatenates list options across modules), giving a
-  # final public TCP set of [ 22 80 443 ]. UDP 51820 (WireGuard) is unchanged.
+  # networking.nix (NixOS concatenates list options across modules), giving a
+  # final public TCP set of [ 22 80 443 ].
   networking.firewall.allowedTCPPorts = [
     80 # Let's Encrypt HTTP-01 challenge (headscale ACME)
     443 # headscale control API (HTTPS)

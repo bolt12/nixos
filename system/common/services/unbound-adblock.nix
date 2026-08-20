@@ -4,8 +4,8 @@
 #
 # One definition, two importers:
 #   - RPi  (LAN resolver): binds 0.0.0.0, allows the LAN, runs as `bolt`.
-#   - Hetzner hub (tunnel resolver): binds the wg0 address only, refuse-by-
-#     default ACL, runs as `unbound`.
+#   - Hetzner hub (tailnet resolver): binds its tailscale address only, refuse-
+#     by-default ACL, runs as `unbound`.
 #
 # The machine-specific bits (listen interfaces, access-control, service user,
 # ip-freebind) are the only knobs; everything else (hardening, cache sizing,
@@ -182,8 +182,8 @@ in
           # blocklist update on either resolver.
           local-zone = map (h: ''"${h}." always_transparent'') cfg.allowlist;
           # nixpkgs already sets ip-freebind by default, so unbound can bind an
-          # address that does not exist yet (e.g. the hub's wg0 address before
-          # the tunnel is up). No consumer needs to opt in.
+          # address that does not exist yet (e.g. the hub's tailscale address
+          # before tailscale0 comes up). No consumer needs to opt in.
         };
 
         remote-control = {

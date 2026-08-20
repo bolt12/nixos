@@ -1,8 +1,8 @@
 # ============================================================================
-# hetzner-hub, Hetzner Cloud VM (public WireGuard hub + tunnel DNS resolver)
+# hetzner-hub, Hetzner Cloud VM (Headscale control plane + tunnel DNS resolver)
 # ============================================================================
-# Replaces the RPi as the public WireGuard endpoint after the home ISP switch
-# removes the public IP. Installed via nixos-anywhere; managed declaratively and
+# Replaces the RPi as the fleet's public entry point after the home ISP switch
+# removed the public IP. Installed via nixos-anywhere; managed declaratively and
 # deployed thereafter with colmena (see flake.nix). See ./README.md for the
 # install + cutover procedure.
 # ============================================================================
@@ -37,8 +37,8 @@
     "flakes"
   ];
 
-  # Key-only root SSH (public, on port 22). Independent of wg0, so a WireGuard
-  # mistake can never lock you out. Same key as the rest of the fleet.
+  # Key-only root SSH (public, on port 22). Independent of the tailnet, so a
+  # headscale mistake can never lock you out. Same key as the rest of the fleet.
   services.openssh = {
     enable = true;
     settings = {

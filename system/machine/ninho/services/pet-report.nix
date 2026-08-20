@@ -102,7 +102,7 @@ in
 
     # Tap-through target for the ntfy push. Addresses ninho by its VPN IP, the
     # same convention homepage.nix uses, so the link works from the phone over
-    # WireGuard rather than only on the LAN.
+    # Tailscale rather than only on the LAN.
     publicUrl = "http://${network.ninho.vpnIp}:${toString ports.pet-report}";
 
     # Frigate is an oci-container here, so its unit is docker-frigate.service.

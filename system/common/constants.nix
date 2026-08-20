@@ -12,7 +12,7 @@
 #      when forking**: they describe my home network, not yours.
 #
 #   2. CONVENTIONAL. Port allocations, Wyoming TTS/STT port grid,
-#      `paths.wireguardPrivateKey`. Likely fine to keep as-is; pick
+#      storage subdirectory names. Likely fine to keep as-is; pick
 #      different ports only if you have a clash on your network.
 #
 # Each section below is annotated.
@@ -21,9 +21,16 @@ let
   # Tailscale addresses (auto-assigned by Headscale, stable per node key). These
   # are what every service URL and the DNS anchor resolve to. Read once from
   # `tailscale status`; only change if a node is deleted and re-registered.
+  #
+  # Re-enrolment does not give a host its old address back. Headscale allocates
+  # sequentially (`prefixes.allocation`) and walks forward from the last address
+  # it handed out, never backwards into ones a deleted node freed. A host whose
+  # tailscaled.state is wiped presents a new machine key, so it lands as a fresh
+  # node on a higher address. Reflashing the Pi moved it 100.64.0.1 -> 100.64.0.9
+  # on 2026-08-20; the four IDs it burned through are still holes in the pool.
   ninhoVpnIp = "100.64.0.3";
   hubVpnIp = "100.64.0.5";
-  rpiVpnIp = "100.64.0.1";
+  rpiVpnIp = "100.64.0.9";
   headscaleHostname = "hetzner-nixos.ddns.net"; # Headscale control host (No-IP DDNS -> hub v4)
 in
 {
@@ -37,7 +44,9 @@ in
   network = {
     lan = {
       subnet = "192.168.1.0/24";
-      gateway = "192.168.1.254";
+      # ISP router. The subnet survived the 2026-08 provider swap; the gateway
+      # did not (it was .254 on the old box).
+      gateway = "192.168.1.1";
     };
     ninho = {
       vpnIp = ninhoVpnIp;
@@ -55,10 +64,12 @@ in
       vpnIp = hubVpnIp; # hub DNS resolver + service anchor address, over Tailscale
       externalInterface = "eth0"; # public NIC (usePredictableInterfaceNames = false)
     };
-    # RPi: LAN-only now (Tang + local adblock DNS). No longer on the VPN.
+    # RPi: LAN adblock DNS + Tang. Also a tailnet node, but everything that
+    # talks to it (ninho's clevis unlock, the DNS fallbacks, the ssh alias) uses
+    # lanIp, because it is only ever reached from the LAN it serves.
     rpi = {
       lanIp = "192.168.1.110";
-      vpnIp = rpiVpnIp; # 100.64.0.1, the RPi's tailscale address
+      vpnIp = rpiVpnIp; # 100.64.0.9, the RPi's tailscale address
     };
     # Tailscale/Headscale runs on the mandated 100.64.0.0/10 CGNAT range. The
     # subnet is used for trusted-network access control (e.g. home-assistant, the
