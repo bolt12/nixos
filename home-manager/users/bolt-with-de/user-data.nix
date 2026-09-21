@@ -16,11 +16,11 @@ let
   };
 in
 {
-  # This places the file at ~/Documents/.stignore
-  # Syncthing will read this file to know what to skip.
-  home.file."Desktop/.stignore" = {
-    source = docsIgnorePatterns;
-  };
+  # Same fix as bolt/user-data.nix: copy .stignore as a real file so
+  # Syncthing's jailed filesystem can read it (symlinks escape the folder).
+  home.activation.syncthingIgnoresLaptop = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    install -Dm644 ${docsIgnorePatterns} "$HOME/Desktop/.stignore"
+  '';
 
   # Sway monitors: laptop panel + ultrawide.
   userConfig.sway = {

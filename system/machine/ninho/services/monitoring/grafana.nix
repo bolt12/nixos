@@ -1,6 +1,9 @@
 # Grafana: datasources, dashboards, unified alerting + ntfy webhook routing.
 # All alert rules are inline; see grafana-dashboards/ for the JSON dashboards.
-{ pkgs, ... }:
+{ pkgs, constants, ... }:
+let
+  inherit (constants) ports;
+in
 {
   # Ensure /etc/secrets/grafana/secret_key exists and is readable by the grafana
   # user (it reads it via the settings file provider). Generates one on first
@@ -75,8 +78,22 @@
                   uid = "ntfy-webhook";
                   type = "webhook";
                   settings = {
-                    url = "http://localhost:8106/grafana-alerts";
+                    url = "http://localhost:${toString ports.ntfy}/grafana-alerts";
                     httpMethod = "POST";
+                    # Grafana's default payload is application/json, which ntfy turns
+                    # into a file attachment, so the phone would only get
+                    # "You received a file: attachment.json". A plain-text body with
+                    # title and priority headers keeps the alert readable.
+                    contentType = "text/plain";
+                    body = ''
+                      {{ range .Alerts }}{{ .Labels.alertname }} [{{ .Status }}]{{ with .Annotations.summary }}: {{ . }}{{ end }}
+                      {{ end }}
+                    '';
+                    headers = {
+                      Title = "Grafana alert";
+                      Priority = "4";
+                      Tags = "server,warning";
+                    };
                   };
                 }
               ];

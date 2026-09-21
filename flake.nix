@@ -14,7 +14,8 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
-    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+    # Pinned to master for jellyfin 12.0; revert to nixos-unstable once the channel catches up.
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/74ff0f999082529d3da34002edbf6e7afc2787a9";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     home-manager = {
       url = "github:nix-community/home-manager/release-26.05";

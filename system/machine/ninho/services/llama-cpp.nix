@@ -1,4 +1,4 @@
-# llama-swap orchestrator + 9 model definitions (see llama-cpp/models.nix).
+# llama-swap orchestrator + tailcat sharing (see llama-cpp/models.nix for models).
 {
   config,
   pkgs,
@@ -13,9 +13,20 @@ let
     writeShellScript
     ;
 
+  # Tailcat: WireGuard-based peer sharing built into llama-swap v253+.
+  # v256 adds global concurrency cap, improved playground chat UI, TabbyAPI metrics.
+  # The key file is generated on first run; the connection token is printed
+  # to the journal (journalctl -u llama-swap | grep tailcat).
+  tailcatKeyFile = "/var/lib/llama-cpp/tailcat.key";
+
+  # Regenerate the config file from the merged settings so the ExecStart
+  # override below can reference it (the module's configFile is internal).
+  settingsFormat = pkgs.formats.yaml { };
+  llamaSwapConfig = settingsFormat.generate "config.yaml" config.services.llama-swap.settings;
+
   # llama-swap configuration - RTX 5090 (32GB VRAM), 128GB RAM
   # Models optimized for quality/context balance
-  # Note: llama-cpp-cuda is now defined in system/common/overlays.nix
+  # Note: llama-cpp-cuda is defined in machine/ninho/package-overrides.nix
 
   # Single source of truth for the control FIFO: referenced by both wrappers, the
   # helper service, and the tmpfiles rule that creates it.
@@ -97,9 +108,8 @@ in
     listenAddress = "0.0.0.0";
 
     settings = {
-      # Health check timeout - set high to allow large model downloads
-      # (gpt-oss-120b F16 is ~65GB on first load)
-      healthCheckTimeout = 3600; # 60 minutes
+      # Health check timeout - set high to allow large model downloads on first load
+      healthCheckTimeout = 3600;
 
       # startPort: sets the starting port number for the automatic ${PORT} macro.
       # - optional, default: 5800
@@ -140,10 +150,20 @@ in
           ];
         };
       };
-      # Default idle TTL: llama-swap unloads a model after 15 min of inactivity
-      # so it stops squatting on VRAM. A pinned model was holding ~31GB of the
-      # 32GB card indefinitely, starving Immich's GPU machine-learning (CUDA
-      # OOM). A model can set its own `ttl` to override this default.
+      # Tailcat: expose local models to friends over WireGuard (no VPN, no port
+      # forwarding). The connection token is printed on first run; share it and
+      # the friend adds it as a peer in their llama-swap config.
+      tailcat = {
+        models = [
+          "qwen3.8-27B-full"
+          "qwen3.8-27B-vision"
+          "qwen3.8-flash-next-full"
+          "qwen3.8-flash-next-vision"
+        ];
+        admin = false;
+      };
+
+      # Default idle TTL: unload after 15 min to free VRAM for Immich/Frigate.
       models =
         let
           rawModels = import ./llama-cpp/models.nix {
@@ -282,12 +302,32 @@ in
     path = [ pkgs.ffmpeg-headless ];
 
     serviceConfig = {
+      # Override ExecStart to add -listen-tailcat (the NixOS module has no
+      # option for extra CLI flags). Reconstructs the command from module
+      # options so listenAddress/port/settings changes still take effect.
+      ExecStart = lib.mkForce (
+        builtins.concatStringsSep " " [
+          (lib.getExe config.services.llama-swap.package)
+          "--listen=${config.services.llama-swap.listenAddress}:${toString config.services.llama-swap.port}"
+          "--config=${llamaSwapConfig}"
+          "-listen-tailcat ${tailcatKeyFile}"
+        ]
+      );
+
       # Use static user instead of DynamicUser (for FIFO compatibility)
       DynamicUser = lib.mkForce false;
+      # Tailcat's netmon needs PrivateUsers off (interface visibility) and
+      # AF_NETLINK (routing table reads for DERP region selection).
+      PrivateUsers = lib.mkForce false;
+      RestrictAddressFamilies = lib.mkForce [
+        "AF_INET"
+        "AF_INET6"
+        "AF_UNIX"
+        "AF_NETLINK"
+      ];
       User = "llama-swap";
       Group = "llama-swap";
 
-      # Set environment variables for llama-cpp cache
       # GGML_CUDA_DISABLE_GRAPHS: prevent CUDA graph corruption when
       # two llama-server processes share the same GPU (see llama.cpp #20027, #7492)
       Environment = [
@@ -296,21 +336,20 @@ in
         "GGML_CUDA_DISABLE_GRAPHS=1"
       ];
 
-      # Grant write access to state directory
       StateDirectory = "llama-cpp";
       StateDirectoryMode = "0755";
 
       # Restore full /proc visibility: upstream module sets ProcSubset=pid,
-      # which hides /proc/meminfo and breaks llama-swap's sys-stats polling
-      # ("couldn't read /proc/meminfo: no such file or directory").
+      # which hides /proc/meminfo and breaks llama-swap's sys-stats polling.
       ProcSubset = lib.mkForce "all";
 
-      # Increase timeouts for large model downloads (up to 142GB!)
-      TimeoutStartSec = "infinity"; # No timeout during download
+      TimeoutStartSec = "infinity";
       TimeoutStopSec = "30s";
     };
   };
 
-  # Add llama-cpp-cuda to system packages for manual testing
-  environment.systemPackages = [ llama-cpp-cuda ];
+  environment.systemPackages = [
+    llama-cpp-cuda
+    pkgs.unstable.tailcat
+  ];
 }

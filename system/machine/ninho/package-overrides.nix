@@ -17,7 +17,10 @@ in
 {
   nixpkgs.overlays = [
     (final: prev: {
-      # llama-cpp-cuda - CUDA build for Blackwell (sm_120), pinned to a llama.cpp release
+      # llama-cpp-cuda - CUDA build for Blackwell (sm_120), pinned to a llama.cpp release.
+      # b11069 adds CUTLASS W4A4 MXFP4/NVFP4 MoE prefill kernels for sm_120,
+      # deeper MTP draft (+10%), new spec types (draft-dflash, draft-dspark),
+      # video input flags, agent mode.
       llama-cpp-cuda =
         (unstable.llama-cpp.override {
           cudaSupport = true;
@@ -27,13 +30,13 @@ in
           metalSupport = false;
         }).overrideAttrs
           (oldAttrs: {
-            version = "10408";
+            version = "11069";
 
             src = pkgs.fetchFromGitHub {
               owner = "ggml-org";
               repo = "llama.cpp";
-              tag = "b10408";
-              hash = "sha256-b01kyCjcrAJ4zFPNRM2GU/9TR5y1mi7WIJDNYrhSJZo=";
+              rev = "68d9053afd4f4d0752ced6187585f862355a40be";
+              hash = "sha256-KdYybSdOXKBjtLjrfqIf6zUWb7WdIExpb5WaPlqsm8k=";
               leaveDotGit = true;
               postFetch = ''
                 git -C "$out" rev-parse --short HEAD > $out/COMMIT
@@ -56,37 +59,32 @@ in
               ${oldAttrs.preConfigure or ""}
             '';
 
-            # b8635 removed tools/server/public/index.html.gz from the source tree,
-            # but upstream nixpkgs postPatch still tries to rm it, so use -f to tolerate
             postPatch =
               builtins.replaceStrings
                 [ "rm tools/server/public/index.html.gz" ]
                 [ "rm -f tools/server/public/index.html.gz" ]
                 (oldAttrs.postPatch or "");
 
-            # b9091+ moved the webui sources from tools/server/webui → tools/ui.
-            # nixpkgs's package.nix still bakes the old path into npmRoot and its
-            # npmDeps hash; override both so fetchNpmDeps reads the new lockfile.
-            # Recompute via:
-            #   nix run nixpkgs#prefetch-npm-deps -- <unpacked-src>/tools/ui/package-lock.json
             npmRoot = "tools/ui";
             npmDepsHash = "sha256-2Q7XhaLAArmviOLdQsNbYTfdyDE5pW9lR26cRHEVl9k=";
 
-            # Keep the original postInstall to handle installation correctly
             postInstall = oldAttrs.postInstall or "";
           });
 
-      # llama-swap v249 - Latest release with Anthropic API compatibility.
-      # Provenance of the overrides below: v195 renamed ui/ → ui-svelte/ (so we
-      # rebuild the UI derivation from scratch), v221 added forking process tests
-      # that fail in the sandbox, v239 gated the web UI behind the embed_ui tag.
+      # llama-swap v256 - Latest release with global concurrency cap, improved
+      # playground chat UI, TabbyAPI metrics, reduced zstd memory.
+      # v256 requires Go 1.27 (buildGo127Module override below).
+      # Provenance of the overrides below: v195 renamed ui/ -> ui-svelte/ and v251
+      # renamed it back to ui/ (we rebuild the UI derivation either way), v221
+      # added forking process tests that fail in the sandbox, v239 gated the web
+      # UI behind the embed_ui tag.
       llama-swap =
         let
           llama-swap-src = pkgs.fetchFromGitHub {
             owner = "mostlygeek";
             repo = "llama-swap";
-            tag = "v249";
-            hash = "sha256-7wXOL8XtcKV6Abdxar25C85ODQ34RYOAGYCTaCXxPpY=";
+            tag = "v256";
+            hash = "sha256-midZ5/eq4ULDhCC3wtzman0OdH5bHMIO8FsmzizU8sc=";
             leaveDotGit = true;
             postFetch = ''
               cd "$out"
@@ -97,10 +95,10 @@ in
           };
           llama-swap-ui = pkgs.buildNpmPackage {
             pname = "llama-swap-ui";
-            version = "249";
+            version = "256";
             src = llama-swap-src;
-            sourceRoot = "${llama-swap-src.name}/ui-svelte";
-            npmDepsHash = "sha256-6MPXQtmaz97D9PUU2Nn5DH/2HZNP/rnAWVSck/FiCyk=";
+            sourceRoot = "${llama-swap-src.name}/ui";
+            npmDepsHash = "sha256-lmhRJ8275PIQ+7vHdr9aZ31lYeXUkXrWnlvuwOadjRQ=";
             postPatch = ''
               substituteInPlace vite.config.ts \
                 --replace-fail "../internal/server/ui_dist" "${placeholder "out"}/ui_dist"
@@ -110,36 +108,41 @@ in
             '';
           };
         in
-        unstable.llama-swap.overrideAttrs (oldAttrs: {
-          version = "249";
-          src = llama-swap-src;
-          proxyVendor = true;
-          vendorHash = "sha256-59ep82wHrd134bCm3G8i7xhvW4M+PbIf6CcFyODTPC8=";
-          # v239 gates the embedded web UI behind the `embed_ui` Go build tag
-          # (internal/server/embed.go). Without it, embed_notag.go compiles an
-          # empty UI FS, so every /ui/ path returns 404 while the API stays fine.
-          # Upstream's Makefile/goreleaser pass `-tags embed_ui`; buildGoModule
-          # reads `tags` at build time, so setting it via overrideAttrs works.
-          tags = (oldAttrs.tags or [ ]) ++ [ "embed_ui" ];
-          # Merge (not replace) passthru so buildGoModule's overrideModAttrs survives.
-          passthru = (oldAttrs.passthru or { }) // {
-            ui = llama-swap-ui;
-          };
+        (unstable.llama-swap.override { buildGoModule = unstable.buildGo127Module; }).overrideAttrs
+          (oldAttrs: {
+            version = "256";
+            src = llama-swap-src;
+            proxyVendor = true;
+            vendorHash = "sha256-6zg0EMTIC+dPYdeeQ1oLMrfeNddR7cot0W7p2TFT6W4=";
+            # v239 gates the embedded web UI behind the `embed_ui` Go build tag
+            # (internal/server/embed.go). Without it, embed_notag.go compiles an
+            # empty UI FS, so every /ui/ path returns 404 while the API stays fine.
+            # Upstream's Makefile/goreleaser pass `-tags embed_ui`; buildGoModule
+            # reads `tags` at build time, so setting it via overrideAttrs works.
+            tags = (oldAttrs.tags or [ ]) ++ [ "embed_ui" ];
+            # Merge (not replace) passthru so buildGoModule's overrideModAttrs survives.
+            passthru = (oldAttrs.passthru or { }) // {
+              ui = llama-swap-ui;
+            };
 
-          # v221's internal/process tests exec shell scripts via shebang, which
-          # fails in the Nix sandbox (no /bin/bash); skip those forking tests.
-          checkFlags = (oldAttrs.checkFlags or [ ]) ++ [
-            "-skip=TestProcessCommand_(StopForkingWrapper|StopHonorsGracefulTimeout|StopReapsForkedGrandchild)"
-          ];
+            # Tests that exec #!/bin/bash scripts fail in the Nix sandbox (no
+            # /bin/bash): v221's internal/process forking tests, and v251's
+            # vllm-wrapper TestStartDaemonArgv. This REPLACES the base checkFlags
+            # rather than appending: go test only honors the first -skip flag, and
+            # the base package always emits a no-op -skip=^$ on Linux, so an
+            # appended -skip is silently ignored.
+            checkFlags = [
+              "-skip=TestProcessCommand_(StopForkingWrapper|StopHonorsGracefulTimeout|StopReapsForkedGrandchild)|TestStartDaemonArgv"
+            ];
 
-          preBuild = ''
-            ldflags+=" -X main.commit=$(cat COMMIT)"
-            ldflags+=" -X main.date=$(cat SOURCE_DATE_EPOCH)"
-            # go:embed ui_dist lives only in internal/server (the proxy/ copy
-            # v221 needed was dropped upstream by v239).
-            cp -r ${llama-swap-ui}/ui_dist internal/server/
-          '';
-        });
+            preBuild = ''
+              ldflags+=" -X main.commit=$(cat COMMIT)"
+              ldflags+=" -X main.date=$(cat SOURCE_DATE_EPOCH)"
+              # go:embed ui_dist lives only in internal/server (the proxy/ copy
+              # v221 needed was dropped upstream by v239).
+              cp -r ${llama-swap-ui}/ui_dist internal/server/
+            '';
+          });
 
       # MOSS-Transcribe-Diarize: SOTA end-to-end transcription + diarization
       # (Apache-2.0). Replaces whisperx. One model pass emits transcription +

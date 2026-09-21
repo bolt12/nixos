@@ -150,6 +150,7 @@ in
     pet-report-backend = 8116; # ...and its API, loopback only, behind that nginx
     bazarr = 8112;
     open-webui = 8113;
+    trek = 8120;
     comfy-ui = 8188;
 
     # Monitoring

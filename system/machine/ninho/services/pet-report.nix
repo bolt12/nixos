@@ -5,7 +5,9 @@
 #
 # Every dependency already runs on this host, which is why the upstream defaults
 # line up: Frigate (ports.frigate), llama-swap serving the vision alias
-# (ports.llamaswap), and ntfy for the twice-daily push (ports.ntfy).
+# (ports.llamaswap), and ntfy for the report pushes (ports.ntfy). A push goes out
+# per morning/evening batch only when that day period has observations; quiet
+# days stay silent.
 #
 # The roster (who each pet is, how to tell them apart), report preferences, and
 # household context are app state set in the in-app setup wizard, not here. What

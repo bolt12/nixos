@@ -1,4 +1,9 @@
-{ pkgs, config, ... }:
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
 
 # User-specific data for bolt
 # Contains personal aliases, directory shortcuts, and Syncthing configuration
@@ -11,11 +16,12 @@ let
   };
 in
 {
-  # This places the file at ~/Documents/.stignore
-  # Syncthing will read this file to know what to skip.
-  home.file."x1-g8-laptop/Desktop/.stignore" = {
-    source = docsIgnorePatterns;
-  };
+  # Syncthing reads .stignore from the sync folder root. home.file creates a
+  # symlink into the Nix store, which Syncthing's jailed filesystem rejects
+  # ("too many levels of symbolic links"). Copy the content as a real file.
+  home.activation.syncthingIgnoresNinho = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    install -Dm644 ${docsIgnorePatterns} "$HOME/x1-g8-laptop/Desktop/.stignore"
+  '';
 
   # Agda playground location for the libraries/defaults files.
   # bolt-with-de overrides this with its own laptop-rooted prefix when imported.

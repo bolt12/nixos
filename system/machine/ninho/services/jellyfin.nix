@@ -1,6 +1,7 @@
 # Jellyfin media server with NVENC hardware transcoding (RTX 5090).
 {
   constants,
+  pkgs,
   ...
 }:
 {
@@ -9,6 +10,7 @@
   services = {
     jellyfin = {
       enable = true;
+      package = pkgs.unstable.jellyfin;
       openFirewall = true;
 
       # NVENC hardware transcoding (RTX 5090)

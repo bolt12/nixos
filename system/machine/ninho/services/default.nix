@@ -28,5 +28,6 @@
     ./redlib.nix # Privacy-respecting Reddit frontend
     ./syncoid.nix # ZFS replication rpool → storage/backup (tier-2 backup)
     ./postgres-backup.nix # Daily pg_dumpall → /storage/data/postgres-backups
+    ./trek.nix # Self-hosted collaborative travel planner
   ];
 }

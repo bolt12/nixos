@@ -371,10 +371,38 @@ in
               };
             }
             {
+              Frigate = {
+                href = "http://${ninhoIp}:${toString ports.frigate}";
+                description = "Camera NVR";
+                icon = "frigate";
+              };
+            }
+            {
+              "Pet Report" = {
+                href = "http://${ninhoIp}:${toString ports.pet-report}";
+                description = "Pet Activity Journal";
+                icon = "mdi-paw";
+              };
+            }
+            {
               Ntfy = {
                 href = "http://${ninhoIp}:${toString ports.ntfy}";
                 description = "Push Notifications";
                 icon = "ntfy";
+              };
+            }
+            {
+              TREK = {
+                href = "http://${ninhoIp}:${toString ports.trek}";
+                description = "Travel Planner";
+                icon = "mdi-map-marker-path";
+              };
+            }
+            {
+              Supernote = {
+                href = "http://${ninhoIp}:19072";
+                description = "Supernote Private Cloud";
+                icon = "mdi-notebook";
               };
             }
           ];

@@ -43,22 +43,22 @@ let
     {
       name = "eufy_office";
       friendly = "Eufy Office Camera";
-      url = "rtsp://Bolt12:Eufy12@192.168.1.66/live0";
+      url = "rtsp://Bolt12:Eufy12@192.168.1.107:554/live0";
     }
     {
       name = "family_room";
       friendly = "Family Room Camera";
-      url = "rtsp://Bolt12:Eufy12@192.168.1.100:554/live0";
+      url = "rtsp://Bolt12:Eufy12@192.168.1.108:554/live0";
     }
     {
       name = "living_room";
       friendly = "Living Room Camera";
-      url = "rtsp://Bolt12:Eufy12@192.168.1.65:554/live0";
+      url = "rtsp://Bolt12:Eufy12@192.168.1.105:554/live0";
     }
     {
       name = "bedroom";
       friendly = "Bedroom Camera";
-      url = "rtsp://Bolt12:Eufy12@192.168.1.116/live0";
+      url = "rtsp://Bolt12:Eufy12@192.168.1.109:554/live0";
     }
   ];
 

@@ -187,7 +187,6 @@ in
       # ─────────────────────────────────────────────────────────────
       "notify" # Notification system
       "persistent_notification" # Persistent notifications
-      "ntfy" # ntfy.sh
       "discord" # Discord
       "signal_messenger" # Signal
       "facebook" # Facebook Messenger

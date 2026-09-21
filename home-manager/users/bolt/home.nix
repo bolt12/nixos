@@ -57,19 +57,9 @@ let
     model = "qwen3.8-27B-full";
     haikuEnvVar = "OLAUDE_HAIKU";
   };
-  olaude-qwen3-6-27B = mkClaudeWrapper {
-    name = "olaude-qwen3-6-27B";
-    model = "qwen3.6-27B-full";
-    haikuEnvVar = "OLAUDE_HAIKU";
-  };
-  olaude-qwen3-6-35B-A3B = mkClaudeWrapper {
-    name = "olaude-qwen3-6-35B-A3B";
-    model = "qwen3.6-35B-A3B-full";
-    haikuEnvVar = "OLAUDE_HAIKU";
-  };
-  olaude-gemma-4-26B-A4B = mkClaudeWrapper {
-    name = "olaude-gemma-4-26B-A4B";
-    model = "gemma-4-26B-A4B";
+  olaude-qwen3-8-flash-next = mkClaudeWrapper {
+    name = "olaude-qwen3-8-flash-next";
+    model = "qwen3.8-flash-next-full";
     haikuEnvVar = "OLAUDE_HAIKU";
   };
 
@@ -147,9 +137,7 @@ in
     packages = [
       glaude
       olaude-qwen3-8-27B
-      olaude-qwen3-6-27B
-      olaude-qwen3-6-35B-A3B
-      olaude-gemma-4-26B-A4B
+      olaude-qwen3-8-flash-next
       pi-local
       pi-glm
     ];
