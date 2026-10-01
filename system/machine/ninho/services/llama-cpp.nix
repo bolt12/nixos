@@ -14,7 +14,7 @@ let
     ;
 
   # Tailcat: WireGuard-based peer sharing built into llama-swap v253+.
-  # v256 adds global concurrency cap, improved playground chat UI, TabbyAPI metrics.
+  # v260: searchable model picker, capability discovery, profile load/unload UI.
   # The key file is generated on first run; the connection token is printed
   # to the journal (journalctl -u llama-swap | grep tailcat).
   tailcatKeyFile = "/var/lib/llama-cpp/tailcat.key";
@@ -160,6 +160,8 @@ in
           "qwen3.8-flash-next-full"
           "qwen3.8-flash-next-vision"
         ];
+        # v258: empty allow now denies all clients; explicit wildcard restores open access.
+        allow = [ "*" ];
         admin = false;
       };
 
@@ -328,12 +330,9 @@ in
       User = "llama-swap";
       Group = "llama-swap";
 
-      # GGML_CUDA_DISABLE_GRAPHS: prevent CUDA graph corruption when
-      # two llama-server processes share the same GPU (see llama.cpp #20027, #7492)
       Environment = [
         "HOME=/var/lib/llama-cpp"
         "XDG_CACHE_HOME=/var/lib/llama-cpp/cache"
-        "GGML_CUDA_DISABLE_GRAPHS=1"
       ];
 
       StateDirectory = "llama-cpp";

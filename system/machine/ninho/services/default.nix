@@ -26,8 +26,10 @@
     ./open-webui.nix # Multimodal chat UI for llama-swap
     ./morning-brief.nix # Daily LLM-summarized overnight brief → ntfy
     ./redlib.nix # Privacy-respecting Reddit frontend
+    ./rss-bridge.nix # Atom feed scraped from Agere water-cut notices
     ./syncoid.nix # ZFS replication rpool → storage/backup (tier-2 backup)
     ./postgres-backup.nix # Daily pg_dumpall → /storage/data/postgres-backups
     ./trek.nix # Self-hosted collaborative travel planner
+    ./wanderer.nix # Self-hosted trail catalogue (GPX tracks, lists)
   ];
 }

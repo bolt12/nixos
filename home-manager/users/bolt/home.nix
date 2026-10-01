@@ -143,6 +143,13 @@ in
     ];
   };
 
+  programs.git.includes = [
+    {
+      condition = "gitdir:~/x1-g8-laptop/Desktop/Bolt/UMinho/Profissional/Well-Typed/Projects/";
+      contents.user.email = "armando@well-typed.com";
+    }
+  ];
+
   # Additional programs (headless - no firefox, no autorandr)
   programs = {
     ssh = {
@@ -170,8 +177,14 @@ in
     };
   };
 
-  # No desktop services for headless configuration.
   # Emanote user service lives in ../../services/emanote-user.nix (importable
   # so machines without journal data can disable it via disabledModules).
-  services = { };
+  services.gpg-agent = {
+    enable = true;
+    enableBashIntegration = true;
+    # Default only: bolt-with-de imports this file, and its wayland profile
+    # sets pinentry-all for the desktop.
+    pinentry.package = lib.mkDefault pkgs.pinentry-curses;
+    defaultCacheTtl = 3600;
+  };
 }

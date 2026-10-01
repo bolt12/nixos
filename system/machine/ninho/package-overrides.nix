@@ -18,9 +18,9 @@ in
   nixpkgs.overlays = [
     (final: prev: {
       # llama-cpp-cuda - CUDA build for Blackwell (sm_120), pinned to a llama.cpp release.
-      # b11069 adds CUTLASS W4A4 MXFP4/NVFP4 MoE prefill kernels for sm_120,
-      # deeper MTP draft (+10%), new spec types (draft-dflash, draft-dspark),
-      # video input flags, agent mode.
+      # b11249: fused RMS_NORM+SCALE kernel, CUDA graphs with MTP (#28549),
+      # tuned FA for more head sizes, Qwen4Exp sparse FA + hyper-connection ops,
+      # 4x faster tensor conversion, video_url support, router race fixes.
       llama-cpp-cuda =
         (unstable.llama-cpp.override {
           cudaSupport = true;
@@ -30,13 +30,13 @@ in
           metalSupport = false;
         }).overrideAttrs
           (oldAttrs: {
-            version = "11069";
+            version = "11249";
 
             src = pkgs.fetchFromGitHub {
               owner = "ggml-org";
               repo = "llama.cpp";
-              rev = "68d9053afd4f4d0752ced6187585f862355a40be";
-              hash = "sha256-KdYybSdOXKBjtLjrfqIf6zUWb7WdIExpb5WaPlqsm8k=";
+              rev = "6d78fb0727fdd8fbae15b6b5e9e0c0951a750d69";
+              hash = "sha256-+axr1IVq7W0LK6enrphbZolLvm+54MSSI5xOgqDn1DQ=";
               leaveDotGit = true;
               postFetch = ''
                 git -C "$out" rev-parse --short HEAD > $out/COMMIT
@@ -71,9 +71,10 @@ in
             postInstall = oldAttrs.postInstall or "";
           });
 
-      # llama-swap v256 - Latest release with global concurrency cap, improved
-      # playground chat UI, TabbyAPI metrics, reduced zstd memory.
-      # v256 requires Go 1.27 (buildGo127Module override below).
+      # llama-swap v260 - Searchable model picker, capability discovery,
+      # CORS controls, profile load/unload UI, log stream splitting.
+      # v258 BREAKING: empty tailcat.allow now denies all (fixed in llama-cpp.nix).
+      # v256+ requires Go 1.27 (buildGo127Module override below).
       # Provenance of the overrides below: v195 renamed ui/ -> ui-svelte/ and v251
       # renamed it back to ui/ (we rebuild the UI derivation either way), v221
       # added forking process tests that fail in the sandbox, v239 gated the web
@@ -83,8 +84,8 @@ in
           llama-swap-src = pkgs.fetchFromGitHub {
             owner = "mostlygeek";
             repo = "llama-swap";
-            tag = "v256";
-            hash = "sha256-midZ5/eq4ULDhCC3wtzman0OdH5bHMIO8FsmzizU8sc=";
+            tag = "v260";
+            hash = "sha256-W5JJW1/qQm39U/g42jseRmGQobqqWRfVsJ2lT/7K9P8=";
             leaveDotGit = true;
             postFetch = ''
               cd "$out"
@@ -95,7 +96,7 @@ in
           };
           llama-swap-ui = pkgs.buildNpmPackage {
             pname = "llama-swap-ui";
-            version = "256";
+            version = "260";
             src = llama-swap-src;
             sourceRoot = "${llama-swap-src.name}/ui";
             npmDepsHash = "sha256-lmhRJ8275PIQ+7vHdr9aZ31lYeXUkXrWnlvuwOadjRQ=";
@@ -110,10 +111,10 @@ in
         in
         (unstable.llama-swap.override { buildGoModule = unstable.buildGo127Module; }).overrideAttrs
           (oldAttrs: {
-            version = "256";
+            version = "260";
             src = llama-swap-src;
             proxyVendor = true;
-            vendorHash = "sha256-6zg0EMTIC+dPYdeeQ1oLMrfeNddR7cot0W7p2TFT6W4=";
+            vendorHash = "sha256-pihd/GVw3GqZTwBgb8gYo2zyLpE4HqKI0xb//tojMyo=";
             # v239 gates the embedded web UI behind the `embed_ui` Go build tag
             # (internal/server/embed.go). Without it, embed_notag.go compiles an
             # empty UI FS, so every /ui/ path returns 404 while the API stays fine.

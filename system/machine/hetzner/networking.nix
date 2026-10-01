@@ -46,4 +46,12 @@
       linkConfig.RequiredForOnline = "routable";
     };
   };
+
+  # networkd brings systemd-resolved along, and resolved answers LLMNR (5355) and
+  # mDNS (5353) on 0.0.0.0 by default. There is no local link worth announcing
+  # on a cloud VM, and until now only the firewall kept both off the internet.
+  services.resolved.settings.Resolve = {
+    LLMNR = false;
+    MulticastDNS = false;
+  };
 }

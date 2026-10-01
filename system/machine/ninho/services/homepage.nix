@@ -260,14 +260,7 @@ in
           ];
         }
         {
-          Notes = [
-            {
-              Emanote = {
-                href = "http://${ninhoIp}:${toString ports.emanote}";
-                description = "Zettelkasten Journal";
-                icon = "emanote";
-              };
-            }
+          Reading = [
             {
               Miniflux = {
                 href = "http://${ninhoIp}:${toString ports.miniflux}";
@@ -282,16 +275,23 @@ in
               };
             }
             {
-              "Anki Sync" = {
-                href = "#";
-                description = "Flashcard Sync Server";
-                icon = "anki";
+              Emanote = {
+                href = "http://${ninhoIp}:${toString ports.emanote}";
+                description = "Zettelkasten Journal";
+                icon = "emanote";
+              };
+            }
+            {
+              "RSS-Bridge" = {
+                href = "http://${ninhoIp}:${toString ports.agere-feed}";
+                description = "Feed Generator";
+                icon = "rss-bridge";
               };
             }
             {
               Redlib = {
                 href = "http://${ninhoIp}:${toString ports.redlib}";
-                description = "Private Reddit frontend";
+                description = "Private Reddit Frontend";
                 icon = "mdi-reddit";
               };
             }
@@ -351,6 +351,17 @@ in
           ];
         }
         {
+          Infrastructure = [
+            {
+              Attic = {
+                href = "http://${ninhoIp}:${toString ports.attic}";
+                description = "Nix Binary Cache";
+                icon = "mdi-package-variant-closed";
+              };
+            }
+          ];
+        }
+        {
           Gaming = [
             {
               Sunshine = {
@@ -396,6 +407,13 @@ in
                 href = "http://${ninhoIp}:${toString ports.trek}";
                 description = "Travel Planner";
                 icon = "mdi-map-marker-path";
+              };
+            }
+            {
+              Wanderer = {
+                href = "http://${ninhoIp}:${toString ports.wanderer}";
+                description = "Trail Catalogue";
+                icon = "wanderer";
               };
             }
             {

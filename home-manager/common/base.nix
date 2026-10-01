@@ -38,8 +38,28 @@
       enable = true;
       settings = {
         use-agent = true;
-        pinentry-mode = "loopback";
       };
+    };
+
+    nix-index = {
+      enable = true;
+      enableBashIntegration = true;
+    };
+
+    fzf = {
+      enable = true;
+      enableBashIntegration = true;
+      defaultCommand = "fd --type f";
+      changeDirWidgetCommand = "fd --type d";
+      defaultOptions = [
+        "--height 40%"
+        "--border"
+      ];
+    };
+
+    starship = {
+      enable = true;
+      enableBashIntegration = true;
     };
 
     atuin = {

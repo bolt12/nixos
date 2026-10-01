@@ -381,12 +381,7 @@ in
           always = true;
         }
 
-        # Clipboard history daemon
-        { command = "wl-paste --type text --watch cliphist store"; }
-        { command = "wl-paste --type image --watch cliphist store"; }
-
-        # Notification center
-        { command = "swaync"; }
+        # cliphist + swaync are systemd services (profiles/wayland.nix)
 
         # Window switcher daemon
         { command = "env RUST_BACKTRACE=1 swayrd"; }

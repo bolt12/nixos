@@ -14,7 +14,12 @@
 # No hand-placed secrets: headscale generates its own noise/DERP keys and the
 # SQLite DB under /var/lib/headscale on first start. The only "secret" is a
 # preauth key you mint at runtime with the CLI (see the bootstrap block below).
-{ constants, ... }:
+{
+  constants,
+  inputs,
+  pkgs,
+  ...
+}:
 let
   # The control-plane hostname clients dial: a No-IP DDNS name that
   # forward-resolves to this box's public v4 (constants.network.hub.publicHost =
@@ -25,6 +30,10 @@ in
 {
   services.headscale = {
     enable = true;
+
+    # The package comes from its own nixos-unstable pin (see the
+    # nixpkgs-headscale input in flake.nix); the module stays 26.05's.
+    package = inputs.nixpkgs-headscale.legacyPackages.${pkgs.stdenv.hostPlatform.system}.headscale;
 
     # Serve the control API on all interfaces, TCP 443. The firewall below is
     # what actually gates public exposure. port < 1024 makes the module grant

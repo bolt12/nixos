@@ -37,6 +37,13 @@
     "flakes"
   ];
 
+  # Same policy as the RPi. The generation that was live 30 days ago survives
+  # each run, so there is always something to roll back to after a deploy.
+  nix.gc = {
+    automatic = true;
+    options = "--delete-older-than 30d";
+  };
+
   # Key-only root SSH (public, on port 22). Independent of the tailnet, so a
   # headscale mistake can never lock you out. Same key as the rest of the fleet.
   services.openssh = {

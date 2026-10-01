@@ -19,7 +19,8 @@ Top-level layout under `services/`:
 - `faster-whisper` + Wyoming voice grid (en/pt)
 - `homepage` (dashboard), `ntfy`, `atuin`, `attic`, `miniflux`,
   `anki-sync-server`, `open-webui`, `redlib`, `frigate` + `pet-report`,
-  `supernote`, `gaming` (Steam + Sunshine).
+  `supernote`, `gaming` (Steam + Sunshine), `trek` (trip planner),
+  `wanderer` (trail catalogue: web + PocketBase + Meilisearch).
 
 System-level pieces split out of `configuration.nix`:
 

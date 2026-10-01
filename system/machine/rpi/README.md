@@ -18,6 +18,28 @@ Always-on home box. Three roles:
    networking is IPv4 DHCP. Hold the address with a reservation on the router.
    Losing the old router's reservation is what broke ninho's unattended boot in
    August 2026.
+
+   The Tang keys are the other half of that unlock, and the SD card is the only
+   place they live. A copy sits on ninho in `/etc/secrets/tang-rpi` (root, 0700,
+   on `rpool/root`, which syncoid replicates to the storage pool). Take it again
+   after every key rotation:
+
+   ```
+   ssh root@192.168.1.110 'tar -C /var/lib/private/tang -cf - .' \
+     | sudo sh -c 'install -d -m 700 /etc/secrets/tang-rpi && tar -C /etc/secrets/tang-rpi -xf -'
+   ```
+
+   After a reflash, put the keys back before ninho next reboots. The tang
+   module runs with `DynamicUser`, so its state lives under `/var/lib/private`
+   and systemd fixes the ownership on the next start:
+
+   ```
+   sudo tar -C /etc/secrets/tang-rpi -cf - . \
+     | ssh root@192.168.1.110 'systemctl stop tangd.socket && install -d -m 700 /var/lib/private /var/lib/private/tang && tar -C /var/lib/private/tang -xf - && systemctl start tangd.socket'
+   ```
+
+   The key filenames are their thumbprints, so `ls -a` on both sides is enough
+   to confirm the two copies match.
 3. **Tailnet node** (`100.64.0.9`) via `services.headscaleClient`, so the box and
    its services are reachable off-LAN over Tailscale. It held `100.64.0.1` until
    the 2026-08 reflash; see the authkey note under Deploying for why the address

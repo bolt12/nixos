@@ -15,7 +15,7 @@ let
   # Get emanote from the flake input
   emanotePackage = inputs.emanote.packages.${pkgs.stdenv.hostPlatform.system}.default;
 
-  # This RPi is the public journal gateway (single-user: bolt).
+  # This RPi serves the journal on the LAN (single-user: bolt).
   # The service is intentionally system-level so the journal survives user-session
   # logouts and boots before any login. The path is bolt-scoped by design; if this
   # ever becomes multi-user, lift journalDir to a NixOS option.
@@ -35,13 +35,15 @@ in
     };
 
     nixPath = [
-      "nixpkgs=${inputs.nixpkgs}"
-      # Add more channels as needed
+      # The nixpkgs this node is built from (nodeNixpkgs.rpi-5 in flake.nix),
+      # not the 26.05 `nixpkgs` input the other hosts use. Interpolate the
+      # input, not pkgs.path: a path value gets copied into a new 370M store
+      # path, where the input's outPath reuses the source already there.
+      "nixpkgs=${inputs.nixpkgs-unstable}"
     ];
     # Required by Cachix to be used as non-root user
     settings.trusted-users = [
       "bolt"
-      "deck"
       "root"
       "@wheel"
     ];
@@ -113,8 +115,6 @@ in
   # $ nix search wget
   environment = {
     systemPackages = with pkgs; [
-      bluez
-      bluez-tools
       git
       git-annex
       libraspberrypi
@@ -139,13 +139,6 @@ in
         "127.0.0.0/8"
         constants.network.lan.subnet
       ];
-    };
-
-    pipewire = {
-      enable = true;
-      alsa.enable = true;
-      alsa.support32Bit = true;
-      pulse.enable = true;
     };
   };
 
@@ -194,11 +187,7 @@ in
     };
   };
 
-  # Swap
-  swapDevices = [
-    {
-      device = "/swapfile";
-      size = 8192;
-    }
-  ];
+  # Compressed swap in RAM. The 8 GiB /swapfile it replaces was never touched
+  # and sat on the SD card, the one disk this box has.
+  zramSwap.enable = true;
 }

@@ -16,6 +16,13 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     # Pinned to master for jellyfin 12.0; revert to nixos-unstable once the channel catches up.
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/74ff0f999082529d3da34002edbf6e7afc2787a9";
+    # Only the hub's headscale package comes from here. 26.05 ships 0.28.0,
+    # whose map updates can list a node among its own peers, and that crashes
+    # the Tailscale Android app. A pin of its own means bumping it moves nothing
+    # else, and headscale refuses to skip a minor version or downgrade, so
+    # update it on purpose: `nix flake update nixpkgs-headscale`. Drop it once
+    # the stable channel ships >= 0.29.4.
+    nixpkgs-headscale.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     home-manager = {
       url = "github:nix-community/home-manager/release-26.05";
@@ -92,13 +99,11 @@
     };
 
     # pet-report: VLM-driven pet-activity journal layered over Frigate.
-    # Temporarily tracking the PR #3 branch (bolt12/1) to trial it before
-    # merging; revert to git+file:///home/bolt/pet-report (or the merged main)
-    # afterwards. The `follows` only dedupes the lock, since pet-report's
-    # overlay builds against whichever haskellPackages it is applied to (ours),
-    # not the nixpkgs it pins.
+    # The `follows` only dedupes the lock, since pet-report's overlay builds
+    # against whichever haskellPackages it is applied to (ours), not the
+    # nixpkgs it pins.
     pet-report = {
-      url = "github:bolt12/pet-report?ref=bolt12/1";
+      url = "github:bolt12/pet-report";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

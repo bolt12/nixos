@@ -3,22 +3,26 @@
 
 { pkgs, lib, ... }:
 {
-  # Persistent clipboard daemon: keeps copied text/images alive after the
-  # source app exits (cliphist gives history; this preserves the *current*
-  # selection too).
-  systemd.user.services.wl-clip-persist = {
-    Unit = {
-      Description = "Persist clipboard after source app exits";
-      After = [ "graphical-session.target" ];
-      PartOf = [ "graphical-session.target" ];
-      ConditionEnvironment = "WAYLAND_DISPLAY";
-    };
-    Service = {
-      ExecStart = "${pkgs.wl-clip-persist}/bin/wl-clip-persist --clipboard regular";
-      Restart = "on-failure";
-      RestartSec = 3;
-    };
-    Install.WantedBy = [ "graphical-session.target" ];
+  services.swaync = {
+    enable = true;
+    package = pkgs.unstable.swaynotificationcenter;
+  };
+
+  services.gpg-agent = {
+    enable = true;
+    enableBashIntegration = true;
+    pinentry.package = pkgs.pinentry-all;
+    defaultCacheTtl = 3600;
+  };
+
+  services.wl-clip-persist = {
+    enable = true;
+    clipboardType = "regular";
+  };
+
+  services.cliphist = {
+    enable = true;
+    allowImages = true;
   };
 
   # Auto-inhibit idle/lock when a fullscreen video is playing (detected via
@@ -47,7 +51,6 @@
     waybar # Status bar
     swaybg # Static wallpaper for Wayland (used by both sway and niri)
     # fuzzel is configured via programs.fuzzel (programs/fuzzel/default.nix)
-    swaynotificationcenter # Notification center (replaces mako)
     swaylock-effects # Screen locker with blur/clock (replaces swaylock-fancy)
     wlogout # Logout menu
 
@@ -70,9 +73,8 @@
     # conflicting-subpath error.
     wl-gammactl # Gamma correction
 
-    # Clipboard and utilities
+    # Clipboard utilities (wl-clipboard pulled in by services.cliphist)
     wl-clipboard # Wayland clipboard utilities
-    cliphist # Clipboard history manager
 
     # Desktop portals for app integration
     xdg-desktop-portal
@@ -92,6 +94,5 @@
 
     # System integration
     pkgs.networkmanagerapplet # Network management
-    pkgs.pinentry-all # GPG password entry
   ];
 }

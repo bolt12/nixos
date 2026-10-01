@@ -12,7 +12,6 @@
     # File and directory operations
     fd # Modern find replacement
     ripgrep # Fast grep replacement
-    fzf # Fuzzy finder
     dust # Modern du replacement
     eza # Modern ls replacement
     ncdu # Disk usage analyzer (kept alongside dust)

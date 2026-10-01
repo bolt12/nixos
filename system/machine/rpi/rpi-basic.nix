@@ -57,8 +57,6 @@
           "audio"
           "video"
           "wheel"
-          "docker"
-          "podman"
         ];
 
         openssh.authorizedKeys.keys = [

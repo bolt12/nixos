@@ -1,6 +1,13 @@
 # TREK: self-hosted collaborative travel/trip planner (Docker).
 # Single container: NestJS + React + SQLite, no external DB needed.
 # https://github.com/liketrek/TREK
+#
+# Pinned by tag and digest because the module's default pull policy is
+# `missing`: a `:latest` tag is fetched once and then never refreshed, so the
+# container silently stays on whatever it first pulled. To bump, read the new
+# digest from https://hub.docker.com/v2/repositories/mauriceboe/trek/tags/<tag>
+# and check the release notes: schema migrations run at boot and cannot be
+# rolled back, so snapshot storage/data first.
 {
   pkgs,
   constants,
@@ -18,7 +25,7 @@ in
   ];
 
   virtualisation.oci-containers.containers.trek = {
-    image = "mauriceboe/trek:latest";
+    image = "mauriceboe/trek:4.3.3@sha256:1ef1ccf41af8ae409e0435518facb5789b6adc99681ef26d1869508355455749";
     autoStart = true;
     ports = [
       "${toString ports.trek}:3000"

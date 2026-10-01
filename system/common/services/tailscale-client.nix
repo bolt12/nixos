@@ -18,6 +18,9 @@ let
   # Hand-placed secret, deliberately outside the store and outside git. Mint it
   # on the hub with `headscale preauthkeys create --user <id> --reusable`.
   authKeyPath = "/etc/tailscale/authkey";
+  # raw-table rule that keeps peers off IPv6 link-local paths; see the
+  # firewall block below for why.
+  linkLocalDrop = "PREROUTING -s fe80::/10 -p udp --dport ${toString config.services.tailscale.port} -j DROP";
 in
 {
   options.services.headscaleClient = {
@@ -63,6 +66,27 @@ in
     };
 
     networking.firewall.trustedInterfaces = [ "tailscale0" ];
+
+    # Keep peers off IPv6 link-local paths until every node runs a Tailscale
+    # with the fix for tailscale#21411 (PR #21523, merged 2026-09-29, in no
+    # release yet; 26.05 ships 1.98.10 and the Android app has the same bug).
+    # Linux's batched send drops the %zone from fe80:: destinations, so the
+    # kernel refuses every WireGuard packet on that path, while disco uses a
+    # send that keeps the zone and reports the path healthy. ninho and the
+    # Pixel picked it on home wifi about once a minute and lost all tunnel
+    # traffic until the next switch.
+    #
+    # Dropping link-local UDP to our port makes disco fail there too, so both
+    # ends settle on the IPv4 LAN address. It has to live in `raw`: tailscaled
+    # jumps to its own ts-input chain at the top of filter/INPUT and accepts
+    # this port there, before nixos-fw is ever consulted.
+    networking.firewall.extraCommands = ''
+      ip6tables -t raw -D ${linkLocalDrop} 2>/dev/null || true
+      ip6tables -t raw -I ${linkLocalDrop}
+    '';
+    networking.firewall.extraStopCommands = ''
+      ip6tables -t raw -D ${linkLocalDrop} 2>/dev/null || true
+    '';
 
     # nixpkgs builds tailscaled-autoconnect around a `cat` of that file under
     # `set -o errexit`, so a missing key kills the unit with nothing in the

@@ -25,6 +25,12 @@
 
       # Optional: Cleanup old entries after 60 days
       CLEANUP_ARCHIVE_READ_DAYS = "60";
+
+      # Allow fetching from LAN/Tailscale addresses (RSS-Bridge on this host)
+      FETCHER_ALLOW_PRIVATE_NETWORKS = "1";
+
+      # RSS-Bridge feeds can be large (full article HTML); default 15 MiB
+      HTTP_CLIENT_MAX_BODY_SIZE = "50";
     };
   };
 

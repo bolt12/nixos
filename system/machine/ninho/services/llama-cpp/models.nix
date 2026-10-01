@@ -40,6 +40,7 @@
         --load-mode none \
         --parallel 1 \
         --no-mmproj \
+        -t 16 \
         --spec-type draft-mtp \
         --spec-draft-n-max 4 \
         --spec-default \
@@ -77,6 +78,7 @@
         --cache-type-v q8_0 \
         --load-mode none \
         --parallel 1 \
+        -t 16 \
         --chat-template-file ${qwenChatTemplate} \
         --reasoning-format deepseek \
         --chat-template-kwargs '{"preserve_thinking": true, "reasoning_effort": "low"}' \
@@ -90,10 +92,9 @@
   };
 
   # Qwen3.8-Flash-Next (125B MoE / 6B active, qwen4exp architecture, 262K context).
-  # MTP draft head (PR #27836) and recurrent state rollback (PR #28123) in b10903.
   # --n-cpu-moe 36: engram table (33 GiB) exceeds VRAM; below ~24 fails at cudaMalloc.
-  # -c 262144 pinned: -fit hits a graph_max_nodes assert on this architecture.
-  # --spec-draft-n-max 4: deeper MTP draft in b11069 (+120% net on sm_120 vs 2).
+  # -fit on: b11249 fixes the graph_max_nodes assert that blocked -fit on qwen4exp.
+  # No MTP: unsloth UD-IQ4_XS quant strips MTP layers from Flash-Next.
   "qwen3.8-flash-next-full" = {
     cmd = ''
       ${gpu-tenant-wrapper} ${llama-cpp-cuda}/bin/llama-server \
@@ -107,17 +108,15 @@
         --min-p 0.0 \
         --presence-penalty 0.0 \
         --repeat-penalty 1.0 \
-        -c 262144 \
+        -fit on \
+        --fit-target 2048 \
         --flash-attn on \
         --cache-type-k q8_0 \
         --cache-type-v q8_0 \
-        -ngl 99 \
         --n-cpu-moe 36 \
         --parallel 1 \
         --no-mmproj \
-        --spec-type draft-mtp \
-        --spec-draft-n-max 4 \
-        --spec-default \
+        -t 16 \
         --chat-template-file ${qwenChatTemplate} \
         --reasoning-format deepseek \
         --chat-template-kwargs '{"preserve_thinking": true, "reasoning_effort": "xhigh"}' \
@@ -142,14 +141,15 @@
         --min-p 0.0 \
         --presence-penalty 0.0 \
         --repeat-penalty 1.0 \
-        -c 32768 \
+        -fit on \
+        --fit-target 2048 \
         --flash-attn on \
         --cache-type-k q8_0 \
         --cache-type-v q8_0 \
-        -ngl 99 \
         --n-cpu-moe 36 \
         --image-min-tokens 1024 \
         --parallel 1 \
+        -t 16 \
         --chat-template-file ${qwenChatTemplate} \
         --reasoning-format deepseek \
         --chat-template-kwargs '{"preserve_thinking": true, "reasoning_effort": "low"}' \

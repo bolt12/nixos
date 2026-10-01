@@ -1,9 +1,5 @@
 { config, lib, ... }:
 
-# Git configuration with user-specific parameterization
-# Common git settings are defined here, while user-specific values
-# (name, email, signing key) are pulled from config.userConfig.git
-
 {
   programs.git = {
     enable = true;

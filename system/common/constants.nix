@@ -145,12 +145,15 @@ in
 
     # Additional services
     redlib = 8108;
+    agere-feed = 8109;
     frigate = 8114; # NVR (Docker stable-tensorrt): camera detection + clips + API
     pet-report = 8115; # Pet-activity journal over Frigate: web UI via nginx
     pet-report-backend = 8116; # ...and its API, loopback only, behind that nginx
     bazarr = 8112;
     open-webui = 8113;
     trek = 8120;
+    wanderer = 8121; # Wanderer trail catalogue: web UI
+    wanderer-db = 8122; # ...and its PocketBase admin, bound to 127.0.0.1 only
     comfy-ui = 8188;
 
     # Monitoring

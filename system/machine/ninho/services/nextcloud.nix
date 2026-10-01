@@ -34,7 +34,7 @@ in
     enable = true;
     hostName = nextcloudHostname;
     home = nextcloudHome;
-    package = pkgs.nextcloud32;
+    package = pkgs.nextcloud35;
 
     database.createLocally = true;
     configureRedis = true;

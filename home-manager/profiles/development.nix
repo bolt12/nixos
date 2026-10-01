@@ -41,7 +41,6 @@ in
     tldr # Concise man pages
     manix # Nix documentation search
     nix-doc # Nix documentation tool
-    nix-index # Nix package search
     nix-tree # Nix dependency visualization
 
     # Build and packaging tools

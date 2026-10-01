@@ -96,6 +96,7 @@ ssh -p 2222 root@<ninho-lan-ip>
 - `flushBeforeStage2 = true` tears down initrd networking so NetworkManager starts clean in stage 2.
 - The clevis token is per-device (bound into each LUKS2 header), so a device's passphrase can change independently; re-bind that device with step 4 afterwards.
 - Tang is stateless. Rotating its keys requires re-binding every Clevis client (rerun step 4 per device).
+- The Tang keys are backed up on ninho at `/etc/secrets/tang-rpi`. Re-take the copy after every rotation; backup and restore commands are in `system/machine/rpi/README.md`.
 - Colmena RPi deploy requires: ssh-agent with the key loaded, `--impure`, and `targetUser = "root"` (no interactive sudo).
 
 ### llama-swap / stable-diffusion.cpp

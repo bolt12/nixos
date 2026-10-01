@@ -49,6 +49,7 @@ in
 
     sonarr = {
       enable = true;
+      package = pkgs.unstable.sonarr;
       openFirewall = true;
       settings = {
         server.port = ports.sonarr;
@@ -94,6 +95,7 @@ in
         download_location = storage.torrents;
         move_completed = true;
         move_completed_path = storage.torrents;
+        enabled_plugins = [ "Label" ];
       };
       web = {
         enable = true;

@@ -79,6 +79,15 @@
     };
   };
 
-  # No desktop services for headless configuration
-  services = { };
+  programs.gpg = {
+    enable = true;
+    settings.use-agent = true;
+  };
+
+  services.gpg-agent = {
+    enable = true;
+    enableBashIntegration = true;
+    pinentry.package = pkgs.pinentry-curses;
+    defaultCacheTtl = 3600;
+  };
 }
