@@ -18,9 +18,9 @@ in
   nixpkgs.overlays = [
     (final: prev: {
       # llama-cpp-cuda - CUDA build for Blackwell (sm_120), pinned to a llama.cpp release.
-      # b11249: fused RMS_NORM+SCALE kernel, CUDA graphs with MTP (#28549),
-      # tuned FA for more head sizes, Qwen4Exp sparse FA + hyper-connection ops,
-      # 4x faster tensor conversion, video_url support, router race fixes.
+      # b11408: /v1/systemone decision-model API (#29818), Qwen4Exp MTP (#29761)
+      # and qwen4exp fixes, shared experts fused into MMVQ (#29184), probabilistic
+      # draft acceptance for MTP (#27694), faster model loading (#29598).
       llama-cpp-cuda =
         (unstable.llama-cpp.override {
           cudaSupport = true;
@@ -29,47 +29,58 @@ in
           rocmSupport = false;
           metalSupport = false;
         }).overrideAttrs
-          (oldAttrs: {
-            version = "11249";
+          (
+            finalAttrs: oldAttrs: {
+              version = "11408";
 
-            src = pkgs.fetchFromGitHub {
-              owner = "ggml-org";
-              repo = "llama.cpp";
-              rev = "6d78fb0727fdd8fbae15b6b5e9e0c0951a750d69";
-              hash = "sha256-+axr1IVq7W0LK6enrphbZolLvm+54MSSI5xOgqDn1DQ=";
-              leaveDotGit = true;
-              postFetch = ''
-                git -C "$out" rev-parse --short HEAD > $out/COMMIT
-                find "$out" -name .git -print0 | xargs -0 rm -rf
+              src = pkgs.fetchFromGitHub {
+                owner = "ggml-org";
+                repo = "llama.cpp";
+                rev = "9f12cd4a4c52ea351b85cf78939db8991e1bc025";
+                hash = "sha256-rHvOS0ltFcv1KDhN5cLBrezDZJXDS0VyLTXo8CRnyz0=";
+                leaveDotGit = true;
+                postFetch = ''
+                  git -C "$out" rev-parse --short HEAD > $out/COMMIT
+                  find "$out" -name .git -print0 | xargs -0 rm -rf
+                '';
+              };
+
+              cmakeFlags = (oldAttrs.cmakeFlags or [ ]) ++ [
+                "-DGGML_NATIVE=ON"
+                # RTX 5090 is Blackwell (sm_120), not Ada (89). 120a-real is llama.cpp's
+                # own recommended Blackwell arch: the architecture-specific "a" variant
+                # enables the FP4 tensor-core MMA path (BLACKWELL_MMA_AVAILABLE, gated on
+                # __CUDA_ARCH__>=1200), which native MXFP4/NVFP4 need. real-only (no PTX):
+                # there's no other GPU to fall back to, and no virtual arch until Rubin.
+                "-DCMAKE_CUDA_ARCHITECTURES=120a-real"
+                # nixpkgs hardcodes its own release's build number and commit in a let
+                # binding, so without these `llama-server --version` and /props report
+                # nixpkgs' pin (b10809) instead of this one. The later -D wins.
+                "-DLLAMA_BUILD_NUMBER=${finalAttrs.version}"
+                "-DLLAMA_BUILD_COMMIT=${builtins.substring 0 7 finalAttrs.src.rev}"
+              ];
+
+              preConfigure = ''
+                export NIX_ENFORCE_NO_NATIVE=0
+                ${oldAttrs.preConfigure or ""}
               '';
-            };
 
-            cmakeFlags = (oldAttrs.cmakeFlags or [ ]) ++ [
-              "-DGGML_NATIVE=ON"
-              # RTX 5090 is Blackwell (sm_120), not Ada (89). 120a-real is llama.cpp's
-              # own recommended Blackwell arch: the architecture-specific "a" variant
-              # enables the FP4 tensor-core MMA path (BLACKWELL_MMA_AVAILABLE, gated on
-              # __CUDA_ARCH__>=1200), which native MXFP4/NVFP4 need. real-only (no PTX):
-              # there's no other GPU to fall back to, and no virtual arch until Rubin.
-              "-DCMAKE_CUDA_ARCHITECTURES=120a-real"
-            ];
+              postPatch =
+                builtins.replaceStrings
+                  [ "rm tools/server/public/index.html.gz" ]
+                  [ "rm -f tools/server/public/index.html.gz" ]
+                  (oldAttrs.postPatch or "");
 
-            preConfigure = ''
-              export NIX_ENFORCE_NO_NATIVE=0
-              ${oldAttrs.preConfigure or ""}
-            '';
+              npmRoot = "tools/ui";
+              npmDepsHash = "sha256-a17M+L3nLdRnN6WMB6imPFmwqG2g8uv+gwN0XTAUrf8=";
 
-            postPatch =
-              builtins.replaceStrings
-                [ "rm tools/server/public/index.html.gz" ]
-                [ "rm -f tools/server/public/index.html.gz" ]
-                (oldAttrs.postPatch or "");
+              postInstall = oldAttrs.postInstall or "";
+            }
+          );
 
-            npmRoot = "tools/ui";
-            npmDepsHash = "sha256-2Q7XhaLAArmviOLdQsNbYTfdyDE5pW9lR26cRHEVl9k=";
-
-            postInstall = oldAttrs.postInstall or "";
-          });
+      # Strata, the Qwen3.8-Flash-Next engine behind the qwen3.8-flash-next-strata llama-swap
+      # entry. strata.nix explains why its CUDA has to be 13.0 and not unstable's default.
+      strata = final.callPackage ./strata.nix { cudaPackages = unstable.cudaPackages_13_0; };
 
       # llama-swap v260 - Searchable model picker, capability discovery,
       # CORS controls, profile load/unload UI, log stream splitting.
@@ -84,8 +95,8 @@ in
           llama-swap-src = pkgs.fetchFromGitHub {
             owner = "mostlygeek";
             repo = "llama-swap";
-            tag = "v260";
-            hash = "sha256-W5JJW1/qQm39U/g42jseRmGQobqqWRfVsJ2lT/7K9P8=";
+            tag = "v262";
+            hash = "sha256-DAYaR+N7alGbdLsGlaiDlsHiqxOMg65069i/vHOkLKk=";
             leaveDotGit = true;
             postFetch = ''
               cd "$out"
@@ -96,7 +107,7 @@ in
           };
           llama-swap-ui = pkgs.buildNpmPackage {
             pname = "llama-swap-ui";
-            version = "260";
+            version = "262";
             src = llama-swap-src;
             sourceRoot = "${llama-swap-src.name}/ui";
             npmDepsHash = "sha256-lmhRJ8275PIQ+7vHdr9aZ31lYeXUkXrWnlvuwOadjRQ=";
@@ -111,7 +122,7 @@ in
         in
         (unstable.llama-swap.override { buildGoModule = unstable.buildGo127Module; }).overrideAttrs
           (oldAttrs: {
-            version = "260";
+            version = "262";
             src = llama-swap-src;
             proxyVendor = true;
             vendorHash = "sha256-pihd/GVw3GqZTwBgb8gYo2zyLpE4HqKI0xb//tojMyo=";

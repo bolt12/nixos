@@ -66,6 +66,12 @@
 
       # AMD SATA controller fixes - Disable aggressive power management
       options ahci ignore_sss=1
+
+      # Cap the ZFS ARC at 16 GiB (default: RAM minus 1 GiB). The kernel does not count ARC as
+      # available memory, and ZFS caches mmap'd files twice (ARC plus page cache), so an
+      # uncapped ARC starves the local models: llama.cpp's mmap'd Flash-Next experts thrashed
+      # from disk and Strata sized its RAM budget to 11 GiB instead of 43.
+      options zfs zfs_arc_max=17179869184
     '';
 
     # ZFS configuration

@@ -10,6 +10,7 @@ let
   inherit (constants) ports;
   inherit (pkgs)
     llama-cpp-cuda
+    strata
     writeShellScript
     ;
 
@@ -97,6 +98,60 @@ let
     hash = "sha256-OY7fW1u4AvtrnJqNumcNCfKq7vb9yqCyyjByZfWfeNw=";
   };
 
+  # Strata state for the qwen3.8-flash-next-strata entry: the pack and MTP draft head that
+  # strata-prepare builds once, the engine log, and the server's saved settings.
+  strataDir = "/var/lib/llama-cpp/strata";
+
+  # Shard 1 of the Unsloth UD-IQ4_XS files the llama.cpp Flash-Next entries download through -hf.
+  # Strata pins this revision for the quant (its docs/UNSLOTH_Q4.md); the engine finds shards 2
+  # and 3 beside it and reads the experts from them in place.
+  flashNextShard = "/var/lib/llama-cpp/cache/huggingface/hub/models--unsloth--Qwen3.8-Flash-Next-GGUF/snapshots/38bb39ee97821de2c9009abb7e93950eec396e66/UD-IQ4_XS/Qwen3.8-Flash-Next-UD-IQ4_XS-00001-of-00003.gguf";
+
+  # The engine config Strata's own setup wrote for this model, with store and state paths.
+  strataConfig = (pkgs.formats.json { }).generate "strata-ud-iq4_xs.json" {
+    exe = "${strata}/libexec/strata/strata";
+    args = [
+      "--pack"
+      "${strataDir}/pack-ud-iq4_xs"
+      "--native"
+      flashNextShard
+      "--expert-profile"
+      "${strata}/share/strata/data/expert-profile.bin"
+      "--expert-cache"
+      "auto"
+      "--prefill"
+      "auto"
+      "--spec"
+      "4"
+      "--spec-min-p"
+      "0.5"
+      "--mtp"
+      "${strataDir}/mtp/rt"
+      "--max-context"
+      "262144"
+      "--kv"
+      "int8"
+      "--kv-resident"
+      "32768"
+      # Clamped at load to the RAM then free, less 4 GiB. 55 GiB covers every expert the GPU cache
+      # does not hold; a smaller budget still loads, but reads the rest from disk per token.
+      "--resident-budget-gib"
+      "55"
+      # The expert cache otherwise fills all but 700 MiB of VRAM at load. Leave the same 2 GiB the
+      # llama.cpp entries keep (--fit-target 2048) for Immich ML and Jellyfin's NVENC.
+      "--vram-reserve-mib"
+      "2048"
+    ];
+    cwd = strataDir;
+    tokenizer = "${strataDir}/pack-ud-iq4_xs/tokenizer";
+    model_name = "qwen3.8-flash-next-strata";
+    log = "${strataDir}/engine.log";
+  };
+
+  # The server saves <config>.shared-settings.json next to the path it is given, so it gets a
+  # symlink in the state directory rather than the read-only store path.
+  strataConfigLink = "${strataDir}/strata-ud-iq4_xs.json";
+
 in
 {
   services.llama-swap = {
@@ -174,6 +229,8 @@ in
               gpu-tenant-wrapper-frigate
               llama-cpp-cuda
               qwenChatTemplate
+              strata
+              strataConfigLink
               ;
           };
         in
@@ -197,9 +254,44 @@ in
     "d /var/lib/llama-cpp 0755 llama-swap llama-swap - -"
     "d /var/lib/llama-cpp/models 0755 llama-swap llama-swap - -"
     "d /var/lib/llama-cpp/cache 0755 llama-swap llama-swap - -"
+    "d ${strataDir} 0755 llama-swap llama-swap - -"
+    "L+ ${strataConfigLink} - - - - ${strataConfig}"
     # FIFO for GPU tenant control (avoids sudo from within llama-swap)
     "p ${controlFifo} 0660 llama-swap root - -"
   ];
+
+  # Builds what the Strata entry reads besides the GGUF, the same steps Strata's setup.py runs:
+  # a pack of the file's dense tensors (~30 s), and the MTP draft head. The GGUF has no MTP
+  # layer, so its ~5 GB of tensors come from the original Qwen checkpoint (a revision pinned in
+  # tools/mtp_fetch.py). Runs once; delete the marker to rebuild after a Strata update.
+  systemd.services.strata-prepare = {
+    description = "Prepare Strata's pack and MTP draft head for Qwen3.8-Flash-Next";
+    wantedBy = [ "multi-user.target" ];
+    wants = [ "network-online.target" ];
+    after = [ "network-online.target" ];
+    unitConfig.ConditionPathExists = "!${strataDir}/.prepared";
+    path = [ strata ];
+    environment.HOME = "/var/lib/llama-cpp";
+    serviceConfig = {
+      Type = "oneshot";
+      User = "llama-swap";
+      Group = "llama-swap";
+      WorkingDirectory = strataDir;
+    };
+    script = ''
+      if [ ! -e ${flashNextShard} ]; then
+        echo "missing ${flashNextShard}: load qwen3.8-flash-next-full once so llama-swap downloads it" >&2
+        exit 1
+      fi
+      rm -rf pack-ud-iq4_xs mtp/rt
+      strata-tool iq_pack --gguf ${flashNextShard} --out pack-ud-iq4_xs --compat-bf16
+      strata-tool mtp_fetch fetch --out mtp
+      strata-tool mtp_pack --src mtp --experts q2_0 --out mtp/mtp-q2_0.gguf
+      strata-tool mtp_rt --gguf mtp/mtp-q2_0.gguf --out mtp/rt
+      install -m 644 ${strata}/share/strata/data/draft_vocab.bin mtp/rt/draft_vocab.bin
+      touch .prepared
+    '';
+  };
 
   # Frees GPU tenants on request from llama-swap's model wrappers, which cannot do
   # it themselves (they run unprivileged with all capabilities dropped). Runs as
@@ -341,6 +433,9 @@ in
       # Restore full /proc visibility: upstream module sets ProcSubset=pid,
       # which hides /proc/meminfo and breaks llama-swap's sys-stats polling.
       ProcSubset = lib.mkForce "all";
+
+      # Strata page-locks the experts it keeps in RAM (tens of GiB); the default is 8 MiB.
+      LimitMEMLOCK = "infinity";
 
       TimeoutStartSec = "infinity";
       TimeoutStopSec = "30s";
