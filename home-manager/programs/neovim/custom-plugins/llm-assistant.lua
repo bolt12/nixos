@@ -196,6 +196,7 @@ Output ONLY the prompt block, no titles, explanations, or commentary:
       "qwen3.6-27B-full",
       "qwen3.6-35B-A3B-full",
       "qwen3.8-27B-full",
+      "qwen3.8-flash-next-strata",
       "step-3.5-flash-full",
     },
     cloud_models = {
@@ -468,13 +469,18 @@ function Api.fetch_models(callback)
           end
         end
         -- Re-sort: local = not in cloud_set, cloud = in cloud_set
+        -- llama-swap lists aliases too, so an id can repeat; nui menus reject duplicate ids.
         local_models = {}
         cloud_models = {}
+        local seen = {}
         for _, m in ipairs(parsed.data) do
-          if cloud_set[m.id] then
-            table.insert(cloud_models, m.id)
-          else
-            table.insert(local_models, m.id)
+          if not seen[m.id] then
+            seen[m.id] = true
+            if cloud_set[m.id] then
+              table.insert(cloud_models, m.id)
+            else
+              table.insert(local_models, m.id)
+            end
           end
         end
         table.sort(local_models)

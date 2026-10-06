@@ -51,7 +51,6 @@
         --chat-template-kwargs '{"preserve_thinking": true, "reasoning_effort": "xhigh"}' \
         --jinja
     '';
-    aliases = [ "qwen3.8-27B-full" ];
   };
 
   # Qwen3.8 27B vision. Same model as -full but keeps Frigate alive (pet-report
@@ -87,7 +86,6 @@
         --jinja
     '';
     aliases = [
-      "qwen3.8-27B-vision"
       "qwen-vision"
       "vision"
     ];
@@ -134,7 +132,6 @@
         --chat-template-kwargs '{"preserve_thinking": true, "reasoning_effort": "xhigh"}' \
         --jinja
     '';
-    aliases = [ "qwen3.8-flash-next-full" ];
   };
 
   # Qwen3.8-Flash-Next on Strata (../../strata.nix), from the same UD-IQ4_XS files as -full.
@@ -188,7 +185,6 @@
         --chat-template-kwargs '{"preserve_thinking": true, "reasoning_effort": "low"}' \
         --jinja
     '';
-    aliases = [ "qwen3.8-flash-next-vision" ];
   };
 
 }

@@ -144,8 +144,9 @@ in
         # `thinkpad_acpi`, so that widget would be non-functional here.
         tlpControl.enable = true; # needs `tlp` (already enabled in x1-g8)
 
-        # Idle inhibitor toggle (handier than a keybind for ad-hoc "stay awake").
-        caffeine.enable = true;
+        # No caffeine plugin: the registry purged it (#973) because DMS now ships
+        # an idle inhibitor, on by default as a Control Center tile and also
+        # available as the "Idle inhibitor" bar widget.
 
         # Launcher extensions for the Mod+d spotlight.
         calculator.enable = true;

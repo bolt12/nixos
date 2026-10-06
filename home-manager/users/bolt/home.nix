@@ -34,6 +34,10 @@ let
         export ANTHROPIC_BASE_URL="${llamaswapUrl}"
         export ANTHROPIC_API_KEY="not-needed"
         export API_TIMEOUT_MS="3000000"
+        # llama-swap sends nothing until a cold model is up (Flash-Next on Strata
+        # takes ~85 s), and the first-byte window otherwise comes from a remote
+        # flag (180 s), which a cold load plus a long session's re-prefill can pass.
+        export CLAUDE_STREAM_FIRST_BYTE_TIMEOUT_MS=600000
         export CLAUDE_CODE_MAX_OUTPUT_TOKENS=100000
         export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
         export ANTHROPIC_DEFAULT_OPUS_MODEL="${model}"
@@ -59,7 +63,7 @@ let
   };
   olaude-qwen3-8-flash-next = mkClaudeWrapper {
     name = "olaude-qwen3-8-flash-next";
-    model = "qwen3.8-flash-next-full";
+    model = "qwen3.8-flash-next-strata";
     haikuEnvVar = "OLAUDE_HAIKU";
   };
 
@@ -98,6 +102,7 @@ in
     ../../programs/ai-cmd/default.nix
     ../../programs/agda/default.nix
     ../../programs/bash/default.nix
+    ../../programs/cctop/default.nix
     ../../programs/emacs/default.nix
     ../../programs/git/default.nix
     ../../programs/neovim/default.nix
