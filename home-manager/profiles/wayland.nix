@@ -13,6 +13,7 @@
     enableBashIntegration = true;
     pinentry.package = pkgs.pinentry-all;
     defaultCacheTtl = 3600;
+    maxCacheTtl = 7200;
   };
 
   services.wl-clip-persist = {

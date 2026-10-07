@@ -105,6 +105,7 @@ in
     ../../programs/cctop/default.nix
     ../../programs/emacs/default.nix
     ../../programs/git/default.nix
+    ../../programs/mcp-nixos/default.nix
     ../../programs/neovim/default.nix
     ../../programs/syncthing/default.nix
     ../../programs/tmux/default.nix
@@ -187,9 +188,13 @@ in
   services.gpg-agent = {
     enable = true;
     enableBashIntegration = true;
-    # Default only: bolt-with-de imports this file, and its wayland profile
-    # sets pinentry-all for the desktop.
+    # Defaults only: bolt-with-de imports this file, and its wayland profile
+    # sets pinentry-all and its own cache TTLs for the desktop.
     pinentry.package = lib.mkDefault pkgs.pinentry-curses;
-    defaultCacheTtl = 3600;
+    # A working day. Non-interactive shells get no GPG_TTY (programs/bash
+    # returns early for them), so pinentry-curses has no terminal to prompt on
+    # and signing from one depends on the cache being warm.
+    defaultCacheTtl = lib.mkDefault 28800;
+    maxCacheTtl = lib.mkDefault 28800;
   };
 }
