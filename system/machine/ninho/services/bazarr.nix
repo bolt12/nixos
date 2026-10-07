@@ -7,8 +7,7 @@
   ...
 }:
 let
-  inherit (constants) ports storage;
-  bazarrHome = "${storage.data}/bazarr";
+  inherit (constants) ports;
 in
 {
   services.bazarr = {
@@ -17,11 +16,6 @@ in
     listenPort = ports.bazarr;
     openFirewall = true;
   };
-
-  # Create data directory
-  systemd.tmpfiles.rules = [
-    "d ${bazarrHome} 0750 bazarr bazarr - -"
-  ];
 
   # Group membership (media, storage-users) is assigned centrally in
   # services/permissions.nix, like the rest of the *arr stack.

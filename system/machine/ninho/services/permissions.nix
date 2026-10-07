@@ -1,13 +1,34 @@
 # Centralized group/permission management: wires service users into media + storage-users.
-{ config, ... }:
+{ lib, ... }:
+let
+  # Services that create files under /storage/media. Each one has to be able
+  # to change what another created (Jellyfin and Bazarr save subtitles next to
+  # an episode Sonarr imported), so they all run with a group-writable umask.
+  # deluged is not listed: its module already sets 0002.
+  libraryWriters = [
+    "sonarr"
+    "radarr"
+    "lidarr"
+    "readarr"
+    "bazarr"
+    "jellyfin"
+  ];
+in
 {
   # ============================================================================
   # Centralized Permission Management
   # ============================================================================
   # This module manages all service permissions for shared data access.
-  # All services can read/write to /storage/data and /storage/media through
-  # the 'media' group and 'storage-users' group.
+  # 'media' is the write group for the library and the downloads
+  # (/storage/media/*, /storage/torrents); the SGID roots in servarr.nix put
+  # new files in it. 'storage-users' owns the /storage roots themselves.
   # ============================================================================
+
+  # mkForce because the sonarr, radarr and jellyfin modules set a UMask of
+  # their own (0022, 0022, 0077).
+  systemd.services = lib.genAttrs libraryWriters (_: {
+    serviceConfig.UMask = lib.mkForce "0002";
+  });
 
   # Needed for some reason this isn't set
   users.users.prowlarr.isSystemUser = true;
@@ -30,10 +51,6 @@
     ];
 
     # Servarr stack - needs access to media files for management
-    prowlarr.extraGroups = [
-      "media"
-      "storage-users"
-    ];
     radarr.extraGroups = [
       "media"
       "storage-users"
@@ -57,13 +74,12 @@
       "storage-users"
     ];
 
-    # Cloud services - need access to share photos/files with other services
+    # Cloud services - need access to share photos/files with other services.
+    # Not in 'media': neither of them manages the library.
     nextcloud.extraGroups = [
-      "media"
       "storage-users"
     ];
     immich.extraGroups = [
-      "media"
       "storage-users"
       "render"
       "video"

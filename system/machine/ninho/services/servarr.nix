@@ -21,13 +21,17 @@ in
 
     # Create organized media directories with proper ownership
     # These are where *Arr services will organize and hardlink media
-    "d ${storage.media}/movies 0775 radarr storage-users - -"
-    "d ${storage.media}/tv 0775 sonarr storage-users - -"
-    "d ${storage.media}/music 0775 lidarr storage-users - -"
-    "d ${storage.media}/books 0775 readarr storage-users - -"
+    # SGID keeps everything created below in the `media` group, which every
+    # library writer belongs to (services/permissions.nix).
+    "d ${storage.media}/movies 2775 radarr media - -"
+    "d ${storage.media}/tv 2775 sonarr media - -"
+    "d ${storage.media}/music 2775 lidarr media - -"
+    "d ${storage.media}/books 2775 readarr media - -"
 
-    # Ensure torrents directory exists with proper permissions
-    "d ${storage.torrents} 0775 deluge storage-users - -"
+    # Ensure torrents directory exists with proper permissions. Same group and
+    # SGID as the library: with fs.protected_hardlinks the *arrs can only
+    # hardlink a download they are also allowed to write.
+    "d ${storage.torrents} 2775 deluge media - -"
   ];
 
   services = {
