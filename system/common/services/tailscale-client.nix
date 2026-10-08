@@ -67,9 +67,10 @@ in
 
     networking.firewall.trustedInterfaces = [ "tailscale0" ];
 
-    # Keep peers off IPv6 link-local paths until every node runs a Tailscale
-    # with the fix for tailscale#21411 (PR #21523, merged 2026-09-29, in no
-    # release yet; 26.05 ships 1.98.10 and the Android app has the same bug).
+    # Keep peers off IPv6 link-local paths until every node runs Tailscale
+    # >= 1.104.1, the first release with the fix for tailscale#21411 (PR
+    # #21523, not backported to 1.102.x). 26.05 ships 1.98.10, and the Android
+    # app has the same bug below 1.104.1.
     # Linux's batched send drops the %zone from fe80:: destinations, so the
     # kernel refuses every WireGuard packet on that path, while disco uses a
     # send that keeps the zone and reports the path healthy. ninho and the
