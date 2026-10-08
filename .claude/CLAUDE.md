@@ -99,6 +99,28 @@ ssh -p 2222 root@<ninho-lan-ip>
 - The Tang keys are backed up on ninho at `/etc/secrets/tang-rpi`. Re-take the copy after every rotation; backup and restore commands are in `system/machine/rpi/README.md`.
 - Colmena RPi deploy requires: ssh-agent with the key loaded, `--impure`, and `targetUser = "root"` (no interactive sudo).
 
+### Monitoring
+
+Everything is under `system/machine/ninho/services/monitoring/`: `prometheus.nix` (scrape jobs), `exporters.nix`, `probes.nix` (blackbox), `textfile.nix` (node exporter textfile collectors), `alerts.nix` (Grafana rules and ntfy routing), `dashboards/` (one Nix file per dashboard, `lib.nix` for the panel constructors).
+
+**Key details for future edits:**
+- Dashboards are generated. Edit `dashboards/<name>.nix`; there is no JSON to edit. A new dashboard also goes in the list in `dashboards/default.nix`.
+- A row in a dashboard file flows left to right and wraps at 24 columns. Keep the panels on one line the same height, or the grid leaves gaps.
+- An exporter can report `up == 1` and return none of its metrics (deluge and two postgres collectors did, for weeks). After adding one, check that its metric family exists, and add a `*-blind` rule in `alerts.nix`.
+- Alert rules treat missing data as fine by design, so that one dead exporter does not fire every rule that reads it. `target-down` and the `*-blind` rules cover the missing case.
+- Removing a provisioned rule from `alerts.nix` does not delete it from Grafana. List its uid under `deleteRules`.
+- Adding a port to `constants.ports` adds an HTTP probe for it. If nothing answers HTTP on that port on ninho, add the name to `notProbed` in `probes.nix`.
+- llama-server scrape ports are derived from the sorted model names and `startPort`, the same way llama-swap assigns them. Do not scrape through llama-swap's `/upstream/<model>` route: that loads the model.
+- Grafana's datasource declares `timeInterval = "1m"` to match the scrape interval. Change both together, or `$__rate_interval` becomes too short and rate graphs turn into dots.
+- `frigate_camera_events_total` is the number of events Frigate keeps and it goes down. Do not use `rate()` or `increase()` on it.
+- Do not set `mergeValues` on state timelines: Grafana 13.0 drops the state colours.
+- `services.deluge.authFile` is seeded by tmpfiles and needs its trailing `\n`. Without it deluged appends its `localclient` line onto the seeded one and the declared account stops parsing.
+
+**Checking a change before switching:**
+1. `nix build .#nixosConfigurations.ninho-nixos.config.system.build.toplevel` runs `promtool` on the scrape config, the blackbox config check, and shellcheck on the collectors.
+2. The dashboard JSON is at the path printed by `nix eval --raw .#nixosConfigurations.ninho-nixos.config.services.grafana.provision.dashboards.settings.providers --apply 'ps: (builtins.head ps).options.path'`.
+3. Run every panel `expr` in that JSON against `http://localhost:9090/api/v1/query`. An empty result is a bug unless the panel needs a loaded model or a unit that is currently failed.
+
 ### llama-swap / stable-diffusion.cpp
 
 **Key details for future edits:**

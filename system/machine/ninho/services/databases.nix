@@ -1,5 +1,5 @@
 # Centralized PostgreSQL: shared by Nextcloud, Immich, Miniflux, Home Assistant.
-{ config, pkgs, ... }:
+{ lib, ... }:
 {
   # PostgreSQL - services will auto-create databases
   services.postgresql.enable = true;
@@ -10,6 +10,13 @@
   services.postgresql.ensureUsers = [
     { name = "postgres-exporter"; }
   ];
+
+  # Without pg_monitor the exporter cannot size databases it has no CONNECT on
+  # or list the WAL directory, so its `database` and `wal` collectors fail.
+  # ensureUsers has no clause for role membership, hence the explicit GRANT.
+  systemd.services.postgresql-setup.script = lib.mkAfter ''
+    psql -tAc 'GRANT pg_monitor TO "postgres-exporter"'
+  '';
 
   # Redis - for Nextcloud/Immich caching (auto-configured by those services)
 }

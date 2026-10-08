@@ -14,8 +14,10 @@ in
   # previous stable→unstable module swap is no longer needed. (The package stays
   # pinned to unstable below for version parity with the rest of the *arr stack.)
   systemd.tmpfiles.rules = [
-    # Deluge auth file
-    "f /var/lib/secrets/deluge-auth 0600 deluge deluge - deluge:deluge:10"
+    # Deluge auth file. The trailing newline matters: deluged appends its own
+    # `localclient` line, and without the newline that line lands on the end
+    # of this one and the account stops parsing.
+    "f /var/lib/secrets/deluge-auth 0600 deluge deluge - deluge:deluge:10\\n"
 
     # Create organized media directories with proper ownership
     # These are where *Arr services will organize and hardlink media

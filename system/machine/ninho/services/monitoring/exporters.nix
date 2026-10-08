@@ -1,13 +1,20 @@
-# Prometheus exporters: system, GPU, DB, ZFS, SMART, systemd, energy, *arr.
-# Pure data; merged into services.prometheus.exporters by the module system.
-_: {
+# Prometheus exporters: system, GPU, DB, ZFS, SMART, systemd, *arr, cAdvisor.
+# Merged into services.prometheus.exporters by the module system.
+{
+  config,
+  constants,
+  lib,
+  pkgs,
+  ...
+}:
+{
   services.prometheus.exporters = {
     # System metrics (CPU, RAM, Disk, Network)
     node = {
       enable = true;
+      # Unit state comes from the systemd exporter below, which also has
+      # timers, sockets and restart counts.
       enabledCollectors = [
-        "wifi"
-        "systemd"
         "processes"
         "zfs"
       ];
@@ -25,8 +32,14 @@ _: {
       enable = true;
       port = 9187;
       # Connect as the exporter's own OS user so local peer auth succeeds
-      # (the role is created in databases.nix).
+      # (the role and its pg_monitor grant are in databases.nix).
       dataSourceName = "user=postgres-exporter host=/run/postgresql database=postgres sslmode=disable";
+      # Off by default.
+      extraFlags = [
+        "--collector.long_running_transactions"
+        "--collector.database_wraparound"
+        "--collector.postmaster"
+      ];
     };
 
     # ZFS pool health & performance
@@ -53,12 +66,7 @@ _: {
     systemd = {
       enable = true;
       port = 9558;
-    };
-
-    # Energy consumption
-    scaphandre = {
-      enable = true;
-      port = 9606;
+      extraFlags = [ "--systemd.collector.enable-restart-count" ];
     };
 
     # Servarr
@@ -107,18 +115,44 @@ _: {
       port = 9713;
       delugeHost = "localhost";
       delugePort = 58846;
-      delugePasswordFile = "/var/lib/deluge/.config/deluge/auth";
+      # The whole auth file goes in as a credential; the start script below
+      # picks the localclient password out of it.
+      delugePasswordFile = config.services.deluge.authFile;
     };
   };
 
-  # Create API key files for exportarr and deluge auth
-  # Also enable RAPL power monitoring for scaphandre (AMD Ryzen 9 9950X3D)
+  # Deluge's auth file is `user:password:level` lines, and the module's start
+  # script exports the entire file as the password. deluged always keeps a
+  # `localclient` entry for local connections, so use that one.
+  systemd.services.prometheus-deluge-exporter.script = lib.mkForce ''
+    DELUGE_PASSWORD=$(${pkgs.gawk}/bin/awk -F: \
+      '$1 == "localclient" { print $2; exit }' "$CREDENTIALS_DIRECTORY/password-file")
+    export DELUGE_PASSWORD
+    exec ${pkgs.prometheus-deluge-exporter}/bin/deluge-exporter
+  '';
+
+  # Per-service and per-container CPU, memory, IO and pressure, read from the
+  # cgroup tree. Loopback only.
+  services.cadvisor = {
+    enable = true;
+    listenAddress = "127.0.0.1";
+    port = constants.ports.cadvisor;
+    extraOptions = [
+      "-enable_metrics=cpu,memory,diskIO,oom_event,pressure"
+      "-housekeeping_interval=30s"
+      "-store_container_labels=false"
+    ];
+  };
+
+  # API key files for exportarr, and RAPL access for the node exporter's
+  # power metrics (AMD Ryzen 9 9950X3D).
   # The kernel loads intel_rapl_common for AMD but leaves domains disabled by default
   systemd.tmpfiles.rules = [
     # Enable RAPL domains (w = write to file)
     "w /sys/class/powercap/intel-rapl:0/enabled - - - - 1"
     "w /sys/class/powercap/intel-rapl:0:0/enabled - - - - 1"
-    # Make energy counters world-readable so scaphandre can read them (z = set permissions)
+    # The counters are root-only by default and the node exporter is not root
+    # (z = set permissions).
     "z /sys/class/powercap/intel-rapl:0/energy_uj 0444 - - -"
     "z /sys/class/powercap/intel-rapl:0:0/energy_uj 0444 - - -"
     "d /var/lib/secrets 0755 root root -"

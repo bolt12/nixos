@@ -13,7 +13,8 @@ Top-level layout under `services/`:
 - `nextcloud`, `immich`, `jellyfin`
 - `*arr` stack via `servarr.nix` + `bazarr` + `deluge` + `bitmagnet`
 - `home-assistant` (split into config domains under `services/home-assistant/`)
-- `monitoring` (Prometheus + exporters + Grafana, split per concern)
+- `monitoring` (Prometheus, exporters, blackbox probes, textfile collectors,
+  Grafana alert rules, and dashboards generated from Nix in `dashboards/`)
 - `llama-cpp` + `llama-cpp/models.nix` (llama-swap with 13 models, FLUX,
   SD3.5, Whisper, Jina reranker)
 - `faster-whisper` + Wyoming voice grid (en/pt)

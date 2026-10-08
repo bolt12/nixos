@@ -268,29 +268,6 @@ in
           ];
         }
       );
-
-      # Fix scaphandre build error with riemann_client unstable feature
-      scaphandre = prev.scaphandre.overrideAttrs (oldAttrs: {
-        # Unmark as broken and apply patch to fix the compilation error
-        meta = oldAttrs.meta // {
-          broken = false;
-        };
-
-        # Patch the riemann_client vendored source to drop the unstable
-        # `#![rustfmt::skip]` inner attribute that breaks the stable compiler.
-        # 26.05 switched to fetchCargoVendor, which renamed the vendor dir, so
-        # locate mod_pb.rs by content instead of a fixed glob.
-        preBuild = (oldAttrs.preBuild or "") + ''
-          found=$(find "$NIX_BUILD_TOP" -path '*/riemann_client-*/src/proto/mod_pb.rs' 2>/dev/null | head -n1)
-          if [ -n "$found" ]; then
-            echo "Patching riemann_client mod_pb.rs to remove unstable Rust feature: $found"
-            sed -i '/#!\[rustfmt::skip\]/d' "$found"
-          else
-            echo "WARNING: riemann_client mod_pb.rs not found; scaphandre patch skipped" >&2
-          fi
-        '';
-      });
-
     })
   ];
 }

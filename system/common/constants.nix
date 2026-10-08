@@ -158,6 +158,8 @@ in
 
     # Monitoring
     prometheus = 9090;
+    cadvisor = 9714; # upstream default is 8080, which llama-swap holds
+    blackbox = 9115; # upstream default
 
     # Sync
     atuin = 8888;
