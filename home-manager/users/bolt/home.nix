@@ -12,12 +12,15 @@
 
 let
   llamaswapUrl = "http://${constants.network.ninho.vpnIp}:${toString constants.ports.llamaswap}";
+  searxngUrl = "http://${constants.network.ninho.vpnIp}:${toString constants.ports.searxng}";
 
   # Wraps `claude` to route through ninho's llama-swap endpoint with a chosen model.
   #  - model:        used for Opus and Sonnet slots
   #  - haikuModel:   used for Haiku slot (defaults to `model`)
   #  - haikuEnvVar:  if set, lets that env var override haikuModel at run-time
   #  - disallowedTools: tools the endpoint cannot serve, removed from the session
+  #  - mcpServers:   MCP servers added to the session (Claude Code's `mcpServers`
+  #                  schema); their tools are allowed without a permission check
   mkClaudeWrapper =
     {
       name,
@@ -25,6 +28,7 @@ let
       haikuModel ? model,
       haikuEnvVar ? null,
       disallowedTools ? [ ],
+      mcpServers ? { },
     }:
     let
       haikuExpr = if haikuEnvVar == null then haikuModel else "\${${haikuEnvVar}:-${haikuModel}}";
@@ -32,6 +36,14 @@ let
       # variadic and takes a positional prompt as more tool names.
       denyArgs = lib.optionalString (disallowedTools != [ ]) (
         lib.escapeShellArg "--disallowedTools=${lib.concatStringsSep "," disallowedTools}" + " "
+      );
+      # The `=` form again: both of these options are variadic as well.
+      mcpArgs = lib.optionalString (mcpServers != { }) (
+        lib.escapeShellArgs [
+          "--mcp-config=${pkgs.writeText "${name}-mcp.json" (builtins.toJSON { inherit mcpServers; })}"
+          "--allowedTools=${lib.concatMapStringsSep "," (s: "mcp__${s}") (lib.attrNames mcpServers)}"
+        ]
+        + " "
       );
     in
     pkgs.writeShellApplication {
@@ -54,7 +66,7 @@ let
         # env vars only rebind the opus/sonnet/haiku aliases, so a full model ID
         # persisted via `/model` (e.g. claude-fable-5[1m]) would otherwise win and
         # break against the llama-swap endpoint that doesn't serve it.
-        exec claude --model "${model}" ${denyArgs}"$@"
+        exec claude --model "${model}" ${denyArgs}${mcpArgs}"$@"
       '';
     };
 
@@ -67,19 +79,33 @@ let
   # only hands the nested "perform a web search" prompt to the model: the 27B
   # then generates until CLAUDE_CODE_MAX_OUTPUT_TOKENS (minutes per call, then
   # an output-token error) and Flash-Next on Strata returns no results.
-  localDisallowedTools = [ "WebSearch" ];
+  # web_url_read duplicates WebFetch, and under the server-wide allow rule it
+  # would fetch pages with no permission check.
+  localDisallowedTools = [
+    "WebSearch"
+    "mcp__searxng__web_url_read"
+  ];
+
+  # The search that does work there: SearXNG on ninho (services/searxng.nix)
+  # through mcp-searxng.
+  localMcpServers.searxng = {
+    command = lib.getExe pkgs.unstable.mcp-searxng;
+    env.SEARXNG_URL = searxngUrl;
+  };
 
   olaude-qwen3-8-27B = mkClaudeWrapper {
     name = "olaude-qwen3-8-27B";
     model = "qwen3.8-27B-full";
     haikuEnvVar = "OLAUDE_HAIKU";
     disallowedTools = localDisallowedTools;
+    mcpServers = localMcpServers;
   };
   olaude-qwen3-8-flash-next = mkClaudeWrapper {
     name = "olaude-qwen3-8-flash-next";
     model = "qwen3.8-flash-next-strata";
     haikuEnvVar = "OLAUDE_HAIKU";
     disallowedTools = localDisallowedTools;
+    mcpServers = localMcpServers;
   };
 
   # Pi coding agent wrapper for Ninho local models
