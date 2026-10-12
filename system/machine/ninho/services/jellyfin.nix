@@ -40,4 +40,12 @@
       };
     };
   };
+
+  # The module allowlists only hardwareAcceleration.device. CUDA also opens the
+  # control and UVM nodes, and without them cuInit fails and every NVENC
+  # transcode exits 187 while remuxes keep working.
+  systemd.services.jellyfin.serviceConfig.DeviceAllow = [
+    "/dev/nvidiactl rw"
+    "/dev/nvidia-uvm rw"
+  ];
 }
