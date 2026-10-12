@@ -31,5 +31,6 @@
     ./postgres-backup.nix # Daily pg_dumpall → /storage/data/postgres-backups
     ./trek.nix # Self-hosted collaborative travel planner
     ./wanderer.nix # Self-hosted trail catalogue (GPX tracks, lists)
+    ./searxng.nix # Metasearch: web search for the local-model Claude wrappers
   ];
 }

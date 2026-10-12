@@ -348,6 +348,13 @@ in
                 icon = "ollama";
               };
             }
+            {
+              SearXNG = {
+                href = "http://${ninhoIp}:${toString ports.searxng}";
+                description = "Metasearch (web search for local models)";
+                icon = "searxng";
+              };
+            }
           ];
         }
         {

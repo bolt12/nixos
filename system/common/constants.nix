@@ -146,6 +146,7 @@ in
     # Additional services
     redlib = 8108;
     agere-feed = 8109;
+    searxng = 8110; # Metasearch: web search backend for the olaude wrappers
     frigate = 8114; # NVR (Docker stable-tensorrt): camera detection + clips + API
     pet-report = 8115; # Pet-activity journal over Frigate: web UI via nginx
     pet-report-backend = 8116; # ...and its API, loopback only, behind that nginx
