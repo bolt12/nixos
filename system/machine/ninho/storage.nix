@@ -79,7 +79,7 @@
         hourly = 12; # 12 hours (reduced from 48)
         daily = 7; # 1 week (reduced from 14)
         weekly = 4; # 1 month (reduced from 8)
-        monthly = 6; # 6 months (reduced from 12)
+        monthly = 2; # 2 months (reduced from 6), storage/backup keeps 12
         yearly = 0; # Disabled (reduced from 2)
         autosnap = true;
         autoprune = true;
