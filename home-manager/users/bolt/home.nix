@@ -17,15 +17,22 @@ let
   #  - model:        used for Opus and Sonnet slots
   #  - haikuModel:   used for Haiku slot (defaults to `model`)
   #  - haikuEnvVar:  if set, lets that env var override haikuModel at run-time
+  #  - disallowedTools: tools the endpoint cannot serve, removed from the session
   mkClaudeWrapper =
     {
       name,
       model,
       haikuModel ? model,
       haikuEnvVar ? null,
+      disallowedTools ? [ ],
     }:
     let
       haikuExpr = if haikuEnvVar == null then haikuModel else "\${${haikuEnvVar}:-${haikuModel}}";
+      # Must be the `=` form. Written as `--disallowedTools X "$@"` the option is
+      # variadic and takes a positional prompt as more tool names.
+      denyArgs = lib.optionalString (disallowedTools != [ ]) (
+        lib.escapeShellArg "--disallowedTools=${lib.concatStringsSep "," disallowedTools}" + " "
+      );
     in
     pkgs.writeShellApplication {
       inherit name;
@@ -47,7 +54,7 @@ let
         # env vars only rebind the opus/sonnet/haiku aliases, so a full model ID
         # persisted via `/model` (e.g. claude-fable-5[1m]) would otherwise win and
         # break against the llama-swap endpoint that doesn't serve it.
-        exec claude --model "${model}" "$@"
+        exec claude --model "${model}" ${denyArgs}"$@"
       '';
     };
 
@@ -56,15 +63,23 @@ let
     model = "GLM-5";
     haikuModel = "GLM-4.5-Air";
   };
+  # WebSearch is answered by Anthropic's server-side search tool. A local server
+  # only hands the nested "perform a web search" prompt to the model: the 27B
+  # then generates until CLAUDE_CODE_MAX_OUTPUT_TOKENS (minutes per call, then
+  # an output-token error) and Flash-Next on Strata returns no results.
+  localDisallowedTools = [ "WebSearch" ];
+
   olaude-qwen3-8-27B = mkClaudeWrapper {
     name = "olaude-qwen3-8-27B";
     model = "qwen3.8-27B-full";
     haikuEnvVar = "OLAUDE_HAIKU";
+    disallowedTools = localDisallowedTools;
   };
   olaude-qwen3-8-flash-next = mkClaudeWrapper {
     name = "olaude-qwen3-8-flash-next";
     model = "qwen3.8-flash-next-strata";
     haikuEnvVar = "OLAUDE_HAIKU";
+    disallowedTools = localDisallowedTools;
   };
 
   # Pi coding agent wrapper for Ninho local models
