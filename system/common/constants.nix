@@ -117,6 +117,7 @@ in
   #   8888        Atuin (upstream default)
   #   9090        Prometheus (upstream default)
   #  11987        CoolerControl
+  #  19072        Supernote private cloud (upstream default, with 19443 and 18072)
   #  27701        Anki sync server
   ports = {
     nextcloud = 8081;
@@ -147,6 +148,8 @@ in
     redlib = 8108;
     agere-feed = 8109;
     searxng = 8110; # Metasearch: web search backend for the olaude wrappers
+    owntracks = 8111; # OwnTracks: phone location intake + map, behind basic auth
+    owntracks-recorder = 8117; # ...and the recorder itself, loopback only, behind that nginx
     frigate = 8114; # NVR (Docker stable-tensorrt): camera detection + clips + API
     pet-report = 8115; # Pet-activity journal over Frigate: web UI via nginx
     pet-report-backend = 8116; # ...and its API, loopback only, behind that nginx
@@ -156,6 +159,9 @@ in
     wanderer = 8121; # Wanderer trail catalogue: web UI
     wanderer-db = 8122; # ...and its PocketBase admin, bound to 127.0.0.1 only
     comfy-ui = 8188;
+    supernote = 19072; # Supernote private cloud: web UI and device sync over HTTP
+    supernote-https = 19443; # ...the same behind the image's self-signed certificate
+    supernote-sync = 18072; # ...and auto-sync, which upstream does not let you remap
 
     # Monitoring
     prometheus = 9090;

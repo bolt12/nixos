@@ -100,6 +100,15 @@ let
     disallowedTools = localDisallowedTools;
     mcpServers = localMcpServers;
   };
+  # The 27B with its vision projector loaded, for sessions that read images.
+  # Its own llama-swap entry, so the plain wrapper keeps the longer context.
+  olaude-qwen3-8-27B-vision = mkClaudeWrapper {
+    name = "olaude-qwen3-8-27B-vision";
+    model = "qwen3.8-27B-full-vision";
+    haikuEnvVar = "OLAUDE_HAIKU";
+    disallowedTools = localDisallowedTools;
+    mcpServers = localMcpServers;
+  };
   olaude-qwen3-8-flash-next = mkClaudeWrapper {
     name = "olaude-qwen3-8-flash-next";
     model = "qwen3.8-flash-next-strata";
@@ -184,6 +193,7 @@ in
     packages = [
       glaude
       olaude-qwen3-8-27B
+      olaude-qwen3-8-27B-vision
       olaude-qwen3-8-flash-next
       pi-local
       pi-glm

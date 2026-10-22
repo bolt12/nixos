@@ -30,7 +30,9 @@ in
 
   home.packages = with pkgs; [
     # Web browsers and communication
-    chromium # Primary web browser
+    # Widevine is off by default in nixpkgs, and DRM-protected video needs it.
+    # The override only copies the cached browser and adds the CDM, no rebuild.
+    (chromium.override { enableWideVine = true; }) # Primary web browser
     google-chrome # Secondary browser for compatibility
     discord # Gaming/community communication
     slack # Work communication

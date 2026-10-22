@@ -32,5 +32,6 @@
     ./trek.nix # Self-hosted collaborative travel planner
     ./wanderer.nix # Self-hosted trail catalogue (GPX tracks, lists)
     ./searxng.nix # Metasearch: web search for the local-model Claude wrappers
+    ./owntracks.nix # Location history from the phone (recorder + map)
   ];
 }

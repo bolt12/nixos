@@ -53,6 +53,44 @@
     '';
   };
 
+  # Qwen3.8 27B with its vision projector, for agent sessions that read images
+  # (olaude-qwen3-8-27B-vision). The -full command with the mmproj left in: the
+  # projector is 0.87 GiB that -fit would otherwise give to the context.
+  # --image-min-tokens 1024: Qwen-VL needs this for reliable grounding.
+  "qwen3.8-27B-full-vision" = {
+    cmd = ''
+      ${gpu-tenant-wrapper-frigate} ${llama-cpp-cuda}/bin/llama-server \
+        -hf unsloth/Qwen3.8-27B-GGUF:UD-Q4_K_M \
+        --metrics \
+        --host 0.0.0.0 \
+        --port ''${PORT} \
+        --temp 1.0 \
+        --top-p 0.95 \
+        --top-k 20 \
+        --min-p 0.0 \
+        --presence-penalty 0.0 \
+        --repeat-penalty 1.0 \
+        -n 32768 \
+        -fit on \
+        --fit-target 2048 \
+        --image-min-tokens 1024 \
+        --flash-attn on \
+        --cache-type-k q8_0 \
+        --cache-type-v q8_0 \
+        --cache-ram 32768 \
+        --load-mode none \
+        --parallel 1 \
+        -t 16 \
+        --spec-type draft-mtp \
+        --spec-draft-n-max 4 \
+        --spec-default \
+        --chat-template-file ${qwenChatTemplate} \
+        --reasoning-format deepseek \
+        --chat-template-kwargs '{"preserve_thinking": true, "reasoning_effort": "xhigh"}' \
+        --jinja
+    '';
+  };
+
   # Qwen3.8 27B vision. Same model as -full but keeps Frigate alive (pet-report
   # reads its HTTP API) and pins a short context for captioning.
   # --image-min-tokens 1024: Qwen-VL needs this for reliable grounding.

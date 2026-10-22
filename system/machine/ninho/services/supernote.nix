@@ -1,4 +1,14 @@
 # Supernote private cloud (constants.storage.data/supernote).
+# Ratta publishes it only as Docker images. Deployment manual:
+# https://ib.supernote.com/private-cloud/Supernote-Private-Cloud-Manual-Deployment-Method-Using-Docker-Containers.pdf
+#
+# To bump, take the new supernote-service and notelib tags from
+# https://hub.docker.com/u/supernote and refresh the hash of `initSql`. MariaDB
+# loads that script only into an empty db_data, so an existing database is
+# upgraded by hand, the way the manual describes:
+#   docker exec supernote-mariadb sh -c \
+#     'mysql -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" "$MYSQL_DATABASE" < /docker-entrypoint-initdb.d/supernotedb.sql'
+# Read the new script first: it truncates f_recycle_file and f_file_convert.
 {
   config,
   pkgs,
@@ -8,27 +18,25 @@
 }:
 
 let
-  inherit (constants) storage;
+  inherit (constants) storage ports;
   # Data directory for Supernote
   dataDir = "${storage.data}/supernote";
 
-  # Generate random passwords (change these in production!)
-  mysqlRootPassword = "changeme_mysql_root";
-  mysqlPassword = "changeme_mysql_user";
-  redisPassword = "changeme_redis";
+  # Schema for a fresh database. The URL carries no version, so the hash is
+  # what pins it; `nix store prefetch-file <url>` prints the current one.
+  initSql = pkgs.fetchurl {
+    url = "https://supernote-private-cloud.supernote.com/cloud/supernotedb.sql";
+    hash = "sha256-kY6lmwUtHK7TiPQ/v2aXy21O2epoyfUaizM6bn/mbkw=";
+  };
 
-  # Environment file for docker-compose
+  # Settings for docker-compose. The three passwords are not here: preStart
+  # generates them into secrets.env and joins the two files into .env.
   envFile = pkgs.writeText "supernote.env" ''
     DB_HOSTNAME=supernote-mariadb
-    MYSQL_ROOT_PASSWORD=${mysqlRootPassword}
     MYSQL_DATABASE=supernotedb
     MYSQL_USER=supernote
-    MYSQL_PASSWORD=${mysqlPassword}
     REDIS_HOST=supernote-redis
-    REDIS_PASSWORD=${redisPassword}
     REDIS_PORT=6379
-    HTTP_PORT=19072
-    HTTPS_PORT=19443
   '';
 
   # Docker compose file for Supernote private cloud
@@ -41,7 +49,7 @@ let
 
     services:
       supernote-mariadb:
-        image: supernote/mariadb:10.6.19
+        image: mariadb:10.6.24
         container_name: supernote-mariadb
         restart: unless-stopped
         environment:
@@ -51,14 +59,19 @@ let
           MYSQL_PASSWORD: ''${MYSQL_PASSWORD}
         volumes:
           - ${dataDir}/db_data:/var/lib/mysql
-          - ${dataDir}/supernotedb.sql:/docker-entrypoint-initdb.d/supernotedb.sql:ro
+          - ${initSql}:/docker-entrypoint-initdb.d/supernotedb.sql:ro
         networks:
           - supernote-net
         healthcheck:
-          test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p''${MYSQL_ROOT_PASSWORD}"]
+          # Has to fail while the entrypoint initialises an empty db_data. That
+          # phase runs a temporary server on the socket only, and
+          # supernote-service does not recover from finding port 3306 closed
+          # when it starts. A socket `mysqladmin ping` passes during it.
+          test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
           interval: 10s
           timeout: 5s
           retries: 5
+          start_period: 60s
         logging:
           driver: "json-file"
           options:
@@ -66,7 +79,7 @@ let
             max-file: "3"
 
       supernote-redis:
-        image: supernote/redis:7.0.12
+        image: redis:7.4.7
         container_name: supernote-redis
         restart: unless-stopped
         command: redis-server --requirepass ''${REDIS_PASSWORD} --appendonly yes
@@ -98,7 +111,7 @@ let
             max-file: "3"
 
       supernote-service:
-        image: supernote/supernote-service:25.12.17
+        image: supernote/supernote-service:26.10.09
         container_name: supernote-service
         restart: unless-stopped
         depends_on:
@@ -115,15 +128,20 @@ let
           REDIS_PASSWORD: ''${REDIS_PASSWORD}
           REDIS_PORT: ''${REDIS_PORT}
         ports:
-          - "''${HTTP_PORT:-19072}:8080"
-          - "18072:18072"
-          - "''${HTTPS_PORT:-19443}:443"
+          - "${toString ports.supernote}:8080"
+          - "${toString ports.supernote-sync}:18072"
+          - "${toString ports.supernote-https}:443"
         volumes:
           - ${dataDir}/supernote_data:/home/supernote/data
           - ${dataDir}/logs:/home/supernote/logs
+          # The entrypoint redirects the web UI's output into this directory,
+          # and the UI does not start when it is missing.
+          - ${dataDir}/cloud_logs:/home/supernote/cloud/logs
           - ${dataDir}/recycle:/home/supernote/recycle
-          - ${dataDir}/file_conversion:/home/supernote/file_conversion
-          - ${dataDir}/certs:/home/supernote/certs
+          - ${dataDir}/convert:/home/supernote/convert
+          - /etc/localtime:/etc/localtime:ro
+          # Nothing at /etc/nginx/cert: an empty mount there hides the
+          # certificate the image ships and nginx does not start.
         networks:
           - supernote-net
         logging:
@@ -142,9 +160,9 @@ in
     "d ${dataDir}/redis_data 0755 root root - -"
     "d ${dataDir}/supernote_data 0755 root root - -"
     "d ${dataDir}/logs 0755 root root - -"
+    "d ${dataDir}/cloud_logs 0755 root root - -"
     "d ${dataDir}/recycle 0755 root root - -"
-    "d ${dataDir}/file_conversion 0755 root root - -"
-    "d ${dataDir}/certs 0755 root root - -"
+    "d ${dataDir}/convert 0755 root root - -"
   ];
 
   # Systemd service to manage docker-compose
@@ -159,19 +177,22 @@ in
 
     preStart = ''
       set -e
-      # Download the DB-init SQL if absent. Fail (do not start compose) on a
-      # failed download: a missing bind source makes docker substitute an empty
-      # directory and break the MariaDB init, which then self-perpetuates.
-      # -f so an HTTP error is a curl failure rather than a saved error page.
-      if [ ! -f ${dataDir}/supernotedb.sql ]; then
-        echo "Downloading supernotedb.sql..."
-        ${pkgs.curl}/bin/curl -fL -o ${dataDir}/supernotedb.sql \
-          https://supernote-private-cloud.supernote.com/docker-deploy/supernotedb.sql
+      umask 077
+
+      # The passwords are generated once and stay out of the Nix store.
+      # MariaDB writes them into db_data on its first start, so secrets.env
+      # and db_data are reset together or not at all.
+      if [ ! -f ${dataDir}/secrets.env ]; then
+        for var in MYSQL_ROOT_PASSWORD MYSQL_PASSWORD REDIS_PASSWORD; do
+          value=$(${pkgs.openssl}/bin/openssl rand -hex 24)
+          printf '%s=%s\n' "$var" "$value"
+        done > ${dataDir}/secrets.env.tmp
+        mv ${dataDir}/secrets.env.tmp ${dataDir}/secrets.env
       fi
 
       # Copy compose files to data directory
       cp ${composeFile} ${dataDir}/docker-compose.yml
-      cp ${envFile} ${dataDir}/.env
+      cat ${envFile} ${dataDir}/secrets.env > ${dataDir}/.env
       chmod 600 ${dataDir}/.env
     '';
 
@@ -190,9 +211,9 @@ in
 
   # Open firewall ports
   networking.firewall.allowedTCPPorts = [
-    19072 # HTTP access
-    19443 # HTTPS access
-    18072 # WebSocket sync (optional)
+    ports.supernote
+    ports.supernote-https
+    ports.supernote-sync
   ];
 
   # Add docker-compose to system packages

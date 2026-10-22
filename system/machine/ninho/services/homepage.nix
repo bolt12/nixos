@@ -424,8 +424,15 @@ in
               };
             }
             {
+              OwnTracks = {
+                href = "http://${ninhoIp}:${toString ports.owntracks}";
+                description = "Location History";
+                icon = "owntracks";
+              };
+            }
+            {
               Supernote = {
-                href = "http://${ninhoIp}:19072";
+                href = "http://${ninhoIp}:${toString ports.supernote}";
                 description = "Supernote Private Cloud";
                 icon = "mdi-notebook";
               };

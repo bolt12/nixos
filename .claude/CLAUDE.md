@@ -126,3 +126,13 @@ Everything is under `system/machine/ninho/services/monitoring/`: `prometheus.nix
 **Key details for future edits:**
 - SD3.5 GGUF quantizations (e.g. from second-state) strip the VAE (`first_stage_model` tensors), so a separate `--vae` safetensors file is required when using `--diffusion-model` with split GGUF components in stable-diffusion.cpp
 - Wyoming faster-whisper uses CTranslate2 format; whisper.cpp (whisper-server) uses GGML format, and model files are not interchangeable between the two
+
+### Supernote private cloud
+
+`services/supernote.nix` runs Ratta's four images under docker-compose.
+
+**Key details for future edits:**
+- The entrypoint starts the web UI with its output redirected into `/home/supernote/cloud/logs`. Without a mount there the redirect fails, the UI never starts, and nginx answers 502 while every container still shows `Up`.
+- Do not mount a directory at `/etc/nginx/cert` unless it holds `server.crt` and `server.key`. An empty mount hides the image's own certificate and nginx does not start.
+- `secrets.env` and `db_data` belong together. MariaDB stores the passwords in `db_data` on its first start, so regenerating one without resetting the other locks the service out.
+- The schema is `initSql`, a pinned download of an unversioned URL, loaded only into an empty `db_data`. On an image bump, refresh the hash with `nix store prefetch-file` and read the new script before running it against a live database: it truncates `f_recycle_file` and `f_file_convert`.
