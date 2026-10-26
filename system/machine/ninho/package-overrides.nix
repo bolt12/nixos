@@ -18,9 +18,11 @@ in
   nixpkgs.overlays = [
     (final: prev: {
       # llama-cpp-cuda - CUDA build for Blackwell (sm_120), pinned to a llama.cpp release.
-      # b11408: /v1/systemone decision-model API (#29818), Qwen4Exp MTP (#29761)
-      # and qwen4exp fixes, shared experts fused into MMVQ (#29184), probabilistic
-      # draft acceptance for MTP (#27694), faster model loading (#29598).
+      # b11890: FFN gate/up matmuls and GLU fused in MMQ (#29948), chunked CUDA
+      # graphs (#30804), faster low-bit MMVQ (#30517), grouped-experts top-k
+      # fusion (#29181), Qwen3.8 Flash Next MTP takes image embeddings (#30397).
+      # llama-server's default port moved to 9931 (#30159); every entry in
+      # llama-cpp/models.nix passes --port, so nothing here depends on it.
       llama-cpp-cuda =
         (unstable.llama-cpp.override {
           cudaSupport = true;
@@ -31,13 +33,13 @@ in
         }).overrideAttrs
           (
             finalAttrs: oldAttrs: {
-              version = "11408";
+              version = "11890";
 
               src = pkgs.fetchFromGitHub {
                 owner = "ggml-org";
                 repo = "llama.cpp";
-                rev = "9f12cd4a4c52ea351b85cf78939db8991e1bc025";
-                hash = "sha256-rHvOS0ltFcv1KDhN5cLBrezDZJXDS0VyLTXo8CRnyz0=";
+                rev = "a074215352c382e66a108597bcf7f4f31e00d111";
+                hash = "sha256-ysVn16q9PMOfHKQLtnp+QfErvIDMl4NADdzxKn/OiWs=";
                 leaveDotGit = true;
                 postFetch = ''
                   git -C "$out" rev-parse --short HEAD > $out/COMMIT
@@ -72,7 +74,7 @@ in
                   (oldAttrs.postPatch or "");
 
               npmRoot = "tools/ui";
-              npmDepsHash = "sha256-a17M+L3nLdRnN6WMB6imPFmwqG2g8uv+gwN0XTAUrf8=";
+              npmDepsHash = "sha256-XLtEZsSFdk+2SyfXzBp8HQ2e27PQPpDCn1YjePU1/9w=";
 
               postInstall = oldAttrs.postInstall or "";
             }
@@ -82,21 +84,22 @@ in
       # entry. strata.nix explains why its CUDA has to be 13.0 and not unstable's default.
       strata = final.callPackage ./strata.nix { cudaPackages = unstable.cudaPackages_13_0; };
 
-      # llama-swap v260 - Searchable model picker, capability discovery,
-      # CORS controls, profile load/unload UI, log stream splitting.
+      # llama-swap v267 - capacity-based router (opt-in), Help agent code search,
+      # model load progress from health checks, configurable maxRequestBodyMB.
       # v258 BREAKING: empty tailcat.allow now denies all (fixed in llama-cpp.nix).
-      # v256+ requires Go 1.27 (buildGo127Module override below).
+      # v256+ requires Go 1.27 and v266+ Go 1.27.3 (the `go` override below).
       # Provenance of the overrides below: v195 renamed ui/ -> ui-svelte/ and v251
       # renamed it back to ui/ (we rebuild the UI derivation either way), v221
       # added forking process tests that fail in the sandbox, v239 gated the web
-      # UI behind the embed_ui tag.
+      # UI behind the embed_ui tag, and v267 gated the Help agent's source behind
+      # embed_src.
       llama-swap =
         let
           llama-swap-src = pkgs.fetchFromGitHub {
             owner = "mostlygeek";
             repo = "llama-swap";
-            tag = "v262";
-            hash = "sha256-DAYaR+N7alGbdLsGlaiDlsHiqxOMg65069i/vHOkLKk=";
+            tag = "v267";
+            hash = "sha256-NR9XO/RyzxOzSODNe42VqevmXw/TchrLFJr4iqbbGIM=";
             leaveDotGit = true;
             postFetch = ''
               cd "$out"
@@ -107,7 +110,7 @@ in
           };
           llama-swap-ui = pkgs.buildNpmPackage {
             pname = "llama-swap-ui";
-            version = "262";
+            version = "267";
             src = llama-swap-src;
             sourceRoot = "${llama-swap-src.name}/ui";
             npmDepsHash = "sha256-lmhRJ8275PIQ+7vHdr9aZ31lYeXUkXrWnlvuwOadjRQ=";
@@ -119,19 +122,38 @@ in
               rm -rf $out/lib
             '';
           };
+          # v266 and its tailscale.com dependency require Go >= 1.27.3, and the
+          # pinned unstable ships 1.27.1, which GOTOOLCHAIN=local refuses. Only
+          # llama-swap's builder gets the newer Go. Drop it once unstable has it.
+          go = unstable.go_1_27.overrideAttrs (
+            finalAttrs: _: {
+              version = "1.27.3";
+              src = pkgs.fetchurl {
+                url = "https://go.dev/dl/go${finalAttrs.version}.src.tar.gz";
+                hash = "sha256-bndJA1zzYPBrJXXRYup535/ajvZxiJ5cN1+OUHd/Jrs=";
+              };
+            }
+          );
         in
-        (unstable.llama-swap.override { buildGoModule = unstable.buildGo127Module; }).overrideAttrs
+        (unstable.llama-swap.override {
+          buildGoModule = unstable.buildGo127Module.override { inherit go; };
+        }).overrideAttrs
           (oldAttrs: {
-            version = "262";
+            version = "267";
             src = llama-swap-src;
             proxyVendor = true;
-            vendorHash = "sha256-pihd/GVw3GqZTwBgb8gYo2zyLpE4HqKI0xb//tojMyo=";
+            vendorHash = "sha256-9K9b7XrlP9pvaF5ZD0QDVhqakAcKzF/YlktWPDuVHto=";
             # v239 gates the embedded web UI behind the `embed_ui` Go build tag
             # (internal/server/embed.go). Without it, embed_notag.go compiles an
             # empty UI FS, so every /ui/ path returns 404 while the API stays fine.
             # Upstream's Makefile/goreleaser pass `-tags embed_ui`; buildGoModule
             # reads `tags` at build time, so setting it via overrideAttrs works.
-            tags = (oldAttrs.tags or [ ]) ++ [ "embed_ui" ];
+            # v267's `embed_src` does the same for the Help agent's code__* tools,
+            # which answer "source not embedded" without it. preBuild fills _src.
+            tags = (oldAttrs.tags or [ ]) ++ [
+              "embed_ui"
+              "embed_src"
+            ];
             # Merge (not replace) passthru so buildGoModule's overrideModAttrs survives.
             passthru = (oldAttrs.passthru or { }) // {
               ui = llama-swap-ui;
@@ -150,6 +172,15 @@ in
             preBuild = ''
               ldflags+=" -X main.commit=$(cat COMMIT)"
               ldflags+=" -X main.date=$(cat SOURCE_DATE_EPOCH)"
+              # The Makefile's `src` target, with find standing in for git ls-files
+              # since postFetch deleted .git. The list is taken before _src exists
+              # so find cannot walk into the copy, and buildGoModule's default
+              # exclude pattern (`/_`) keeps it from compiling the copied packages.
+              find . -type f \( -name '*.go' ! -name '*_test.go' \
+                -o -path './ui/*' \( -name '*.ts' -o -name '*.svelte' \) ! -name '*.test.ts' \) \
+                -print0 > "$TMPDIR/src-files"
+              mkdir -p internal/mcptools/sourcecode/_src
+              tar -cf - --null -T "$TMPDIR/src-files" | tar -xf - -C internal/mcptools/sourcecode/_src
               # go:embed ui_dist lives only in internal/server (the proxy/ copy
               # v221 needed was dropped upstream by v239).
               cp -r ${llama-swap-ui}/ui_dist internal/server/

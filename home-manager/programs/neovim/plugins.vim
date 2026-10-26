@@ -524,6 +524,7 @@ package.path = package.path .. ";" .. plugins_dir .. "/?.lua"
 
 require('llm-assistant')
 require('journal-wrap-images')
+require('rasto')
 EOF
 
 lua << EOF

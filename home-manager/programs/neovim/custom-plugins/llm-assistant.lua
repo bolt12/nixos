@@ -790,6 +790,7 @@ function UI.show_mode_menu()
   local items = {
     Menu.item("Code Assistant", { id = "code_assistant" }),
     Menu.item("Journal Summary", { id = "journal_summary" }),
+    Menu.item("Journal: rasto", { id = "rasto" }),
     Menu.item("Image Generation", { id = "image_generation" }),
     Menu.separator("", { char = "─" }),
     Menu.item("Select Model...", { id = "select_model" }),
@@ -798,7 +799,7 @@ function UI.show_mode_menu()
   local menu = Menu({
     relative = "editor",
     position = "50%",
-    size = { width = 42, height = 10 },
+    size = { width = 42, height = 11 },
     border = {
       style = "rounded",
       text = {
@@ -824,6 +825,8 @@ function UI.show_mode_menu()
         require("llm-assistant").journal_summary()
       elseif id == "image_generation" then
         require("llm-assistant").image_generation()
+      elseif id == "rasto" then
+        require("rasto").run()
       elseif id == "select_model" then
         UI.show_model_picker(function(model)
           State.model_override = model

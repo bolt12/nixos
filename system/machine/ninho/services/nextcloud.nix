@@ -43,8 +43,10 @@ in
     maxUploadSize = "16G";
     https = false;
 
-    autoUpdateApps.enable = true;
-    appstoreEnable = true;
+    # Nix owns every non-shipped app. Leaving appstoreEnable unset keeps the
+    # App Store fetcher off: with it on, `occ upgrade` and `app:update` pull
+    # newer store releases of these same apps into store-apps, where they
+    # shadow the Nix copies and crash the updater on a duplicate autoloader.
     extraAppsEnable = true;
     extraApps = with config.services.nextcloud.package.packages.apps; {
       # List of apps we want to install and are already packaged in
@@ -57,12 +59,23 @@ in
         deck
         forms
         groupfolders
+        guests
         notes
         notify_push
+        onlyoffice
         polls
         tasks
         cospend
         ;
+      # Not packaged in nixpkgs; bump by hand from
+      # https://github.com/nextcloud-releases/integration_google/releases
+      integration_google = pkgs.fetchNextcloudApp {
+        appName = "integration_google";
+        appVersion = "4.4.0";
+        url = "https://github.com/nextcloud-releases/integration_google/releases/download/v4.4.0/integration_google-v4.4.0.tar.gz";
+        hash = "sha256-TUz/scI3xuMSBTYvI2g7X8h3FAXv3IcadCpKPr29UHc=";
+        license = "agpl3Plus";
+      };
     };
 
     config = {

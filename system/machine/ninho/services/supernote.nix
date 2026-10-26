@@ -113,7 +113,12 @@ let
       supernote-service:
         image: supernote/supernote-service:26.10.09
         container_name: supernote-service
-        restart: unless-stopped
+        # Not unless-stopped. After an unclean shutdown dockerd would start this
+        # alongside MariaDB, skipping depends_on, and the backend gives up for
+        # good on a closed port 3306 while the container stays Up. on-failure
+        # is not applied when the daemon starts, so supernote-cloud's
+        # `up -d` starts it once MariaDB is healthy.
+        restart: on-failure
         depends_on:
           supernote-mariadb:
             condition: service_healthy
@@ -153,11 +158,14 @@ let
 
 in
 {
-  # Create required directories
+  # Create required directories. tmpfiles also resets the owner of an existing
+  # directory on every switch. MariaDB and Redis run as uid 999 and stop
+  # writing when their data directory goes back to root (Redis then refuses
+  # every write with MISCONF, and login fails).
   systemd.tmpfiles.rules = [
     "d ${dataDir} 0755 root root - -"
-    "d ${dataDir}/db_data 0755 root root - -"
-    "d ${dataDir}/redis_data 0755 root root - -"
+    "d ${dataDir}/db_data 0755 999 999 - -"
+    "d ${dataDir}/redis_data 0755 999 999 - -"
     "d ${dataDir}/supernote_data 0755 root root - -"
     "d ${dataDir}/logs 0755 root root - -"
     "d ${dataDir}/cloud_logs 0755 root root - -"
@@ -174,6 +182,9 @@ in
     ];
     wants = [ "network-online.target" ];
     wantedBy = [ "multi-user.target" ];
+    # A dockerd restart leaves supernote-service stopped (restart: on-failure),
+    # so restart along with it and let compose bring it back.
+    partOf = [ "docker.service" ];
 
     preStart = ''
       set -e
