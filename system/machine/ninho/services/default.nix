@@ -33,5 +33,7 @@
     ./wanderer.nix # Self-hosted trail catalogue (GPX tracks, lists)
     ./searxng.nix # Metasearch: web search for the local-model Claude wrappers
     ./owntracks.nix # Location history from the phone (recorder + map)
+    ./tls.nix # Wildcard Let's Encrypt cert for the tailnet HTTPS names
+    ./rabisco.nix # HTTPS front for the Supernote plugin's server
   ];
 }

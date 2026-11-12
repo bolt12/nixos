@@ -51,6 +51,9 @@ in
     ninho = {
       vpnIp = ninhoVpnIp;
       hostname = "ninho.local";
+      # DuckDNS name pointed at vpnIp. Every name under it resolves there too,
+      # and services/tls.nix holds the wildcard certificate that covers them.
+      domain = "ninho-bolt.duckdns.org";
       # Wired NIC (RTL8126A) + its MAC. Used to arm Wake-on-LAN on ninho and to
       # target the magic packet from the RPi so it can power ninho back on after
       # a mains outage.
@@ -162,6 +165,7 @@ in
     supernote = 19072; # Supernote private cloud: web UI and device sync over HTTP
     supernote-https = 19443; # ...the same behind the image's self-signed certificate
     supernote-sync = 18072; # ...and auto-sync, which upstream does not let you remap
+    rabisco = 8234; # Supernote plugin's server; the tablet reaches it via nginx on 443
 
     # Monitoring
     prometheus = 9090;
