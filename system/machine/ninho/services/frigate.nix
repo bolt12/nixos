@@ -208,6 +208,11 @@ in
         # Frigate requires a tmpfs recording cache; on the overlay fs the record
         # muxer stalls, which (sharing one ffmpeg) also starves the detect pipe.
         "--tmpfs=/tmp/cache:size=1000000000"
+        # The module stops the unit with a bare `docker stop`, which waits this
+        # long before SIGKILL; Docker's default is 10 s. Frigate sometimes needs
+        # 11, and a kill exits 137, which SuccessExitStatus below does not cover,
+        # so a planned stop by gpu-tenant-control left the unit failed.
+        "--stop-timeout=30"
       ];
     };
   };
