@@ -73,14 +73,14 @@
         autoprune = true;
       };
 
-      # User data (home) - Reduced retention to prevent disk space issues
+      # User data (home) - tight retention; longterm archive on storage/ keeps the history
       production = {
-        frequently = 0; # Disabled (reduced from 4)
-        hourly = 12; # 12 hours (reduced from 48)
-        daily = 7; # 1 week (reduced from 14)
-        weekly = 4; # 1 month (reduced from 8)
-        monthly = 2; # 2 months (reduced from 6), storage/backup keeps 12
-        yearly = 0; # Disabled (reduced from 2)
+        frequently = 0;
+        hourly = 12;
+        daily = 7;
+        weekly = 2; # 2 weeks; storage/backup keeps 12
+        monthly = 1; # 1 month; storage/backup keeps 12
+        yearly = 0;
         autosnap = true;
         autoprune = true;
       };
