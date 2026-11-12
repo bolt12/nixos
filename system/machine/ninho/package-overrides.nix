@@ -18,10 +18,12 @@ in
   nixpkgs.overlays = [
     (final: prev: {
       # llama-cpp-cuda - CUDA build for Blackwell (sm_120), pinned to a llama.cpp release.
-      # b11960 (v0.8.0): MoE SLRU expert cache (#30637), DeepSeek V4.1 Flash
-      # (#31086), LFM3 family (#31252), /v1/realtime endpoint (#31269), Qwen3
-      # bidirectional attention + dense_2 (#30607), DFlash2 probabilistic drafts
-      # (#30663), GGML v0.28.0.
+      # b12110 (v0.9.0): MTP hidden state kept in context checkpoints (#30141),
+      # spec checkpoint restored for drafts longer than n_rs_seq (#31350), CUDA
+      # MoE gate/up + GLU fused in MMQ (#31188), qwen4exp conv-state write without
+      # a copy (#31443), flash_attn_ext_rows for multi-seq unified KV (#29510),
+      # FP8 E4M3 type (#27512), GGML v0.29.0. #31620 makes -hf tags match only at
+      # a name boundary; the UD-Q4_K_M and UD-IQ4_XS tags in models.nix still do.
       llama-cpp-cuda =
         (unstable.llama-cpp.override {
           cudaSupport = true;
@@ -32,13 +34,13 @@ in
         }).overrideAttrs
           (
             finalAttrs: oldAttrs: {
-              version = "11960";
+              version = "12110";
 
               src = pkgs.fetchFromGitHub {
                 owner = "ggml-org";
                 repo = "llama.cpp";
-                rev = "8642541b255bfb5dc39cd351a178be09013a55d6";
-                hash = "sha256-QSN6nHQX5VpLAKL+I2zELmXpur77e6JGGD3va88sbAE=";
+                rev = "cd959bae99ff4bed22bef2604f45241c09bbb8c8";
+                hash = "sha256-2FHjR0XXT+THe/RBXC8CXsWQ0PRa7oDzucYwhSy3/UM=";
                 leaveDotGit = true;
                 postFetch = ''
                   git -C "$out" rev-parse --short HEAD > $out/COMMIT
