@@ -4,6 +4,7 @@
 {
   boot = {
     # Pinned to 6.18 (6.19 breaks NVIDIA 580.x: vm_area_struct.__vm_flags removed)
+    # Moving to 7.0+? Delete rtw89-backport.nix and its import in configuration.nix.
     kernelPackages = pkgs.linuxPackages_6_18;
 
     # Supported filesystems

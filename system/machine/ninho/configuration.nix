@@ -19,6 +19,7 @@
   imports = [
     ./hardware-configuration.nix
     ./boot.nix # Kernel, initrd, LUKS auto-unlock, GRUB, watchdog
+    ./rtw89-backport.nix # TEMPORARY: Valve USB Wi-Fi driver from Linux 7.0; delete once on a 7.0+ kernel
     ./networking.nix # NetworkManager, DNS, firewall, Tailscale
     ./storage.nix # ZFS, sanoid, storage directory seeds
     ./users.nix # bolt + pollard user declarations
