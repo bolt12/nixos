@@ -16,6 +16,7 @@ let
 
   # Tailcat: WireGuard-based peer sharing built into llama-swap v253+.
   # v260: searchable model picker, capability discovery, profile load/unload UI.
+  # v269: persistent captures (SQLite), model categories in UI, embeddings cap.
   # The key file is generated on first run; the connection token is printed
   # to the journal (journalctl -u llama-swap | grep tailcat).
   tailcatKeyFile = "/var/lib/llama-cpp/tailcat.key";

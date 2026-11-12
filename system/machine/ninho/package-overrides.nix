@@ -83,8 +83,8 @@ in
       # entry. strata.nix explains why its CUDA has to be 13.0 and not unstable's default.
       strata = final.callPackage ./strata.nix { cudaPackages = unstable.cudaPackages_13_0; };
 
-      # llama-swap v267 - capacity-based router (opt-in), Help agent code search,
-      # model load progress from health checks, configurable maxRequestBodyMB.
+      # llama-swap v269 - persistent captures (SQLite), pluggable usage extractors,
+      # capability-derived model categories in UI, embeddings capability flag.
       # v258 BREAKING: empty tailcat.allow now denies all (fixed in llama-cpp.nix).
       # v256+ requires Go 1.27 and v266+ Go 1.27.3 (the `go` override below).
       # Provenance of the overrides below: v195 renamed ui/ -> ui-svelte/ and v251
@@ -97,8 +97,8 @@ in
           llama-swap-src = pkgs.fetchFromGitHub {
             owner = "mostlygeek";
             repo = "llama-swap";
-            tag = "v267";
-            hash = "sha256-NR9XO/RyzxOzSODNe42VqevmXw/TchrLFJr4iqbbGIM=";
+            tag = "v269";
+            hash = "sha256-Hcq28lSvoELCJdnj9m+hXUQBDj75LdzFIinuzRH+jd0=";
             leaveDotGit = true;
             postFetch = ''
               cd "$out"
@@ -109,10 +109,10 @@ in
           };
           llama-swap-ui = pkgs.buildNpmPackage {
             pname = "llama-swap-ui";
-            version = "267";
+            version = "269";
             src = llama-swap-src;
             sourceRoot = "${llama-swap-src.name}/ui";
-            npmDepsHash = "sha256-lmhRJ8275PIQ+7vHdr9aZ31lYeXUkXrWnlvuwOadjRQ=";
+            npmDepsHash = "sha256-vUYkqIfHE7nbpbDVMk8tCOQOP5c9rdr8dGBBBBKj0rc=";
             postPatch = ''
               substituteInPlace vite.config.ts \
                 --replace-fail "../internal/server/ui_dist" "${placeholder "out"}/ui_dist"
@@ -138,10 +138,10 @@ in
           buildGoModule = unstable.buildGo127Module.override { inherit go; };
         }).overrideAttrs
           (oldAttrs: {
-            version = "267";
+            version = "269";
             src = llama-swap-src;
             proxyVendor = true;
-            vendorHash = "sha256-9K9b7XrlP9pvaF5ZD0QDVhqakAcKzF/YlktWPDuVHto=";
+            vendorHash = "sha256-jXfblTvNNgs1u6Yc0J/F5ONmxzjH1BBsIRp6LrsDXv0=";
             # v239 gates the embedded web UI behind the `embed_ui` Go build tag
             # (internal/server/embed.go). Without it, embed_notag.go compiles an
             # empty UI FS, so every /ui/ path returns 404 while the API stays fine.
