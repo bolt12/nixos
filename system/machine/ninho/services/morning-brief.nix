@@ -38,10 +38,13 @@ let
             failed_services=$(systemctl --failed --no-legend --plain 2>/dev/null | head -20 || true)
             [ -z "$failed_services" ] && failed_services="(none)"
 
-            # Recent warnings, excluding pure scrape noise from prometheus/exportarr
+            # Recent warnings, excluding pure scrape noise from prometheus/exportarr.
+            # Capped at 20 lines: the LLM needs the signal not every line, and
+            # -fit can size the model's context as low as 4096 tokens when VRAM
+            # is tight, so a 50-line dump blows past it.
             journal_warnings=$(journalctl --since "24 hours ago" -p warning --no-pager -o cat 2>/dev/null \
               | grep -vE "(prometheus|exportarr)" \
-              | head -50 || true)
+              | head -20 || true)
             [ -z "$journal_warnings" ] && journal_warnings="(none)"
 
             noisy_units=$(journalctl --since "24 hours ago" -o json --no-pager 2>/dev/null \
@@ -138,25 +141,38 @@ let
             trap 'rm -f "$prompt_file" "$payload_file" "$response_file"' EXIT
             printf '%s' "$prompt" > "$prompt_file"
 
-            jq -nc --arg m "$MODEL" --rawfile p "$prompt_file" \
-              '{model: $m, messages: [{role: "user", content: $p}], max_tokens: 6000, temperature: 0.6}' \
-              > "$payload_file"
-
-            # Qwen3.8 reasoning lands in .reasoning_content; the user-facing answer
-            # is in .content. With preserve_thinking=true it's easy to truncate before
-            # any .content tokens are emitted, so we budget generously and fall back
-            # to a clear error if .content is empty (jq // does not catch "").
-            if curl -fsS -X POST "$LLAMA_SWAP_URL/v1/chat/completions" \
-                 -H "Content-Type: application/json" \
-                 --max-time 1500 \
-                 --data-binary "@$payload_file" \
-                 -o "$response_file"; then
-              response=$(jq -r '.choices[0].message.content
-                                | if (. // "") == "" then "Morning brief: LLM returned empty content (likely truncated by max_tokens)." else . end' \
-                         "$response_file" 2>/dev/null \
-                         || echo "Morning brief: LLM response parse error.")
+            # Query the model's available context so we can bail early when a
+            # game or other GPU tenant has squeezed -fit to a tiny window.
+            n_ctx=$(curl -fsS "$LLAMA_SWAP_URL/v1/models" --max-time 60 2>/dev/null \
+              | jq -r ".data[] | select(.id == \"$MODEL\") | .context_length // 0" || echo 0)
+            prompt_bytes=$(wc -c < "$prompt_file")
+            est_tokens=$(( prompt_bytes * 10 / 26 ))
+            max_tokens=1500
+            if [ "$n_ctx" -gt 0 ] && [ "$est_tokens" -gt $(( n_ctx - max_tokens )) ]; then
+              response="Morning brief: skipped, model context is ''${n_ctx} tokens but prompt needs ~''${est_tokens}. Likely a game is holding VRAM."
             else
-              response="Morning brief: LLM call failed; see \`journalctl -u morning-brief\`."
+              jq -nc --arg m "$MODEL" --rawfile p "$prompt_file" --argjson mt "$max_tokens" \
+                '{model: $m, messages: [{role: "user", content: $p}], max_tokens: $mt, temperature: 0.6}' \
+                > "$payload_file"
+
+              # Qwen3.8 reasoning lands in .reasoning_content; the user-facing
+              # answer is in .content.
+              http_code=$(curl -sS -X POST "$LLAMA_SWAP_URL/v1/chat/completions" \
+                   -H "Content-Type: application/json" \
+                   --max-time 1500 \
+                   --data-binary "@$payload_file" \
+                   -o "$response_file" \
+                   -w '%{http_code}')
+
+              if [ "$http_code" = "200" ]; then
+                response=$(jq -r '.choices[0].message.content
+                                  | if (. // "") == "" then "Morning brief: LLM returned empty content (likely truncated by max_tokens)." else . end' \
+                           "$response_file" 2>/dev/null \
+                           || echo "Morning brief: LLM response parse error.")
+              else
+                err_detail=$(jq -r '.error.message // empty' "$response_file" 2>/dev/null || true)
+                response="Morning brief: LLM returned HTTP $http_code. ''${err_detail:-(no detail; see journalctl -u morning-brief)}"
+              fi
             fi
 
             # ---- ntfy priority by self-tagged severity ---------------------------
