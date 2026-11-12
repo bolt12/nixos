@@ -255,6 +255,9 @@ in
       av1_mode = 2; # 0=off, 1=allow, 2=prefer
       hevc_mode = 2; # 0=off, 1=allow, 2=prefer
 
+      # LAN and Tailscale origins for the web UI (PIN pairing, settings)
+      csrf_allowed_origins = "https://192.168.1.131:47990,https://100.64.0.3:47990";
+
       # Match the host display to the Moonlight client's resolution. Without
       # this, Sunshine captures the pinned 4K desktop and downscales it, so a
       # 1080p laptop (x1-g8) never gets a native-resolution stream. This runs
