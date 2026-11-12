@@ -348,8 +348,8 @@ in
           (warning "rpool-space-low" "Root Pool Space Low" {
             expr = ''node_filesystem_avail_bytes{mountpoint="/"} / 2^30'';
             op = "lt";
-            threshold = 75;
-            for = "30m";
+            threshold = 120;
+            for = "10m";
             summary = "${value "%.0f"} GiB left on rpool";
           })
           (warning "snapshot-stale" "Snapshots Stale" {
