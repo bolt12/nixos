@@ -155,6 +155,13 @@
       useTang = true;
     };
 
+    # Import rpool only once every LUKS device is open, by Clevis or by
+    # passphrase. nixpkgs orders the import after the network for
+    # boot.initrd.clevis.useTang but not for clevisLuksAskpass, so the import
+    # gave up after its 60 s device poll while Clevis was still waiting for the
+    # network, and a boot with Tang a minute late dropped to an emergency shell.
+    initrd.systemd.services.zfs-import-rpool.after = [ "cryptsetup.target" ];
+
     # GRUB bootloader with mirrored boot support
     loader = {
       efi = {
