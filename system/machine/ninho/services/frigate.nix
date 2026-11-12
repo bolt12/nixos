@@ -231,6 +231,16 @@ in
   # services/llama-cpp.nix stops Frigate to free VRAM and is one such caller.
   systemd.services.docker-frigate.serviceConfig.SuccessExitStatus = [ 143 ];
 
+  # The module orders this unit after docker without requiring it. That holds at
+  # boot, where multi-user.target pulls docker in anyway, but not when
+  # gpu-tenant-control starts Frigate by itself. A switch that bumps docker also
+  # restarts llama-swap, which ends the resident model, so the helper restores
+  # Frigate while docker is stopped. With nothing pulling docker back, the unit
+  # fails against the dead daemon, burns its start limit in under two seconds,
+  # and the switch exits 4. Requiring docker makes that start bring docker up
+  # first and wait for it.
+  systemd.services.docker-frigate.requires = [ "docker.service" ];
+
   # LAN-only; tailscale0 is already a trusted interface.
   networking.firewall.allowedTCPPorts = [ ports.frigate ];
 }
