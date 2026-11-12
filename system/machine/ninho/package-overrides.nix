@@ -85,8 +85,10 @@ in
       # entry. strata.nix explains why its CUDA has to be 13.0 and not unstable's default.
       strata = final.callPackage ./strata.nix { cudaPackages = unstable.cudaPackages_13_0; };
 
-      # llama-swap v269 - persistent captures (SQLite), pluggable usage extractors,
-      # capability-derived model categories in UI, embeddings capability flag.
+      # llama-swap v272 - /v1/realtime proxying and Realtime playground (v270),
+      # realtime routing by session.update model (v271), upstream 4xx/5xx no
+      # longer relayed as 200 after `Expect: 100-continue` (v272), and
+      # /props?autoload=false answers 409 instead of loading a model (v272).
       # v258 BREAKING: empty tailcat.allow now denies all (fixed in llama-cpp.nix).
       # v256+ requires Go 1.27 and v266+ Go 1.27.3 (the `go` override below).
       # Provenance of the overrides below: v195 renamed ui/ -> ui-svelte/ and v251
@@ -99,8 +101,8 @@ in
           llama-swap-src = pkgs.fetchFromGitHub {
             owner = "mostlygeek";
             repo = "llama-swap";
-            tag = "v269";
-            hash = "sha256-Hcq28lSvoELCJdnj9m+hXUQBDj75LdzFIinuzRH+jd0=";
+            tag = "v272";
+            hash = "sha256-TQXr/WgTHOAME2WScG30tdRzx8njgbz0scQz1QbfZpQ=";
             leaveDotGit = true;
             postFetch = ''
               cd "$out"
@@ -111,7 +113,7 @@ in
           };
           llama-swap-ui = pkgs.buildNpmPackage {
             pname = "llama-swap-ui";
-            version = "269";
+            version = "272";
             src = llama-swap-src;
             sourceRoot = "${llama-swap-src.name}/ui";
             npmDepsHash = "sha256-vUYkqIfHE7nbpbDVMk8tCOQOP5c9rdr8dGBBBBKj0rc=";
@@ -140,7 +142,7 @@ in
           buildGoModule = unstable.buildGo127Module.override { inherit go; };
         }).overrideAttrs
           (oldAttrs: {
-            version = "269";
+            version = "272";
             src = llama-swap-src;
             proxyVendor = true;
             vendorHash = "sha256-jXfblTvNNgs1u6Yc0J/F5ONmxzjH1BBsIRp6LrsDXv0=";
