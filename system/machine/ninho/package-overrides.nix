@@ -302,6 +302,15 @@ in
           ];
         }
       );
+
+      # TEMPORARY: drop once nixos-26.05's xdg-desktop-portal is 1.22.1 or newer.
+      # 1.20.4 reads a caller's pid namespace with fstatat(pidfd, "ns/pid"), which
+      # fails with ENOTDIR on a pidfd, so every Realtime portal request from Steam's
+      # container fails ("Could not get pidns for pid ..."). SteamVR then leaves its
+      # compositor and VR Link threads at normal priority and retries each one once
+      # a second. 1.22.1 asks the kernel with the PIDFD_GET_PID_NAMESPACE ioctl.
+      # The gtk and xapp portal backends build against this, so they rebuild.
+      xdg-desktop-portal = unstable.xdg-desktop-portal;
     })
   ];
 }

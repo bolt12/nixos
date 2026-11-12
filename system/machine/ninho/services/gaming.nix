@@ -290,6 +290,12 @@ in
     wireplumber.enable = true;
   };
 
+  # RealtimeKit. Steam's sandbox blocks the CAP_SYS_NICE that SteamVR asks for at
+  # setup, so SteamVR raises its compositor and VR Link threads through the
+  # xdg-desktop-portal Realtime portal, which forwards to rtkit. PipeWire uses it
+  # for its audio threads too.
+  security.rtkit.enable = true;
+
   # Firewall ports are handled by:
   #   services.sunshine.openFirewall = true
   #   programs.steam.remotePlay.openFirewall = true
