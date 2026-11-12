@@ -11,7 +11,8 @@
 # Retention on the destination is governed by sanoid's `longterm` template
 # in storage.nix, we keep replicated snapshots much longer than rpool's
 # stingy 2-month max.
-_: {
+{ lib, ... }:
+{
   services.syncoid = {
     enable = true;
     interval = "daily";
@@ -41,4 +42,13 @@ _: {
       "rpool/root".target = "storage/backup/root";
     };
   };
+
+  # The module's timers are not persistent, so systemd forgets their last run
+  # at every boot and the exporter reports 0 until midnight. The
+  # syncoid-not-running rule in monitoring/alerts.nix then fires on a healthy
+  # replica. Persistent also runs a midnight that the box slept through as
+  # soon as it boots. One entry per command above, named as upstream does.
+  systemd.timers = lib.genAttrs [ "syncoid-rpool-home" "syncoid-rpool-root" ] (_: {
+    timerConfig.Persistent = true;
+  });
 }
