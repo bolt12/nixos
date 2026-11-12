@@ -114,11 +114,14 @@ let
 
   # One ntfy topic, three urgencies.
   #
-  # Grafana's default webhook payload is a JSON document, which ntfy delivers
-  # as an attachment. `payload.template` replaces it with plain text. Title,
-  # priority and tags go in ntfy's headers, and Grafana sends header values
-  # as written, without templating, so each severity needs its own receiver.
-  receiver = name: uid: severity: priority: tags: extra: {
+  # The payload is ntfy's JSON form, posted to the server root with the topic
+  # inside, so the title and tags can change with each notification. Header
+  # values would not: Grafana sends them as written, without templating.
+  #
+  # Notifications are grouped by alertname, so the title is the rule's name.
+  # A firing alert is listed by its summary and a resolved one by its subject.
+  # The fallback line is for Grafana's DatasourceError, which has no summary.
+  receiver = name: uid: priority: tag: extra: {
     orgId = 1;
     inherit name;
     receivers = [
@@ -126,17 +129,31 @@ let
         inherit uid;
         type = "webhook";
         settings = {
-          url = "http://localhost:${toString ports.ntfy}/grafana-alerts";
+          url = "http://localhost:${toString ports.ntfy}/";
           httpMethod = "POST";
           payload.template = ''
-            {{ range .Alerts }}{{ .Labels.alertname }} [{{ .Status }}]{{ with .Annotations.summary }}: {{ . }}{{ end }}
-            {{ end }}'';
-          headers = {
-            Title = "ninho: ${severity}";
-            Priority = toString priority;
-            Tags = tags;
-            "Content-Type" = "text/plain";
-          };
+            {{- $title := .CommonLabels.alertname -}}
+            {{- $tag := "${tag}" -}}
+            {{- if eq .Status "resolved" -}}
+              {{- $title = printf "Resolved: %s" $title -}}
+              {{- $tag = "white_check_mark" -}}
+            {{- else if gt (len .Alerts.Firing) 1 -}}
+              {{- $title = printf "%s (%d)" $title (len .Alerts.Firing) -}}
+            {{- end -}}
+            {{- $message := "" -}}
+            {{- $sep := "" -}}
+            {{- range .Alerts.Firing -}}
+              {{- $line := or .Annotations.summary (printf "Rule %s could not be evaluated" .Labels.rulename) -}}
+              {{- $message = printf "%s%s%s" $message $sep $line -}}
+              {{- $sep = "\n" -}}
+            {{- end -}}
+            {{- range .Alerts.Resolved -}}
+              {{- $message = printf "%s%s✓ %s" $message $sep (or .Annotations.subject "back to normal") -}}
+              {{- $sep = "\n" -}}
+            {{- end -}}
+            {{- coll.Dict "topic" "grafana-alerts" "title" $title "message" $message "priority" ${toString priority} "tags" (coll.Slice $tag) | data.ToJSON -}}
+          '';
+          headers."Content-Type" = "application/json";
         }
         // extra;
       }
@@ -151,9 +168,9 @@ in
         # `ntfy` keeps the name and uid it had as the only receiver. Critical
         # is "high" and not "max": a resolved alert arrives at the same
         # priority as the alert itself.
-        (receiver "ntfy" "ntfy-webhook" "warning" 3 "warning" { })
-        (receiver "ntfy-critical" "ntfy-critical" "critical" 4 "rotating_light" { })
-        (receiver "ntfy-info" "ntfy-info" "info" 2 "information_source" { disableResolveMessage = true; })
+        (receiver "ntfy" "ntfy-webhook" 3 "warning" { })
+        (receiver "ntfy-critical" "ntfy-critical" 4 "rotating_light" { })
+        (receiver "ntfy-info" "ntfy-info" 2 "information_source" { disableResolveMessage = true; })
       ];
     };
 
