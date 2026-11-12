@@ -3,12 +3,30 @@
 
 {
   inputs,
+  lib,
   pkgs,
   system,
   ...
 }:
 let
   nix-ai-tools = inputs.nix-ai-tools.packages.${system};
+
+  # TEMPORARY: drop once nixos-26.05 backports unstable's fix
+  # (https://github.com/NixOS/nixpkgs/issues/584492). VS Code 1.122+ ships rg as
+  # @vscode/ripgrep-universal/bin/<system>/rg, and 26.05's package still replaces
+  # the old @vscode/ripgrep/bin/rg, so 1.144.0 fails in postPatch. Once the
+  # package uses the new path this replacement matches nothing.
+  vscode =
+    if lib.versionAtLeast pkgs.vscode.version "1.122.0" then
+      pkgs.vscode.overrideAttrs (old: {
+        postPatch =
+          builtins.replaceStrings
+            [ "@vscode/ripgrep/bin/rg" ]
+            [ "@vscode/ripgrep-universal/bin/linux-x64/rg" ]
+            old.postPatch;
+      })
+    else
+      pkgs.vscode;
 in
 {
 
