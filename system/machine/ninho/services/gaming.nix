@@ -194,6 +194,10 @@ in
   # STEAM CONFIGURATION
   # ==========================================================================
 
+  # Force CEF (Steam's UI renderer) onto the native X11 backbuffer so NvFBC
+  # can capture Big Picture Mode instead of getting a black screen.
+  environment.sessionVariables.STEAM_ENABLE_NATIVE_BACKBUFFER = "1";
+
   # Enable Steam with optimizations for game streaming
   programs.steam = {
     enable = true;
