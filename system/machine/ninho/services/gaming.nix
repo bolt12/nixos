@@ -325,17 +325,9 @@ in
   # ==========================================================================
   # INPUT DEVICES (uinput for virtual controllers/keyboard/mouse)
   # ==========================================================================
-  # Load uinput kernel module and set permissions
-  boot.kernelModules = [ "uinput" ];
+  hardware.uinput.enable = true;
 
-  # Create udev rules for input devices and NVIDIA capabilities
   services.udev.extraRules = ''
-    # Allow input group access to /dev/uinput for virtual devices
-    KERNEL=="uinput", SUBSYSTEM=="misc", MODE="0660", GROUP="input", OPTIONS+="static_node=uinput"
-
-    # Allow video group access to NVIDIA capability devices (required for NVENC/NVDEC).
-    # Sunshine runs as bolt, who is in the video group, so 0660+video suffices
-    # (the previous 0666 granted world read/write).
     SUBSYSTEM=="nvidia-caps", MODE="0660", GROUP="video"
   '';
 
@@ -346,6 +338,7 @@ in
 
   users.users.bolt.extraGroups = [
     "input"
+    "uinput"
     "render"
   ];
   users.users.pollard.extraGroups = [
