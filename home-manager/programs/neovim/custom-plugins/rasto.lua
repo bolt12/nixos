@@ -193,6 +193,10 @@ local function start(out)
   local ok, job = pcall(vim.fn.jobstart, args, {
     term = true,
     cwd = out.root,
+    -- Claude Code's fullscreen renderer (tui = "fullscreen") draws on the
+    -- alternate screen and takes the mouse, so the terminal buffer keeps no
+    -- scrollback. The inline one leaves a plain buffer to scroll and search.
+    env = { CLAUDE_CODE_DISABLE_ALTERNATE_SCREEN = "1" },
     on_exit = function(_, code)
       vim.schedule(function()
         finish(code)
@@ -208,6 +212,7 @@ local function start(out)
   active = vim.tbl_extend("force", active, { term = term, path = out.path, name = out.name, before = before, from = from })
   pcall(vim.api.nvim_buf_set_name, term, "rasto://" .. out.name)
   vim.wo.winbar = " rasto · " .. out.name .. " · the note is read-only until you quit olaude (/exit); then the diff opens"
+    .. " · scroll: mouse wheel or Ctrl-\\ Ctrl-n, type again: i"
   vim.cmd("startinsert")
 end
 
