@@ -61,6 +61,9 @@ let
         export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
         export ANTHROPIC_DEFAULT_OPUS_MODEL="${model}"
         export ANTHROPIC_DEFAULT_SONNET_MODEL="${model}"
+        # Unset, the fable alias (a subagent's `model: fable`) resolves to Fable 5.2,
+        # which the endpoint doesn't serve.
+        export ANTHROPIC_DEFAULT_FABLE_MODEL="${model}"
         export ANTHROPIC_DEFAULT_HAIKU_MODEL="${haikuExpr}"
         # Force the main model with --model (highest precedence). The DEFAULT_*
         # env vars only rebind the opus/sonnet/haiku aliases, so a full model ID
