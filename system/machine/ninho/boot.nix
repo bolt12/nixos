@@ -73,6 +73,12 @@
       # uncapped ARC starves the local models: llama.cpp's mmap'd Flash-Next experts thrashed
       # from disk and Strata sized its RAM budget to 11 GiB instead of 43.
       options zfs zfs_arc_max=17179869184
+
+      # Wi-Fi country. Without one, cfg80211 applies the world domain (00), which
+      # disables 6 GHz, and the Steam Frame's wireless adapter needs 6 GHz to reach
+      # the headset: Valve's frame-dongle-troubleshoot.sh treats a domain without a
+      # 6 GHz band as fatal.
+      options cfg80211 ieee80211_regdom=PT
     '';
 
     # ZFS configuration
