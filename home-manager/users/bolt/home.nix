@@ -21,6 +21,8 @@ let
   #  - disallowedTools: tools the endpoint cannot serve, removed from the session
   #  - mcpServers:   MCP servers added to the session (Claude Code's `mcpServers`
   #                  schema); their tools are allowed without a permission check
+  #  - contextTokens: the model's real context window. Claude Code doesn't know
+  #                  these model IDs, so without it it assumes 200K and compacts there.
   mkClaudeWrapper =
     {
       name,
@@ -29,6 +31,7 @@ let
       haikuEnvVar ? null,
       disallowedTools ? [ ],
       mcpServers ? { },
+      contextTokens ? null,
     }:
     let
       haikuExpr = if haikuEnvVar == null then haikuModel else "\${${haikuEnvVar}:-${haikuModel}}";
@@ -65,6 +68,9 @@ let
         # which the endpoint doesn't serve.
         export ANTHROPIC_DEFAULT_FABLE_MODEL="${model}"
         export ANTHROPIC_DEFAULT_HAIKU_MODEL="${haikuExpr}"
+        ${lib.optionalString (contextTokens != null) ''
+          export CLAUDE_CODE_MAX_CONTEXT_TOKENS=${toString contextTokens}
+        ''}
         # Force the main model with --model (highest precedence). The DEFAULT_*
         # env vars only rebind the opus/sonnet/haiku aliases, so a full model ID
         # persisted via `/model` (e.g. claude-fable-5[1m]) would otherwise win and
@@ -96,12 +102,15 @@ let
     env.SEARXNG_URL = searxngUrl;
   };
 
+  # The n_ctx -fit gives the 27B with Frigate and Sunshine stopped (its /props on
+  # ninho). With another GPU tenant holding VRAM, -fit loads a shorter context.
   olaude-qwen3-8-27B = mkClaudeWrapper {
     name = "olaude-qwen3-8-27B";
     model = "qwen3.8-27B-full";
     haikuEnvVar = "OLAUDE_HAIKU";
     disallowedTools = localDisallowedTools;
     mcpServers = localMcpServers;
+    contextTokens = 262144;
   };
   # The 27B with its vision projector loaded, for sessions that read images.
   # Its own llama-swap entry, so the plain wrapper keeps the longer context.
@@ -118,6 +127,7 @@ let
     haikuEnvVar = "OLAUDE_HAIKU";
     disallowedTools = localDisallowedTools;
     mcpServers = localMcpServers;
+    contextTokens = 262144; # Strata's --max-context (services/llama-cpp.nix)
   };
 
   # Pi coding agent wrapper for Ninho local models
