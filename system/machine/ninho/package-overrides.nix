@@ -18,11 +18,10 @@ in
   nixpkgs.overlays = [
     (final: prev: {
       # llama-cpp-cuda - CUDA build for Blackwell (sm_120), pinned to a llama.cpp release.
-      # b11890: FFN gate/up matmuls and GLU fused in MMQ (#29948), chunked CUDA
-      # graphs (#30804), faster low-bit MMVQ (#30517), grouped-experts top-k
-      # fusion (#29181), Qwen3.8 Flash Next MTP takes image embeddings (#30397).
-      # llama-server's default port moved to 9931 (#30159); every entry in
-      # llama-cpp/models.nix passes --port, so nothing here depends on it.
+      # b11960 (v0.8.0): MoE SLRU expert cache (#30637), DeepSeek V4.1 Flash
+      # (#31086), LFM3 family (#31252), /v1/realtime endpoint (#31269), Qwen3
+      # bidirectional attention + dense_2 (#30607), DFlash2 probabilistic drafts
+      # (#30663), GGML v0.28.0.
       llama-cpp-cuda =
         (unstable.llama-cpp.override {
           cudaSupport = true;
@@ -33,13 +32,13 @@ in
         }).overrideAttrs
           (
             finalAttrs: oldAttrs: {
-              version = "11890";
+              version = "11960";
 
               src = pkgs.fetchFromGitHub {
                 owner = "ggml-org";
                 repo = "llama.cpp";
-                rev = "a074215352c382e66a108597bcf7f4f31e00d111";
-                hash = "sha256-ysVn16q9PMOfHKQLtnp+QfErvIDMl4NADdzxKn/OiWs=";
+                rev = "8642541b255bfb5dc39cd351a178be09013a55d6";
+                hash = "sha256-QSN6nHQX5VpLAKL+I2zELmXpur77e6JGGD3va88sbAE=";
                 leaveDotGit = true;
                 postFetch = ''
                   git -C "$out" rev-parse --short HEAD > $out/COMMIT
