@@ -147,7 +147,7 @@ let
               | jq -r ".data[] | select(.id == \"$MODEL\") | .context_length // 0" || echo 0)
             prompt_bytes=$(wc -c < "$prompt_file")
             est_tokens=$(( prompt_bytes * 10 / 26 ))
-            max_tokens=1500
+            max_tokens=4096
             if [ "$n_ctx" -gt 0 ] && [ "$est_tokens" -gt $(( n_ctx - max_tokens )) ]; then
               response="Morning brief: skipped, model context is ''${n_ctx} tokens but prompt needs ~''${est_tokens}. Likely a game is holding VRAM."
             else
