@@ -82,6 +82,49 @@ in
             state = "{% set outdoor = state_attr('weather.forecast_home', 'temperature') | float(15) %}{% if outdoor > 25 %}cool{% else %}heat{% endif %}";
             icon = "mdi:thermostat-auto";
           }
+          # Placeholder ratedKw (zones.nix); replace once you read the unit labels.
+          {
+            name = "AC Estimated Energy Today";
+            unique_id = "ac_estimated_energy_today";
+            state = ''
+              {% set total = ${
+                builtins.concatStringsSep " + " (
+                  map (z: "(states('sensor.ac_${z.slug}_runtime_today') | float(0)) * ${toString z.ratedKw}") zones
+                )
+              } %}
+              {{ total | round(2) }}
+            '';
+            unit_of_measurement = "kWh";
+            device_class = "energy";
+            state_class = "total_increasing";
+            icon = "mdi:lightning-bolt";
+          }
+          {
+            name = "AC Estimated Cost Today";
+            unique_id = "ac_estimated_cost_today";
+            state = ''
+              {% set price = 0.16 %}
+              {% set kwh = states('sensor.ac_estimated_energy_today') | float(0) %}
+              {{ (kwh * price) | round(2) }}
+            '';
+            unit_of_measurement = "EUR";
+            icon = "mdi:currency-eur";
+          }
+          {
+            name = "AC Estimated Cost Billing Cycle";
+            unique_id = "ac_estimated_cost_billing";
+            state = ''
+              {% set price = 0.16 %}
+              {% set total = ${
+                builtins.concatStringsSep " + " (
+                  map (z: "(states('sensor.ac_${z.slug}_runtime_billing') | float(0)) * ${toString z.ratedKw}") zones
+                )
+              } %}
+              {{ (total * price) | round(2) }}
+            '';
+            unit_of_measurement = "EUR";
+            icon = "mdi:currency-eur";
+          }
         ]
         ++ (map mkZoneTarget zones);
       }

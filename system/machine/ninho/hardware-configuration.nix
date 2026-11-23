@@ -52,6 +52,21 @@
     fsType = "zfs";
   };
 
+  fileSystems."/storage/torrents" = {
+    device = "storage/torrents";
+    fsType = "zfs";
+  };
+
+  fileSystems."/storage/media" = {
+    device = "storage/media";
+    fsType = "zfs";
+  };
+
+  fileSystems."/var/lib/llama-cpp" = {
+    device = "rpool/llama";
+    fsType = "zfs";
+  };
+
   fileSystems."/boot" = {
     device = "/dev/disk/by-uuid/BDAB-258A";
     fsType = "vfat";

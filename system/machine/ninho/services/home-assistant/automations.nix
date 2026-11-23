@@ -618,6 +618,29 @@ in
             }
           ];
         }
+        # ─────────────────────────────────────────────────────────────
+        # Frontend
+        # ─────────────────────────────────────────────────────────────
+
+        {
+          id = "set_default_theme";
+          alias = "Set Default Theme on Start";
+          trigger = [
+            {
+              platform = "homeassistant";
+              event = "start";
+            }
+          ];
+          action = [
+            {
+              action = "frontend.set_theme";
+              data = {
+                name = "ninho-dark";
+                mode = "dark";
+              };
+            }
+          ];
+        }
       ];
   };
 }

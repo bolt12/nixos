@@ -330,6 +330,57 @@ in
                 }
               ];
             }
+            # ── Cameras ──
+            {
+              type = "grid";
+              title = "Cameras";
+              cards = [
+                {
+                  type = "picture-glance";
+                  title = "Office";
+                  camera_image = "camera.office_camera";
+                  camera_view = "live";
+                  entities = [ ];
+                  layout_options = {
+                    grid_columns = 2;
+                    grid_rows = 2;
+                  };
+                }
+                {
+                  type = "picture-glance";
+                  title = "Family Room";
+                  camera_image = "camera.family_room_camera";
+                  camera_view = "live";
+                  entities = [ ];
+                  layout_options = {
+                    grid_columns = 2;
+                    grid_rows = 2;
+                  };
+                }
+                {
+                  type = "picture-glance";
+                  title = "Living Room";
+                  camera_image = "camera.living_room_camera";
+                  camera_view = "live";
+                  entities = [ ];
+                  layout_options = {
+                    grid_columns = 2;
+                    grid_rows = 2;
+                  };
+                }
+                {
+                  type = "picture-glance";
+                  title = "Bedroom";
+                  camera_image = "camera.bedroom_camera";
+                  camera_view = "live";
+                  entities = [ ];
+                  layout_options = {
+                    grid_columns = 2;
+                    grid_rows = 2;
+                  };
+                }
+              ];
+            }
             # ── Schedule ──
             {
               type = "grid";
@@ -524,42 +575,22 @@ in
                     }
                     {
                       type = "template";
-                      icon = "mdi:snowflake";
-                      content = "Cool All 22°C";
-                      icon_color = "blue";
+                      icon = "mdi:home-thermometer";
+                      content = "All Comfort";
+                      icon_color = "green";
                       tap_action = {
                         action = "call-service";
-                        service = "climate.set_temperature";
-                        service_data = {
-                          entity_id = [
-                            "climate.ac_sala"
-                            "climate.ac_escritorio"
-                            "climate.ac_quarto"
-                            "climate.ac_quarto_hospedes"
-                          ];
-                          temperature = 22;
-                          hvac_mode = "cool";
-                        };
+                        service = "script.all_comfort";
                       };
                     }
                     {
                       type = "template";
                       icon = "mdi:fire";
-                      content = "Heat All 24°C";
+                      content = "All Boost";
                       icon_color = "orange";
                       tap_action = {
                         action = "call-service";
-                        service = "climate.set_temperature";
-                        service_data = {
-                          entity_id = [
-                            "climate.ac_sala"
-                            "climate.ac_escritorio"
-                            "climate.ac_quarto"
-                            "climate.ac_quarto_hospedes"
-                          ];
-                          temperature = 24;
-                          hvac_mode = "heat";
-                        };
+                        service = "script.all_boost";
                       };
                     }
                   ];
@@ -572,72 +603,61 @@ in
               title = "Thermostats";
               cards = [
                 {
-                  type = "thermostat";
+                  type = "custom:mushroom-climate-card";
                   entity = "climate.ac_sala";
                   name = "Sala (Living Room)";
+                  icon = "mdi:sofa";
+                  hvac_modes = [
+                    "off"
+                    "cool"
+                    "heat"
+                    "fan_only"
+                    "auto"
+                  ];
+                  show_temperature_control = true;
                   layout_options = {
                     grid_columns = 2;
-                    grid_rows = 3;
+                    grid_rows = 2;
                   };
-                  features = [
-                    {
-                      type = "climate-hvac-modes";
-                      hvac_modes = [
-                        "off"
-                        "cool"
-                        "heat"
-                        "fan_only"
-                        "auto"
-                      ];
-                    }
-                    { type = "climate-fan-modes"; }
-                  ];
                 }
                 {
-                  type = "thermostat";
+                  type = "custom:mushroom-climate-card";
                   entity = "climate.ac_escritorio";
                   name = "Escritório (Office)";
+                  icon = "mdi:desk";
+                  hvac_modes = [
+                    "off"
+                    "cool"
+                    "heat"
+                    "fan_only"
+                    "auto"
+                  ];
+                  show_temperature_control = true;
                   layout_options = {
                     grid_columns = 2;
-                    grid_rows = 3;
+                    grid_rows = 2;
                   };
-                  features = [
-                    {
-                      type = "climate-hvac-modes";
-                      hvac_modes = [
-                        "off"
-                        "cool"
-                        "heat"
-                        "fan_only"
-                        "auto"
-                      ];
-                    }
-                    { type = "climate-fan-modes"; }
-                  ];
                 }
                 {
                   type = "vertical-stack";
                   layout_options = {
                     grid_columns = 2;
-                    grid_rows = 3;
+                    grid_rows = 2;
                   };
                   cards = [
                     {
-                      type = "thermostat";
+                      type = "custom:mushroom-climate-card";
                       entity = "climate.ac_quarto";
                       name = "Quarto (Bedroom)";
-                      features = [
-                        {
-                          type = "climate-hvac-modes";
-                          hvac_modes = [
-                            "off"
-                            "cool"
-                            "heat"
-                            "fan_only"
-                            "auto"
-                          ];
-                        }
+                      icon = "mdi:bed";
+                      hvac_modes = [
+                        "off"
+                        "cool"
+                        "heat"
+                        "fan_only"
+                        "auto"
                       ];
+                      show_temperature_control = true;
                     }
                     {
                       type = "custom:mushroom-entity-card";
@@ -655,25 +675,22 @@ in
                   type = "vertical-stack";
                   layout_options = {
                     grid_columns = 2;
-                    grid_rows = 3;
+                    grid_rows = 2;
                   };
                   cards = [
                     {
-                      type = "thermostat";
+                      type = "custom:mushroom-climate-card";
                       entity = "climate.ac_quarto_hospedes";
                       name = "Quarto de Hóspedes (Guest)";
-                      features = [
-                        {
-                          type = "climate-hvac-modes";
-                          hvac_modes = [
-                            "off"
-                            "cool"
-                            "heat"
-                            "fan_only"
-                            "auto"
-                          ];
-                        }
+                      icon = "mdi:bed-outline";
+                      hvac_modes = [
+                        "off"
+                        "cool"
+                        "heat"
+                        "fan_only"
+                        "auto"
                       ];
+                      show_temperature_control = true;
                     }
                     {
                       type = "custom:mushroom-entity-card";
@@ -824,6 +841,53 @@ in
                 }
               ];
             }
+            # ── Energy Estimates ──
+            {
+              type = "grid";
+              title = "Energy Estimates";
+              cards = [
+                {
+                  type = "custom:mushroom-entity-card";
+                  entity = "sensor.ac_estimated_energy_today";
+                  name = "Est. Energy Today";
+                  icon = "mdi:lightning-bolt";
+                  layout_options = {
+                    grid_columns = 2;
+                    grid_rows = 1;
+                  };
+                }
+                {
+                  type = "custom:mushroom-entity-card";
+                  entity = "sensor.ac_estimated_cost_today";
+                  name = "Est. Cost Today";
+                  icon = "mdi:currency-eur";
+                  layout_options = {
+                    grid_columns = 2;
+                    grid_rows = 1;
+                  };
+                }
+                {
+                  type = "custom:mushroom-entity-card";
+                  entity = "sensor.ac_estimated_cost_billing_cycle";
+                  name = "Est. Cost (Billing Cycle)";
+                  icon = "mdi:receipt-text";
+                  layout_options = {
+                    grid_columns = 2;
+                    grid_rows = 1;
+                  };
+                }
+                {
+                  type = "custom:mushroom-entity-card";
+                  entity = "sensor.ac_total_runtime_billing";
+                  name = "Total Runtime (Billing)";
+                  icon = "mdi:timer-outline";
+                  layout_options = {
+                    grid_columns = 2;
+                    grid_rows = 1;
+                  };
+                }
+              ];
+            }
             # ── Automations ──
             {
               type = "grid";
@@ -944,88 +1008,138 @@ in
             {
               type = "grid";
               title = "Today's Metrics";
-              cards = [
-                {
-                  type = "custom:mushroom-entity-card";
-                  entity = "sensor.garmin_connect_body_battery_most_recent";
-                  name = "Body Battery";
-                  icon = "mdi:battery-heart-variant";
-                  layout_options = {
-                    grid_columns = 2;
-                    grid_rows = 1;
-                  };
-                }
-                {
-                  type = "custom:mushroom-entity-card";
-                  entity = "sensor.garmin_connect_resting_heart_rate";
-                  name = "Resting HR";
-                  icon = "mdi:heart-pulse";
-                  layout_options = {
-                    grid_columns = 2;
-                    grid_rows = 1;
-                  };
-                }
-                {
-                  type = "custom:mushroom-entity-card";
-                  entity = "sensor.garmin_connect_sleep_score";
-                  name = "Sleep Score";
-                  icon = "mdi:sleep";
-                  layout_options = {
-                    grid_columns = 2;
-                    grid_rows = 1;
-                  };
-                }
-                {
-                  type = "custom:mushroom-entity-card";
-                  entity = "sensor.garmin_connect_avg_stress_level";
-                  name = "Avg Stress";
-                  icon = "mdi:head-snowflake";
-                  layout_options = {
-                    grid_columns = 2;
-                    grid_rows = 1;
-                  };
-                }
-                {
-                  type = "custom:mushroom-entity-card";
-                  entity = "sensor.garmin_connect_total_steps";
-                  name = "Steps";
-                  icon = "mdi:shoe-print";
-                  layout_options = {
-                    grid_columns = 2;
-                    grid_rows = 1;
-                  };
-                }
-                {
-                  type = "custom:mushroom-entity-card";
-                  entity = "sensor.garmin_connect_active_kilocalories";
-                  name = "Active Cal";
-                  icon = "mdi:fire";
-                  layout_options = {
-                    grid_columns = 2;
-                    grid_rows = 1;
-                  };
-                }
-                {
-                  type = "custom:mushroom-entity-card";
-                  entity = "sensor.garmin_connect_total_distance_mtr";
-                  name = "Distance";
-                  icon = "mdi:map-marker-distance";
-                  layout_options = {
-                    grid_columns = 2;
-                    grid_rows = 1;
-                  };
-                }
-                {
-                  type = "custom:mushroom-entity-card";
-                  entity = "sensor.garmin_connect_floors_ascended";
-                  name = "Floors";
-                  icon = "mdi:stairs-up";
-                  layout_options = {
-                    grid_columns = 2;
-                    grid_rows = 1;
-                  };
-                }
-              ];
+              cards =
+                let
+                  mkSparkline =
+                    {
+                      entity,
+                      name,
+                      color ? null,
+                      color_thresholds ? null,
+                    }:
+                    {
+                      type = "custom:mini-graph-card";
+                      entities = [
+                        {
+                          inherit entity name;
+                        }
+                      ];
+                      hours_to_show = 24;
+                      height = 50;
+                      line_width = 2;
+                      font_size = 75;
+                      show = {
+                        name = true;
+                        icon = true;
+                        state = true;
+                        graph = "line";
+                        labels = false;
+                        points = false;
+                        legend = false;
+                        fill = true;
+                      };
+                      layout_options = {
+                        grid_columns = 2;
+                        grid_rows = 1;
+                      };
+                    }
+                    // (if color != null then { inherit color; } else { })
+                    // (if color_thresholds != null then { inherit color_thresholds; } else { });
+                in
+                [
+                  (mkSparkline {
+                    entity = "sensor.garmin_connect_body_battery_most_recent";
+                    name = "Body Battery";
+                    color_thresholds = [
+                      {
+                        value = 0;
+                        color = "#F44336";
+                      }
+                      {
+                        value = 40;
+                        color = "#FF9800";
+                      }
+                      {
+                        value = 70;
+                        color = "#4CAF50";
+                      }
+                    ];
+                  })
+                  (mkSparkline {
+                    entity = "sensor.garmin_connect_resting_heart_rate";
+                    name = "Resting HR";
+                    color_thresholds = [
+                      {
+                        value = 40;
+                        color = "#4CAF50";
+                      }
+                      {
+                        value = 60;
+                        color = "#FF9800";
+                      }
+                      {
+                        value = 80;
+                        color = "#F44336";
+                      }
+                    ];
+                  })
+                  (mkSparkline {
+                    entity = "sensor.garmin_connect_sleep_score";
+                    name = "Sleep Score";
+                    color_thresholds = [
+                      {
+                        value = 0;
+                        color = "#F44336";
+                      }
+                      {
+                        value = 50;
+                        color = "#FF9800";
+                      }
+                      {
+                        value = 70;
+                        color = "#7E57C2";
+                      }
+                    ];
+                  })
+                  (mkSparkline {
+                    entity = "sensor.garmin_connect_avg_stress_level";
+                    name = "Avg Stress";
+                    color_thresholds = [
+                      {
+                        value = 0;
+                        color = "#4CAF50";
+                      }
+                      {
+                        value = 40;
+                        color = "#FF9800";
+                      }
+                      {
+                        value = 60;
+                        color = "#F44336";
+                      }
+                    ];
+                  })
+                  (mkSparkline {
+                    entity = "sensor.garmin_connect_total_steps";
+                    name = "Steps";
+                    color = "#2196F3";
+                  })
+                  (mkSparkline {
+                    entity = "sensor.garmin_connect_active_kilocalories";
+                    name = "Active Cal";
+                    color = "#FF5722";
+                  })
+                  (mkSparkline {
+                    entity = "sensor.garmin_connect_total_distance_mtr";
+                    name = "Distance";
+                    color = "#009688";
+                  })
+                  (mkSparkline {
+                    entity = "sensor.garmin_connect_floors_ascended";
+                    name = "Floors";
+                    color = "#795548";
+                  })
+                ];
             }
             # ── Trends ──
             {

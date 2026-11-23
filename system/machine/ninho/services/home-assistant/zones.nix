@@ -7,6 +7,7 @@
     eco = 19;
     comfort = 21;
     boost = 22;
+    ratedKw = 1.0;
   }
   {
     slug = "escritorio";
@@ -14,6 +15,7 @@
     eco = 19;
     comfort = 21;
     boost = 22;
+    ratedKw = 1.0;
   }
   {
     slug = "quarto";
@@ -21,6 +23,7 @@
     eco = 17;
     comfort = 19;
     boost = 20;
+    ratedKw = 1.0;
   }
   {
     slug = "quarto_hospedes";
@@ -32,5 +35,6 @@
     eco = 17;
     comfort = 20;
     boost = 21;
+    ratedKw = 1.0;
   }
 ]

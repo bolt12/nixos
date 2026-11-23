@@ -15,6 +15,7 @@
     ./rest-commands.nix
     ./automations.nix
     ./scripts.nix
+    ./cameras.nix
     ./lovelace.nix
   ];
 }

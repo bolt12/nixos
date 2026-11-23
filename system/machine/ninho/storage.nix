@@ -44,10 +44,30 @@
         recursive = true;
       };
 
-      # Storage data - daily snapshots with long retention
+      # Storage data - daily snapshots with long retention.
+      # This is the only copy of service state history (Nextcloud, Immich,
+      # postgres dumps, etc.), so retention is generous.
       "storage/data" = {
         useTemplate = [ "storage" ];
         recursive = true;
+      };
+
+      # Torrents and media are expendable (re-downloadable) and churn
+      # heavily, so snapshotting them wastes space for no benefit.
+      "storage/torrents" = {
+        autosnap = false;
+        autoprune = false;
+      };
+
+      "storage/media" = {
+        autosnap = false;
+        autoprune = false;
+      };
+
+      # LLM model cache: freely re-downloadable from Hugging Face.
+      "rpool/llama" = {
+        autosnap = false;
+        autoprune = false;
       };
 
       # Replicated rpool/{home,root} snapshots from syncoid live here.
@@ -61,13 +81,12 @@
     };
 
     templates = {
-      # System datasets (root) - Reduced retention to prevent disk space issues
       system = {
         frequently = 0;
-        hourly = 6; # 6 hours (reduced from 24)
-        daily = 3; # 3 days (reduced from 7)
-        weekly = 2; # 2 weeks (reduced from 4)
-        monthly = 2; # 2 months (reduced from 3)
+        hourly = 6;
+        daily = 3;
+        weekly = 2;
+        monthly = 2;
         yearly = 0;
         autosnap = true;
         autoprune = true;
@@ -85,14 +104,13 @@
         autoprune = true;
       };
 
-      # Bulk storage - Reduced retention to prevent disk space issues
       storage = {
         frequently = 0;
         hourly = 0;
-        daily = 14; # 2 weeks (reduced from 30)
-        weekly = 4; # 1 month (reduced from 8)
-        monthly = 6; # 6 months (reduced from 24)
-        yearly = 1; # 1 year (reduced from 5)
+        daily = 30;
+        weekly = 8;
+        monthly = 12;
+        yearly = 2;
         autosnap = true;
         autoprune = true;
       };

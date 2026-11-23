@@ -413,10 +413,12 @@ in
       DynamicUser = lib.mkForce false;
       # Tailcat's netmon needs PrivateUsers off (interface visibility) and
       # AF_NETLINK (routing table reads for DERP region selection).
+      # AF_INET6 is dropped: llama.cpp's -hf uses libcurl which tries IPv6
+      # first with no Happy Eyeballs fallback, and IPv6 egress to HuggingFace
+      # is blackholed on this network, hanging every model resolution.
       PrivateUsers = lib.mkForce false;
       RestrictAddressFamilies = lib.mkForce [
         "AF_INET"
-        "AF_INET6"
         "AF_UNIX"
         "AF_NETLINK"
       ];

@@ -54,7 +54,48 @@ in
       homekit = { };
 
       # Enable the Home Assistant frontend
-      frontend = { };
+      frontend = {
+        themes = {
+          ninho-dark = {
+            primary-color = "#7B8CDE";
+            accent-color = "#7B8CDE";
+            lovelace-background = "#0D1117";
+            primary-background-color = "#0D1117";
+            secondary-background-color = "#161B22";
+            card-background-color = "#161B22";
+            primary-text-color = "#C9D1D9";
+            secondary-text-color = "#8B949E";
+            text-primary-color = "#C9D1D9";
+            disabled-text-color = "#484F58";
+            app-header-background-color = "#161B22";
+            app-header-text-color = "#C9D1D9";
+            sidebar-background-color = "#0D1117";
+            sidebar-text-color = "#C9D1D9";
+            sidebar-selected-background-color = "rgba(123, 140, 222, 0.15)";
+            sidebar-selected-icon-color = "#7B8CDE";
+            ha-card-background = "#161B22";
+            ha-card-border-color = "#21262D";
+            ha-card-border-radius = "12px";
+            ha-card-box-shadow = "none";
+            ha-card-header-color = "#C9D1D9";
+            divider-color = "#21262D";
+            state-icon-active-color = "#7B8CDE";
+            state-icon-color = "#8B949E";
+            switch-checked-color = "#7B8CDE";
+            switch-unchecked-button-color = "#484F58";
+            switch-unchecked-track-color = "#21262D";
+            ha-chip-background = "#21262D";
+            label-badge-background-color = "#161B22";
+            label-badge-text-color = "#C9D1D9";
+            input-fill-color = "#21262D";
+            input-ink-color = "#C9D1D9";
+            input-label-ink-color = "#8B949E";
+            modes.dark = {
+              primary-color = "#7B8CDE";
+            };
+          };
+        };
+      };
 
       # Enable configuration UI
       config = { };
@@ -133,6 +174,12 @@ in
       "thread" # Thread network
       "zha" # Zigbee Home Automation
       "zwave_js" # Z-Wave JS
+
+      # ─────────────────────────────────────────────────────────────
+      # Cameras
+      # ─────────────────────────────────────────────────────────────
+      "generic" # Generic camera platform (MJPEG/RTSP/still)
+      "stream" # Stream component for camera live view
 
       # ─────────────────────────────────────────────────────────────
       # Climate & Appliances

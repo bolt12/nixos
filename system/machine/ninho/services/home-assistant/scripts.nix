@@ -1,24 +1,49 @@
 # Home Assistant, reusable script definitions invoked by automations and the UI.
 # Scripts go through input_select.zone_*_mode so the applier remains the sole
 # writer to climate.* entities.
-_: {
+_:
+let
+  zones = import ./zones.nix;
+  allZoneModes = map (z: "input_select.zone_${z.slug}_mode") zones;
+
+  mkAllZonesScript =
+    {
+      alias,
+      description,
+      option,
+    }:
+    {
+      inherit alias description;
+      sequence = [
+        {
+          action = "input_select.select_option";
+          target.entity_id = allZoneModes;
+          data = {
+            inherit option;
+          };
+        }
+      ];
+    };
+in
+{
   services.home-assistant.config = {
     script = {
-      all_ac_off = {
+      all_ac_off = mkAllZonesScript {
         alias = "All AC Off";
         description = "Set every zone to off.";
-        sequence = [
-          {
-            action = "input_select.select_option";
-            target.entity_id = [
-              "input_select.zone_sala_mode"
-              "input_select.zone_escritorio_mode"
-              "input_select.zone_quarto_mode"
-              "input_select.zone_quarto_hospedes_mode"
-            ];
-            data.option = "off";
-          }
-        ];
+        option = "off";
+      };
+
+      all_comfort = mkAllZonesScript {
+        alias = "All Comfort";
+        description = "Set every zone to comfort mode.";
+        option = "comfort";
+      };
+
+      all_boost = mkAllZonesScript {
+        alias = "All Boost";
+        description = "Set every zone to boost mode.";
+        option = "boost";
       };
 
       guest_room_on = {
