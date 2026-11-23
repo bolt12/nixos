@@ -36,8 +36,8 @@
         -fit on \
         --fit-target 2048 \
         --flash-attn on \
-        --cache-type-k q8_0 \
-        --cache-type-v q8_0 \
+        --cache-type-k f8_e4m3 \
+        --cache-type-v f8_e4m3 \
         --cache-ram 32768 \
         --load-mode none \
         --parallel 1 \
@@ -75,8 +75,8 @@
         --fit-target 2048 \
         --image-min-tokens 1024 \
         --flash-attn on \
-        --cache-type-k q8_0 \
-        --cache-type-v q8_0 \
+        --cache-type-k f8_e4m3 \
+        --cache-type-v f8_e4m3 \
         --cache-ram 32768 \
         --load-mode none \
         --parallel 1 \
@@ -113,8 +113,8 @@
         -ngl 99 \
         --image-min-tokens 1024 \
         --flash-attn on \
-        --cache-type-k q8_0 \
-        --cache-type-v q8_0 \
+        --cache-type-k f8_e4m3 \
+        --cache-type-v f8_e4m3 \
         --load-mode none \
         --parallel 1 \
         -t 16 \
@@ -157,8 +157,8 @@
         -fit on \
         --fit-target 2048 \
         --flash-attn on \
-        --cache-type-k q8_0 \
-        --cache-type-v q8_0 \
+        --cache-type-k f8_e4m3 \
+        --cache-type-v f8_e4m3 \
         --n-cpu-moe 36 \
         -b 4096 \
         -ub 4096 \
@@ -212,8 +212,8 @@
         -fit on \
         --fit-target 2048 \
         --flash-attn on \
-        --cache-type-k q8_0 \
-        --cache-type-v q8_0 \
+        --cache-type-k f8_e4m3 \
+        --cache-type-v f8_e4m3 \
         --n-cpu-moe 36 \
         --image-min-tokens 1024 \
         --parallel 1 \
@@ -221,6 +221,33 @@
         --chat-template-file ${qwenChatTemplate} \
         --reasoning-format deepseek \
         --chat-template-kwargs '{"preserve_thinking": true, "reasoning_effort": "low"}' \
+        --jinja
+    '';
+  };
+
+  # Inkling 2 Mini (26.4B total / 3.4B active, looped MoE, 1M native context).
+  # Layers 6-17 run three times per token (inkling2_loop architecture).
+  # No --n-cpu-moe: loop-layer experts on CPU produce garbage (#32755).
+  # No MTP: no draft heads published yet.
+  # The GGUF carries its own Jinja chat template; no external file needed.
+  "inkling-2-mini" = {
+    cmd = ''
+      ${gpu-tenant-wrapper-frigate} ${llama-cpp-cuda}/bin/llama-server \
+        -hf unsloth/Inkling-2-Mini-GGUF:UD-Q4_K_M \
+        --metrics \
+        --host 0.0.0.0 \
+        --port ''${PORT} \
+        -n 32768 \
+        -fit on \
+        --fit-target 2048 \
+        --flash-attn on \
+        --cache-type-k f8_e4m3 \
+        --cache-type-v f8_e4m3 \
+        --load-mode none \
+        --parallel 1 \
+        --no-mmproj \
+        -t 16 \
+        --reasoning-format deepseek \
         --jinja
     '';
   };

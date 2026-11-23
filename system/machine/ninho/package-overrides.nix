@@ -18,12 +18,10 @@ in
   nixpkgs.overlays = [
     (final: prev: {
       # llama-cpp-cuda - CUDA build for Blackwell (sm_120), pinned to a llama.cpp release.
-      # b12110 (v0.9.0): MTP hidden state kept in context checkpoints (#30141),
-      # spec checkpoint restored for drafts longer than n_rs_seq (#31350), CUDA
-      # MoE gate/up + GLU fused in MMQ (#31188), qwen4exp conv-state write without
-      # a copy (#31443), flash_attn_ext_rows for multi-seq unified KV (#29510),
-      # FP8 E4M3 type (#27512), GGML v0.29.0. #31620 makes -hf tags match only at
-      # a name boundary; the UD-Q4_K_M and UD-IQ4_XS tags in models.nix still do.
+      # b12651: Inkling 2 Mini looped-transformer arch (inkling2_loop, #32694),
+      # loop-expert corruption fix (#32807), /v1/audio/speech TTS, FP8 E4M3
+      # KV cache, DNS-rebinding/SSRF hardening, MCP tool cancellation,
+      # Qwen-VL 2x2 spatial merge, --sleep-idle-seconds.
       llama-cpp-cuda =
         (unstable.llama-cpp.override {
           cudaSupport = true;
@@ -34,13 +32,13 @@ in
         }).overrideAttrs
           (
             finalAttrs: oldAttrs: {
-              version = "12110";
+              version = "12651";
 
               src = pkgs.fetchFromGitHub {
                 owner = "ggml-org";
                 repo = "llama.cpp";
-                rev = "cd959bae99ff4bed22bef2604f45241c09bbb8c8";
-                hash = "sha256-2FHjR0XXT+THe/RBXC8CXsWQ0PRa7oDzucYwhSy3/UM=";
+                rev = "f5e6915c28f10330885fcb9243a93ae98d3115ab";
+                hash = "sha256-mLNFjQ+datSeyhDb46Ls/DNp0IyBSp9XhmyfjKvQ2eg=";
                 leaveDotGit = true;
                 postFetch = ''
                   git -C "$out" rev-parse --short HEAD > $out/COMMIT
@@ -63,19 +61,21 @@ in
                 "-DLLAMA_BUILD_COMMIT=${builtins.substring 0 7 finalAttrs.src.rev}"
               ];
 
+              buildInputs = (oldAttrs.buildInputs or [ ]) ++ [
+                unstable.cudaPackages.cuda_nvml_dev
+              ];
+
               preConfigure = ''
                 export NIX_ENFORCE_NO_NATIVE=0
                 ${oldAttrs.preConfigure or ""}
               '';
 
-              postPatch =
-                builtins.replaceStrings
-                  [ "rm tools/server/public/index.html.gz" ]
-                  [ "rm -f tools/server/public/index.html.gz" ]
-                  (oldAttrs.postPatch or "");
+              postPatch = builtins.replaceStrings [ "rm tools/server/public/index.html.gz" ] [ "true" ] (
+                oldAttrs.postPatch or ""
+              );
 
-              npmRoot = "tools/ui";
-              npmDepsHash = "sha256-XLtEZsSFdk+2SyfXzBp8HQ2e27PQPpDCn1YjePU1/9w=";
+              npmRoot = "ui/apps/chat";
+              npmDepsHash = "sha256-3kJJJGgPvtoRozjjvXJ97ljxzt0tshwi88UUd1D3VsI=";
 
               postInstall = oldAttrs.postInstall or "";
             }
