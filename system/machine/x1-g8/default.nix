@@ -138,7 +138,28 @@
       alsa.enable = true;
       alsa.support32Bit = true;
       pulse.enable = true;
-      wireplumber.enable = true;
+      wireplumber = {
+        enable = true;
+        # Drop the HFP LC3-SWB codec (whitelist omits lc3_swb). The X1's Intel
+        # AX201 never completes the transparent SCO link it needs, so with
+        # LC3-SWB headsets (Sony WF-1000XM6) the mic stays silent and the
+        # failed retries make the earbuds drop and reconnect in a loop.
+        # mSBC/CVSD work fine on this adapter.
+        extraConfig."51-bluez-no-lc3swb" = {
+          "monitor.bluez.properties" = {
+            "bluez5.codecs" = [
+              "sbc"
+              "sbc_xq"
+              "aac"
+              "ldac"
+              "aptx"
+              "aptx_hd"
+              "cvsd"
+              "msbc"
+            ];
+          };
+        };
+      };
     };
 
     # USB Automounting

@@ -44,6 +44,19 @@ in
     # via programs.dank-material-shell.plugins.<id>.enable below.
     inputs.dms-plugin-registry.homeModules.default
 
+    # Stylix mkTarget stubs: these targets set options wrapped in mkIf false
+    # (because autoEnable = false) but the module system still validates that
+    # the option path exists. Declare freeform sinks for options that our
+    # nixpkgs pin doesn't provide. Remove when Stylix adds option-existence
+    # guards or when nixpkgs ships the missing options.
+    {
+      options.programs = {
+        noctalia = lib.mkOption { type = lib.types.anything; default = { }; internal = true; };
+        prismlauncher.themes = lib.mkOption { type = lib.types.anything; default = { }; internal = true; };
+        rofi.settings = lib.mkOption { type = lib.types.anything; default = { }; internal = true; };
+      };
+    }
+
     # Add desktop-specific profiles
     ../../profiles/desktop.nix
     ../../profiles/fonts.nix
@@ -121,7 +134,6 @@ in
     dank-material-shell = {
       enable = true;
       systemd.enable = true;
-      quickshell.package = pkgs.quickshell;
       niri = {
         enableKeybinds = false;
         enableSpawn = false;
@@ -163,6 +175,10 @@ in
   # Desktop-specific services
   services = {
     lorri.enable = true;
+    # DMS claims org.freedesktop.Notifications (BusName=), so swaync's
+    # auto-started service conflicts. Disable it here; Sway's own config
+    # can launch swaync manually when DMS isn't running.
+    swaync.enable = lib.mkForce false;
     # No blueman-applet here: DankMaterialShell (the bar on niri) ships its own
     # Bluetooth widget, so the GTK tray applet would be a duplicate icon. The
     # Sway fallback spawns blueman-applet itself, and blueman-manager stays

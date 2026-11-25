@@ -63,7 +63,6 @@ in
 
     # Build and packaging tools
     cachix # Nix binary cache
-    home-manager # User environment management
 
     # Container and virtualization
     # Note: Docker is enabled at system level
